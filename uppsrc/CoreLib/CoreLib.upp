@@ -1,0 +1,14 @@
+description "\377B128,71,0";
+
+uses
+	Core;
+
+uses(LIGHTCORE) LightCore;
+
+file
+	CoreLib.h,
+	Util.h,
+	Util.cpp,
+	UppManagement.h,
+	UppManagement.cpp;
+

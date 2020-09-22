@@ -1,0 +1,30 @@
+
+template <class Whole, class Part>
+auto class WholePart {
+
+	auto declaration install() {
+		
+		class $Whole {
+			friend $Dynamic;
+			private list<$Part> parts;
+			// optional construction, delegations and destruction
+		};
+		class $Part {
+			friend $Dynamic;
+			private $Whole *whole;
+			// optional construction, delegations and destruction
+		};
+	}
+};
+
+struct State {
+
+};
+
+struct Town {
+
+};
+
+$WholePart::install<State,Town>();
+
+
