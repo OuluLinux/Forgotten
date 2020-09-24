@@ -1,0 +1,439 @@
+/*
+	TODO:
+		- meta string arrays
+			- also for definitions
+*/
+
+/*
+
+	Template specialization
+
+*/
+template<class T> void swap(T& x, T& y) {
+	T t = x;
+	x = y;
+	y = t;
+}
+
+//template<class T> void swap(Vector<T>& x, Vector<T>& y)
+template<class T> void swap< Vector<T> >(Vector<T>& x, Vector<T>& y) {
+	x.swap(y);
+}
+
+
+template <class T> struct Burg {
+	static void (*_functions)(const int&);
+	static void dummy(const int&);
+	void adopt(const T& anElem) { primary_code(); }
+};
+
+class BurgInstance;
+
+using template <> class Burg<BurgInstance> {
+	export / implementation "BurgInstance.C";
+};
+
+template <> void (*Burg< BurgInstance >::_functions)(const int&) = {
+	(void (*)(const int&))&Burg< BurgInstance >::dummy
+};
+
+template <> void Burg< BurgInstance >::adopt(const BurgInstance& anElem) {/* do something */}
+
+
+
+/*
+
+	Function array
+
+*/
+class Ambig {
+public:
+	void annul(const Ambig& anElement);
+};
+
+private static void (*Ambig1::_functions[])(const int&) = {
+	(void(*)(const int&))&Ambig::annul
+};
+
+
+
+
+
+
+/*
+
+	Using integer meta variables in code:
+
+	Note: requires "-global SomeGlobalFile" for globals to be extracted
+*/
+auto declaration m_init(identifier Class) {
+	namespace ${Class}A {
+		auto number count = 0;
+	};
+	auto number count = 0;
+};
+
+auto declaration m(identifier Class, identifier Name) {
+	namespace ${Class}A {
+		static int ${Name}$count = 3 * $count;
+		count++; // or $count = $count + 1; // or count = count + 1;
+	};
+	static int $ {Name}$count = $count % 3;
+	count = count + 1;
+};
+
+auto identifier cls = "SomeClass";
+$m_init($cls);
+auto for (int i = 0; i < 9; i++)
+	$m($cls, var);
+	
+	
+	
+	
+	
+	
+	
+	
+/*
+
+	Looping in meta functions
+
+*/
+auto declaration auto_statements(identifier prefix) {
+	auto int t = 2;
+	auto do {
+		int $ {prefix}i = 0;
+		auto switch (t) {
+		auto case 3:
+			int $ {prefix}do_while_$t = -$t;
+			auto break;
+		auto case 5:
+			auto while (true) {
+				long $ {prefix}do_while_$t = $t;
+				auto break;
+			}
+			auto break;
+		auto default:
+			int $ {prefix}do_while_$t = $t;
+			auto break;
+		}
+		auto t++;
+	} while (t < 8);
+	auto for (int i = 5; i < 16; i++)
+		auto if (i == 7)
+			auto continue;
+		else if (i == 9)
+			auto break;
+		else
+			int ${prefix}
+			for_$i = $i;
+	auto int k = 5;
+	auto while (true) {
+		auto if (k > 9)
+			auto break;
+		int $ {prefix}while_$k = $k;
+		auto k++;
+	}
+}
+
+int f() {
+	$auto_statements(local_);
+}
+
+$auto_statements(global_);
+
+
+
+	
+/*
+
+	Extending classes
+
+*/
+
+auto declaration MakeSomeClassContent(identifier Class)
+{
+	class $Class 	{
+		int i = 0;
+	public:
+		!inline ${Scope} () {}
+		!inline ${Scope} (int i) : i(i) {}
+		!inline virtual ~${Scope} () {}
+		!inline int get_i() const {return i;}
+	};
+};
+
+class Bugs {};
+
+$MakeSomeClassContent(Bugs);
+
+
+
+	
+/*
+
+	Conversions
+
+*/
+
+auto character to_character(token t) { $t }
+auto identifier to_identifier(token t) { $t }
+auto number to_number(token t) { $t }
+auto string to_string(token t) { $t }
+
+const char chars1[] = { $character('9'), $character(a), $character(9), $character("9") };
+const char chars2[] = { $to_character('9'), $to_character(a), $to_character(9), $to_character("9") };
+const char chars3[] = { '''9', ''a, ''9, ''"9" };
+const int ids1[] = { $identifier('a'), $identifier(b), $identifier(c), $identifier("d") };
+const int ids2[] = { $to_identifier('a'), $to_identifier(b), $to_identifier(c), $to_identifier("d") };
+const char *strings1[] = { $string('9'), $string(a), $string(9), $string("9") }; 
+const char *strings2[] = { $to_string('9'), $to_string(a), $to_string(9), $to_string("9") }; 
+const char *strings3[] = { ""'9', ""a, ""9, """9" }; 
+
+
+/*
+
+	C preprocessor definitions
+	
+*/
+auto bool defined(identifier key) {
+	if ($std::defined(key))
+		return true;
+	TODO
+}
+
+/*
+
+	Derived information via inheritance
+	
+	e.g. for getting name of top-most inheritor of base class
+*/
+struct File {};
+class Front { export / implementation = File; export / interface = File;};
+
+class Level0 : public Front {
+	export / implementation = File;
+	export / interface = File;
+	int cloned_value = 0;
+	typedef @Super Super : { derived(!is_root()); };
+	typedef @Scope Level0_Root : { derived(is_root()); };
+	typedef @Scope Level0_Branch : { derived(!is_root() && !is_leaf()); };
+	typedef @Scope Level0_Leaf : { derived(is_leaf()); };
+	typedef @Scope Level0_Tree : { derived(true); };
+	typedef @Scope Level0_Pure : { derived(is_pure()); };
+	typedef @Scope Level0_Boundary : { derived(is_boundary()); };
+	typedef @Scope Level0_Concrete : { derived(!is_pure()); };
+	protected const char* top_class_name;
+	@{Scope} () : {
+		derived(true) {top_class_name = 0;}
+		derived(is_leaf() && !is_root()) {top_class_name = ""@Scope;};
+	};
+};
+
+class Level1 : public Level0 { export / implementation = File; export / interface = File;};
+
+public virtual const Level0 *Level0::clone() const : { derived(true) { return new @ {Scope}(*this); }; };
+
+public inline / interface Front *Level0::derived_clone() const
+			: {
+	derived(is_root()) { Front* p = clone(); p->cloned_value = 1; return p;};
+	derived(!is_root()) { Front* p = clone(); p->cloned_value = 2; return p;};
+};
+
+
+/*
+
+	String in meta compiling
+	
+*/
+auto string s0 = "s0";
+static const char* cc0 = $s0;
+auto string ws0 = L"ws0";
+static const wchar_t* cwc0 = $ws0;
+auto string s1 = ${s0}"cont";
+static const char* cc1 = $s1;
+auto int i = 1 + 2 + 3;
+auto string s2 = "s2_"$i;
+static const char* cc2 = $s2;
+static const char* ccc0[] = {$s0};
+static const char* ccc0[] = {$s1, $s2}; // --> {"s0", "s0cont", "s2_6"};
+
+
+/*
+
+	Error invocation
+
+*/
+auto declaration unbraced(number n)
+{
+	if (!$n)
+		$std::error("error from "$n);
+	else if ($n > 1)
+		$std::diagnostic("diagnostic from "$n);
+	else
+		$std::warning("warning from "$n);
+};
+
+/*
+
+	Inheritance: base / derived / interface problem
+
+	e.g. use in ECS to get interface from ComponentBase
+*/
+auto declaration FactoryInheritedMethod(function_specifier InheritedMethod) {
+	public virtual $InheritedMethod :{ derived(Scope.is_root() ) { return 0; } };
+};
+
+auto declaration FactoryInterfaceMethod(function_specifier IfaceMethod) {
+	public virtual $IfaceMethod :{derived(Scope.is_root()) { return 0; };};
+};
+
+struct Base {
+	auto expression make_new = new @Scope;
+};
+
+
+struct Interface1 {
+	export/interface Base;
+	export/implementation Base;
+	
+	int get_value() const {return 0;}
+	
+	$FactoryInterfaceMethod(Interface1* ${Namespace}::Base::GetInterface1());
+	public virtual Interface1* GetInterface1() :{ derived(true) {return this;}};
+};
+
+struct Derived1 : public Base, public Interface1 {
+	export/interface Base;
+	export/implementation Base;
+	
+	$FactoryInheritedMethod(Derived1* ${Namespace}::Base::GetDerived1());
+	public virtual Derived1* GetDerived1() {return this;}
+};
+
+struct Derived2 : public Base {
+	export/interface Base;
+	export/implementation Base;
+	
+	$FactoryInheritedMethod(Derived2* ${Namespace}::Base::GetDerived2());
+	public virtual Derived2* GetDerived2() {return this;}
+};
+
+!inline int main() {
+	Derived1 d1;
+	Derived2 d2;
+	Base* b = &d1;
+	Interface1* iface = b->GetDerived1()->GetInterface1();
+	return iface != 0;
+}
+
+/*
+
+	Inheritance: creator / product
+
+	e.g. have generic abstract "brand" and multiple actual brands and products
+	
+*/
+
+auto declaration FactoryMethod(function_specifier Method)
+{
+	auto expression make_new = new @Scope;
+	public virtual/pure $Method
+		:{ derived(!Scope.is_pure()) { return @{@{$${Scope}_class}::make_new}; } };
+};
+
+class AbstractBrand {};
+
+class AbstractProduct1 {
+	export/interface AbstractBrand;
+	export/implementation AbstractBrand;
+	$FactoryMethod(AbstractProduct1 *${Namespace}::AbstractBrand::make_product1());
+};
+
+class AbstractProduct2 {
+	export/interface AbstractBrand;
+	export/implementation AbstractBrand;
+	const char *_name;
+public:
+	@{Scope}(const char *aName) : _name(aName) :{ derived(is_root()) {} };
+	@{Scope}(const char *aName) : @{Super}(aName) :{ derived(!is_root()) {} };
+	$FactoryMethod(AbstractProduct2 *${Namespace}::AbstractBrand::make_product2(const char *aName));
+	auto expression make_new = new @{Scope}(aName);
+};
+
+class Class;
+
+class MyBrand : public AbstractBrand {
+public:
+	auto identifier AbstractProduct1_class = MyProduct1;
+	auto identifier AbstractProduct2_class = MyProduct2;
+	auto identifier Product3_class = MyProduct3;
+};
+
+class MyProduct1 : public AbstractProduct1 {
+	export/interface MyBrand;
+	export/implementation MyBrand;
+};
+
+class MyProduct2 : public AbstractProduct2{
+	export/interface MyBrand;
+	export/implementation MyBrand;
+};
+
+/*
+
+	Prerprocessor etc.
+	
+	TODO: enable $std::setcpp or something
+*/
+static const char *user = ""$std::getenv("USER");
+#define SomeId abc
+static const char *id = ""$std::getcpp("SomeId");
+
+
+/*
+
+	Adding meta-information to classes.
+	
+	NOTE: ~Meta() is called in very late phase and you can't create functions there.
+*/
+
+class Iterator {
+	int i;
+	void fn() {}
+};
+
+class C : public Iterator {
+	export/interface Iterator; export/implementation Iterator;
+	double d;
+	int get_d() {return d;}
+};
+
+
+class Meta {};
+
+struct MetaInfo {
+	export/interface Meta; export/implementation Meta;
+	const char *str;
+};
+
+auto Meta::Meta() {
+	private static const MetaInfo info[] = {};
+};
+
+auto Meta::~Meta() {
+	for (iterator i = $bases(); i; ++i)
+		if (!i->is_auto())
+			private static const MetaInfo info[] = { {"base "${i->base().name()} } };
+	for (iterator j = $functions(); j; ++j)
+		private static const MetaInfo info[] = { { "function "$j->name() } };
+	for (iterator k = $variables(); k; ++k)
+		private static const MetaInfo info[] = { { "var "$k->name() } };
+	private static const MetaInfo info[] = { { 0 } };
+};
+
+
+class Iterator : auto virtual Meta {};
+class C : auto virtual Meta {};
+
+

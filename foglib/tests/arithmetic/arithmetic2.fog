@@ -1,0 +1,25 @@
+auto declaration m_init(identifier Class)
+{
+	namespace ${Class}A {
+		auto number count = 0;
+	};
+	auto number count = 0;
+};
+
+auto declaration m(identifier Class, identifier Name)
+{
+	namespace ${Class}A
+	{
+		static int ${Name}$count = 3 * $count;
+		count++; // or $count = $count + 1; // or count = count + 1;
+	};
+	static int ${Name}$count = $count % 3;
+	count = count + 1;
+};
+
+auto identifier cls = "SomeClass";
+
+$m_init($cls);
+auto for(int i = 0; i < 9; i++)
+	$m($cls,var);
+

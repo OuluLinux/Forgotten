@@ -1,0 +1,12 @@
+auto string s0 = "s0";
+static const char* cc0 = $s0;
+auto string ws0 = L"ws0";
+static const wchar_t* cwc0 = $ws0;
+auto string s1 = ${s0}"cont";
+static const char* cc1 = $s1;
+auto int i = 1 + 2 + 3;
+auto string s2 = "s2_"$i;
+static const char* cc2 = $s2;
+static const char* ccc0[] = {$s0};
+static const char* ccc0[] = {$s1, $s2};
+

@@ -1,0 +1,46 @@
+
+auto declaration FactoryMethod(function_specifier Method)
+{
+	auto expression make_new = new @Scope;
+	public virtual/pure $Method
+		:{ derived(!Scope.is_pure()) { return @{@{$${Scope}_class}::make_new}; } };
+};
+
+class AbstractBrand {};
+
+class AbstractProduct1 {
+	export/interface AbstractBrand;
+	export/implementation AbstractBrand;
+	$FactoryMethod(AbstractProduct1 *${Namespace}::AbstractBrand::make_product1());
+};
+
+class AbstractProduct2 {
+	export/interface AbstractBrand;
+	export/implementation AbstractBrand;
+	const char *_name;
+public:
+	@{Scope}(const char *aName) : _name(aName) :{ derived(is_root()) {} };
+	@{Scope}(const char *aName) : @{Super}(aName) :{ derived(!is_root()) {} };
+	$FactoryMethod(AbstractProduct2 *${Namespace}::AbstractBrand::make_product2(const char *aName));
+	auto expression make_new = new @{Scope}(aName);
+};
+
+class Class;
+
+class MyBrand : public AbstractBrand {
+public:
+	auto identifier AbstractProduct1_class = MyProduct1;
+	auto identifier AbstractProduct2_class = MyProduct2;
+	auto identifier Product3_class = MyProduct3;
+};
+
+class MyProduct1 : public AbstractProduct1 {
+	export/interface MyBrand;
+	export/implementation MyBrand;
+};
+
+class MyProduct2 : public AbstractProduct2{
+	export/interface MyBrand;
+	export/implementation MyBrand;
+};
+

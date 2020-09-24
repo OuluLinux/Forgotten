@@ -1,0 +1,34 @@
+struct File {};
+class Front { export / implementation = File; export / interface = File;};
+
+class Level0 : public Front {
+	export / implementation = File;
+	export / interface = File;
+	int cloned_value = 0;
+	typedef @Super Super : { derived(!is_root()); };
+	typedef @Scope Level0_Root : { derived(is_root()); };
+	typedef @Scope Level0_Branch : { derived(!is_root() && !is_leaf()); };
+	typedef @Scope Level0_Leaf : { derived(is_leaf()); };
+	typedef @Scope Level0_Tree : { derived(true); };
+	typedef @Scope Level0_Pure : { derived(is_pure()); };
+	typedef @Scope Level0_Boundary : { derived(is_boundary()); };
+	typedef @Scope Level0_Concrete : { derived(!is_pure()); };
+	protected const char* top_class_name;
+	@{Scope} () : {
+		derived(true) {top_class_name = 0;}
+		derived(is_leaf() && !is_root()) {top_class_name = ""@Scope;};
+	};
+};
+
+class Level1 : public Level0 { export / implementation = File; export / interface = File;};
+
+public virtual const Level0 *Level0::clone() const : { derived(true) { return new @ {Scope}(*this); }; };
+
+public inline / interface Front *Level0::derived_clone() const
+			: {
+	derived(is_root()) { Front* p = clone(); p->cloned_value = 1; return p;};
+	derived(!is_root()) { Front* p = clone(); p->cloned_value = 2; return p;};
+};
+
+
+

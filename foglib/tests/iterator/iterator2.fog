@@ -1,0 +1,39 @@
+
+class Iterator {
+	int i;
+	void fn() {}
+};
+
+class C : public Iterator {
+	export/interface Iterator; export/implementation Iterator;
+	double d;
+	int get_d() {return d;}
+};
+
+
+class Meta {};
+
+struct MetaInfo {
+	export/interface Meta; export/implementation Meta;
+	const char *str;
+};
+
+auto Meta::Meta() {
+	private static const MetaInfo info[] = {};
+};
+
+auto Meta::~Meta() {
+	for (iterator i = $bases(); i; ++i)
+		if (!i->is_auto())
+			private static const MetaInfo info[] = { {"base "${i->base().name()} } };
+	for (iterator j = $functions(); j; ++j)
+		private static const MetaInfo info[] = { { "function "$j->name() } };
+	for (iterator k = $variables(); k; ++k)
+		private static const MetaInfo info[] = { { "var "$k->name() } };
+	private static const MetaInfo info[] = { { 0 } };
+};
+
+
+class Iterator : auto virtual Meta {};
+class C : auto virtual Meta {};
+

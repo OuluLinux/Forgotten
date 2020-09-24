@@ -1,0 +1,14 @@
+description "Exotic file format importer.\377";
+
+uses
+	Core,
+	plugin/png;
+
+file
+	Importer.h,
+	Importer.cpp,
+	CRH.cpp;
+
+mainconfig
+	"" = "";
+

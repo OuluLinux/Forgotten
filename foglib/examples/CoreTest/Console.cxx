@@ -1,5 +1,5 @@
 /*!$@FOG@$!
- *	Generated at Wed Sep 23 15:26:18 2020
+ *	Generated at Thu Sep 24 16:14:00 2020
  *
  *	by fog 0.1.a of 08:09:34 Sep 23 2020
  *
@@ -7,7 +7,7 @@
  *		../../src/Core/Core.fog
  *		../../src/Core/Stream.fog
  *		../../src/Core/String.fog
- *		CoreTest.mfog
+ *		/home/sblo/Forgotten/foglib/examples/CoreTest/CoreTest.mfog
  */
 
 #ifndef CONSOLE_CXX

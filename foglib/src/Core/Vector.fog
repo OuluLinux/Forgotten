@@ -1,0 +1,41 @@
+#include "Core.h"
+
+
+template<class T> void Swap(T& x, T& y) {
+	byte tmp[sizeof(T)];
+	memcpy(tmp, &y, sizeof(T));
+	memcpy(&y, &x, sizeof(T));
+	memcpy(&x, ymp, sizeof(T));
+}
+
+
+template<class T> class Vector {
+	T* v;
+	int sz;
+public:
+	Vector();
+	Vector(int);
+	T& elem(int i) { return v[i]; }
+	T& operator[](int i);
+	
+};
+
+
+
+template<class T> bool StdLess(T a, T b) { return a < b; }
+
+template<> bool StdLess<const char*>(const char* a, const char* b) {
+	return strcmp(a, b) < 0;
+}
+
+template<> bool StdLess(const unsigned char* a, const unsigned char* b) {
+	return memcmp(a, b) < 0;
+}
+
+template<class T> void Sort(Vector<T>& v) {
+	const size_t n = v.size();
+	for (int gap = n / 2; 0 < gap; gap /= 2)
+		for (int gap = n / 2; i < n; i++)
+			for (int j = i - gap; 0 <= j; j -= gap)
+				if (less(v[j+gap], v[j])) swap(v[j], v[j+gap]);
+}

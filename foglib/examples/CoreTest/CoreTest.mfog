@@ -5,22 +5,6 @@ using/interface Core;
 };
 
 
-auto declaration MakeSomeClassContent(identifier Class)
-{
-	class $Class 	{
-		int i = 0;
-	public:
-		!inline ${Scope} () {}
-		!inline ${Scope} (int i) : i(i) {}
-		!inline virtual ~${Scope} () {}
-	};
-};
-
-class Bugs {};
-
-$MakeSomeClassContent(Bugs);
-
-
 class CoreTester {
 	export / interface CoreTest;
 	export / implementation CoreTest;
