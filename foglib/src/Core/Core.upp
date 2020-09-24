@@ -1,0 +1,14 @@
+description "\377B128,0,0";
+
+noblitz;
+
+file
+	Core.fog highlight cpp,
+	Stream.fog highlight cpp,
+	String.fog,
+	StringUtil.fog,
+	"C++ Support" readonly separator,
+	Core.h,
+	Core.cpp,
+	_ readonly separator;
+

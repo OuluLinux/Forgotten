@@ -1,0 +1,10 @@
+using "Math/Math.fog";
+
+namespace ManyCore {
+using/interface Core;
+};
+
+
+using "ManyCore/Program.fog";
+
+

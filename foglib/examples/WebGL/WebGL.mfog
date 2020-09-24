@@ -1,0 +1,73 @@
+using "MachLib/MachLib.fog";
+
+namespace WebGL {
+using/interface ManyCore;
+}
+
+
+
+class WebGLExample {
+	export / interface WebGL;
+	export / implementation WebGL;
+	
+	
+	
+	!inline public int Main() {
+		Program program(GLSLVersion::GLSL440);
+		
+		String str("Testing 123");
+		Console::Put(str);
+		
+		/*Console::Put("Vertex source:\n");
+		Console::Put(program.GetVertexSource());
+		
+		Console::Put("\n\n");
+		Console::Put("Fragment source:\n");
+		Console::Put(program.GetFragmentSource());*/
+		
+		return 0;
+	}
+};
+
+
+
+/*
+auto declaration defer(class clientClass)
+{
+${${clientClass}::deferred($Scope)};
+}
+*/
+
+
+/*auto declaration BuildInterface() {
+	auto for (iterator k = $variables(); k; ++k) {
+		!inline $k->derive_type() get_${k->name()} () {return $k->name();}
+		!inline void set_${k->name()} (const $k->derive_type()& v) {$k->name() = v;;}
+	}
+}
+
+struct Person {
+	export/interface WebGL;
+	export/implementation WebGL;
+	
+	int age;
+	double length;
+	
+	$BuildInterface();
+	
+};*/
+
+/*struct GeneratedInterface {
+	
+};
+
+auto GeneratedInterface::~GeneratedInterface() {
+	for (iterator k = $variables(); k; ++k) {
+		!inline static void get_${k->name()} () ;
+	}
+}
+
+struct Person : auto virtual GeneratedInterface {};*/
+
+
+

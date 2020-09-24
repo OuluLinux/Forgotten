@@ -1,0 +1,8 @@
+description "\377B0,167,167";
+
+uses
+	MachCore;
+
+file
+	MachLib.fog;
+

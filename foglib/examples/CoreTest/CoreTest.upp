@@ -1,0 +1,26 @@
+noblitz;
+
+uses
+	Core;
+
+include
+	.;
+
+file
+	main.cpp,
+	CoreTest.mfog highlight cpp,
+	"FOG Generated" readonly separator,
+	CoreTest.hxx,
+	CoreTest.cxx,
+	Core.hxx,
+	Core.cxx,
+	Console.cxx,
+	_ readonly separator;
+
+mainconfig
+	"" = "";
+
+custom() "mfog",
+	"fog -cd$(DIR) -t4 -I../../src $(PATH)\n",
+	"$(DIR)/CoreTest.hxx";
+

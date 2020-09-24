@@ -1,0 +1,70 @@
+using "Core/Core.fog";
+
+namespace CoreTest {
+using/interface Core;
+};
+
+
+
+class CoreTester {
+	export / interface CoreTest;
+	export / implementation CoreTest;
+	
+	
+	
+	!inline public int Main() {
+		String s("test");
+		ConstChar* c = s;
+		Console::Put("Starting Core-testing\n");
+		/*Console::Put(program.GetVertexSource());
+		
+		Console::Put("\n\n");
+		Console::Put("Fragment source:\n");
+		Console::Put(program.GetFragmentSource());*/
+		
+		return 0;
+	}
+};
+
+
+
+/*
+auto declaration defer(class clientClass)
+{
+${${clientClass}::deferred($Scope)};
+}
+*/
+
+
+/*auto declaration BuildInterface() {
+	auto for (iterator k = $variables(); k; ++k) {
+		!inline $k->derive_type() get_${k->name()} () {return $k->name();}
+		!inline void set_${k->name()} (const $k->derive_type()& v) {$k->name() = v;;}
+	}
+}
+
+struct Person {
+	export/interface WebGL;
+	export/implementation WebGL;
+	
+	int age;
+	double length;
+	
+	$BuildInterface();
+	
+};*/
+
+/*struct GeneratedInterface {
+	
+};
+
+auto GeneratedInterface::~GeneratedInterface() {
+	for (iterator k = $variables(); k; ++k) {
+		!inline static void get_${k->name()} () ;
+	}
+}
+
+struct Person : auto virtual GeneratedInterface {};*/
+
+
+

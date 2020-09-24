@@ -1,0 +1,176 @@
+
+typedef const char ConstChar;
+typedef const char* CString;
+
+
+
+
+
+/*auto int SMALLSTR = 8;
+template<class T>
+struct String0 {
+	export/interface Core;
+	export/implementation Core;
+
+	char* data = 0;
+
+};
+
+template<class T>
+class StringT {
+	export/interface Core;
+	export/implementation Core;
+
+	union {
+		T data[$SMALLSTR];
+		String0<T>* ptr = 0;
+	};
+	bool is_big = false;
+
+public:
+	inline StringT() {data[0] = 0;}
+
+
+	inline const T* Get() const {
+		if (is_big)	return ptr->data;
+		else		return &data[0];
+	}
+
+};
+
+class String {
+	export/interface Core;
+	export/implementation Core;
+	using/interface StringT;
+
+	StringT<char> data;
+
+public:
+	String() {}
+	String(const char* s) {}
+
+
+	!inline operator ConstChar*() const {return data.Get();}
+
+};*/
+
+
+/*auto declaration MakeString(identifier String, type el, identifier post) {
+
+	typedef const $el Const${post};
+
+	auto int SMALLSTR = 8;
+	identifier Data = ${String}Data${post};
+	identifier ConstChar = Const${post};
+
+	class Data() {
+		export/interface Core;
+		export/implementation Core;
+
+	};
+
+
+	class $String {
+		export/interface Core;
+		export/implementation Core;
+		using/interface ${String}Data${post};
+
+		union {
+			$Data* ptr = 0;
+			$el small[$SMALLSTR];
+		};
+		bool is_big = false;
+
+	public:
+
+		$String() {small[0] = 0;}
+		$String(ConstChar* ptr) {}
+
+
+
+		operator ConstChar* () const;
+	};
+
+}
+
+$MakeString(String, char, Char);*/
+
+
+
+
+/*auto declaration StringBase(class_key string, type el) {
+
+	public !inline $string::$string () :{};
+	public !inline $string::$string (const char*) :{};
+
+}
+
+class String {
+	export/interface Core;
+	export/implementation Core;
+
+public:
+
+};
+
+$StringBase(String, el);*/
+
+
+/*auto declaration StringBase(identifier id) {
+	class $id {
+		int i;
+	};
+}
+
+
+$StringBase("String");*/
+
+
+
+auto statement StringBasePrivate(identifier Elem, identifier ConstElem) {
+	
+
+	struct Data {
+		${Elem}* data;
+	
+	};
+	
+	union {
+		$Elem data[$SMALLSTR];
+		Data* ptr = 0;
+	};
+	bool is_big = false;
+	
+	
+}
+
+auto statement StringBasePublic(identifier Elem, identifier ConstElem) {
+	${Scope} () {data[0] = 0;}
+	${Scope} (const char* c) {
+	
+	}
+	
+	inline $ConstElem* Get() const {
+		if (is_big)	return ptr->data;
+		else		return &data[0];
+	}
+
+	operator $ConstElem*() const {return Get();}
+	
+}
+
+class String {
+	export/interface Core;
+	export/implementation Core;
+	
+	auto int SMALLSTR = 8;
+	
+	
+	$StringBasePrivate(char, ConstChar);
+	
+public:
+	
+	$StringBasePublic(char, ConstChar);
+	
+	
+};

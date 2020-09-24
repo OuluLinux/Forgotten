@@ -1,0 +1,7 @@
+
+namespace Core {};
+
+
+using "Core/String.fog";
+using "Core/Stream.fog";
+

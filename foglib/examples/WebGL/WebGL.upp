@@ -1,0 +1,31 @@
+description "An simple example to make a FOG project, which compiles to html and WebGL with FOG and emscripten.\377";
+
+noblitz;
+
+uses
+	MachLib;
+
+options
+	-I.;
+
+file
+	Readme.txt,
+	main.cpp,
+	WebGL.mfog highlight cpp,
+	"FOG generated" readonly separator,
+	WebGL.hxx,
+	WebGL.cxx,
+	ManyCore.hxx,
+	ManyCore.cxx,
+	Core.hxx,
+	Core.cxx,
+	Console.cxx,
+	_ readonly separator;
+
+mainconfig
+	"" = "";
+
+custom() "mfog",
+	"fog -cd$(DIR) -t4 -I../../src $(PATH)\n",
+	"$(DIR)/Main.hxx";
+
