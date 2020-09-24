@@ -10,6 +10,8 @@ file
 	main.cpp,
 	CoreTest.mfog highlight cpp,
 	"FOG Generated" readonly separator,
+	Bugs.cxx,
+	Bugs.hxx,
 	CoreTest.hxx,
 	CoreTest.cxx,
 	Core.hxx,

@@ -4,9 +4,11 @@ noblitz;
 
 file
 	Core.fog highlight cpp,
-	Stream.fog highlight cpp,
+	LangNotes.fog,
+	Vector.fog,
 	String.fog,
 	StringUtil.fog,
+	Stream.fog highlight cpp,
 	"C++ Support" readonly separator,
 	Core.h,
 	Core.cpp,

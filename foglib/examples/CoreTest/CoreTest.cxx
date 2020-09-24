@@ -1,5 +1,5 @@
 /*!$@FOG@$!
- *	Generated at Wed Sep 23 15:26:18 2020
+ *	Generated at Thu Sep 24 04:16:12 2020
  *
  *	by fog 0.1.a of 08:09:34 Sep 23 2020
  *
@@ -7,7 +7,8 @@
  *		../../src/Core/Core.fog
  *		../../src/Core/Stream.fog
  *		../../src/Core/String.fog
- *		CoreTest.mfog
+ *		../../src/Core/Vector.fog
+ *		/home/sblo/Forgotten/foglib/examples/CoreTest/CoreTest.mfog
  */
 
 #ifndef CORETEST_CXX
@@ -17,14 +18,14 @@
 #include <CoreTest.hxx>
 #endif
 
-#line 15 "CoreTest.mfog"
+#line 30 "/home/sblo/Forgotten/foglib/examples/CoreTest/CoreTest.mfog"
 int CoreTester::Main()
 {
-#line 16
+#line 31
     String s("test");
     ConstChar * c = s;
     Console::Put("Starting Core-testing\n");
-#line 25
+#line 40
     return 0;
 };
 
