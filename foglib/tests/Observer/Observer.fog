@@ -16,7 +16,7 @@ auto declaration Observer(identifier O, identifier S, identifier M)
 		vector<$O *> _observers;
 	public:
 		void attach($O *anObserver) { _observers.push_back(anObserver); }
-		void detach($O *anObserver) { _observers.remove(anObserver); }
+		void detach($O *anObserver) { _observers.erase(anObserver); }
 		!inline void notify(const $M& aMessage)
 		{
 			for ($O *p = _observers.begin(); p != _observers.end(); ++p)

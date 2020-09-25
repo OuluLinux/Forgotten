@@ -103,11 +103,10 @@ bool FogMetaFunctionSpecifier::make_slot(FogMakerContext& makerContext) const
 //            ERRMSG("Cannot compose exclusive meta-function " << viz(*this));
 //        else if (!FogMetaArgument::matches(metaFunction->formals(), dollarContext.formals()))
 //            ERRMSG("Must have consistent argument types and names for " << viz(*this));
-        else
-        {
+		else {
             FogTokenStatementsRef newList(new FogTokenStatements(metaType), FogTokenStatementsRef::ADOPT);
 //            FogConstTokensRef newList(new FogConstTokens, FogConstTokensRef::ADOPT);
-//            if (_position->is_append())
+            //if (_position->is_append())
 //  //                newList->add_list(metaFunction->tokens());
 //                newList->add(metaFunction->token());
 //  //            newList->add_list(*_tokens);

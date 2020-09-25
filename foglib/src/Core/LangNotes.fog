@@ -437,3 +437,515 @@ class Iterator : auto virtual Meta {};
 class C : auto virtual Meta {};
 
 
+
+
+
+
+
+
+
+
+/*
+
+	Adding serializer for a class
+
+*/
+class Stream {};
+class Object {};
+
+class CustomObject : public Object {
+	export/interface Object; export/implementation Object;
+	unsigned long value0;
+	short value1;
+};
+
+
+auto class Serializer {};
+
+// Basic serializer
+auto declaration unsigned long ::Serialize(expression name) {
+	public virtual void Serialize(Stream& s) {s % $name;}
+	public ${Scope}(Stream& s) {s % $name;}
+}
+
+// Custom serializer.
+// You can have different initializer than "= 0" and you can call some post-loading function.
+auto declaration short ::Serialize(expression name) {
+	public virtual void Serialize(Stream& s) {s % $name;}
+	public ${Scope}(Stream& s) {s % $name; if (s.IsLoading()) PostLoad($name);}
+}
+
+auto declaration Serializer::Install() {
+	auto type DerivedClass = $Scope;
+	auto static statement switch_body = {default: return 0;}
+	protected enum DerivedObjectTypes {};
+
+	public virtual void Serialize(Stream& s) :{
+		derived(true) entry {
+			if (s.IsLoading()) {
+				int scope_i; int magic;
+				s % scope_i % magic;
+				ASSERT(scope_i == MESSAGE_@Scope && magic == 1234);
+			}
+			else {
+				int scope_i = MESSAGE_@Scope; int magic = 1234;
+				s % scope_i % magic;
+			}
+		}
+		derived(true) exit {
+			if (s.IsLoading()) {
+				int magic;
+				s % magic;
+				ASSERT(magic == 4321);
+			}
+			else {
+				int magic = 4321;
+				s % magic;
+			}
+		}
+	};
+
+	public static !inline $Scope* LoadAnyStream(Stream& s) {
+		switch (s.Peek()) @switch_body;
+	};
+	
+	protected static @Scope* LoadStream(Stream& s) :{
+		derived(true) {
+			if (s.Peek() == MESSAGE_@Scope)
+				return new @{Scope}(s);
+			else
+				return new @{Scope};
+	        }
+	};
+
+	auto ${Scope}() {
+		protected enum ${DerivedClass}::DerivedObjectTypes { MESSAGE_$Dynamic };
+		auto switch_body +=
+			case MESSAGE_$Dynamic:
+				return ${Dynamic}::LoadStream(s);
+		public inline/implementation ${Dynamic}(Stream& s) {
+			Clear();
+			if (s.IsStoring()) return;
+		}
+	}
+
+	auto ~${Scope}() {
+		auto for (iterator i = $variables(); i; i++)
+			auto if (!i->is_static())
+				$i->type().Serialize($i->id());
+	}
+}
+
+
+
+class Object {
+	$Serializer::Install();
+};
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+	Adding automatic critical sections for class
+	
+	Also, shows how to add meta inheritance inside a class with meta-call.
+*/
+class Monitor {
+	auto number has_monitor = false;
+public:
+	class ReadOnlyLock {
+	private:
+		Monitor& _monitor;
+	public:
+		inline ReadOnlyLock(Monitor& aMonitor) : _monitor(aMonitor) { _monitor.enter_shared(); }
+		inline ~ReadOnlyLock() { _monitor.leave(); }
+	};
+	friend class ReadOnlyLock;
+	class ReadWriteLock {
+	private:
+		Monitor& _monitor;
+	public:
+		inline ReadWriteLock(Monitor& aMonitor) : _monitor(aMonitor) { _monitor.enter_exclusive(); }
+		inline ~ReadWriteLock() { _monitor.leave(); }
+	};
+	friend class ReadWriteLock;
+private:
+	void enter_exclusive() { /* ... */ }
+	void enter_shared() { /* ... */ }
+	void leave() { /* ... */ }
+};
+
+auto declaration Monitor::install() {
+	class $This : auto $Dynamic {
+		private $Dynamic _monitor;
+		auto number has_monitor = true;
+	};
+}
+
+auto Monitor::~Monitor() {
+	auto if (has_monitor) {						// Avoid execution for Monitor and its derived classes.
+		auto for (iterator f = $functions(); f; ++f) {
+			auto if (f->is_static())
+				;
+			else if (f->is_volatile())
+				;
+			else if (f->is_const()) {
+				$f->specifier() : { entry { ReadOnlyLock aLock(_monitor); } };
+			} else {
+				$f->specifier() : { entry { ReadWriteLock aLock(_monitor); } };
+			}
+		}
+	}
+}
+; // [[derived tree]];
+
+class DerivedMonitor : public Monitor {
+	export / interface Monitor;
+	export / implementation Monitor;
+};
+
+
+
+
+class Monitored {
+	$DerivedMonitor::install();
+private:
+	int *_i;
+public:
+	int *f() { return _i; }
+	const int *fc() const { return _i; }
+	const volatile int *fcv() const volatile { return _i; }
+	volatile int *fv() volatile { return _i; }
+};
+
+
+
+
+
+
+
+/*
+
+	Getting right meta-scope with $ chars
+
+	Note:	It's difficult to get your head around this.
+			In practice you should call "$std::diagnostic(""${Scope.long_name()});" etc.
+*/
+class MultiDollar {};
+
+class A {
+	export/interface MultiDollar; export/implementation MultiDollar;
+	auto declaration f(identifier anArg) {
+		class B {
+			export/interface MultiDollar; export/implementation MultiDollar;
+			auto declaration g(identifier anArg) {
+				static const char *p0 = ""Scope;			// "Scope"
+				static const char *p1 = ""${Scope.long_name()};	// "C::D"
+				static const char *p2 = ""$${Scope.long_name()};	// "C::D::B"
+				static const char *p3 = ""$$${Scope.long_name()};	// "C::D"
+				static const char *p4 = ""$$$${Scope.long_name()};	// "A"
+				static const char *p5 = ""$$$$${Scope.long_name()};	// ""
+				static const char *p6 = ""@{Scope.long_name()};	// "C::D"
+				static const char *a0 = ""anArg;			// "anArg"
+				static const char *a1 = ""$anArg;			// "y"
+				static const char *a2 = ""$$anArg;			// "x"
+				static const char *a3 = ""$$$anArg;			// "x"
+			}
+		};
+	};
+};
+
+class C {
+	export/interface MultiDollar; export/implementation MultiDollar;
+	class D {
+		export/interface MultiDollar; export/implementation MultiDollar;
+		$A::f(x);
+		$B::g(y); // note x is still remembered with $$anArg
+	};
+};
+
+
+
+
+
+
+
+/*
+
+	Event loop & IPC message debugging observer
+
+*/
+template <class T> class vector;
+
+auto declaration Observer(identifier O, identifier S, identifier M) {
+	class $M {
+	public:
+		auto identifier ObserverClass = $O;
+		auto identifier SubjectClass = $S;
+		virtual !inline void dispatch_to($O& anObserver, $S& aSubject) const
+		{ anObserver.observe(aSubject, *this); };
+	};
+	class $S {
+	private:
+		vector < $O * > _observers;
+	public:
+		void attach($O *anObserver) { _observers.push_back(anObserver); }
+		void detach($O *anObserver) { _observers.erase(anObserver); }
+		!inline void notify(const $M& aMessage) {
+			for ($O *p = _observers.begin(); p != _observers.end(); ++p)
+				aMessage.dispatch_to(*p, *this);
+		}
+	};
+	class $O {
+	public:
+		virtual !inline void observe($S& aSubject, const $M& aMessage) {}
+		typedef void observe_$ {M}($S& aSubject, const $M& aMessage);
+	};
+};
+
+auto declaration ObservableMessage() {
+	public !inline using dispatch_to { anObserver.observe(aSubject, *this); };
+	public typedef void $ {Namespace}::$ {ObserverClass}::observe_$ {This}($SubjectClass& aSubject, const $This& aMessage);
+	public virtual !inline using observe_$ {This} $ {Namespace}::$ {ObserverClass}::observe {}
+};
+
+class MyObserver { /* ... */
+	export / interface "MyObserver.hxx";
+	export / implementation "MyObserver.cxx";
+	// ...
+};
+
+class MyMessage { /* ... */
+	export / interface MyObserver;
+	export / implementation MyObserver;
+	// ...
+};
+
+class MySubject { /* ... */
+	export / interface MyObserver;
+	export / implementation MyObserver;
+	// ...
+};
+
+$Observer(MyObserver, MySubject, MyMessage);
+
+class MyMessage1 : public MyMessage {
+	export / interface MyMessage;
+	export / implementation MyMessage;
+	$ObservableMessage();
+private:
+	int _count;
+	int _count1;
+public:
+	MyMessage1(int aCount) : _count(aCount) {}
+	int count() const { return _count; }
+};
+
+class MyObserver1 : public MyObserver {
+	export / interface MyObserver;
+	export / implementation MyObserver;
+};
+
+public using observe_MyMessage1 MyObserver1::observe {
+	cout << aSubject << " changed count to " << aMessage.count() << endl;
+}
+
+
+
+
+
+
+
+/*
+
+	Easy enum to string
+	
+*/
+class SynchronisedEnum
+{
+	public enum Enum {};
+	public static const char *texts[] = {};
+//	auto number values = 0;													// Meta-variable
+	auto declaration Define(identifier aName, expression aValue)
+	{
+		enum SynchronisedEnum::Enum { $aName = $aValue };
+		static const char *SynchronisedEnum::texts[] = { [$aValue] ""$aName };
+//		auto values++;												// Meta-expression
+	}
+};
+
+$SynchronisedEnum::Define(LABEL, 40);
+$SynchronisedEnum::Define(FIRST, 1);
+$SynchronisedEnum::Define(THIRD, 3);
+
+
+
+
+
+/*
+
+	Template class specialization
+	
+*/
+struct Templates {};
+
+template <class T> class X {
+	T _t;
+	static int _i;
+public:
+	X(T aT) : _t(aT) {}
+};
+
+template <> class X <int> {
+	int _var;
+};
+
+public static X<int> Templates::temp = 0;
+
+
+
+
+
+/*
+
+	The beginning/initial code for own dynamic_cast code
+	
+*/
+struct TypeInfo;
+
+struct TypeInfoData {
+	TypeInfo* ti;
+	int addr_offset;
+;}
+
+struct TypeInfo {
+	TypeInfo(const char* name, TypeInfoData* list);
+};
+
+auto initializer_clause TYPEINFO_BASE_OF(identifier Base, identifier Parent)
+{{ &${Base}::static_type_info(), (char *)&($Base&)(${Parent}&)*(char *)0x1000 - (char *)0x1000}};
+
+struct BaseObject {
+	virtual const TypeInfo& dynamic_type_info() const :{ derived(true) { return static_type_info(); } };
+	static const TypeInfo& static_type_info();
+};
+
+auto declaration PRIMPRINT_RTTI_0(identifier Class) {
+	struct $Class {
+		using/implementation=TypeInfo;
+		using static_type_info {
+			static const TypeInfoData base_list[2] = {
+				{ 0, 0 }
+			};
+			static const TypeInfo type_info(""$Class, base_list);
+			return type_info;
+		};
+	};
+};
+
+auto declaration PRIMPRINT_RTTI_1(identifier Class, identifier Base) {
+	struct $Class {
+		using/implementation=TypeInfo;
+		using static_type_info {
+			static const TypeInfoData base_list[2] = {
+				${TYPEINFO_BASE_OF(${Base},$Class)},
+				{ 0, 0 }
+			};
+			static const TypeInfo type_info(""$Class, base_list);
+			return type_info;
+		};
+	};
+};
+
+$PRIMPRINT_RTTI_0(BaseObject);
+
+class UtilityInc1 : public BaseObject {
+	int x;
+};
+
+$PRIMPRINT_RTTI_1(UtilityInc1, BaseObject);
+
+
+
+
+
+
+
+
+/*
+
+	Traversing multi-type trees
+
+*/
+auto declaration VisitorBaseElement(identifier V)
+{
+	public typedef $V Visitor;
+	public typedef $Scope Element;
+	public !inline virtual bool accept($V& aVisitor) { return false; }
+};
+
+auto declaration VisitorDerivedElement() {
+	public !inline virtual bool accept(Visitor& aVisitor)
+	{ return aVisitor.accept_$ {Scope}(*this) || @ {Super}::accept_$ {Super}(aVisitor); };
+	public !inline virtual bool Visitor::accept_$ {Scope}($Scope& anElement)
+			: {
+		derived(is_root()) { return false; };
+		derived(!is_root()) exit { return true; };
+	};
+};
+
+class Visitor {
+	export / interface "Visitor.hxx"; export / implementation "Visitor.cxx";
+	// ...
+};
+
+class Element {
+	export / interface Visitor; export / implementation Visitor;
+	// ...
+	$VisitorBaseElement(Visitor);
+	//...
+};
+
+class DerivedElement1 : public Element {
+	export / interface Visitor; export / implementation Visitor;
+	// ...
+	$VisitorDerivedElement();
+	//...
+};
+
+class DerivedElement2 : public Element {
+	export / interface Visitor; export / implementation Visitor;
+	// ...
+	$VisitorDerivedElement();
+	//...
+};
+
+class DerivedElement3 : public Element {
+	export / interface Visitor; export / implementation Visitor;
+	// ...
+	$VisitorDerivedElement();
+	//...
+};
+
+class DerivedDerivedElement : public DerivedElement2 {
+	export / interface Visitor; export / implementation Visitor;
+	// ...
+	$VisitorDerivedElement();
+	//...
+};
+
+class DerivedVisitor : public Visitor {
+	export / interface Visitor; export / implementation Visitor;
+	// ...
+};
+
+using DerivedVisitor::accept_DerivedElement1 { cout << "DerivedVisitor accepts DerivedElement1" << endl; }
+using DerivedVisitor::accept_DerivedElement2 { cout << "DerivedVisitor accepts DerivedElement2" << endl; }

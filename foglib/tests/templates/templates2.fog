@@ -1,0 +1,16 @@
+struct Templates {};
+
+
+template <class T> class X {
+	T _t;
+	static int _i;
+public:
+	X(T aT) : _t(aT) {}
+};
+
+template <> class X <int> {
+	int _var;
+};
+
+public static X<int> Templates::temp = 0;
+

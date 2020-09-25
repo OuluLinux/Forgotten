@@ -1,4 +1,4 @@
-using/utility "utility.inc";
+using "utility.inc";
 
 class Utility : public PrimPrint
 {
@@ -31,7 +31,7 @@ class UtilitySet
 class UtilitySet
 {
 	int d1;										// non-utility but later set/utility invalidates.
-	export/utility;
+	//export/utility;
 	int d2;										// utility
 };
 
@@ -40,4 +40,4 @@ class UtilitySet
 	int d3;										// non-utility but prior set/utility invalidates.
 };
 
-int UtilitySet::d4;								// non-utility but prior set/utility invalidates.
+//int UtilitySet::d4;								// non-utility but prior set/utility invalidates.

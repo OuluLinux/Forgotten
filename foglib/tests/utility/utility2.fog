@@ -1,0 +1,54 @@
+struct TypeInfo;
+
+struct TypeInfoData {
+	TypeInfo* ti;
+	int addr_offset;
+;}
+
+struct TypeInfo {
+	TypeInfo(const char* name, TypeInfoData* list);
+};
+
+auto initializer_clause TYPEINFO_BASE_OF(identifier Base, identifier Parent)
+{{ &${Base}::static_type_info(), (char *)&($Base&)(${Parent}&)*(char *)0x1000 - (char *)0x1000}};
+
+struct BaseObject {
+	virtual const TypeInfo& dynamic_type_info() const :{ derived(true) { return static_type_info(); } };
+	static const TypeInfo& static_type_info();
+};
+
+auto declaration PRIMPRINT_RTTI_0(identifier Class) {
+	struct $Class {
+		using/implementation=TypeInfo;
+		using static_type_info {
+			static const TypeInfoData base_list[2] = {
+				{ 0, 0 }
+			};
+			static const TypeInfo type_info(""$Class, base_list);
+			return type_info;
+		};
+	};
+};
+
+auto declaration PRIMPRINT_RTTI_1(identifier Class, identifier Base) {
+	struct $Class {
+		using/implementation=TypeInfo;
+		using static_type_info {
+			static const TypeInfoData base_list[2] = {
+				${TYPEINFO_BASE_OF(${Base},$Class)},
+				{ 0, 0 }
+			};
+			static const TypeInfo type_info(""$Class, base_list);
+			return type_info;
+		};
+	};
+};
+
+$PRIMPRINT_RTTI_0(BaseObject);
+
+class UtilityInc1 : public BaseObject {
+	int x;
+};
+
+$PRIMPRINT_RTTI_1(UtilityInc1, BaseObject);
+

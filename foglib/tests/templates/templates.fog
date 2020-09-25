@@ -32,11 +32,13 @@ class X < int >
 private:
 	int _var;
 };
-								
+
+#if 0								
 /*template <>*/ public void X<double>::dummy() {}	// ANSI requires explicit prefix.
 
 template <> int X<float>::_i = 5;					// Requires propagation of primary to instantiation.
 template <> int X<float>::i = 5;					// Illegal instantiation specialisation.
+#endif
 
 template <class T>
 class Z

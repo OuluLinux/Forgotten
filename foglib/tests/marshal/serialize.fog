@@ -1,0 +1,92 @@
+class Stream {};
+class Object {};
+
+class CustomObject : public Object {
+	export/interface Object; export/implementation Object;
+	unsigned long value0;
+	short value1;
+};
+
+
+auto class Serializer {};
+
+// Basic serializer
+auto declaration unsigned long ::Serialize(expression name) {
+	public virtual void Serialize(Stream& s) {s % $name;}
+	public ${Scope}(Stream& s) {s % $name;}
+}
+
+// Custom serializer.
+// You can have different initializer than "= 0" and you can call some post-loading function.
+auto declaration short ::Serialize(expression name) {
+	public virtual void Serialize(Stream& s) {s % $name;}
+	public ${Scope}(Stream& s) {s % $name; if (s.IsLoading()) PostLoad($name);}
+}
+
+auto declaration Serializer::Install() {
+	auto type DerivedClass = $Scope;
+	auto static statement switch_body = {default: return 0;}
+	protected enum DerivedObjectTypes {};
+
+	public virtual void Serialize(Stream& s) :{
+		derived(true) entry {
+			if (s.IsLoading()) {
+				int scope_i; int magic;
+				s % scope_i % magic;
+				ASSERT(scope_i == MESSAGE_@Scope && magic == 1234);
+			}
+			else {
+				int scope_i = MESSAGE_@Scope; int magic = 1234;
+				s % scope_i % magic;
+			}
+		}
+		derived(true) exit {
+			if (s.IsLoading()) {
+				int magic;
+				s % magic;
+				ASSERT(magic == 4321);
+			}
+			else {
+				int magic = 4321;
+				s % magic;
+			}
+		}
+	};
+
+	public static !inline $Scope* LoadAnyStream(Stream& s) {
+		switch (s.Peek()) @switch_body;
+	};
+	
+	protected static @Scope* LoadStream(Stream& s) :{
+		derived(true) {
+			if (s.Peek() == MESSAGE_@Scope)
+				return new @{Scope}(s);
+			else
+				return new @{Scope};
+	        }
+	};
+
+	auto ${Scope}() {
+		protected enum ${DerivedClass}::DerivedObjectTypes { MESSAGE_$Dynamic };
+		auto switch_body +=
+			case MESSAGE_$Dynamic:
+				return ${Dynamic}::LoadStream(s);
+		public inline/implementation ${Dynamic}(Stream& s) {
+			Clear();
+			if (s.IsStoring()) return;
+		}
+	}
+
+	auto ~${Scope}() {
+		auto for (iterator i = $variables(); i; i++)
+			auto if (!i->is_static())
+				$i->type().Serialize($i->id());
+	}
+}
+
+
+
+class Object {
+	$Serializer::Install();
+};
+
