@@ -4,6 +4,9 @@ namespace Com {};
 using "Com/Defs.fog";
 using "Com/Macros.fog";
 using "Com/Native.fog";
+using "Com/Hash.fog";
+using "Com/Algorithm.fog";
+
 using "Com/Math.fog";
 using "Com/Concurrency.fog";
 using "Com/Environment.fog";

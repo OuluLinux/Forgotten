@@ -8,6 +8,8 @@ file
 	Defs.fog,
 	Macros.fog,
 	Native.fog,
+	Hash.fog,
+	Algorithm.fog,
 	Math.fog,
 	Concurrency.fog,
 	Environment.fog,

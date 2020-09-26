@@ -16,11 +16,18 @@ class Tester {
 		ASSERT(sizeof(v) == 8);
 		
 		VOID_PTR p;
-		p = Null;
+		ASSERT(p == Null);
 		
 		ASSERT(SignificantBits(0x8000) == 16);
 		ASSERT(SignificantBits64(0x8000) == 16);
 		
+		CombineHash ch;
+		ch.Put(777999777).Put(123).Put64(0xF0F0F0F0F0F0F0F0);
+		dword hash = ch;
+		ASSERT(hash == 1894504625);
+		int a = 0;
+		int b = 1;
+		ASSERT(min(a, b) < max(a, b));
 		
 		/*Console::Put(program.GetVertexSource());
 		

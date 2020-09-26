@@ -1,0 +1,20 @@
+
+namespace Com {
+
+template <class T> const T& min(const T& a, const T& b) {
+	if (a < b)
+		return a;
+	else
+		return b;
+}
+
+template <class T> const T& max(const T& a, const T& b) {
+	if (a >= b)
+		return a;
+	else
+		return b;
+}
+
+
+
+}

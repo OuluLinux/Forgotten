@@ -1,3 +1,16 @@
+
+
+auto statement DebugMetaLog(string s) {
+	auto if (true)
+		auto $std::diagnostic($s);
+};
+
+auto bool IsDefined(identifier id) {
+	$std::defined(id);
+}
+
+
+
 namespace C {
 	
 struct Nuller {
@@ -14,6 +27,13 @@ template<class T> struct Ptr {
 	void operator=(T* p) {value = p;}
 	void operator=(const Nuller& p) {value = 0;}
 	operator T*() const {return value;}
+	bool operator==(const Ptr& p) const {return value == p.value;}
+	bool operator==(const Nuller& p) const {return value == 0;}
+	
+	auto if ($IsDefined("CPU64"))
+		unsigned long long Int() const {return (unsigned long long)value;}
+	else
+		unsigned long Int() const {return (unsigned long)value;}
 };
 
 
@@ -81,15 +101,6 @@ $GlobalTypedefPtr(const void,		CONST_VOID_PTR);
 auto string PLATFORM = "UNKNOWN";
 auto number CPU_32 = 0;
 auto number CPU_64 = 0;
-
-auto statement DebugMetaLog(string s) {
-	auto if (true)
-		auto $std::diagnostic($s);
-};
-
-auto bool IsDefined(identifier id) {
-	$std::defined(id);
-}
 
 auto if ($IsDefined("CPU64")) {
 	$DebugMetaLog("Using 64bit cpu");
