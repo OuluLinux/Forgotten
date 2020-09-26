@@ -1,24 +1,22 @@
 noblitz;
 
 uses
-	Core;
+	Com;
 
 include
 	.;
 
 file
-	main.cpp,
-	CoreTest.mfog highlight cpp,
+	Readme.txt,
+	ComTest.mfog highlight cpp,
 	"FOG Generated" readonly separator,
-	CoreTest.hxx,
-	CoreTest.cxx,
 	Global.hxx,
 	Global.cxx,
 	Core.hxx,
 	Core.cxx,
 	Console.cxx,
-	Native.hxx,
-	Native.cxx,
+	C.hxx,
+	C.cxx,
 	_ readonly separator;
 
 mainconfig

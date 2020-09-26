@@ -1,0 +1,11 @@
+
+namespace Com {
+
+int MemoryCompare(const void *m1, const void *m2, int sz) :{ export/noimplementation; };
+void* MemoryCopy(void *dest, const void *src, int sz) :{ export/noimplementation; };
+void* MemoryMove(void *dest, const void *src, int sz) :{ export/noimplementation; };
+int SignificantBits(uint32 x) :{ export/noimplementation; };
+int SignificantBits64(uint64 x) :{ export/noimplementation; };
+
+};
+

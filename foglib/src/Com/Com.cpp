@@ -31,7 +31,7 @@
 #undef GetFileTitle
 
 
-#include "Core.h"
+#include "Com.h"
 
 
 
@@ -740,14 +740,47 @@ Vector<String> Split(String to_split, String split_str, bool ignore_empty) {
 
 #endif
 
-namespace Native {
+
+namespace C {
+
+struct Nuller {};
+	
+}
+
+NAMESPACE_SDK_BEGIN
+
+C::Nuller Null;
+
 
 void Break(const char* msg) {
 	fprintf(stderr, "%s\n", msg);
 	__BREAK__;
 }
 
+int MemoryCompare(const void *m1, const void *m2, int sz) {
+	#if defined flagGCC || flagCLANG
+	return __builtin_memcmp(m1, m2, sz);
+	#else
+	return memcmp(m1, m2, sz);
+	#endif
 }
+
+void* MemoryCopy(void *dest, const void *src, int sz) {
+	#if defined flagGCC || flagCLANG
+	return __builtin_memcpy(dest, src, sz);
+	#else
+	return memcpy(dest, src, sz);
+	#endif
+}
+
+void* MemoryMove(void *dest, const void *src, int sz) {
+	#if defined flagGCC || flagCLANG
+	return __builtin_memmove(dest, src, sz);
+	#else
+	return memmove(dest, src, sz);
+	#endif
+}
+
 
 
 
@@ -771,4 +804,8 @@ void Console::Put(const char* msg) {
 	if (len)
 		fwrite(msg, len, 1, stdout);
 }
+
+
+NAMESPACE_SDK_END
+
 

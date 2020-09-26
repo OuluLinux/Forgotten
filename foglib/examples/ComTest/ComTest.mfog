@@ -1,26 +1,26 @@
-using "Core/Core.fog";
+using "Com/Com.fog";
 
-namespace CoreTest {
-using/interface Core;
-};
+namespace Com {
 
 
-class CoreTester {
-	export / interface CoreTest;
-	export / implementation CoreTest;
+
+
+class Tester {
 	
-	
-	
-	!inline public int Main() {
-		String s("test");
+	!inline public void Run() {
+		/*String s("test");
 		ConstChar* c = s;
-		Console::Put("Starting Core-testing\n");
+		Console::Put("Starting Com-testing\n");*/
 		
-		uint64 v;
+		uint64 v = UINT_MAX;
 		ASSERT(sizeof(v) == 8);
 		
 		VOID_PTR p;
 		p = Null;
+		
+		ASSERT(SignificantBits(0x8000) == 16);
+		ASSERT(SignificantBits64(0x8000) == 16);
+		
 		
 		/*Console::Put(program.GetVertexSource());
 		
@@ -28,9 +28,17 @@ class CoreTester {
 		Console::Put("Fragment source:\n");
 		Console::Put(program.GetFragmentSource());*/
 		
-		return 0;
 	}
 };
+
+
+
+}
+
+$MainClass(Com::Tester);
+
+
+
 
 
 

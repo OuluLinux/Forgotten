@@ -1,0 +1,90 @@
+
+
+
+#ifndef NULL
+	#define NULL 0
+#endif
+
+// TODO translate
+#define t_(x) x
+
+
+#define SCHAR_MIN		(-128)
+#define SCHAR_MAX		127
+#define UCHAR_MAX		255
+#define SHRT_MIN		(-32768)
+#define SHRT_MAX		32767
+#define USHRT_MAX		65535
+#define INT_MIN			(-INT_MAX - 1)
+#define INT_MAX			2147483647
+#define UINT_MAX		4294967295U
+
+// TODO add support for 64 bit integers in fog
+//#define INT64_MAX		9223372036854775807LL
+//#define INT64_MIN		(-LLONG_MAX - 1LL)
+//#define UINT64_MAX	18446744073709551615ULL
+
+
+#define M_E        2.71828182845904523536   // e
+#define M_LOG2E    1.44269504088896340736   // log2(e)
+#define M_LOG10E   0.434294481903251827651  // log10(e)
+#define M_LN2      0.693147180559945309417  // ln(2)
+#define M_LN10     2.30258509299404568402   // ln(10)
+#define M_PI       3.14159265358979323846   // pi
+#define M_PI_2     1.57079632679489661923   // pi/2
+#define M_PI_4     0.785398163397448309616  // pi/4
+#define M_1_PI     0.318309886183790671538  // 1/pi
+#define M_2_PI     0.636619772367581343076  // 2/pi
+#define M_2_SQRTPI 1.12837916709551257390   // 2/sqrt(pi)
+#define M_SQRT2    1.41421356237309504880   // sqrt(2)
+#define M_SQRT1_2  0.707106781186547524401  // 1/sqrt(2)
+
+
+#define MACROSTR(x) #x
+#define COUT(x) {::UScript::String ____s; ____s << x; Cout() << ____s << "\n";}
+#define COUTLOG(x) {::UScript::String ____s; ____s << x; LOG(____s); Cout() << ____s << "\n";}
+#define TODO {Panic("TODO " __FILE__ ":" + UScript::IntStr(__LINE__)); throw UScript::Exc("TODO");}
+#define SYNON_UNION_2(type, name0, name1) union {type name0; type name1;};
+
+
+#define LOG(x) {UScript::Log() << x << ENDL; UScript::Log().Flush();}
+
+#define DUMP(x) {LOG( #x  " = " << ToString(x));}
+
+#define DUMPC(c) {\
+LOG(#c << " {"); \
+for (int i = 0; i < c.GetCount(); i++) \
+	LOG("\t[" << i << "]: " << ToString(c[i])); \
+LOG("}"); \
+}
+
+#define DUMPM(m) {\
+LOG(#m << " {"); \
+for (int i = 0; i < m.GetCount(); i++) \
+	LOG("\t[" << i << "]: " << ToString(m.GetKey(i)) << ": " << ToString(m[i])); \
+LOG("}"); \
+}
+
+
+auto statement MainClass(token id) {
+	
+	// Indirect including of the main class.
+	// This requires that the MainClass is in Main namespace.
+	// You create a dummy global object, which 'requires' the Main interface,
+	// which makes the Main.hxx to be included in Global.hxx.
+	struct ComInterfaceLinker {
+		export/interface Com;
+		export/implementation Com;
+	};
+	ComInterfaceLinker loader;
+	
+	
+	extern "C" !inline int main(int argc, const char** argv) {
+		Env& e = Env::Local();
+		e.Init(argc, argv);
+		${id}().Run();
+		return e.Deinit();
+	};
+}
+
+

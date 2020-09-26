@@ -1,5 +1,5 @@
-#ifndef _Core_Defs_h_
-#define _Core_Defs_h_
+#ifndef _Com_Defs_h_
+#define _Com_Defs_h_
 
 
 NAMESPACE_SDK_BEGIN
@@ -49,23 +49,34 @@ NAMESPACE_SDK_BEGIN
 #define PANIC(msg) ASSERT_(false, msg)
 
 
+#if defined flagGCC || flagCLANG
+	#define MemoryCompare __builtin_memcmp
+	#define MemoryCopy    __builtin_memcpy
+	#define MemoryMove    __builtin_memmove
+#elif defined flagMSC
+	#define MemoryCompare memcmp
+	#define MemoryCopy    memcpy
+	#define MemoryMove    memmove
+#endif
 
-typedef unsigned char	uint8;
-typedef char			int8;
-typedef unsigned short	uint16;
-typedef short			int16;
-typedef unsigned int	uint32;
-typedef int				int32;
-typedef uint64_t		uint64;
-typedef int64_t			int64;
 
-typedef unsigned char	Byte;
-typedef unsigned char	byte;
-typedef uint16			word;
-typedef uint32			dword;
-typedef uint64			qword;
 
-typedef unsigned long	DWORD;
+typedef unsigned char		uint8;
+typedef char				int8;
+typedef unsigned short		uint16;
+typedef short				int16;
+typedef unsigned int		uint32;
+typedef int					int32;
+typedef unsigned long long	uint64;
+typedef long long			int64;
+
+typedef unsigned char		Byte;
+typedef unsigned char		byte;
+typedef uint16				word;
+typedef uint32				dword;
+typedef uint64				qword;
+
+typedef unsigned long		DWORD;
 
 
 

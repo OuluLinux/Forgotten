@@ -1,5 +1,5 @@
 
-typedef const char ConstChar;
+/typedef const char ConstChar;
 typedef const char* CString;
 
 
@@ -9,8 +9,8 @@ typedef const char* CString;
 /*auto int SMALLSTR = 8;
 template<class T>
 struct String0 {
-	export/interface Core;
-	export/implementation Core;
+	export/interface Com;
+	export/implementation Com;
 
 	char* data = 0;
 
@@ -18,8 +18,8 @@ struct String0 {
 
 template<class T>
 class StringT {
-	export/interface Core;
-	export/implementation Core;
+	export/interface Com;
+	export/implementation Com;
 
 	union {
 		T data[$SMALLSTR];
@@ -39,8 +39,8 @@ public:
 };
 
 class String {
-	export/interface Core;
-	export/implementation Core;
+	export/interface Com;
+	export/implementation Com;
 	using/interface StringT;
 
 	StringT<char> data;
@@ -64,15 +64,15 @@ public:
 	identifier ConstChar = Const${post};
 
 	class Data() {
-		export/interface Core;
-		export/implementation Core;
+		export/interface Com;
+		export/implementation Com;
 
 	};
 
 
 	class $String {
-		export/interface Core;
-		export/implementation Core;
+		export/interface Com;
+		export/implementation Com;
 		using/interface ${String}Data${post};
 
 		union {
@@ -106,8 +106,8 @@ $MakeString(String, char, Char);*/
 }
 
 class String {
-	export/interface Core;
-	export/implementation Core;
+	export/interface Com;
+	export/implementation Com;
 
 public:
 
@@ -160,8 +160,8 @@ auto statement StringBasePublic(identifier Elem, identifier ConstElem) {
 }
 
 class String {
-	export/interface Core;
-	export/implementation Core;
+	export/interface Com;
+	export/implementation Com;
 	
 	auto int SMALLSTR = 8;
 	

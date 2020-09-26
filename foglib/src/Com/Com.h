@@ -1,5 +1,5 @@
-#ifndef _Core_Core_h_
-#define _Core_Core_h_
+#ifndef _Com_Com_h_
+#define _Com_Com_h_
 
 
 #ifdef WINSOCK_HACK_FIX
@@ -98,12 +98,13 @@ using namespace std::chrono;
 
 #define DLOG(x) LOG(x)
 
-#define NAMESPACE_SDK_BEGIN namespace  Native {
+#define NAMESPACE_SDK_BEGIN namespace  Com {
 #define NAMESPACE_SDK_END }
 
 
 #include "Defs.h"
 
+NAMESPACE_SDK_BEGIN
 
 struct Console {
 	
@@ -113,5 +114,6 @@ struct Console {
 	
 };
 
+NAMESPACE_SDK_END
 
 #endif

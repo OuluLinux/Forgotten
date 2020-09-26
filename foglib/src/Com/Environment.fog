@@ -1,0 +1,40 @@
+
+
+class Env {
+	export / implementation Com;
+	export / interface Com;
+	
+	
+public:
+	
+	void Init(int argc, const char** argv) {
+		SetExeFilePath(argv[0]);
+		SeedRandom();
+		ParseCommandLine(argc, argv);
+		ReadComCmdlineArgs();
+		RunInitBlocks();
+	}
+	
+	int Deinit() {
+		ShutdownThreads();
+		RunExitBlocks();
+		return GetExitCode();
+	}
+	
+	void ShutdownThreads() {}
+	
+	static Env& Local() {static Env e; return e;}
+	
+protected:
+	void SetExeFilePath(const char* path) {}
+	void SeedRandom() {}
+	void ParseCommandLine(int argc, const char** argv) {}
+	void ReadComCmdlineArgs() {}
+	void RunInitBlocks() {}
+	void RunExitBlocks() {}
+	int GetExitCode() {return 0;}
+	
+	
+};
+
+

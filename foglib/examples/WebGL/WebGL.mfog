@@ -1,7 +1,7 @@
 using "MachLib/MachLib.fog";
 
 namespace WebGL {
-using/interface ManyCore;
+using/interface ManyCom;
 }
 
 

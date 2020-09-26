@@ -1,0 +1,3 @@
+
+
+#define ONCELOCK static AtomicInt __once; if (__once++ == 0)

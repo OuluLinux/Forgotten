@@ -14,8 +14,8 @@ enum GLSLExtension {
 };
 
 class Program {
-	export/interface ManyCore;
-	export/implementation ManyCore;
+	export/interface Hive;
+	export/implementation Hive;
 	
 public:
 

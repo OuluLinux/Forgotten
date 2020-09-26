@@ -1,7 +1,7 @@
 
 
 struct Console {
-	export/interface Core;
+	export/interface Com;
 	
 	
 	static int Get(char* buf, int size);

@@ -4,7 +4,7 @@ uses
 	Math;
 
 file
-	ManyCore.fog,
+	Hive.fog,
 	Program.fog,
 	_ readonly separator;
 

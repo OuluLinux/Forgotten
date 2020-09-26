@@ -3,16 +3,22 @@ description "\377B128,0,0";
 noblitz;
 
 file
-	Core.fog highlight cpp,
+	Com.fog highlight cpp,
 	LangNotes.fog,
 	Defs.fog,
+	Macros.fog,
+	Native.fog,
+	Math.fog,
+	Concurrency.fog,
+	Environment.fog,
 	Vector.fog,
 	String.fog,
 	StringUtil.fog,
 	Stream.fog highlight cpp,
 	"C++ Support" readonly separator,
-	Core.h,
-	Core.cpp,
+	Com.h,
+	Com.cpp,
 	Defs.h,
+	Math.cpp,
 	_ readonly separator;
 
