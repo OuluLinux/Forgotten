@@ -1,13 +1,14 @@
 /*!$@FOG@$!
- *	Generated at Thu Sep 24 16:14:00 2020
+ *	Generated at Sat Sep 26 06:11:06 2020
  *
  *	by fog 0.1.a of 08:09:34 Sep 23 2020
  *
  *	from
  *		../../src/Core/Core.fog
+ *		../../src/Core/Defs.fog
  *		../../src/Core/Stream.fog
  *		../../src/Core/String.fog
- *		/home/sblo/Forgotten/foglib/examples/CoreTest/CoreTest.mfog
+ *		CoreTest.mfog
  */
 
 #ifndef CORETEST_CXX
@@ -17,14 +18,28 @@
 #include <CoreTest.hxx>
 #endif
 
-#line 14 "/home/sblo/Forgotten/foglib/examples/CoreTest/CoreTest.mfog"
+#line 14 "CoreTest.mfog"
 int CoreTester::Main()
 {
 #line 15
     String s("test");
     ConstChar * c = s;
     Console::Put("Starting Core-testing\n");
-#line 24
+#line 19
+    uint64 v;
+    {
+#line 20
+        if (!(sizeof (v) == 8))
+        {
+#line 20
+            Break("Assertion failed: sizeof(v) == 8");
+        }
+    }
+#line 21
+    ;
+    VOID_PTR p;
+    p = Null;
+#line 31
     return 0;
 };
 

@@ -11,22 +11,7 @@
  *		CoreTest.mfog
  */
 
-#ifndef CORETEST_HXX
-#define CORETEST_HXX
-
-#ifndef CORE_HXX
-#include <Core.hxx>
-#endif
-
-class CoreTester
-{
-public:
-#line 14 "CoreTest.mfog"
-    int Main();
-};
-
-namespace CoreTest
-{
-};
+#ifndef GLOBAL_CXX
+#define GLOBAL_CXX
 
 #endif

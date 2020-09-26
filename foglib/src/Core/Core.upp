@@ -5,6 +5,7 @@ noblitz;
 file
 	Core.fog highlight cpp,
 	LangNotes.fog,
+	Defs.fog,
 	Vector.fog,
 	String.fog,
 	StringUtil.fog,
@@ -12,5 +13,6 @@ file
 	"C++ Support" readonly separator,
 	Core.h,
 	Core.cpp,
+	Defs.h,
 	_ readonly separator;
 

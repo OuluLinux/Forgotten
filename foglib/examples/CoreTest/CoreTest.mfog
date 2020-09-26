@@ -15,6 +15,13 @@ class CoreTester {
 		String s("test");
 		ConstChar* c = s;
 		Console::Put("Starting Core-testing\n");
+		
+		uint64 v;
+		ASSERT(sizeof(v) == 8);
+		
+		VOID_PTR p;
+		p = Null;
+		
 		/*Console::Put(program.GetVertexSource());
 		
 		Console::Put("\n\n");

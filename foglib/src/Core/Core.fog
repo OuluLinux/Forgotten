@@ -1,6 +1,7 @@
 
 namespace Core {};
 
+using "Core/Defs.fog";
 
 //using "Core/Vector.fog";
 using "Core/String.fog";

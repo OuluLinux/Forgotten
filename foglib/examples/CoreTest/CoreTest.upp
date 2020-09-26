@@ -12,15 +12,23 @@ file
 	"FOG Generated" readonly separator,
 	CoreTest.hxx,
 	CoreTest.cxx,
+	Global.hxx,
+	Global.cxx,
 	Core.hxx,
 	Core.cxx,
 	Console.cxx,
+	Native.hxx,
+	Native.cxx,
 	_ readonly separator;
 
 mainconfig
 	"" = "";
 
-custom() "mfog",
-	"fog -cd$(DIR) -t4 -I../../src $(PATH)\n",
+custom(POSIX) "mfog",
+	"fog -cd$(DIR) -t4 -I../../src -DPOSIX -DCPU64 -global Global $(PATH)\n",
+	"$(DIR)/CoreTest.hxx";
+
+custom(WIN32) "",
+	"fog -cd$(DIR) -t4 -I../../src -DWIN32 -DCPU64 -global Global $(PATH)\n",
 	"$(DIR)/CoreTest.hxx";
 

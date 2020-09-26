@@ -11,22 +11,10 @@
  *		CoreTest.mfog
  */
 
-#ifndef CORETEST_HXX
-#define CORETEST_HXX
+#ifndef GLOBAL_HXX
+#define GLOBAL_HXX
 
-#ifndef CORE_HXX
-#include <Core.hxx>
-#endif
-
-class CoreTester
-{
-public:
-#line 14 "CoreTest.mfog"
-    int Main();
-};
-
-namespace CoreTest
-{
-};
+#line 3 "../../src/Core/String.fog"
+const char *CString;
 
 #endif
