@@ -158,6 +158,221 @@ void rewinddir(DIR *dir)
 
 
 
+
+
+
+NAMESPACE_SDK_BEGIN
+
+C::Nuller Null;
+
+
+void Break(const char* msg) {
+	fprintf(stderr, "%s\n", msg);
+	__BREAK__;
+}
+
+void* MemoryAlloc(int sz) {return malloc(sz);}
+
+void MemoryFree(void* ptr) {return free(ptr);}
+
+int MemoryCompare( const void *m1, const void *m2, int sz) {
+	#if defined flagGCC || flagCLANG
+	return __builtin_memcmp(m1, m2, sz);
+	#else
+	return memcmp(m1, m2, sz);
+	#endif
+}
+
+void* MemoryCopy(void *dest, const void *src, int sz) {
+	#if defined flagGCC || flagCLANG
+	return __builtin_memcpy(dest, src, sz);
+	#else
+	return memcpy(dest, src, sz);
+	#endif
+}
+
+void* MemoryMove(void *dest, const void *src, int sz) {
+	#if defined flagGCC || flagCLANG
+	return __builtin_memmove(dest, src, sz);
+	#else
+	return memmove(dest, src, sz);
+	#endif
+}
+
+void MemorySet(void *dest, int byte_value, int sz) {
+	memset(dest, byte_value, sz);
+}
+
+
+
+
+int Console::Get(char* line, int size) {
+	if (!line || size <= 0)
+		return 0;
+	size_t i;
+	for (i = 0; i < size - 1; ++i) {
+		int ch = fgetc(stdin);
+		if (ch == '\n' || ch == EOF) {
+			break;
+		}
+		line[i] = ch;
+	}
+	line[i] = '\0';
+	return i;
+}
+
+void Console::Put(const char* msg) {
+	int len = strlen(msg);
+	if (len)
+		fwrite(msg, len, 1, stdout);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+static int s_month[] = {
+	31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+};
+
+static int s_month_off[] = {
+	  0,  31,  59,  90, 120, 151,
+	181, 212, 243, 273, 304, 334
+};
+
+bool IsLeapYear(int year) {
+	return ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0);
+}
+
+int  GetDaysOfMonth(int m, int y) {
+	ASSERT(m >= 1 && m <= 12);
+	return s_month[m - 1] + (m == 2) * IsLeapYear(y);
+}
+
+int64 DateSeconds(uint64 year, uint64 month, uint64 day) {
+	int64 y400 = (year / 400 ) - 2;
+	int64 ym = year - y400 * 400;
+	return y400 * (400 * 365 + 100 - 3) +
+	        ym * 365 + s_month_off[month - 1] + (day - 1) +
+	       (ym - 1) / 4 - (ym - 1) / 100 + (ym - 1) / 400 + 1 +
+	       (month > 2) * IsLeapYear(ym);
+}
+
+int64 TimeSeconds(uint64 year, uint64 month, uint64 day, uint64 hour, uint64 minute, uint64 second) {
+	int64 date = DateSeconds(year, month, day);
+	return date * (int64)24 * 3600 + hour * 3600 + minute * 60 + second;
+}
+
+int64 NativeCurrentTime() {
+	time_t rawtime;
+	time(&rawtime);
+	
+	struct tm t;
+	#ifdef flagWIN32
+	localtime_s(&t, &rawtime);
+	#else
+	t = *localtime(&rawtime);
+	#endif
+	
+	return TimeSeconds(
+		t.tm_year + 1900, t.tm_mon, t.tm_mday,
+		t.tm_hour, t.tm_min, t.tm_sec);
+}
+
+
+
+int StringLength(const char* c, int max_len) {
+	return strnlen(c, max_len);
+}
+
+int StringLength(const short* c, int max_len) {
+	ASSERT(c);
+	if (!c) return 0;
+	int count = 0;
+	if (max_len < 0) {
+		while (*c) {
+			count++;
+			c++;
+		}
+		return count;
+	}
+	else {
+		while (max_len > 0 && *c) {
+			count++;
+			c++;
+			max_len--;
+		}
+		return count;
+	}
+}
+
+
+void NativeDblStr(double d, char* buf, int buf_size) {
+	snprintf(buf, buf_size, "%g", d);
+}
+
+void NativeDblStr(double d, short* buf, int buf_size) {
+	char tmp[50];
+	snprintf(tmp, 50, "%g", d);
+	int len = std::min(50, buf_size);
+	char* it = tmp;
+	char* end = it + len;
+	while (it != end)
+		*buf++ = *it++;
+}
+
+
+
+typedef std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> UnicodeConverter;
+
+inline UnicodeConverter& GetUnicodeConverter() {thread_local static UnicodeConverter conv; return conv;}
+
+const short* NativeUtf8To16(const char* in) {
+	thread_local static std::wstring ws = GetUnicodeConverter().from_bytes(std::string(in));
+	thread_local static std::vector<short> v;
+	v.resize(ws.size());
+	int i = 0;
+	for(wchar_t w : ws)
+		v[i++] = w;
+	v[i] = 0;
+	return v.data();
+}
+
+const char* NativeUtf16To8(const short* in) {
+	thread_local static std::vector<wchar_t> v;
+	int len = StringLength(in, 10000000);
+	v.resize(len + 1);
+	for(wchar_t& s : v) s = *in++;
+	v[len] = 0;
+	thread_local static std::string s = GetUnicodeConverter().to_bytes(std::wstring(v.data()));
+	return s.c_str();
+}
+
+NAMESPACE_SDK_END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #if 0
 
 
@@ -739,73 +954,3 @@ Vector<String> Split(String to_split, String split_str, bool ignore_empty) {
 }
 
 #endif
-
-
-namespace C {
-
-struct Nuller {};
-	
-}
-
-NAMESPACE_SDK_BEGIN
-
-C::Nuller Null;
-
-
-void Break(const char* msg) {
-	fprintf(stderr, "%s\n", msg);
-	__BREAK__;
-}
-
-int MemoryCompare(const void *m1, const void *m2, int sz) {
-	#if defined flagGCC || flagCLANG
-	return __builtin_memcmp(m1, m2, sz);
-	#else
-	return memcmp(m1, m2, sz);
-	#endif
-}
-
-void* MemoryCopy(void *dest, const void *src, int sz) {
-	#if defined flagGCC || flagCLANG
-	return __builtin_memcpy(dest, src, sz);
-	#else
-	return memcpy(dest, src, sz);
-	#endif
-}
-
-void* MemoryMove(void *dest, const void *src, int sz) {
-	#if defined flagGCC || flagCLANG
-	return __builtin_memmove(dest, src, sz);
-	#else
-	return memmove(dest, src, sz);
-	#endif
-}
-
-
-
-
-int Console::Get(char* line, int size) {
-	if (!line || size <= 0)
-		return 0;
-	size_t i;
-	for (i = 0; i < size - 1; ++i) {
-		int ch = fgetc(stdin);
-		if (ch == '\n' || ch == EOF) {
-			break;
-		}
-		line[i] = ch;
-	}
-	line[i] = '\0';
-	return i;
-}
-
-void Console::Put(const char* msg) {
-	int len = strlen(msg);
-	if (len)
-		fwrite(msg, len, 1, stdout);
-}
-
-
-NAMESPACE_SDK_END
-
-

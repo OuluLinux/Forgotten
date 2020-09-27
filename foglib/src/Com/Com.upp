@@ -2,19 +2,25 @@ description "\377B128,0,0";
 
 noblitz;
 
+library(POSIX) pthread;
+
 file
-	Com.fog highlight cpp,
+	"Notes for programmer" readonly separator,
+	Pitfalls.fog,
 	LangNotes.fog,
+	"FOG code" readonly separator,
+	Com.fog highlight cpp,
 	Defs.fog,
 	Macros.fog,
+	Meta.fog,
 	Native.fog,
 	Hash.fog,
 	Algorithm.fog,
+	String.fog,
 	Math.fog,
 	Concurrency.fog,
 	Environment.fog,
 	Vector.fog,
-	String.fog,
 	StringUtil.fog,
 	Stream.fog highlight cpp,
 	"C++ Support" readonly separator,
@@ -22,5 +28,6 @@ file
 	Com.cpp,
 	Defs.h,
 	Math.cpp,
+	Algo.cpp,
 	_ readonly separator;
 

@@ -102,9 +102,22 @@ using namespace std::chrono;
 #define NAMESPACE_SDK_END }
 
 
+namespace C {
+
+struct Nuller {};
+template <class T> struct Ptr;
+
+}
+
 #include "Defs.h"
 
 NAMESPACE_SDK_BEGIN
+
+void Break(const char* msg);
+void MemoryFree(void* ptr);
+int MemoryCompare(const void *m1, const void *m2, int sz);
+void* MemoryCopy(void *dest, const void* src, int sz);
+void* MemoryMove(void *dest, const void* src, int sz);
 
 struct Console {
 	
@@ -113,6 +126,31 @@ struct Console {
 	
 	
 };
+
+struct AtomicBool {
+	std::atomic<bool> value;
+	
+	AtomicBool();
+	AtomicBool(bool b);
+	AtomicBool(const AtomicBool& ai);
+	operator bool();
+	bool operator = (bool b);
+};
+
+struct AtomicInt {
+	std::atomic<int> value;
+	
+	AtomicInt();
+	AtomicInt(int i);
+	AtomicInt(const AtomicInt& ai);
+	operator int() const;
+	int operator = (int i);
+	int operator++();
+	int operator--();
+	int operator++(int);
+	int operator--(int);
+};
+
 
 NAMESPACE_SDK_END
 

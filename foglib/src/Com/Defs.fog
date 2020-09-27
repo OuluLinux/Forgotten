@@ -38,27 +38,19 @@ template<class T> struct Ptr {
 
 
 
-
 }
-
 
 
 namespace Com {
 using/interface C;
 
-
 extern C::Nuller Null;
-
 
 auto character to_character(token t) { $t }
 auto identifier to_identifier(token t) { $t }
 auto number to_number(token t) { $t }
 auto string to_string(token t) { $t }
 auto type to_type(token t) { $t }
-
-
-
-
 
 
 auto declaration ForceGlobalVisible(token t) {
@@ -76,7 +68,6 @@ auto declaration GlobalTypedefPtr(token from, token to) {
 }
 
 
-
 $GlobalTypedef(char,				int8);
 $GlobalTypedef(unsigned short,		uint16);
 $GlobalTypedef(short,				int16);
@@ -91,26 +82,26 @@ $GlobalTypedef(uint32,				dword);
 $GlobalTypedef(uint64,				qword);
 $GlobalTypedef(unsigned long,		DWORD);
 $GlobalTypedefPtr(const char,		CString);
-$GlobalTypedefPtr(void,				VOID_PTR);
-$GlobalTypedefPtr(const void,		CONST_VOID_PTR);
-
-
-
+$GlobalTypedefPtr(void,				VoidPtr);
+$GlobalTypedefPtr(const void,		ConstVoidPtr);
 
 
 auto string PLATFORM = "UNKNOWN";
 auto number CPU_32 = 0;
 auto number CPU_64 = 0;
+auto number PTRSIZE = 0;
 
 auto if ($IsDefined("CPU64")) {
 	$DebugMetaLog("Using 64bit cpu");
 	
-	CPU_64 = 1;
+	auto CPU_64 = 1;
+	auto PTRSIZE = 8;
 }
 else if ($IsDefined("CPU32")) {
 	$DebugMetaLog("Using 32bit cpu");
 	
-	CPU_64 = 1;
+	auto CPU_64 = 1;
+	auto PTRSIZE = 4;
 }
 else $std::error("Define cpu bits: CPU32 or CPU64");
 

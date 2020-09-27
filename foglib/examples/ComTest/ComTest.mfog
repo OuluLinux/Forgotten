@@ -7,15 +7,18 @@ namespace Com {
 
 class Tester {
 	
+	static bool TestCmp(const char& c, void*) {
+		return c == 'c';
+	};
+	
+	$Tuple2(SomeTuple2, int, double);
+	$RefTuple2(SomeRefTuple2, int, double);
+	
 	!inline public void Run() {
-		/*String s("test");
-		ConstChar* c = s;
-		Console::Put("Starting Com-testing\n");*/
-		
 		uint64 v = UINT_MAX;
 		ASSERT(sizeof(v) == 8);
 		
-		VOID_PTR p;
+		VoidPtr p;
 		ASSERT(p == Null);
 		
 		ASSERT(SignificantBits(0x8000) == 16);
@@ -28,6 +31,35 @@ class Tester {
 		int a = 0;
 		int b = 1;
 		ASSERT(min(a, b) < max(a, b));
+		
+		int r = Random();
+		double d = Randomf();
+		int j = d;
+		
+		const char* test_str = "abcdef";
+		int test_strlen = StringLength(test_str);
+		ASSERT(FindIf(test_str, test_str + test_strlen, &TestCmp));
+		
+		
+		ASSERT(String("test") == "test");
+		ASSERT(String::DblStr(1.2) == "1.2");
+		ASSERT("abc" + String("def") == "abcdef");
+		ASSERT(String("abc") + "def" == "abcdef");
+		ASSERT(ToString(ToWString<String>("abc")) == "abc");
+		ASSERT(ToInt<String>("123") == 123);
+		ASSERT(ToString(123) == "123");
+		ASSERT(HexStr((void*)0x123f) == "0x123F");
+		
+		
+		SomeTuple2 ttt = {1, 1.2};
+		ASSERT(ToString(ttt) == "1, 1.2");
+		
+		SomeRefTuple2 tttref(ttt.a, ttt.b);
+		ASSERT(ToString(tttref) == "1, 1.2");
+		
+		/*
+		ConstChar* c = s;
+		Console::Put("Starting Com-testing\n");*/
 		
 		/*Console::Put(program.GetVertexSource());
 		

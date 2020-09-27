@@ -1,176 +1,803 @@
 
-/typedef const char ConstChar;
-typedef const char* CString;
+namespace Com {
+
+class Stream {};
+
+
+inline bool IsOctDigit(char c) { return c >= '0' && c <= '7'; }
+inline bool IsHexDigit(char c) { return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'); }
+inline bool IsDigit(char c) { return c >= '0' && c <= '9'; }
+inline bool IsSpace(char c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r'; }
+inline bool IsAlpha(char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
+inline int GetHexDigit(char c) {
+	if (c >= '0' && c <= '9')
+		return c - '0';
+	if (c >= 'a' && c <= 'f')
+		return 10 + c - 'a';
+	if (c >= 'A' && c <= 'F')
+		return 10 + c - 'A';
+	return 0;
+}
 
 
 
 
-
-/*auto int SMALLSTR = 8;
-template<class T>
-struct String0 {
-	export/interface Com;
-	export/implementation Com;
-
-	char* data = 0;
-
-};
-
-template<class T>
-class StringT {
-	export/interface Com;
-	export/implementation Com;
-
-	union {
-		T data[$SMALLSTR];
-		String0<T>* ptr = 0;
-	};
-	bool is_big = false;
-
-public:
-	inline StringT() {data[0] = 0;}
-
-
-	inline const T* Get() const {
-		if (is_big)	return ptr->data;
-		else		return &data[0];
-	}
-
-};
-
-class String {
-	export/interface Com;
-	export/implementation Com;
-	using/interface StringT;
-
-	StringT<char> data;
-
-public:
-	String() {}
-	String(const char* s) {}
-
-
-	!inline operator ConstChar*() const {return data.Get();}
-
-};*/
-
-
-/*auto declaration MakeString(identifier String, type el, identifier post) {
-
-	typedef const $el Const${post};
-
-	auto int SMALLSTR = 8;
-	identifier Data = ${String}Data${post};
-	identifier ConstChar = Const${post};
-
-	class Data() {
-		export/interface Com;
-		export/implementation Com;
-
-	};
-
-
-	class $String {
-		export/interface Com;
-		export/implementation Com;
-		using/interface ${String}Data${post};
-
-		union {
-			$Data* ptr = 0;
-			$el small[$SMALLSTR];
+auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) {
+	class $Class {
+		auto int CharSize = $chr_bytes;
+		typedef $chr Char;
+		typedef const $chr ConstChar;
+		
+		class RefData {
+			Char* data = NULL;
+			int reserved = 0;
+			
+		public:
+			!inline RefData(Char* str, int reserved) : data(str), reserved(reserved) {}
+			!inline ~RefData() {Clear();}
+			
+			!inline void Clear() {if (data) {MemoryFree(data); data = 0; refs = 0; reserved = 0;}}
+			
+			!inline void IncreaseReserved() {
+				uint64 new_reserved = 1;
+				while (new_reserved <= reserved)
+					new_reserved <<= 1;
+				if (new_reserved >= INT_MAX)
+					new_reserved = INT_MAX;
+				Reserve((int)new_reserved);
+			}
+			
+			!inline void IncreaseReserved(int min_reserved) {
+				uint64 new_reserved = 1;
+				while (new_reserved <= min_reserved)
+					new_reserved <<= 1;
+				if (new_reserved >= INT_MAX)
+					new_reserved = INT_MAX;
+				Reserve((int)new_reserved);
+			}
+			
+			!inline void Reserve(int new_reserved) {
+				if (new_reserved <= reserved)
+					return;
+				Char* new_data = (Char*)MemoryAlloc(new_reserved * sizeof(Char));
+				if (data) {
+					if (reserved > 0)
+						MemoryCopy(new_data, data, sizeof(Char) * reserved);
+					MemoryFree(data);
+				}
+				data = new_data;
+				reserved = new_reserved;
+			}
+		
+			!inline ConstChar* Get() const { return data; }
+			!inline Char* Begin() { return data; }
+			!inline operator ConstChar* () const { return data; }
+		
+			!inline int GetReserved() const { return reserved; }
 		};
-		bool is_big = false;
-
+		$AddRefCounter(RefData);
+		
+		auto int BufSize = 8;
+		auto int BufBytes = $BufSize * $CharSize;
+		auto int PtrCount = $PTRSIZE / 4;
+		
+		union {
+			Char		buf[$BufSize];
+			RefData*	ref[$PtrCount];
+		};
+		bool is_ref = false;
+		int count = 0;
+		
+		
+		$ZeroFunction();
+		
+		#define REF ref[0]
+		
 	public:
-
-		$String() {small[0] = 0;}
-		$String(ConstChar* ptr) {}
-
-
-
-		operator ConstChar* () const;
+		!inline ${Scope} () {Zero();}
+		!inline ${Scope} (const Char* c) {Zero(); *this = c;}
+		!inline ${Scope} (const Char* c, int len) {Zero(); Set(c, len);}
+		!inline ${Scope} (const ${Scope}& s) {Zero(); *this = s;}
+		!inline ~${Scope} () {Clear();}
+		
+		
+		void Clear() {
+			if (is_ref) { REF->Dec(); REF = NULL; is_ref = false;}
+			else {REF = 0;}
+			count = 0;
+		}
+		
+		void Serialize(Stream& s);
+		${Scope}& Set(const Char* c, int len) {
+			Clear();
+			if (!c) return *this;
+			count = min(StringLength(c, len), len);
+			if (count < $BufSize) {
+				MemoryCopy(buf, c, sizeof(Char) * count);
+				buf[count] = 0;
+			}
+			else {
+				Char* buf = (Char*)MemoryAlloc(sizeof(Char) * (count + 1));
+				MemoryCopy(buf, c, sizeof(Char) * count);
+				buf[count] = 0;
+				REF = new RefData(buf, count + 1);
+				REF->Inc();
+				is_ref = true;
+			}
+			return *this;
+		}
+		${Scope}& operator=(const Char* c) {return Set(c, StringLength(c));}
+		${Scope}& operator=(const ${Scope}& str) {
+			if (!str.is_ref) {
+				Clear();
+				MemoryCopy(buf, str.buf, sizeof(buf));
+				is_ref = false;
+			}
+			else {
+				if (is_ref && REF == str.REF)
+					return *this;
+				Clear();
+				is_ref = true;
+				str.REF->Inc();
+				REF = str.REF;
+			}
+			count = str.count;
+			return *this;
+		}
+		
+		${Scope} operator+ (const ${Scope}& l) const {
+			${Scope} s(*this);
+			s.Cat(l);
+			return s;
+		}
+		
+		${Scope}& Cat(Char c, int count) {
+			// TODO improve performance
+			for(int i = 0; i < count; i++) Cat(c);
+			return *this;
+		}
+		
+		${Scope}& Cat(Char i) {
+			if (!is_ref) {
+				is_ref = count + 1 >= $BufSize;
+				if (!is_ref) {
+					buf[count] = i;
+					count++;
+					buf[count] = 0;
+				}
+				else {
+					Char* buf = (Char*)MemoryAlloc(sizeof(Char) * (count + 1 + 1));
+					MemoryCopy(buf, this->buf, sizeof(Char) * count);
+					buf[count] = i;
+					count++;
+					buf[count] = 0;
+					REF = new RefData(buf, count + 1);
+					is_ref = true;
+				}
+			}
+			else {
+				if (REF->GetRefs() == 1) {
+					int new_count = count + 1 + 1;
+					if (new_count > REF->GetReserved())
+						REF->IncreaseReserved();
+					Char* c = REF->Begin();
+					c[count] = i;
+					count++;
+					c[count] = 0;
+				}
+				else {
+					Char* buf = (Char*)MemoryAlloc(sizeof(Char) * (count + 1 + 1));
+					MemoryCopy(buf, REF->Get(), sizeof(Char) * count);
+					buf[count] = i;
+					count++;
+					buf[count] = 0;
+					REF->Dec();
+					REF = new RefData(buf, count + 1);
+				}
+			}
+			return *this;
+		}
+		
+		
+	
+		${Scope}& Cat(const ${Scope}& str) {
+			if (!is_ref) {
+				is_ref = count + str.GetCount() >= $BufSize;
+				if (!is_ref) {
+					MemoryCopy(&buf[count], str.Begin(), sizeof(Char) * (str.GetCount() + 1));
+					count += str.GetCount();
+				}
+				else {
+					int reserved = count + str.GetCount() + 1;
+					Char* buf = (Char*)MemoryAlloc(sizeof(Char) * (reserved));
+					MemoryCopy(buf, this->buf, sizeof(Char) * count);
+					MemoryCopy(&buf[count], str.Begin(), sizeof(Char) * (str.GetCount() + 1));
+					count += str.GetCount();
+					REF = new RefData(buf, reserved);
+					is_ref = true;
+				}
+			}
+			else {
+				if (REF->GetRefs() == 1) {
+					int new_count = count + str.GetCount() + 1;
+					if (new_count > REF->GetReserved())
+						REF->IncreaseReserved(new_count);
+					Char* c = REF->Begin();
+					MemoryCopy(c + count, str.Begin(), sizeof(Char) * str.GetCount());
+					count += str.GetCount();
+					c[count] = 0;
+				}
+				else {
+					int reserved = count + str.GetCount() + 1;
+					Char* buf = (Char*)MemoryAlloc(sizeof(Char) * (reserved));
+					MemoryCopy(buf, REF->Get(), sizeof(Char) * count);
+					MemoryCopy(&buf[count], str.Begin(), sizeof(Char) * (str.GetCount() + 1));
+					count += str.GetCount();
+					buf[count] = 0;
+					REF->Dec();
+					REF = new RefData(buf, reserved);
+				}
+			}
+			return *this;
+		}
+	
+		void Replace(const ${Scope}& s, const ${Scope}& value) {
+			if (s == value) return;
+			int i = Find(s);
+			while (i >= 0) {
+				Replace(i, s.GetCount(), value);
+				i = Find(s, i + value.GetCount());
+			}
+		}
+	
+		void Replace(int i, int len, const ${Scope}& value) {
+			int new_len = this->count - len + value.GetCount();
+			const Char* begin = Begin();
+			int reserved = new_len + 1;
+			Char* buf = (Char*)MemoryAlloc(sizeof(Char) * (reserved));
+			int cursor = 0;
+			if (i > 0) {
+				MemoryCopy(buf, begin, sizeof(Char) * i);
+				cursor += i;
+			}
+			if (value.GetCount() > 0) {
+				MemoryCopy(buf + cursor, value.Begin(), sizeof(Char) * value.GetCount());
+				cursor += value.GetCount();
+			}
+			int c = i + len;
+			int end_len = this->count - c;
+			if (end_len > 0) {
+				MemoryCopy(buf + cursor, begin + c, sizeof(Char) * end_len);
+				cursor += end_len;
+			}
+			buf[cursor++] = 0;
+	
+			Clear();
+			this->is_ref = true;
+			this->count = new_len;
+			REF = new RefData(buf, reserved);
+			ASSERT(cursor == new_len+1);
+		}
+	
+		int GetCount() const { return count; }
+		bool IsEmpty() const { return count == 0; }
+		int Find(const ${Scope}& str, int pos = 0) const {
+			if (GetCount() == 0) return -1;
+			if (pos == count)
+				return -1;
+			ASSERT(pos >= 0 && pos < GetCount());
+			const Char* cur = Begin();
+			const Char* cmp = str.Begin();
+			int len = str.GetCount();
+			for (int i = pos; i < count; i++) {
+				if (Compare(cur + i, cmp, len) == 0)
+					return i;
+			}
+			return -1;
+		}
+		int ReverseFind(const ${Scope}& str) const { return ReverseFind(str, GetCount() - 1); }
+		int ReverseFind(const ${Scope}& str, int pos) const {
+			if (GetCount() == 0) return -1;
+			ASSERT(pos >= 0 && pos < GetCount());
+			const Char* cur = Begin();
+			const Char* cmp = str.Begin();
+			int len = str.GetCount();
+			for (int i = pos; i >= 0; i--) {
+				if (Compare(cur + i, cmp, len) == 0)
+					return i;
+			}
+			return -1;
+		}
+		int FindFirstNotOf(const Char* str) const {
+			if (GetCount() <= 0 || !str) return -1;
+			const Char* it  = Begin();
+			const Char* end = End();
+			int i = 0;
+			while (it != end) {
+				Char chr = *it++;
+				const Char* cmp_it = str;
+				bool match = false;
+				while (1) {
+					Char cmp_chr = *cmp_it++;
+					if (!cmp_chr)
+						break;
+					if (chr == cmp_chr) {
+						match = true;
+						break;
+					}
+				}
+				if (!match)
+					return i;
+				i++;
+			}
+			return -1;
+		}
+		int ReverseFindFirstNotOf(const Char* str) const {
+			if (GetCount() <= 0 || !str) return -1;
+			const Char* begin = Begin();
+			const Char* it = End();
+			int i = GetCount();
+			while (it != begin) {
+				Char chr = *--it;
+				const Char* cmp_it = str;
+				bool match = false;
+				while (1) {
+					Char cmp_chr = *cmp_it++;
+					if (!cmp_chr)
+						break;
+					if (chr == cmp_chr) {
+						match = true;
+						break;
+					}
+				}
+				i--;
+				if (!match)
+					return i;
+			}
+			return -1;
+		}
+		${Scope} Mid(int i) const { if (i >= GetCount()) return Empty(); if (i < 0) i = 0; return Mid(i, GetCount() - i); }
+		${Scope} Mid(int i, int size) const {
+			size = min(size, count - i);
+			if (size <= 0) return ${Scope}();
+			ASSERT(i >= 0 && i + size <= count);
+			return ${Scope}(Begin() + i, size);
+		}
+		${Scope} Left(int i) const { return Mid(0, i); }
+		${Scope} Right(int i) const { return Mid(GetCount() - i, i); }
+		
+		void Remove(int begin, int count) {
+			ASSERT(begin >= 0 && count >= 0);
+			begin = max(0, begin);
+			count = max(0, count);
+			int end = begin + count;
+			int c = GetCount();
+			ASSERT(begin <= c && end <= c);
+			end = min(c, end);
+			begin = min(c, begin);
+			int l = begin;
+			int r = c - end;
+			if (l && r)
+				*this = Left(l) + Right(r);
+			else if (l)
+				*this = Left(l);
+			else if (r)
+				*this = Right(r);
+			else
+				Clear();
+		}
+		bool Insert(int begin, const Char* str, int n) {
+			if (begin < 0 || begin > GetCount() || !str || n <= 0)
+				return false;
+			ASSERT(begin >= 0 && begin <= GetCount());
+			begin = max(0, min(begin, GetCount()));
+			${Scope} part(str, n);
+			int l = begin;
+			int r = GetCount() - begin;
+			if (l && r)
+				*this = Left(l) + part + Right(r);
+			else if (l)
+				*this = Left(l) + part;
+			else if (r)
+				*this = part + Right(r);
+			else
+				*this = part;
+			return true;
+		}
+		const Char* Begin() const {if (is_ref) return REF->Get(); else return buf; }
+		const Char* End() const { return Begin() + GetCount(); }
+	
+		bool operator==(const ${Scope}& s) const {
+			if (s.GetCount() != GetCount()) return false;
+			if (s.IsEmpty()) return true;
+			return Compare(s.Begin(), Begin()) == 0;
+		}
+		bool operator!=(const ${Scope}& s) const { return !(*this == s); }
+	
+		Char operator[] (int i) const {return At(i);}
+		Char At(int i) const { ASSERT(i >= 0 && i < count); return *(Begin() + i); }
+	
+		${Scope}& operator += (const ${Scope}& s) { Cat(s); return *this; }
+		${Scope}& operator << (const ${Scope}& s) { Cat(s); return *this; }
+		${Scope}& operator << (int i) { Cat(IntStr(i)); return *this; }
+		${Scope} operator + (const ${Scope}& s) { ${Scope} out(*this); out.Cat(s); return out; }
+	
+		static int OctInt(const ${Scope}& s) { return CharOctInt(s.Begin()); }
+		static int HexInt(const ${Scope}& s) { return CharHexInt(s.Begin()); }
+		static int StrInt(const ${Scope}& s) { return CharInt(s.Begin()); }
+		static int64 StrInt64(const ${Scope}& s) { return CharInt64(s.Begin()); }
+		static double StrDbl(const ${Scope}& s) { return CharDbl(s.Begin()); }
+	
+		static ${Scope} IntStr(int i) {
+			Char buf[10];
+			const Char* value = IntChar(buf, 10, i);
+			return ${Scope}(value);
+		}
+	
+		static ${Scope} IntStr64(int64 i) {
+			Char buf[30];
+			const Char* value = IntChar64(buf, 30, i);
+			return ${Scope}(value);
+		}
+	
+		static ${Scope} DblStr(double d) {
+			Char output[50];
+			NativeDblStr(d, output, 50);
+			return ${Scope}(output);
+		}
+	
+		${Scope} CharoString() const { return *this; }
+	
+		uint32 GetHashValue() const {
+			CombineHash ch;
+			const Char* buf = Begin();
+			for (int i = 0; i < count; i++)
+				ch.Put(*buf++);
+			return ch;
+		}
+		
+		static int CharOctInt(const Char *s) {
+			if (!s) return 0;
+			while (IsSpace(*s)) s++;
+			int n=0; int neg=0;
+			switch (*s) {
+				case '-': neg=1;
+				case '+': s++;
+			}
+			while (*s == '0') s++;
+			while (IsOctDigit(*s))
+				n = 8*n - (*s++ - '0');
+			if (neg) return n; else return -n;
+		}
+		
+		static int CharHexInt(const Char *s) {
+			if (!s) return 0;
+			while (IsSpace(*s)) s++;
+			int n=0; int neg=0;
+			switch (*s) {
+				case '-': neg=1;
+				case '+': s++;
+			}
+			if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
+				s += 2;
+			while (IsHexDigit(*s))
+				n = 16*n - GetHexDigit(*s++);
+			if (neg) return n; else return -n;
+		}
+		
+		static int CharInt(const Char *s)
+		{
+			int n=0; int neg=0;
+			while (IsSpace(*s)) s++;
+			switch (*s) {
+				case '-': neg=1;
+				case '+': s++;
+			}
+			while (IsDigit(*s))
+				n = 10*n - (*s++ - '0');
+			if (neg) return n; else return -n;
+		}
+		
+		static int64 CharInt64(const Char *s)
+		{
+			int64 n=0; int64 neg=0;
+			while (IsSpace(*s)) s++;
+			switch (*s) {
+				case '-': neg=1;
+				case '+': s++;
+			}
+			while (IsDigit(*s))
+				n = 10*n - (*s++ - '0');
+			if (neg) return n; else return -n;
+		}
+		
+		static uint64 CharIntU64(const Char *s)
+		{
+			uint64 n=0;
+			while (IsSpace(*s)) s++;
+			switch (*s) {
+				case '-': return 0;
+				case '+': s++;
+			}
+			while (IsDigit(*s))
+				n = 10*n - (*s++ - '0');
+			return n;
+		}
+		
+		static double CharDbl(const Char* s) {
+			double a = 0.0;
+			int e = 0;
+			int c;
+			
+			while ((c = *s++) != '\0' && IsDigit(c)) {
+				a = a * 10.0 + (c - '0');
+			}
+			
+			if (c == '.') {
+				while ((c = *s++) != '\0' && IsDigit(c)) {
+					a = a * 10.0 + (c - '0');
+					e = e - 1;
+				}
+			}
+			
+			if (c == 'e' || c == 'E') {
+				int sign = 1;
+				int i = 0;
+				c = *s++;
+				
+				if (c == '+')
+					c = *s++;
+				else
+					if (c == '-') {
+						c = *s++;
+						sign = -1;
+					}
+					
+				while (IsDigit(c)) {
+					i = i * 10 + (c - '0');
+					c = *s++;
+				}
+				
+				e += i * sign;
+			}
+			
+			while (e > 0) {
+				a *= 10.0;
+				e--;
+			}
+			
+			while (e < 0) {
+				a *= 0.1;
+				e++;
+			}
+			
+			return a;
+		}
+		
+		static const Char* IntChar(Char *p, int bufsize, int x) {
+			p += bufsize;
+			bool is_neg = false;
+			if (x < 0) {
+				is_neg = true;
+				x *= -1;
+			}
+			*--p = 0;
+			do {
+				*--p = '0' + x % 10;
+				x /= 10;
+			}
+			while (x);
+			if (is_neg)
+				*--p = '-';
+			return p;
+		}
+		
+		static const Char* IntChar64(Char *p, int bufsize, int64 x) {
+			p += bufsize;
+			bool is_neg = false;
+			if (x < 0) {
+				is_neg = true;
+				x *= -1;
+			}
+			*--p = 0;
+			do {
+				*--p = '0' + x % 10;
+				x /= 10;
+			}
+			while (x);
+			if (is_neg)
+				*--p = '-';
+			return p;
+		}
+		
+		static const Char* IntCharU64(Char *p, int bufsize, uint64 x) {
+			p += bufsize;
+			bool is_neg = false;
+			if (x < 0) {
+				is_neg = true;
+				x *= -1;
+			}
+			*--p = 0;
+			do {
+				*--p = '0' + x % 10;
+				x /= 10;
+			}
+			while (x);
+			if (is_neg)
+				*--p = '-';
+			return p;
+		}
+		
+		
+		static int Length(const Char* c, int max_len=-1) {
+			ASSERT(c);
+			if (!c) return 0;
+			int count = 0;
+			if (max_len < 0) {
+				while (*c) {
+					count++;
+					c++;
+				}
+				return count;
+			}
+			else {
+				while (max_len > 0 && *c) {
+					count++;
+					c++;
+					max_len--;
+				}
+				return count;
+			}
+		}
+		
+		static int Compare(const Char* a, const Char* b) {
+			while (*a || *b) {
+				Char ac = *a++;
+				Char bc = *b++;
+				int diff = ac - bc;
+				if (diff)
+					return diff;
+			}
+			return 0;
+		}
+		
+		static int Compare(const Char* a, const Char* b, int len) {
+			while ((*a || *b) && len > 0) {
+				Char ac = *a++;
+				Char bc = *b++;
+				int diff = ac - bc;
+				if (diff)
+					return diff;
+				len--;
+			}
+			return 0;
+		}
+		
+		static void Copy(Char* dst, const Char* src) {
+			ASSERT(dst && src);
+			if (!dst || !src) return;
+			while (*src)
+				* dst++ = *src++;
+			*dst = 0;
+		}
+		
+		static ConstChar* Empty() {
+			static Char buf[1] = {0};
+			return buf;
+		}
 	};
+	
 
-}
-
-$MakeString(String, char, Char);*/
-
-
-
-
-/*auto declaration StringBase(class_key string, type el) {
-
-	public !inline $string::$string () :{};
-	public !inline $string::$string (const char*) :{};
-
-}
-
-class String {
-	export/interface Com;
-	export/implementation Com;
-
-public:
 
 };
 
-$StringBase(String, el);*/
+#undef REF
 
-
-/*auto declaration StringBase(identifier id) {
-	class $id {
-		int i;
-	};
-}
-
-
-$StringBase("String");*/
+$MakeStringClass(String, char, 1);
+$MakeStringClass(WString, short, 2);
 
 
 
-auto statement StringBasePrivate(identifier Elem, identifier ConstElem) {
-	
 
-	struct Data {
-		${Elem}* data;
-	
-	};
-	
-	union {
-		$Elem data[$SMALLSTR];
-		Data* ptr = 0;
-	};
-	bool is_big = false;
-	
-	
-}
 
-auto statement StringBasePublic(identifier Elem, identifier ConstElem) {
-	${Scope} () {data[0] = 0;}
-	${Scope} (const char* c) {
-	
-	}
-	
-	inline $ConstElem* Get() const {
-		if (is_big)	return ptr->data;
-		else		return &data[0];
-	}
-
-	operator $ConstElem*() const {return Get();}
-	
-}
-
-class String {
-	export/interface Com;
-	export/implementation Com;
-	
-	auto int SMALLSTR = 8;
-	
-	
-	$StringBasePrivate(char, ConstChar);
-	
-public:
-	
-	$StringBasePublic(char, ConstChar);
-	
-	
+struct Exc : public String {
+	Exc() {}
+	Exc(const String& s) : String(s) {}
 };
+
+
+
+#define NEVER throw NeverExc()
+
+
+namespace {
+
+String operator+ (const char* c, const String& l) {
+	String s(c);
+	s.Cat(l);
+	return s;
+}
+
+inline int ToUpper(int chr) {
+	if (chr >= 'a' && chr <= 'z')
+		return 'A' + (chr - 'a');
+	return chr;
+}
+
+inline int ToLower(int chr) {
+	if (chr >= 'A' && chr <= 'Z')
+		return 'a' + (chr - 'A');
+	return chr;
+}
+
+String ToUpper(const String& s);
+String ToLower(const String& s);
+
+inline String ToUpperFirst(const String& s) {
+	return ToUpper(s.Left(1)) + s.Mid(1);
+}
+
+inline double StrDbl(String s) { return String::StrDbl(s); }
+inline int StrInt(String s) { return String::StrInt(s); }
+inline int OctInt(String s) { return String::OctInt(s); }
+inline int HexInt(String s) { return String::HexInt(s); }
+inline int64 StrInt64(String s) { return String::StrInt64(s); }
+inline String IntStr(int i) { return String::IntStr(i); }
+inline String IntStr64(int64 i) { return String::IntStr64(i); }
+inline String DblStr(double d) { return String::DblStr(d); }
+
+String EscapeString(String s);
+String EscapeCharacter(String s);
+
+String TrimBoth(String s);
+
+
+template <class T> inline String ToString(const T& o) {return o.ToString();}
+template<> inline String ToString(const bool& o) {if (o) return "true"; else return "false";}
+template<> inline String ToString(const int& o) {return IntStr(o);}
+template<> inline String ToString(const uint32& o) {return IntStr64(o);}
+template<> inline String ToString(const int64& o) {return IntStr64(o);}
+template<> inline String ToString(const byte& o) {return IntStr(o);}
+template<> inline String ToString(const char& o) {String s; s.Cat(o); return s;}
+template<> inline String ToString(const float& o) {return DblStr(o);}
+template<> inline String ToString(const double& o) {return DblStr(o);}
+template<> inline String ToString(const String& o) {return o;}
+
+template <class T> inline WString ToWString(const T& o) {return o.ToWString();}
+template<> inline String ToString(const WString& o) {return NativeUtf16To8(o.Begin());}
+template<> inline WString ToWString(const String& o) {return NativeUtf8To16(o.Begin());}
+
+
+template <class T> inline int64 ToInt(const T& o) {return o.ToInt();}
+template<> inline int64 ToInt(const bool& o) {return (int64)o;}
+template<> inline int64 ToInt(const int& o) {return (int64)o;}
+template<> inline int64 ToInt(const int64& o) {return (int64)o;}
+template<> inline int64 ToInt(const byte& o) {return (int64)o;}
+template<> inline int64 ToInt(const char& o) {return (int64)o;}
+template<> inline int64 ToInt(const float& o) {return (int64)o;}
+template<> inline int64 ToInt(const double& o) {return (int64)o;}
+template<> inline int64 ToInt(const String& o) {return StrInt(o);}
+
+inline int HexDigit(int c) {return "0123456789ABCDEF"[c & 15];}
+inline int HexDigitLower(int c) {return "0123456789abcdef"[c & 15];}
+inline String HexStr(uint64 p) {
+	String o("0x");
+	bool zero = true;
+	uint64 i = 64;
+	do {
+		i -= 4;
+		byte b = (p >> i) & 15ULL;
+		if (b || !zero) {
+			zero = false;
+			o.Cat(HexDigit(b));
+		}
+	}
+	while (i);
+	if (zero) o.Cat('0');
+	return o;
+}
+inline String HexStr(void* p) {return HexStr((uint64)p);}
+
+}
+
+}

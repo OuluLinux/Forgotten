@@ -1,11 +1,58 @@
 
 namespace Com {
 
-int MemoryCompare(const void *m1, const void *m2, int sz) :{ export/noimplementation; };
-void* MemoryCopy(void *dest, const void *src, int sz) :{ export/noimplementation; };
-void* MemoryMove(void *dest, const void *src, int sz) :{ export/noimplementation; };
+int StringLength(const char* c, int max_len=100000000) :{ export/noimplementation; };
+int StringLength(const short* c, int max_len=100000000) :{ export/noimplementation; };
+void* MemoryAlloc(int sz) :{ export/noimplementation; };
+void MemoryFree(void* ptr) :{ export/noimplementation; };
+int MemoryCompare(const void* m1, const void* m2, int sz) :{ export/noimplementation; };
+void* MemoryCopy(void *dest, const void* src, int sz) :{ export/noimplementation; };
+void* MemoryMove(void *dest, const void* src, int sz) :{ export/noimplementation; };
+void MemorySet(void *dest, int byte_value, int sz) :{ export/noimplementation; };
 int SignificantBits(uint32 x) :{ export/noimplementation; };
 int SignificantBits64(uint64 x) :{ export/noimplementation; };
+
+struct AtomicFlag {
+	void Enter() :{ export/noimplementation; };
+	void Leave() :{ export/noimplementation; };
+	bool TryEnter() :{ export/noimplementation; };
+};
+
+typedef AtomicFlag SpinLock;
+
+
+struct AtomicBool {
+	AtomicBool() :{ export/noimplementation; };
+	AtomicBool(bool b) :{ export/noimplementation; };
+	AtomicBool(const AtomicBool& ai) :{ export/noimplementation; };
+	operator bool() :{ export/noimplementation; };
+	bool operator = (bool b) :{ export/noimplementation; };
+};
+
+struct AtomicInt {
+	AtomicInt() :{ export/noimplementation; };
+	AtomicInt(int i) :{ export/noimplementation; };
+	AtomicInt(const AtomicInt& ai) :{ export/noimplementation; };
+	operator int() const :{ export/noimplementation; };
+	int operator = (int i) :{ export/noimplementation; };
+	int operator++() :{ export/noimplementation; };
+	int operator--() :{ export/noimplementation; };
+	int operator++(int) :{ export/noimplementation; };
+	int operator--(int) :{ export/noimplementation; };
+};
+
+
+int64 DateSeconds(uint64 year, uint64 month, uint64 day) :{ export/noimplementation; };
+int64 TimeSeconds(uint64 year, uint64 month, uint64 day, uint64 hour, uint64 minute, uint64 second) :{ export/noimplementation; };
+uint64 NativeCurrentTime() :{ export/noimplementation; };
+uint64 NativeNanoSeconds() :{ export/noimplementation; };
+uint64 NativeMilliSeconds() :{ export/noimplementation; };
+
+void NativeDblStr(double d, char* buf, int buf_size);
+void NativeDblStr(double d, short* buf, int buf_size);
+
+const short* NativeUtf8To16(const char* in);
+const char*  NativeUtf16To8(const short* in);
 
 };
 

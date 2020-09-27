@@ -34,7 +34,7 @@ template <> inline uint32 GetHashValue(const uint64& k) {
 }
 template <> inline uint32 GetHashValue(const float& k) { return static_cast<uint32>(k); }
 template <> inline uint32 GetHashValue(const double& k) {return GetHashValue(*(uint64*)&k);}
-template <> inline uint32 GetHashValue(const VOID_PTR& k) {
+template <> inline uint32 GetHashValue(const VoidPtr& k) {
 	auto if ($IsDefined("CPU64"))
 		return GetHashValue(k.Int());
 	else

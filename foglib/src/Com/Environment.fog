@@ -1,4 +1,6 @@
 
+namespace Com {
+	
 
 class Env {
 	export / implementation Com;
@@ -9,7 +11,6 @@ public:
 	
 	void Init(int argc, const char** argv) {
 		SetExeFilePath(argv[0]);
-		SeedRandom();
 		ParseCommandLine(argc, argv);
 		ReadComCmdlineArgs();
 		RunInitBlocks();
@@ -27,7 +28,7 @@ public:
 	
 protected:
 	void SetExeFilePath(const char* path) {}
-	void SeedRandom() {}
+	void SeedRandom() {RNG::Local().Seed();}
 	void ParseCommandLine(int argc, const char** argv) {}
 	void ReadComCmdlineArgs() {}
 	void RunInitBlocks() {}
@@ -38,3 +39,4 @@ protected:
 };
 
 
+}

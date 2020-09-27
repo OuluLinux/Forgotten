@@ -1,0 +1,35 @@
+
+
+/*
+
+FOG BUGS AND WORKAROUNDS:
+	
+	Inline conditional is broken. Sorry...
+		WRONG:
+			i == 0 ? a : b
+		RIGHT:
+			if (i == 0) ... a; else ... b;
+
+	Typedefs with pointers doesn't work correctly. They leave out * while emitting.
+		WRONG:
+			typedef const char* CString;
+		RIGHT:
+			typedef C::Ptr<const char> CString;
+	
+	Functions like "operator Type()" requires, that the Type is only one word.
+		WRONG:
+			operator conat char* () const {return "";}
+		RIGHT:
+			typedef const char ConstChar;
+			operator ConstChar* () const {return "";}
+	
+	Meta arrays can't be looped yet
+		WRONG:
+			auto declaration some_fn(statement args[]) {
+				for (iterator i = $args.ids(); i; ++i)
+					...
+			}
+			auto statement some_ids[] = a, b, c;
+			$some_fn($some_ids);
+
+*/

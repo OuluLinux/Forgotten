@@ -1,0 +1,84 @@
+
+namespace Com {
+
+auto declaration Tuple2(identifier cls, identifier a, identifier b) {
+	struct ::${Scope}:: $cls {
+		$a a;
+		$b b;
+		
+		String ToString() const {return Com::ToString(a) + ", " + Com::ToString(b);}
+	};
+}
+
+auto declaration Tuple3(identifier cls, identifier a, identifier b, identifier c) {
+	struct  ::${Scope}:: $cls {
+		$a a;
+		$b b;
+		$c c;
+		
+		String ToString() const {return Com::ToString(a) + ", " + Com::ToString(b) + ", " + Com::ToString(c);}
+	};
+}
+
+auto declaration RefTuple2(identifier cls, identifier a, identifier b) {
+	struct ::${Scope}:: $cls {
+		$a& a;
+		$b& b;
+		
+		${cls}($a& a, $b& b) : a(a), b(b) {}
+		String ToString() const {return Com::ToString(a) + ", " + Com::ToString(b);}
+	};
+}
+
+auto declaration RefTuple3(identifier cls, identifier a, identifier b, identifier c) {
+	struct ::${Scope}:: $cls {
+		$a& a;
+		$b& b;
+		$c& c;
+		
+		${cls}($a& a, $b& b, $c& c) : a(a), b(b), c(c) {}
+		String ToString() const {return Com::ToString(a) + ", " + Com::ToString(b) + ", " + Com::ToString(c);}
+	};
+}
+
+auto declaration AddRefCounter(identifier Class) {
+	class $Class {
+		private AtomicInt refs;
+		public !inline int GetRefs() const { return refs; }
+		public !inline void Inc() { refs++; }
+		public !inline void Dec() { refs--; if (refs <= 0) delete this; }
+	};
+}
+
+auto declaration ZeroFunction() {
+	!inline void Zero() {MemorySet(this, 0, sizeof(${Scope}));}
+}
+
+}
+
+
+
+
+
+
+auto statement MainClass(token id) {
+	
+	// Indirect including of the main class.
+	// This requires that the MainClass is in Main namespace.
+	// You create a dummy global object, which 'requires' the Main interface,
+	// which makes the Main.hxx to be included in Global.hxx.
+	struct ComInterfaceLinker {
+		export/interface Com;
+		export/implementation Com;
+	};
+	ComInterfaceLinker loader;
+	
+	
+	extern "C" !inline int main(int argc, const char** argv) {
+		Com::Env& e = Com::Env::Local();
+		e.Init(argc, argv);
+		${id}().Run();
+		return e.Deinit();
+	};
+}
+

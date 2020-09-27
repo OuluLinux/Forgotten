@@ -49,15 +49,6 @@ NAMESPACE_SDK_BEGIN
 #define PANIC(msg) ASSERT_(false, msg)
 
 
-#if defined flagGCC || flagCLANG
-	#define MemoryCompare __builtin_memcmp
-	#define MemoryCopy    __builtin_memcpy
-	#define MemoryMove    __builtin_memmove
-#elif defined flagMSC
-	#define MemoryCompare memcmp
-	#define MemoryCopy    memcpy
-	#define MemoryMove    memmove
-#endif
 
 
 
@@ -80,16 +71,15 @@ typedef unsigned long		DWORD;
 
 
 
-typedef const char*		CString;
 
 template <class T>
 inline void IGNORE_RESULT(const T&) {}
 
 
-typedef void* VOID_PTR;
-typedef const void* CONST_VOID_PTR;
+typedef const char*		CString;
+typedef void*			VoidPtr;
+typedef const void*		ConstVoidPtr;
 
-class Nuller {};
 
 NAMESPACE_SDK_END
 
