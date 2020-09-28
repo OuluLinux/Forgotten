@@ -1,50 +1,23 @@
 
 
-auto statement DebugMetaLog(string s) {
-	auto if (true)
-		auto $std::diagnostic($s);
-};
-
-auto bool IsDefined(identifier id) {
-	$std::defined(id);
-}
-
-
-
-namespace C {
-	
-struct Nuller {
-	
-	
-};
-
-template<class T> struct Ptr {
-	
-	T* value;
-	
-	Ptr() : value(0) {}
-	Ptr(T* p) : value(p) {}
-	void operator=(T* p) {value = p;}
-	void operator=(const Nuller& p) {value = 0;}
-	operator T*() const {return value;}
-	bool operator==(const Ptr& p) const {return value == p.value;}
-	bool operator==(const Nuller& p) const {return value == 0;}
-	
-	auto if ($IsDefined("CPU64"))
-		unsigned long long Int() const {return (unsigned long long)value;}
-	else
-		unsigned long Int() const {return (unsigned long)value;}
-};
-
-
-
-}
 
 
 namespace Com {
 using/interface C;
 
+typedef C::Nuller Nuller;
 extern C::Nuller Null;
+
+!inline void* MemoryAlloc(int sz) {return C::Memory::Alloc(sz);}
+!inline void MemoryFree(void* ptr) {C::Memory::Free(ptr);}
+!inline int MemoryCompare(const void* m1, const void* m2, int sz) {return C::Memory::Compare(m1,m2,sz);}
+!inline void* MemoryCopy(void *dest, const void* src, int sz) {return C::Memory::Copy(dest,src,sz);}
+!inline void* MemoryMove(void *dest, const void* src, int sz) {return C::Memory::Move(dest,src,sz);}
+!inline void MemorySet(void *dest, int byte_value, int sz) {C::Memory::Set(dest,byte_value,sz);}
+!inline void Break(const char* msg) {C::SysBreak(msg);}
+
+#define ASSERT(e) {if (!(e)) {Break("Assertion failed: " #e);}}
+#define PANIC(msg) Break(msg);
 
 auto character to_character(token t) { $t }
 auto identifier to_identifier(token t) { $t }
@@ -68,6 +41,7 @@ auto declaration GlobalTypedefPtr(token from, token to) {
 }
 
 
+$GlobalTypedef(unsigned char,		uint8);
 $GlobalTypedef(char,				int8);
 $GlobalTypedef(unsigned short,		uint16);
 $GlobalTypedef(short,				int16);
@@ -126,9 +100,9 @@ else
 
 
 
+typedef C::AtomicFlag SpinLock;
 
 
-void Break(const char* msg);
 
 
 template <class T>
@@ -136,8 +110,6 @@ inline void IGNORE_RESULT(const T&) {}
 
 
 
-#define ASSERT(e) {if (!(e)) {Break("Assertion failed: " #e);}}
-#define PANIC(msg) Break(msg);
 
 }
 

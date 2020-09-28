@@ -43,7 +43,7 @@ auto declaration RefTuple3(identifier cls, identifier a, identifier b, identifie
 
 auto declaration AddRefCounter(identifier Class) {
 	class $Class {
-		private AtomicInt refs;
+		private C::AtomicInt refs;
 		public !inline int GetRefs() const { return refs; }
 		public !inline void Inc() { refs++; }
 		public !inline void Dec() { refs--; if (refs <= 0) delete this; }
@@ -54,8 +54,10 @@ auto declaration ZeroFunction() {
 	!inline void Zero() {MemorySet(this, 0, sizeof(${Scope}));}
 }
 
-}
 
+
+
+} // end of Com
 
 
 

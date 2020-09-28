@@ -52,6 +52,7 @@
 #include <initializer_list>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <shared_mutex>
 #include <algorithm>
 #include <tuple>
@@ -107,25 +108,8 @@ namespace C {
 struct Nuller {};
 template <class T> struct Ptr;
 
-}
-
-#include "Defs.h"
-
-NAMESPACE_SDK_BEGIN
-
-void Break(const char* msg);
-void MemoryFree(void* ptr);
-int MemoryCompare(const void *m1, const void *m2, int sz);
-void* MemoryCopy(void *dest, const void* src, int sz);
-void* MemoryMove(void *dest, const void* src, int sz);
-
-struct Console {
-	
-	static int Get(char* buf, int size);
-	static void Put(const char* msg);
-	
-	
-};
+int StringLength(const char* c, int max_len);
+int StringLength(const short* c, int max_len);
 
 struct AtomicBool {
 	std::atomic<bool> value;
@@ -149,6 +133,34 @@ struct AtomicInt {
 	int operator--();
 	int operator++(int);
 	int operator--(int);
+};
+
+class ConditionalVar {
+	std::mutex m;
+	std::condition_variable cv;
+	bool ready = false;
+	
+public:
+	ConditionalVar();
+	void Wait();
+	void SetReady(bool b=true);
+	bool IsReady() const;
+	
+};
+
+
+}
+
+#include "Defs.h"
+
+NAMESPACE_SDK_BEGIN
+
+struct Console {
+	
+	static int Get(char* buf, int size);
+	static void Put(const char* msg);
+	
+	
 };
 
 

@@ -1,40 +1,294 @@
 
 
-template<class T> void Swap(T& x, T& y) {
-	byte tmp[sizeof(T)];
-	memcpy(tmp, &y, sizeof(T));
-	memcpy(&y, &x, sizeof(T));
-	memcpy(&x, ymp, sizeof(T));
+namespace Com {
+
+auto declaration MakeFiller(int size) {
+	struct Filler {
+		$MakeMoveable();
+		
+		byte filler[size];
+	};
 }
 
 
-template<class T> class Vector {
-	T* v;
-	int sz;
+
+template <class T>
+class Pick {
+	T* var = NULL;
 public:
-	Vector();
-	Vector(int);
-	T& elem(int i) { return v[i]; }
-	T& operator[](int i);
+	inline Pick(T& var) : var(&var) {}
+	inline Pick(const Pick& p) : var(p.var) {}
+	//Pick(Pick&& p) : var(p.var) {p.var = NULL;}
+	inline T& Get() const {return *var;}
+	
+	static Pick<T> Ptr(T* p) {return Pick<T>(p);}
+};
+
+
+template <class T>
+void Swap(T& a, T& b) {
+	uint8 tmp[sizeof(T)];
+	MemoryCopy(tmp, &a, sizeof(T));
+	MemoryCopy(&a, &b, sizeof(T));
+	MemoryCopy(&b, tmp, sizeof(T));
+}
+
+template <class T>
+inline void Reverse(T& t) {
+	int count = t.GetCount();
+	int count_2 = count / 2;
+	int a = 0;
+	int b = count - 1;
+	for (int i = 0; i < count_2; i++) {
+		Swap(t[a++], t[b--]);
+	}
+}
+
+
+template <class T> inline class One {
+	T* obj = NULL;
+
+public:
+	typedef const T ConstT;
+	
+	inline One() {}
+	inline One(One& o) {obj = o.obj; o.obj = NULL;}
+	inline One(T* obj) : obj(obj) {}
+	inline ~One() { Clear(); }
+
+	void Create() { Clear(); obj = new T(); }
+	void Clear() { if (obj) { delete obj; obj = NULL; } }
+	void operator=(T* obj) { Clear(); this->obj = obj; }
+	bool Is() const { return obj != NULL; }
+	bool IsEmpty() const { return obj == NULL; }
+	T* operator->() {ASSERT(obj); return obj;}
+	const T* operator->() const {ASSERT(obj); return obj;}
+	inline T& operator*() {ASSERT(obj); return *obj;}
+	inline const T& operator*() const {ASSERT(obj); return *obj;}
+	T* Get() {return obj;}
+	const T* Get() const {return obj;}
+	T& Value() {return *obj;}
+	T* Detach() {ASSERT(obj); T* tmp = obj; obj = NULL; return tmp;}
+	operator bool() const {return !IsEmpty();}
+	bool operator!=(void* ptr) {return ptr != obj;}
+	operator T&() {ASSERT(obj); return *obj;}
+	operator ConstT&() const {ASSERT(obj); return *obj;}
+	
+	template <class K> void CreateDerived() {Clear(); obj = new K();}
+	template <class K> K* GetDerived() {return dynamic_cast<K*>(obj);}
+};
+
+template <class T> inline class FutureOne {
+	C::ConditionalVar cond;
+	One<T> one;
+	
+public:
+	inline FutureOne() {}
+	
+	inline void Set(T* o) {
+		Clear();
+		one = o;
+		cond.SetReady(o != 0);
+	}
+	inline void Clear() {one.Clear(); cond.SetReady(false);}
+	inline T* Get() {if (one.IsEmpty()) return 0; return &*one;}
+	inline T* Detach() {T* o = one.Detach(); cond.SetReady(false); return o;}
+	inline bool IsEmpty() const {return one.IsEmpty();}
+	inline void Wait() {
+		if (cond.IsReady()) {
+			if (!one.IsEmpty()) return;
+			cond.SetReady(false);
+		}
+		else {
+			if (!one.IsEmpty()) {cond.SetReady(); return;}
+		}
+		cond.Wait();
+	}
+	
+	
+	inline T* operator=(T* o) {Set(o); return o;}
+	
+};
+
+
+template <class T>
+class Optional {
+	T* obj = NULL;
+
+public:
+	typedef Com::Pick<T>			PickT;
+	typedef Com::Pick<Optional>	PickOpt;
+	
+	Optional() {}
+	//Optional(Optional&& o) {obj = o.obj; o.obj = NULL;}
+	Optional(const Optional& opt) {if (opt.obj) this->obj = new T(*opt.obj);}
+	Optional(const T& obj) {this->obj = new T(obj);}
+	Optional(const Nuller& n) {}
+	Optional(T* obj) : obj(obj) {}
+	Optional(const PickT& n) {*this = n;}
+	~Optional() { Clear(); }
+
+	void Create() { Clear(); obj = new T(); }
+	template <class K> void Create1(const K& arg) {Clear(); this->obj = new T(arg);}
+	void Clear() { if (obj) { delete obj; obj = NULL; } }
+	void operator=(const Nuller&) { Clear();}
+	void operator=(const T& obj) { Clear(); this->obj = new T(obj); }
+	void operator=(const Optional& o) { Clear(); if (!o.IsEmpty()) {this->obj = new T(*o.obj); }}
+	void operator=(const PickOpt& n) { Clear(); if (!n.Get().IsEmpty()) {Pick(n.Get());}}
+	void Pick(Optional& o) {obj = o.obj; o.obj = NULL;}
+	bool IsEmpty() const { return obj == NULL; }
+	T& GetValue() const {return *obj;}
+	T* operator->() {ASSERT(obj); return obj;}
+	operator bool () const {return obj != NULL;}
+	T& operator*() {return *obj;}
+};
+
+
+
+
+
+template <class K>
+class Vector : public C::DynArray<K> {
+	typedef C::DynArray<K> Base;
+	
+	$MakeMoveable();
+	
+public:
+	
+	inline Vector() {}
+	inline Vector(const Vector& v) : Base(v) {}
+	
+	//void Serialize(Stream& s);
+	
 	
 };
 
 
 
-template<class T> bool StdLess(T a, T b) { return a < b; }
 
-template<> bool StdLess<const char*>(const char* a, const char* b) {
-	return strcmp(a, b) < 0;
-}
 
-template<> bool StdLess(const unsigned char* a, const unsigned char* b) {
-	return memcmp(a, b) < 0;
-}
 
-template<class T> void Sort(Vector<T>& v) {
-	const size_t n = v.size();
-	for (int gap = n / 2; 0 < gap; gap /= 2)
-		for (int gap = n / 2; i < n; i++)
-			for (int j = i - gap; 0 <= j; j -= gap)
-				if (less(v[j+gap], v[j])) swap(v[j], v[j+gap]);
+
+
+
+
+
+
+
+template <class K>
+class Array {
+	
+	C::DynArray<K*> l;
+	
+
+public:
+	typedef K IndirectK;
+	typedef const K ConstK;
+	typedef C::FwdPtrIterator<K> Iterator;
+	typedef C::BwdPtrIterator<K> RIterator;
+
+
+	inline Array() {}
+	/*Array(std::initializer_list<K> list) {
+		auto it = list.begin();
+		auto end = list.end();
+		while (it != end)
+			Add(*it++);
+	}*/
+	inline ~Array() { Clear(); }
+	
+	//Vector<K*>& GetPtrVector() {return l;}
+	
+	inline C::FwdPtrIterator<K>			Begin()			{return Iterator(l.Begin());}
+	inline C::FwdPtrIterator<K>			End()			{return Iterator(l.End());}
+	inline C::ConstFwdPtrIterator<K>	Begin() const	{return Iterator(l.Begin());}
+	inline C::ConstFwdPtrIterator<K>	End() const		{return Iterator(l.End());}
+	inline C::FwdPtrIterator<K>			begin()			{return Begin();}
+	inline C::FwdPtrIterator<K>			end()			{return End();}
+	inline C::ConstFwdPtrIterator<K>	begin() const	{return Begin();}
+	inline C::ConstFwdPtrIterator<K>	end() const		{return End();}
+	inline C::BwdPtrIterator<K>			RBegin()		{return RIterator(l.End() - 1);}
+	inline C::BwdPtrIterator<K>			REnd()			{return RIterator(l.Begin() - 1);}
+	inline C::ConstBwdPtrIterator<K>	RBegin() const	{return RIterator(l.End() - 1);}
+	inline C::ConstBwdPtrIterator<K>	REnd() const	{return RIterator(l.Begin() - 1);}
+	inline C::BwdPtrIterator<K>			rbegin()		{return RBegin();}
+	inline C::BwdPtrIterator<K>			rend()			{return REnd();}
+	inline C::ConstBwdPtrIterator<K>	rbegin() const	{return RBegin();}
+	inline C::ConstBwdPtrIterator<K>	rend() const	{return REnd();}
+	
+	inline void Reserve(int i) {l.Reserve(i);}
+	inline void SetCount(int new_count) {
+		int count = l.GetCount();
+		if (new_count == count) return;
+		if (new_count > count) {
+			l.SetCount(new_count);
+			for (int i = count; i < new_count; i++)
+				l[i] = new K();
+		}
+		else {
+			for (int i = count - 1; i >= new_count; i--)
+				delete l[i];
+			l.SetCount(new_count);
+		}
+	}
+	inline K& Add() { K* k = new K(); l.Add(k); return *k; }
+	inline K& Add(const K& v) { K* k = new K(v); l.Add(k); return *k; }
+	inline K& Add(K* k) { l.Add(k); return *k; }
+	inline K& Insert(int i) {return *l.Insert(i, new K());}
+	inline K& Insert(int i, const K& key) {return *l.Insert(i, new K(key));}
+	inline int GetCount() const { return l.GetCount(); }
+	inline bool IsEmpty() const { return GetCount() == 0; }
+	inline K* Detach(int i) {K* o = l[i]; l.Remove(i); return o;}
+
+	inline K& operator[](int i) {
+		ASSERT(i >= 0 && i < l.GetCount());
+		K** it = l.Get();
+		it = it + i;
+		return **it;
+	}
+	inline const K& operator[](int i) const {
+		ASSERT(i >= 0 && i < l.GetCount());
+		return **(l.Get() + i);
+	}
+
+	inline void Remove(int i) {
+		ASSERT(i >= 0 && i < l.GetCount());
+		delete *(l.Get() + i);
+		l.Remove(i);
+	}
+	//void Remove(const Vector<int>& sorted_list) {Remove(sorted_list.Begin(), sorted_list.GetCount());}
+	inline void Remove(const int* sorted_list, int n) {
+		if(!n) return;
+		const int* it  = sorted_list;
+		const int* end = sorted_list + n;
+		K** vector = l.Get();
+		while (it != end)
+			(*(vector + *it++))->~K();
+		l.Remove(sorted_list, n);
+	}
+	inline void RemoveLast() {ASSERT(GetCount()); Remove(GetCount()-1);}
+	inline void Clear() {
+		K** ptr = l.Get();
+		K** end = ptr + l.GetCount();
+		while (ptr != end)
+			delete *(ptr++);
+		l.Clear();
+	}
+
+	inline K& Top() {
+		ASSERT(GetCount() > 0);
+		return **(l.Get() + l.GetCount() - 1);
+	}
+	inline void operator <<=(const Array& a) {
+		Clear();
+		l.SetCount(a.GetCount(), 0);
+		for (int i = 0; i < a.GetCount(); i++)
+			l[i] = new K(*a.l[i]);
+	}
+	
+	inline Array<K>& operator<<(const K& v) { Add(v); return *this; }
+	
+};
+
+
 }

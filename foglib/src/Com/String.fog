@@ -24,6 +24,8 @@ inline int GetHexDigit(char c) {
 
 auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) {
 	class $Class {
+		$MakeMoveable();
+		
 		auto int CharSize = $chr_bytes;
 		typedef $chr Char;
 		typedef const $chr ConstChar;
@@ -111,7 +113,7 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 		${Scope}& Set(const Char* c, int len) {
 			Clear();
 			if (!c) return *this;
-			count = min(StringLength(c, len), len);
+			count = min(C::StringLength(c, len), len);
 			if (count < $BufSize) {
 				MemoryCopy(buf, c, sizeof(Char) * count);
 				buf[count] = 0;
@@ -126,7 +128,7 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 			}
 			return *this;
 		}
-		${Scope}& operator=(const Char* c) {return Set(c, StringLength(c));}
+		${Scope}& operator=(const Char* c) {return Set(c, C::StringLength(c));}
 		${Scope}& operator=(const ${Scope}& str) {
 			if (!str.is_ref) {
 				Clear();
@@ -699,11 +701,14 @@ $MakeStringClass(WString, short, 2);
 
 
 
+auto declaration MakeException(identifier Exc) {
+	struct $Exc : public String {
+		${Exc}() {}
+		${Exc}(const String& s) : String(s) {}
+	};
+}
 
-struct Exc : public String {
-	Exc() {}
-	Exc(const String& s) : String(s) {}
-};
+$MakeException(Exc);
 
 
 
@@ -712,26 +717,51 @@ struct Exc : public String {
 
 namespace {
 
-String operator+ (const char* c, const String& l) {
+inline String operator+ (const char* c, const String& l) {
 	String s(c);
 	s.Cat(l);
 	return s;
 }
 
-inline int ToUpper(int chr) {
+!inline int ToUpperChar(int chr) {
 	if (chr >= 'a' && chr <= 'z')
 		return 'A' + (chr - 'a');
 	return chr;
 }
 
-inline int ToLower(int chr) {
+!inline int ToLowerChar(int chr) {
 	if (chr >= 'A' && chr <= 'Z')
 		return 'a' + (chr - 'A');
 	return chr;
 }
 
-String ToUpper(const String& s);
-String ToLower(const String& s);
+!inline String ToUpper(const String& s) {
+	int count = s.GetCount();
+	if (!count) return String();
+	char* v = (char*)MemoryAlloc(count+1);
+	char* it = v;
+	for(int i = 0; i < s.GetCount(); i++)
+		*it++ = ToUpperChar(s[i]);
+	*it = 0;
+	String o;
+	o.Set(v, count);
+	MemoryFree(v);
+	return o;
+}
+
+!inline String ToLower(const String& s) {
+	int count = s.GetCount();
+	if (!count) return String();
+	char* v = (char*)MemoryAlloc(count+1);
+	char* it = v;
+	for(int i = 0; i < s.GetCount(); i++)
+		*it++ = ToLowerChar(s[i]);
+	*it = 0;
+	String o;
+	o.Set(v, count);
+	MemoryFree(v);
+	return o;
+}
 
 inline String ToUpperFirst(const String& s) {
 	return ToUpper(s.Left(1)) + s.Mid(1);

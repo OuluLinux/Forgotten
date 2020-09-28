@@ -246,6 +246,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	
+	
 	aFog->compile();
 	
 	aFog->validate();

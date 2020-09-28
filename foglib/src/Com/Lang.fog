@@ -1,0 +1,480 @@
+
+auto statement DebugMetaLog(string s) {
+	auto if (true)
+		auto $std::diagnostic($s);
+};
+
+auto bool IsDefined(identifier id) {
+	$std::defined(id);
+}
+
+auto declaration MakeMoveable() {
+	auto bool is_moveable = true;
+}
+
+auto declaration AssertMoveable(identifier id) {
+	// TODO
+	//auto if ($Scope.is_moveable == false)
+	//	$std.error("The class is not set as moveable");
+}
+
+
+
+namespace C {
+
+namespace Memory {
+	
+void* Alloc(int sz) :{ export/noimplementation; };
+void Free(void* ptr) :{ export/noimplementation; };
+int Compare(const void* m1, const void* m2, int sz) :{ export/noimplementation; };
+void* Copy(void *dest, const void* src, int sz) :{ export/noimplementation; };
+void* Move(void *dest, const void* src, int sz) :{ export/noimplementation; };
+void Set(void *dest, int byte_value, int sz) :{ export/noimplementation; };
+
+}
+
+void SysBreak(const char* msg) :{ export/noimplementation; };
+
+int StringLength(const char* c, int max_len=100000000) :{ export/noimplementation; };
+int StringLength(const short* c, int max_len=100000000) :{ export/noimplementation; };
+
+struct AtomicFlag {
+	$MakeMoveable();
+	
+	void Enter() :{ export/noimplementation; };
+	void Leave() :{ export/noimplementation; };
+	bool TryEnter() :{ export/noimplementation; };
+};
+
+
+
+struct AtomicBool {
+	$MakeMoveable();
+	
+	AtomicBool() :{ export/noimplementation; };
+	AtomicBool(bool b) :{ export/noimplementation; };
+	AtomicBool(const AtomicBool& ai) :{ export/noimplementation; };
+	operator bool() :{ export/noimplementation; };
+	bool operator = (bool b) :{ export/noimplementation; };
+};
+
+struct AtomicInt {
+	$MakeMoveable();
+	
+	AtomicInt() :{ export/noimplementation; };
+	AtomicInt(int i) :{ export/noimplementation; };
+	AtomicInt(const AtomicInt& ai) :{ export/noimplementation; };
+	operator int() const :{ export/noimplementation; };
+	int operator = (int i) :{ export/noimplementation; };
+	int operator++() :{ export/noimplementation; };
+	int operator--() :{ export/noimplementation; };
+	int operator++(int) :{ export/noimplementation; };
+	int operator--(int) :{ export/noimplementation; };
+};
+
+struct ConditionalVar {
+	
+	ConditionalVar() :{ export/noimplementation; };
+	void Wait() :{ export/noimplementation; };
+	void SetReady(bool b=true) :{ export/noimplementation; };
+	bool IsReady() const :{ export/noimplementation; };
+	
+};
+
+#define CASSERT(e) {if (!(e)) {SysBreak("Assertion failed: " #e);}}
+#define CPANIC(msg) SysBreak(msg);
+
+
+struct Nuller {
+	
+	
+};
+
+template<class T> struct Ptr {
+	
+	T* value;
+	
+	Ptr() : value(0) {}
+	Ptr(T* p) : value(p) {}
+	void operator=(T* p) {value = p;}
+	void operator=(const Nuller& p) {value = 0;}
+	operator T*() const {return value;}
+	bool operator==(const Ptr& p) const {return value == p.value;}
+	bool operator==(const Nuller& p) const {return value == 0;}
+	
+	auto if ($IsDefined("CPU64"))
+		unsigned long long Int() const {return (unsigned long long)value;}
+	else
+		unsigned long Int() const {return (unsigned long)value;}
+};
+
+
+
+
+auto declaration MakeCException(identifier Exc) {
+	struct $Exc {
+		const char* msg = 0;
+		${Exc}() {}
+		${Exc}(const char* s) : msg(s) {}
+	};
+}
+
+$MakeCException(MemoryLimitExc);
+
+
+
+auto declaration MakeIterator(bool is_const, identifier name, int step) {
+	template <class K> struct ${name} {
+		${name}() {}
+		${name}(const ${name}& it) {*this = it;}
+		void operator=(const ${name}& it) {kit = it.kit;}
+		${name}<K>& operator++() {kit += $step; return *this;}
+		//${name} operator++(int i) {${name} ret = *this; kit += $step; return ret;}
+		void operator--(int i) {kit -= $step;}
+		void operator+=(int i) {kit += i;}
+		
+		auto if ($is_const) {
+			typedef const K ConstK;
+			const K* kit = NULL;
+			${name}(const K* kit) : kit(kit) {}
+			const K* operator->() const {return kit;}
+			const K* Get() const {return kit;}
+			operator ConstK*() const {return kit;}
+			const K& operator*() const {return *kit;}
+			bool operator!=(const ${name}& it) const {return it.kit != kit;}
+			const K& operator()() const {return *kit;}
+		} else {
+			K* kit = NULL;
+			${name}(K* kit) : kit(kit) {}
+			K* operator->() const {return kit;}
+			K* Get() const {return kit;}
+			operator K*() const {return kit;}
+			K& operator*() const {return *kit;}
+			bool operator!=(const ${name}& it) const {return it.kit != kit;}
+			K& operator()() const {return *kit;}
+		}
+	};
+}
+
+$MakeIterator(0, FwdIterator, +1);
+$MakeIterator(0, BwdIterator, +1);
+$MakeIterator(1, ConstFwdIterator, +1);
+$MakeIterator(1, ConstBwdIterator, +1);
+
+
+
+auto declaration MakePtrIterator(bool is_const, identifier name, int step) {
+	template <class K> struct ${name} {
+		${name}() {}
+		${name}(const ${name}& it) {*this = it;}
+		void operator=(const ${name}& it) {kit = it.kit;}
+		${name}<K>& operator++() {kit += $step; return *this;}
+		void operator--(int i) {kit -= $step;}
+		void operator+=(int i) {kit += i;}
+		
+		auto if ($is_const) {
+			typedef const K ConstK;
+			const K** kit = NULL;
+			${name}(const K** kit) : kit(kit) {}
+			const K* operator->() const {return *kit;}
+			const K* Get() const {return *kit;}
+			operator ConstK*() const {return *kit;}
+			const K& operator*() const {return **kit;}
+			bool operator!=(const ${name}& it) const {return it.kit != kit;}
+			const K& operator()() const {return **kit;}
+		} else {
+			K** kit = NULL;
+			${name}(K** kit) : kit(kit) {}
+			K* operator->() const {return *kit;}
+			K* Get() const {return *kit;}
+			operator K*() const {return *kit;}
+			K& operator*() const {return **kit;}
+			bool operator!=(const ${name}& it) const {return it.kit != kit;}
+			K& operator()() const {return **kit;}
+		}
+	};
+}
+
+$MakePtrIterator(0, FwdPtrIterator, +1);
+$MakePtrIterator(0, BwdPtrIterator, +1);
+$MakePtrIterator(1, ConstFwdPtrIterator, +1);
+$MakePtrIterator(1, ConstBwdPtrIterator, +1);
+
+
+
+
+template <class K>
+inline class DynArray {
+	typedef unsigned long long uint64;
+	auto int MAX_SIZE = 2000000000;
+	
+	K* data = NULL;
+	int reserved = 0;
+	int count = 0;
+
+
+	inline void IncreaseReserved() {
+		uint64 new_reserved = 1;
+		while (new_reserved <= reserved)
+			new_reserved <<= 1;
+		if (new_reserved >= $MAX_SIZE)
+			new_reserved = $MAX_SIZE;
+		Reserve((int)new_reserved);
+	}
+	
+	inline void Pick0(DynArray& v) { data = v.data; v.data = 0; reserved = v.reserved; v.reserved = 0; count = v.count; v.count = 0; }
+	
+public:
+	
+	typedef K IndirectK;
+	typedef const K ConstK;
+	typedef DynArray<K> DynArrayK;
+	typedef FwdIterator<K> Iterator;
+	typedef BwdIterator<K> RIterator;
+
+	/*DynArray(std::initializer_list<K> l) {
+		Reserve(l.size());
+		auto cur = l.begin();
+		auto end = l.end();
+		while (cur != end) {
+			new (&data[count++]) K(*cur++);
+		}
+	}*/
+	inline DynArray() {}
+	//inline DynArray(DynArray&& v) {Pick0(v);}
+	//inline DynArray(const Pick<DynArray>& pick) {DynArray& v = pick.Get(); Swap(data, v.data); Swap(reserved, v.reserved); Swap(count, v.count);}
+	inline DynArray(const DynArray& v) {*this <<= v;}
+	inline DynArray(int i) {SetCount(i);}
+	inline ~DynArray() {
+		Clear();
+		return;
+		$AssertMoveable(K);  // T must be moveable
+	}
+	
+	//void Serialize(Stream& s);
+	//void operator=(const Pick<DynArray>& pick) {Clear(); DynArray& v = pick.Get(); Swap(data, v.data); Swap(reserved, v.reserved); Swap(count, v.count);}
+	//void operator=(DynArray&& v) {Pick0(v);}
+	
+	
+	inline C::FwdIterator<K>		Begin()			{return Iterator(data);}
+	inline C::FwdIterator<K>		End()			{return Iterator(data+count);}
+	inline C::ConstFwdIterator<K>	Begin() const	{return Iterator(data);}
+	inline C::ConstFwdIterator<K>	End() const		{return Iterator(data+count);}
+	inline C::FwdIterator<K>		begin()			{return Begin();}
+	inline C::FwdIterator<K>		end()			{return End();}
+	inline C::ConstFwdIterator<K>	begin() const	{return Begin();}
+	inline C::ConstFwdIterator<K>	end() const		{return End();}
+	inline C::BwdIterator<K>		RBegin()		{return RIterator(data+count-1);}
+	inline C::BwdIterator<K>		REnd()			{return RIterator(data-1);}
+	inline C::ConstBwdIterator<K>	RBegin() const	{return RIterator(data+count-1);}
+	inline C::ConstBwdIterator<K>	REnd() const	{return RIterator(data-1);}
+	inline C::BwdIterator<K>		rbegin()		{return RBegin();}
+	inline C::BwdIterator<K>		rend()			{return REnd();}
+	inline C::ConstBwdIterator<K>	rbegin() const	{return RBegin();}
+	inline C::ConstBwdIterator<K>	rend() const	{return REnd();}
+	
+	inline K* Get() const {return data;}
+	
+	inline K& Add() {
+		if (count + 1 > reserved) IncreaseReserved();
+		if (count >= reserved)
+			throw MemoryLimitExc("DynArray maximum size exceeded");
+		new (&data[count]) K();
+		return data[count++];
+	}
+	inline K& Add(const K& v) {
+		if (count + 1 > reserved) IncreaseReserved();
+		if (count >= reserved)
+			throw MemoryLimitExc("DynArray maximum size exceeded");
+		K* ptr = &data[count];
+		new (ptr) K (v);
+		return data[count++];
+	}
+	/*K& AddPick(const Pick<K>& v) {
+		if (count + 1 > reserved) IncreaseReserved();
+		if (count >= reserved)
+			throw MemoryLimitExc("DynArray maximum size exceeded");
+		new (&data[count]) IndirectK (v);
+		return data[count++];
+	}*/
+	inline DynArray<K>& operator<<(const K& v) { Add(v); return *this; }
+
+	inline void SetCount(int new_count) {
+		CASSERT(new_count >= 0);
+		if (new_count < 0) return;
+		if (new_count > reserved) Reserve(new_count);
+		if (new_count == count) return;
+		if (new_count > count) {
+			for (int i = count; i < new_count; i++)
+				new (&data[i]) K();
+		}
+		else {
+			for (int i = count - 1; i >= new_count; i--)
+				data[i].~K();
+		}
+		count = new_count;
+	}
+	inline void SetCount(int new_count, ConstK& value) {
+		CASSERT(new_count >= 0);
+		if (new_count < 0) return;
+		if (new_count > reserved) Reserve(new_count);
+		if (new_count == count) return;
+		if (new_count > count) {
+			for (int i = count; i < new_count; i++)
+				new (&data[i]) K(value);
+		}
+		else {
+			for (int i = count - 1; i >= new_count; i--)
+				data[i].~K();
+		}
+		count = new_count;
+	}
+	inline void operator<<=(const DynArray& a) {
+		SetCount(0);
+		Reserve(a.GetCount());
+		for (int i = 0; i < a.GetCount(); i++)
+			new (&data[i]) K(a[i]);
+		count = a.GetCount();
+	}
+	inline void Append(const DynArray& a) {
+		int begin = count;
+		int new_count = count + a.GetCount();
+		Reserve(new_count);
+		for (int i = begin, j = 0; i < new_count; i++, j++)
+			new (&data[i]) K(a[j]);
+		count = new_count;
+	}
+	inline void IncreaseReserve(int more_reserved) {Reserve(GetCount() + more_reserved);}
+	inline void Reserve(int new_reserved) {
+		if (new_reserved <= reserved || new_reserved <= 0)
+			return;
+		K* new_data = (K*)Memory::Alloc(new_reserved * sizeof(K));
+		if (data) {
+			if (count > 0)
+				Memory::Copy((void*)new_data, (void*)data, sizeof(K) * count);
+			Memory::Free(data);
+		}
+		data = new_data;
+		reserved = new_reserved;
+	}
+	inline int GetCount() const { return count; }
+	inline int GetReserved() const { return reserved; }
+	inline bool IsEmpty() const { return GetCount() == 0; }
+
+	inline K& operator[](int i) {
+		CASSERT(i >= 0 && i < count);
+		return *(data + i);
+	}
+	inline const K& operator[](int i) const {
+		CASSERT(i >= 0 && i < count);
+		return *(data + i);
+	}
+
+	inline void Remove(int i) {
+		CASSERT(i >= 0 && i < count);
+		int tail = count - (i + 1);
+		if (tail > 0)
+			Memory::Move(data + i, data + i + 1, tail * sizeof(K));
+		count--;
+	}
+	inline void Remove(int i, int count) {
+		CASSERT(count > 0);
+		CASSERT(i >= 0 && i + count <= this->count);
+		int tail = this->count - (i + count);
+		if (tail > 0)
+			Memory::Move(data + i, data + i + count, tail * sizeof(K));
+		this->count -= count;
+	}
+	inline void Remove(const Iterator& it) {
+		K* begin = data;
+		K* cur = it.Get();
+		int pos = cur - begin;
+		Remove(pos);
+		// TODO: Check this
+	}
+	inline void Remove(const Iterator& it, const Iterator& end) {
+		K* begin = data;
+		K* cur = it.Get();
+		K* cur_end = end.Get();
+		int pos0 = cur - begin;
+		int pos1 = cur_end - begin;
+		int len = pos1 - pos0;
+		if (!len) return;
+		Remove(pos0, len);
+		// TODO: Check this
+	}
+	inline void Remove(const DynArray<int>& sorted_list) {Remove(sorted_list.Begin(), sorted_list.GetCount());}
+	inline void Remove(const int* sorted_list, int n) {
+		if(!n) return;
+		int pos = *sorted_list;
+		int npos = pos;
+		for(;;) {
+			CASSERT(pos < count);
+			if(pos == *sorted_list) {
+				(data + pos)->~K();
+				pos++;
+				sorted_list++;
+				if(--n == 0) break;
+				CASSERT(*sorted_list >= pos);
+			}
+			else
+				Memory::Copy(data + npos++, data + pos++, sizeof(K));
+		}
+		while(pos < count)
+			Memory::Copy(data + npos++, data + pos++, sizeof(K));
+		count = npos;
+	}
+	inline K& Insert(int i) {
+		if (count + 1 > reserved) IncreaseReserved();
+		if (count >= reserved)
+			throw MemoryLimitExc("DynArray maximum size exceeded");
+		int tail = this->count - i;
+		if (tail > 0)
+			Memory::Move(data + i + 1, data + i, tail * sizeof(K));
+		new (&data[i]) K();
+		count++;
+		return data[i];
+	}
+	inline K& Insert(int i, ConstK& key) {
+		if (count + 1 > reserved) IncreaseReserved();
+		if (count >= reserved)
+			throw MemoryLimitExc("DynArray maximum size exceeded");
+		int tail = this->count - i;
+		if (tail > 0)
+			Memory::Move(data + i + 1, data + i, tail * sizeof(K));
+		new (&data[i]) K(key);
+		count++;
+		return data[i];
+	}
+
+	inline K& Top() { CASSERT(GetCount() > 0); return data[count - 1]; }
+
+	inline K Pop() {
+		CASSERT(GetCount() > 0);
+		int i = count - 1;
+		K ret(data[i]);
+		data[i].~K();
+		count--;
+		return ret;
+	}
+	
+	inline void RemoveLast() {
+		CASSERT(GetCount() > 0);
+		data[--count].~K();
+	}
+
+	inline void Clear() {
+		if (!reserved) return;
+		K* it = data;
+		K* end = data + count;
+		while (it != end)
+			it++->~IndirectK();
+		count = 0;
+		Memory::Free(data);
+		data = NULL;
+		reserved = 0;
+	}
+};
+
+}
+

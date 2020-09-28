@@ -3,7 +3,7 @@ namespace Com {
 
 
 class CombineHash {
-	auto bool is_moveable = true;
+	$MakeMoveable();
 	
 	uint32 hash = 123456789;
 

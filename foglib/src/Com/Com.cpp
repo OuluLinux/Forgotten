@@ -160,22 +160,19 @@ void rewinddir(DIR *dir)
 
 
 
-
-NAMESPACE_SDK_BEGIN
-
-C::Nuller Null;
+namespace C {
 
 
-void Break(const char* msg) {
+void SysBreak(const char* msg) {
 	fprintf(stderr, "%s\n", msg);
 	__BREAK__;
 }
 
-void* MemoryAlloc(int sz) {return malloc(sz);}
-
-void MemoryFree(void* ptr) {return free(ptr);}
-
-int MemoryCompare( const void *m1, const void *m2, int sz) {
+namespace Memory {
+	
+void* Alloc(int sz) {return malloc(sz);}
+void Free(void* ptr) {return free(ptr);}
+int Compare( const void *m1, const void *m2, int sz) {
 	#if defined flagGCC || flagCLANG
 	return __builtin_memcmp(m1, m2, sz);
 	#else
@@ -183,7 +180,7 @@ int MemoryCompare( const void *m1, const void *m2, int sz) {
 	#endif
 }
 
-void* MemoryCopy(void *dest, const void *src, int sz) {
+void* Copy(void *dest, const void *src, int sz) {
 	#if defined flagGCC || flagCLANG
 	return __builtin_memcpy(dest, src, sz);
 	#else
@@ -191,7 +188,7 @@ void* MemoryCopy(void *dest, const void *src, int sz) {
 	#endif
 }
 
-void* MemoryMove(void *dest, const void *src, int sz) {
+void* Move(void *dest, const void *src, int sz) {
 	#if defined flagGCC || flagCLANG
 	return __builtin_memmove(dest, src, sz);
 	#else
@@ -199,9 +196,20 @@ void* MemoryMove(void *dest, const void *src, int sz) {
 	#endif
 }
 
-void MemorySet(void *dest, int byte_value, int sz) {
+void Set(void *dest, int byte_value, int sz) {
 	memset(dest, byte_value, sz);
 }
+
+}
+
+}
+
+
+NAMESPACE_SDK_BEGIN
+
+C::Nuller Null;
+
+
 
 
 
@@ -289,31 +297,6 @@ int64 NativeCurrentTime() {
 
 
 
-int StringLength(const char* c, int max_len) {
-	return strnlen(c, max_len);
-}
-
-int StringLength(const short* c, int max_len) {
-	ASSERT(c);
-	if (!c) return 0;
-	int count = 0;
-	if (max_len < 0) {
-		while (*c) {
-			count++;
-			c++;
-		}
-		return count;
-	}
-	else {
-		while (max_len > 0 && *c) {
-			count++;
-			c++;
-			max_len--;
-		}
-		return count;
-	}
-}
-
 
 void NativeDblStr(double d, char* buf, int buf_size) {
 	snprintf(buf, buf_size, "%g", d);
@@ -348,13 +331,18 @@ const short* NativeUtf8To16(const char* in) {
 
 const char* NativeUtf16To8(const short* in) {
 	thread_local static std::vector<wchar_t> v;
-	int len = StringLength(in, 10000000);
+	int len = C::StringLength(in, 10000000);
 	v.resize(len + 1);
 	for(wchar_t& s : v) s = *in++;
 	v[len] = 0;
 	thread_local static std::string s = GetUnicodeConverter().to_bytes(std::wstring(v.data()));
 	return s.c_str();
 }
+
+
+
+
+
 
 NAMESPACE_SDK_END
 
@@ -952,5 +940,10 @@ Vector<String> Split(String to_split, String split_str, bool ignore_empty) {
 	
 	return v;
 }
+
+
+
+
+
 
 #endif

@@ -17,6 +17,8 @@ template <class T> const T& max(const T& a, const T& b) {
 
 
 class RNG {
+	$MakeMoveable();
+	
 	uint64 state[4];
 	
 	uint64 s_rotl(const uint64 x, int k) {
@@ -77,7 +79,7 @@ double Randomf() {return RNG::Local().Randomf();}
 void SeedRandom() {return RNG::Local().Seed();}
 
 template <class I, class T>
-I FindIf(I begin, I end, bool (*fn)(T&, void*), void* arg=0) {
+inline I FindIf(I begin, I end, bool (*fn)(T&, void*), void* arg=0) {
 	while (begin != end) {
 		if (fn(*begin, arg))
 			return begin;
