@@ -1,7 +1,7 @@
 /*!$@FOG@$!
- *	Generated at Mon Sep 28 10:34:35 2020
+ *	Generated at Tue Sep 29 13:48:51 2020
  *
- *	by fog 0.1.a of 08:56:34 Sep 28 2020
+ *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
  *	from
  *		../../src/Com/Algorithm.fog
@@ -13,6 +13,7 @@
  *		../../src/Com/Macros.fog
  *		../../src/Com/Meta.fog
  *		../../src/Com/Native.fog
+ *		../../src/Com/Shared.fog
  *		../../src/Com/String.fog
  *		../../src/Com/Vector.fog
  *		ComTest.mfog
@@ -33,23 +34,21 @@ struct ComInterfaceLinker
 
 namespace Com
 {
-#line 9 "../../src/Com/Defs.fog"
-    extern C::Nuller Null;
 };
 
 namespace Com
 {
-#line 34
+#line 28 "../../src/Com/Lang.fog"
     typedef unsigned char Byte;
     
-#line 35
+#line 29
     extern Byte ____unused_Byte;
 };
 
 namespace Com
 {
-#line 39
-    typedef C::Ptr < const char > CString;
+#line 39 "../../src/Com/Defs.fog"
+    typedef C::CPtr < const char > CString;
     
 #line 40
     extern CString ____unused_CString;
@@ -58,7 +57,7 @@ namespace Com
 namespace Com
 {
 #line 39
-    typedef C::Ptr < const void > ConstVoidPtr;
+    typedef C::CPtr < const void > ConstVoidPtr;
     
 #line 40
     extern ConstVoidPtr ____unused_ConstVoidPtr;
@@ -66,17 +65,17 @@ namespace Com
 
 namespace Com
 {
-#line 34
+#line 28 "../../src/Com/Lang.fog"
     typedef unsigned long DWORD;
     
-#line 35
+#line 29
     extern DWORD ____unused_DWORD;
 };
 
 namespace Com
 {
-#line 39
-    typedef C::Ptr < void > VoidPtr;
+#line 39 "../../src/Com/Defs.fog"
+    typedef C::CPtr < void > VoidPtr;
     
 #line 40
     extern VoidPtr ____unused_VoidPtr;
@@ -84,108 +83,108 @@ namespace Com
 
 namespace Com
 {
-#line 34
+#line 28 "../../src/Com/Lang.fog"
     typedef unsigned char byte;
     
-#line 35
+#line 29
     extern byte ____unused_byte;
 };
 
 namespace Com
 {
-#line 34
+#line 28
     typedef unsigned int uint32;
-#line 34
+#line 28
     typedef uint32 dword;
     
-#line 35
+#line 29
     extern dword ____unused_dword;
 };
 
 namespace Com
 {
-#line 34
+#line 28
     typedef short int16;
     
-#line 35
+#line 29
     extern int16 ____unused_int16;
 };
 
 namespace Com
 {
-#line 34
+#line 28
     typedef int int32;
     
-#line 35
+#line 29
     extern int32 ____unused_int32;
 };
 
 namespace Com
 {
-#line 34
+#line 28
     typedef long long int64;
     
-#line 35
+#line 29
     extern int64 ____unused_int64;
 };
 
 namespace Com
 {
-#line 34
+#line 28
     typedef char int8;
     
-#line 35
+#line 29
     extern int8 ____unused_int8;
 };
 
 namespace Com
 {
-#line 34
+#line 28
     typedef unsigned long long uint64;
-#line 34
+#line 28
     typedef uint64 qword;
     
-#line 35
+#line 29
     extern qword ____unused_qword;
 };
 
 namespace Com
 {
-#line 34
+#line 28
     typedef unsigned short uint16;
     
-#line 35
+#line 29
     extern uint16 ____unused_uint16;
-#line 35
+#line 29
     extern uint32 ____unused_uint32;
-#line 35
+#line 29
     extern uint64 ____unused_uint64;
 };
 
 namespace Com
 {
-#line 34
+#line 28
     typedef unsigned char uint8;
     
-#line 35
+#line 29
     extern uint8 ____unused_uint8;
 };
 
 namespace Com
 {
-#line 34
+#line 28
     typedef uint16 word;
     
-#line 35
+#line 29
     extern word ____unused_word;
     
-#line 17
+#line 16 "../../src/Com/Defs.fog"
     void Break(const char *msg);
 #line 19 "../../src/Com/Native.fog"
     int64 DateSeconds(uint64 year, uint64 month, uint64 day);
-#line 81 "../../src/Com/Algorithm.fog"
+#line 557 "../../src/Com/Vector.fog"
     template < class _1, class _2 >
-    inline _1 FindIf(_1 begin, _1 end, bool(*fn)(_2& , void *), void *arg = 0);
+    inline _1 FindIf(_1 first, _1 last, _2 pred);
 #line 25 "../../src/Com/Hash.fog"
     template < class _1 >
     inline uint32 GetHashValue(const _1& k);
@@ -225,14 +224,14 @@ namespace Com
     inline bool IsOctDigit(char c);
 #line 10
     inline bool IsSpace(char c);
-#line 11 "../../src/Com/Defs.fog"
+#line 10 "../../src/Com/Defs.fog"
     void *MemoryAlloc(int sz);
-#line 13
+#line 12
     int MemoryCompare(const void *m1, const void *m2, int sz);
     void *MemoryCopy(void *dest, const void *src, int sz);
-#line 12
+#line 11
     void MemoryFree(void *ptr);
-#line 15
+#line 14
     void *MemoryMove(void *dest, const void *src, int sz);
     void MemorySet(void *dest, int byte_value, int sz);
 #line 21 "../../src/Com/Native.fog"
@@ -267,7 +266,7 @@ namespace Com
     int SignificantBits64(uint64 x);
 #line 28 "../../src/Com/Vector.fog"
     template < class _1 >
-    void Swap(_1& a, _1& b);
+    inline void Swap(_1& a, _1& b);
 #line 20 "../../src/Com/Native.fog"
     int64 TimeSeconds(uint64 year, uint64 month, uint64 day, uint64 hour, uint64 minute, uint64 second);
 #line 11 "../../src/Com/Algorithm.fog"
@@ -281,90 +280,138 @@ namespace Com
     class Array
     {
     public:
-#line 186 "../../src/Com/Vector.fog"
+#line 235 "../../src/Com/Vector.fog"
         typedef const _1 ConstK;
-#line 185
+#line 234
         typedef _1 IndirectK;
-#line 187
+#line 236
         typedef C::FwdPtrIterator < _1 > Iterator;
         typedef C::BwdPtrIterator < _1 > RIterator;
         
-#line 181
+#line 230
         C::DynArray < _1 * > l;
         
     public:
-#line 191
+#line 240
         inline Array();
-#line 198
         inline ~Array();
-#line 289
+#line 336
         inline Array < _1 > & operator<< (const _1& v);
-#line 282
+#line 329
         inline void operator<<= (const Array& a);
-#line 243
+#line 289
         inline _1& operator[](int i);
-#line 249
+#line 295
         inline const _1& operator[](int i) const;
-#line 234
+#line 280
         inline _1& Add();
-#line 236
+#line 282
         inline _1& Add(_1 *k);
-#line 235
+#line 281
         inline _1& Add(const _1& v);
-#line 204
+#line 250
         inline C::ConstFwdPtrIterator < _1 > Begin() const;
-#line 202
+#line 248
         inline C::FwdPtrIterator < _1 > Begin();
-#line 270
+#line 316
         inline void Clear();
-#line 241
+#line 287
         inline _1 *Detach(int i);
-#line 205
+#line 251
         inline C::ConstFwdPtrIterator < _1 > End() const;
-#line 203
+#line 249
         inline C::FwdPtrIterator < _1 > End();
-#line 239
+#line 245
+        inline _1 **Get() const;
+#line 285
         inline int GetCount() const;
-#line 237
+#line 246
+        inline _1 **GetEnd() const;
+#line 283
         inline _1& Insert(int i);
         inline _1& Insert(int i, const _1& key);
-#line 240
+#line 286
         inline bool IsEmpty() const;
-#line 210
+#line 256
         inline C::BwdPtrIterator < _1 > RBegin();
-#line 212
+#line 258
         inline C::ConstBwdPtrIterator < _1 > RBegin() const;
-#line 211
+#line 257
         inline C::BwdPtrIterator < _1 > REnd();
-#line 213
+#line 259
         inline C::ConstBwdPtrIterator < _1 > REnd() const;
-#line 260
+#line 306
         inline void Remove(const int *sorted_list, int n);
-#line 254
+#line 300
         inline void Remove(int i);
-#line 269
+#line 315
         inline void RemoveLast();
-#line 219
+#line 265
         inline void Reserve(int i);
         inline void SetCount(int new_count);
-#line 278
+#line 325
         inline _1& Top();
-#line 208
+#line 254
         inline C::ConstFwdPtrIterator < _1 > begin() const;
-#line 206
+#line 252
         inline C::FwdPtrIterator < _1 > begin();
-#line 209
+#line 255
         inline C::ConstFwdPtrIterator < _1 > end() const;
-#line 207
+#line 253
         inline C::FwdPtrIterator < _1 > end();
-#line 214
+#line 260
         inline C::BwdPtrIterator < _1 > rbegin();
-#line 216
+#line 262
         inline C::ConstBwdPtrIterator < _1 > rbegin() const;
-#line 215
+#line 261
         inline C::BwdPtrIterator < _1 > rend();
-#line 217
+#line 263
         inline C::ConstBwdPtrIterator < _1 > rend() const;
+    };
+};
+
+namespace Com {
+class Slot;
+}
+
+namespace Com
+{
+    class Attachable
+    {
+#line 50 "../../src/Com/Shared.fog"
+        typedef C::FwdIterator < void * > Iter;
+        
+#line 48
+        C::DynArray < void * > slots;
+        
+    public:
+#line 70
+        virtual ~Attachable();
+#line 72
+        inline void Attach(Slot& s);
+#line 85
+        void Detach(Slot *ptr);
+#line 73
+        void DetachAll();
+#line 90
+        inline Slot& Get(int i) const;
+#line 89
+        inline int GetCount() const;
+#line 78
+        bool IsAttached(Slot *ptr);
+        
+#line 42 "../../src/Com/Lang.fog"
+        void AddSlot(Slot *ptr);
+#line 52 "../../src/Com/Shared.fog"
+        void DoAttach(Slot *s);
+#line 57
+        void DoDetach(Slot *s);
+#line 39 "../../src/Com/Lang.fog"
+        Slot& GetSlot(int i);
+#line 41
+        int GetSlotCount();
+#line 40
+        void RemoveSlot(int i);
     };
     
     class CombineHash
@@ -417,10 +464,167 @@ namespace Com
     };
     
     template < class _1 >
+    class Index
+    {
+    public:
+#line 349 "../../src/Com/Vector.fog"
+        typedef C::FwdPtrIterator < _1 > Iterator;
+        typedef C::BwdPtrIterator < _1 > RIterator;
+        
+#line 345
+        C::DynArray < unsigned int > hashes;
+        C::DynArray < _1 > values;
+        
+    public:
+#line 352
+        inline Index();
+#line 407
+        inline void operator<<= (const Index& a);
+#line 363
+        inline const _1& operator[](int i) const;
+#line 373
+        inline const _1& Add(const _1& value);
+#line 358
+        inline C::ConstFwdPtrIterator < _1 > Begin() const;
+#line 354
+        inline C::FwdPtrIterator < _1 > Begin();
+#line 402
+        inline void Clear();
+#line 359
+        inline C::ConstFwdPtrIterator < _1 > End() const;
+#line 356
+        inline C::FwdPtrIterator < _1 > End();
+#line 387
+        inline int Find(const _1& key) const;
+        inline int FindAdd(const _1& key);
+#line 390
+        inline int FindHash(uint32 hash) const;
+#line 360
+        inline _1 *Get();
+#line 372
+        inline int GetCount() const;
+#line 361
+        inline _1 *GetEnd();
+#line 380
+        inline _1& Insert(int i, const _1& value);
+#line 403
+        inline void Remove(int i);
+#line 405
+        inline void RemoveKey(const _1& key);
+#line 404
+        inline void RemoveLast();
+#line 368
+        inline void Set(const Index& i);
+#line 355
+        inline C::FwdPtrIterator < _1 > begin();
+#line 357
+        inline C::FwdPtrIterator < _1 > end();
+    };
+    
+    template < class _1, class _2 >
+    class ArrayMap
+    {
+    public:
+#line 419
+        typedef Array < _2 > ArrayV;
+#line 418
+        typedef Index < _1 > IndexK;
+#line 519
+        typedef C::FwdPairPtrIterator < _1, _2 > Iterator;
+#line 420
+        typedef ArrayMap < _1, _2 > MapKV;
+#line 520
+        typedef C::BwdPairPtrIterator < _1, _2 > RIterator;
+        
+#line 414
+        Index < _1 > keys;
+        Array < _2 > values;
+        
+    public:
+#line 422
+        inline ArrayMap();
+#line 483
+        inline void operator<<= (const ArrayMap& a);
+#line 466
+        inline _2& operator[](int i);
+#line 465
+        inline const _2& operator[](int i) const;
+#line 428
+        inline _2& Add(const _1& key);
+#line 438
+        inline _2& Add(const _1& key, _2 *value);
+#line 433
+        inline _2& Add(const _1& key, const _2& value);
+#line 460
+        inline _2& At(int i);
+#line 455
+        inline const _2& At(int i) const;
+#line 540
+        inline C::ConstFwdPairPtrIterator < _1, _2 > Begin() const;
+#line 538
+        inline C::FwdPairPtrIterator < _1, _2 > Begin();
+#line 478
+        inline void Clear();
+#line 541
+        inline C::ConstFwdPairPtrIterator < _1, _2 > End() const;
+#line 539
+        inline C::FwdPairPtrIterator < _1, _2 > End();
+#line 470
+        inline int Find(const _1& key) const;
+#line 531
+        inline C::FwdPairPtrIterator < _1, _2 > FindIterator(const _1& key) const;
+#line 472
+        inline _2 Get(const _1& key, _2 value);
+#line 471
+        inline _2& Get(const _1& key);
+#line 443
+        inline _2& GetAdd(const _1& key);
+#line 473
+        inline int GetCount() const;
+#line 453
+        inline const _1& GetKey(int i) const;
+#line 424
+        inline const Index < _1 > & GetKeys() const;
+#line 521
+        inline int GetPos(const Iterator& it);
+#line 426
+        inline Array < _2 > & GetValues();
+#line 425
+        inline const Array < _2 > & GetValues() const;
+#line 450
+        inline _2& Insert(int i, const _1& key);
+        inline _2& Insert(int i, const _1& key, const _2& value);
+#line 530
+        inline C::FwdPairPtrIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key);
+#line 529
+        inline C::FwdPairPtrIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key, _2 *value);
+#line 528
+        inline C::FwdPairPtrIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key, const _2& value);
+#line 474
+        inline bool IsEmpty() const;
+#line 527
+        inline void Remove(const Iterator& it);
+#line 477
+        inline void Remove(int i);
+#line 476
+        inline void RemoveKey(const _1& key);
+#line 468
+        inline _2& Top();
+#line 544
+        inline C::ConstFwdPairPtrIterator < _1, _2 > begin() const;
+#line 542
+        inline C::FwdPairPtrIterator < _1, _2 > begin();
+#line 545
+        inline C::ConstFwdPairPtrIterator < _1, _2 > end() const;
+#line 543
+        inline C::FwdPairPtrIterator < _1, _2 > end();
+    };
+    
+    template < class _1 >
     class One
     {
     public:
-#line 52 "../../src/Com/Vector.fog"
+#line 52
         typedef const _1 ConstT;
         
 #line 49
@@ -498,32 +702,26 @@ namespace Com
     template < class _1 >
     class Pick
     {
-#line 17
+#line 16
         _1 *var;
         
     public:
-#line 19
+#line 18
         inline Pick(_1& var);
         inline Pick(const Pick& p);
-#line 22
+#line 21
         inline _1& Get() const;
         
     public:
-#line 24
-        inline static Pick < _1 > Ptr(_1 *p);
+#line 23
+        inline static Pick < _1 > Make(_1 *p);
     };
-};
-
-namespace Com
-{
-#line 8 "../../src/Com/Defs.fog"
-    typedef C::Nuller Nuller;
     
     template < class _1 >
     class Optional
     {
     public:
-#line 120 "../../src/Com/Vector.fog"
+#line 120
         typedef Com::Pick < Optional > PickOpt;
 #line 119
         typedef Com::Pick < _1 > PickT;
@@ -534,43 +732,56 @@ namespace Com
     public:
 #line 122
         inline Optional();
-#line 127
-        inline Optional(_1 *obj);
 #line 126
-        inline Optional(const Nuller& n);
+        inline Optional(_1 *obj);
 #line 124
         Optional(const Optional& opt);
-#line 128
+#line 127
         Optional(const PickT& n);
 #line 125
         Optional(const _1& obj);
-#line 129
+#line 128
         inline ~Optional();
-#line 143
-        inline _1& operator*();
 #line 141
+        inline _1& operator*();
+#line 139
         _1 *operator-> ();
 #line 134
-        inline void operator= (const Nuller& );
-#line 136
         void operator= (const Optional& o);
         void operator= (const PickOpt& n);
-#line 135
-        inline void operator= (const _1& obj);
-#line 142
-        inline operator bool() const;
 #line 133
+        inline void operator= (const _1& obj);
+#line 140
+        inline operator bool() const;
+#line 132
         inline void Clear();
-#line 131
+#line 130
         inline void Create();
         template < class _2 >
         inline void Create1(const _2& arg);
-#line 140
-        inline _1& GetValue() const;
-#line 139
-        inline bool IsEmpty() const;
 #line 138
+        inline _1& GetValue() const;
+#line 137
+        inline bool IsEmpty() const;
+#line 136
         void Pick(Optional& o);
+    };
+    
+    template < class _1 >
+    struct Ptr
+    {
+#line 24 "../../src/Com/Defs.fog"
+        _1 *value;
+        
+        inline Ptr();
+        inline Ptr(_1 *p);
+        inline void operator= (_1 *p);
+#line 30
+        inline bool operator== (const Ptr& p) const;
+#line 29
+        inline operator _1 * () const;
+#line 33
+        inline unsigned long long Int() const;
     };
     
     class RNG
@@ -603,6 +814,35 @@ namespace Com
     public:
 #line 68
         inline static RNG& Local();
+    };
+    
+    class Slot
+    {
+#line 7 "../../src/Com/Shared.fog"
+        Attachable *ptr;
+        
+    public:
+        inline Slot();
+        virtual ~Slot();
+#line 42
+        inline Attachable& operator*() const;
+#line 37
+        inline Attachable *operator-> () const;
+        inline operator bool() const;
+#line 13
+        virtual bool CanAttach(Attachable& a);
+#line 29
+        void Clear();
+#line 39
+        inline Attachable& Get() const;
+        inline Attachable *GetPtr() const;
+#line 16
+        inline bool IsEmpty() const;
+        void Set(Attachable& a);
+#line 15
+        inline void SetPtr(Attachable *p);
+#line 23
+        void TestSet(Attachable& a);
     };
     
     class Stream
@@ -801,11 +1041,11 @@ namespace Com
         class App
         {
         public:
-#line 26 "ComTest.mfog"
+#line 28 "ComTest.mfog"
             inline void Run();
             
-#line 7
-            inline static bool TestCmp(const char& c, void *);
+#line 166
+            inline void TestShared();
             
             struct SomeRefTuple2
             {
@@ -826,22 +1066,28 @@ namespace Com
                 String ToString() const;
             };
             
+            struct TestCmp
+            {
+#line 8 "ComTest.mfog"
+                inline bool operator()(const char& c);
+            };
+            
             struct VirtualBase
             {
-#line 15 "ComTest.mfog"
+#line 17
                 int a;
                 
-#line 12
+#line 14
                 inline VirtualBase();
                 virtual ~VirtualBase();
             };
             
             struct DerivedBase : public Com::Tester::App::VirtualBase
             {
-#line 20
+#line 22
                 int a;
                 
-#line 18
+#line 20
                 inline DerivedBase();
             };
         };
@@ -850,13 +1096,123 @@ namespace Com
     template < class _1 >
     class Vector : public C::DynArray < _1 >
     {
-#line 152 "../../src/Com/Vector.fog"
+#line 150 "../../src/Com/Vector.fog"
         typedef C::DynArray < _1 > Base;
         
     public:
-#line 158
+#line 155
+        typedef C::ConstFwdIterator < _1 > ConstIterator;
+        typedef C::ConstBwdIterator < _1 > ConstRIterator;
+        typedef C::FwdIterator < _1 > Iterator;
+        typedef C::BwdIterator < _1 > RIterator;
+        
+    public:
+#line 160
         inline Vector();
         inline Vector(const Vector& v);
+#line 166
+        inline String Join(String join_str = "", bool ignore_empty = true) const;
+#line 180
+        inline void Split(String to_split, String split_str, bool ignore_empty = true);
+    };
+    
+    template < class _1, class _2 >
+    class VectorMap
+    {
+    public:
+#line 419
+        typedef Vector < _2 > ArrayV;
+#line 418
+        typedef Index < _1 > IndexK;
+#line 490
+        typedef C::FwdPairIterator < _1, _2 > Iterator;
+#line 420
+        typedef VectorMap < _1, _2 > MapKV;
+#line 491
+        typedef C::BwdPairIterator < _1, _2 > RIterator;
+        
+#line 414
+        Index < _1 > keys;
+        Vector < _2 > values;
+        
+    public:
+#line 422
+        inline VectorMap();
+#line 483
+        inline void operator<<= (const VectorMap& a);
+#line 466
+        inline _2& operator[](int i);
+#line 465
+        inline const _2& operator[](int i) const;
+#line 428
+        inline _2& Add(const _1& key);
+#line 438
+        inline _2& Add(const _1& key, _2 *value);
+#line 433
+        inline _2& Add(const _1& key, const _2& value);
+#line 460
+        inline _2& At(int i);
+#line 455
+        inline const _2& At(int i) const;
+#line 511
+        inline C::ConstFwdPairIterator < _1, _2 > Begin() const;
+#line 509
+        inline C::FwdPairIterator < _1, _2 > Begin();
+#line 478
+        inline void Clear();
+#line 512
+        inline C::ConstFwdPairIterator < _1, _2 > End() const;
+#line 510
+        inline C::FwdPairIterator < _1, _2 > End();
+#line 470
+        inline int Find(const _1& key) const;
+#line 502
+        inline C::FwdPairIterator < _1, _2 > FindIterator(const _1& key) const;
+#line 472
+        inline _2 Get(const _1& key, _2 value);
+#line 471
+        inline _2& Get(const _1& key);
+#line 443
+        inline _2& GetAdd(const _1& key);
+#line 473
+        inline int GetCount() const;
+#line 453
+        inline const _1& GetKey(int i) const;
+#line 424
+        inline const Index < _1 > & GetKeys() const;
+#line 492
+        inline int GetPos(const Iterator& it);
+#line 426
+        inline Vector < _2 > & GetValues();
+#line 425
+        inline const Vector < _2 > & GetValues() const;
+#line 450
+        inline _2& Insert(int i, const _1& key);
+        inline _2& Insert(int i, const _1& key, const _2& value);
+#line 501
+        inline C::FwdPairIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key);
+#line 500
+        inline C::FwdPairIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key, _2 *value);
+#line 499
+        inline C::FwdPairIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key, const _2& value);
+#line 474
+        inline bool IsEmpty() const;
+#line 498
+        inline void Remove(const Iterator& it);
+#line 477
+        inline void Remove(int i);
+#line 476
+        inline void RemoveKey(const _1& key);
+#line 468
+        inline _2& Top();
+#line 515
+        inline C::ConstFwdPairIterator < _1, _2 > begin() const;
+#line 513
+        inline C::FwdPairIterator < _1, _2 > begin();
+#line 516
+        inline C::ConstFwdPairIterator < _1, _2 > end() const;
+#line 514
+        inline C::FwdPairIterator < _1, _2 > end();
     };
     
     class WString
@@ -1049,14 +1405,35 @@ namespace Com
         String EscapeCharacter(String s);
 #line 779
         String EscapeString(String s);
-#line 811
+#line 809
+        inline void FromString(const String& s, String& o);
+#line 805
+        inline void FromString(const String& s, byte& o);
+#line 804
+        inline void FromString(const String& s, int64& o);
+#line 803
+        inline void FromString(const String& s, uint32& o);
+#line 800
+        template < class _1 >
+        inline void FromString(const String& s, _1& o);
+#line 801
+        inline void FromString(const String& s, bool& o);
+#line 806
+        inline void FromString(const String& s, char& o);
+#line 808
+        inline void FromString(const String& s, double& o);
+#line 807
+        inline void FromString(const String& s, float& o);
+#line 802
+        inline void FromString(const String& s, int& o);
+#line 821
         inline int HexDigit(int c);
         inline int HexDigitLower(int c);
 #line 773
         inline int HexInt(String s);
-#line 813
+#line 823
         inline String HexStr(uint64 p);
-#line 829
+#line 839
         inline String HexStr(void *p);
 #line 775
         inline String IntStr(int i);
@@ -1068,30 +1445,30 @@ namespace Com
         inline int StrInt(String s);
 #line 774
         inline int64 StrInt64(String s);
-#line 801
+#line 811
         template < class _1 >
         inline int64 ToInt(const _1& o);
-#line 809
+#line 819
         template <>
         inline int64 ToInt < String > (const String& o);
-#line 802
+#line 812
         template <>
         inline int64 ToInt < bool > (const bool& o);
-#line 805
+#line 815
         template <>
         inline int64 ToInt < byte > (const byte& o);
-#line 806
+#line 816
         template <>
         inline int64 ToInt < char > (const char& o);
         template <>
         inline int64 ToInt < double > (const double& o);
-#line 807
+#line 817
         template <>
         inline int64 ToInt < float > (const float& o);
-#line 803
+#line 813
         template <>
         inline int64 ToInt < int > (const int& o);
-#line 804
+#line 814
         template <>
         inline int64 ToInt < int64 > (const int64& o);
 #line 752
@@ -1147,19 +1524,23 @@ namespace Com
 
 namespace Com
 {
-#line 81 "../../src/Com/Algorithm.fog"
+#line 557 "../../src/Com/Vector.fog"
     template < class _1, class _2 >
-    inline _1 FindIf(_1 begin, _1 end, bool(*fn)(_2& , void *), void *arg)
+    inline _1 FindIf(_1 first, _1 last, _2 pred)
     {
-#line 83
-        while (begin != end)
+#line 559
+        while (first != last)
             {
-#line 84
-                if (fn(*begin, arg))
-                    return begin;
-                begin ++ ;
+#line 560
+                int i = pred._2::operator()(*first);
+                if (i)
+#line 561
+                    return first;
+#line 563
+                ++ first;
             }
-        return end;
+#line 566
+        return last;
     };
     
 #line 25 "../../src/Com/Hash.fog"
@@ -1338,7 +1719,18 @@ namespace Com
         return RNG::Local().Seed();
     };
     
-#line 11
+#line 28 "../../src/Com/Vector.fog"
+    template < class _1 >
+    inline void Swap(_1& a, _1& b)
+    {
+#line 30
+        uint8 tmp[sizeof (_1)];
+        MemoryCopy(tmp, &a, sizeof (_1));
+        MemoryCopy(&a, &b, sizeof (_1));
+        MemoryCopy(&b, tmp, sizeof (_1));
+    };
+    
+#line 11 "../../src/Com/Algorithm.fog"
     template < class _1 >
     inline const _1& max(const _1& a, const _1& b)
     {
@@ -1360,238 +1752,255 @@ namespace Com
             return b;
     };
     
-#line 191 "../../src/Com/Vector.fog"
+#line 240 "../../src/Com/Vector.fog"
     template < class _1 >
     inline Array < _1 >::Array() {};
     
-#line 198
+#line 241
     template < class _1 >
     inline Array < _1 >::~Array()
     {
-#line 198
+#line 241
         Clear();
     };
     
-#line 289
+#line 336
     template < class _1 >
     inline Array < _1 > & Array < _1 >::operator<< (const _1& v)
     {
-#line 289
+#line 336
         Add(v);
-#line 289
+#line 336
         return *this;
     };
     
-#line 282
+#line 329
     template < class _1 >
     inline void Array < _1 >::operator<<= (const Array& a)
     {
-#line 283
+#line 330
         Clear();
         l.SetCount(a.GetCount(), 0);
         for (int i = 0; i < a.GetCount(); i ++ )
             l[i] = new _1(*a.l[i]);
     };
     
-#line 243
+#line 289
     template < class _1 >
     inline _1& Array < _1 >::operator[](int i)
     {
         {
-#line 244
+#line 290
             if (!(i >= 0 && i < l.GetCount()))
             {
-#line 244
+#line 290
                 Break("Assertion failed: i >= 0 && i < l.GetCount()");
             }
         }
-#line 245
+#line 291
         ;
-#line 245
+#line 291
         _1 * *it = l.Get();
         it = it + i;
         return **it;
     };
     
-#line 249
+#line 295
     template < class _1 >
     inline const _1& Array < _1 >::operator[](int i) const
     {
         {
-#line 250
+#line 296
             if (!(i >= 0 && i < l.GetCount()))
             {
-#line 250
+#line 296
                 Break("Assertion failed: i >= 0 && i < l.GetCount()");
             }
         }
-#line 251
+#line 297
         ;
-#line 251
+#line 297
         return **(l.Get() + i);
     };
     
-#line 234
+#line 280
     template < class _1 >
     inline _1& Array < _1 >::Add()
     {
-#line 234
+#line 280
         _1 * k = new _1;
-#line 234
+#line 280
         l.Add(k);
-#line 234
+#line 280
         return *k;
     };
     
-#line 236
+#line 282
     template < class _1 >
     inline _1& Array < _1 >::Add(_1 *k)
     {
-#line 236
+#line 282
         l.Add(k);
-#line 236
+#line 282
         return *k;
     };
     
-#line 235
+#line 281
     template < class _1 >
     inline _1& Array < _1 >::Add(const _1& v)
     {
-#line 235
+#line 281
         _1 * k = new _1(v);
-#line 235
+#line 281
         l.Add(k);
-#line 235
+#line 281
         return *k;
     };
     
-#line 204
+#line 250
     template < class _1 >
     inline C::ConstFwdPtrIterator < _1 > Array < _1 >::Begin() const
     {
-#line 204
+#line 250
         return Iterator(l.Begin());
     };
     
-#line 202
+#line 248
     template < class _1 >
     inline C::FwdPtrIterator < _1 > Array < _1 >::Begin()
     {
-#line 202
+#line 248
         return Iterator(l.Begin());
     };
     
-#line 270
+#line 316
     template < class _1 >
     inline void Array < _1 >::Clear()
     {
-#line 271
-        _1 * *ptr = l.Get();
-        _1 * *end = ptr + l.GetCount();
+#line 317
+        C::DynArray < _1 * > tmp;
+        Swap(tmp, l);
+        _1 * *ptr = tmp.Get();
+        _1 * *end = ptr + tmp.GetCount();
         while (ptr != end)
             delete *(ptr ++ );
-        l.Clear();
     };
     
-#line 241
+#line 287
     template < class _1 >
     inline _1 *Array < _1 >::Detach(int i)
     {
-#line 241
+#line 287
         _1 * o = l[i];
-#line 241
+#line 287
         l.Remove(i);
-#line 241
+#line 287
         return o;
     };
     
-#line 205
+#line 251
     template < class _1 >
     inline C::ConstFwdPtrIterator < _1 > Array < _1 >::End() const
     {
-#line 205
+#line 251
         return Iterator(l.End());
     };
     
-#line 203
+#line 249
     template < class _1 >
     inline C::FwdPtrIterator < _1 > Array < _1 >::End()
     {
-#line 203
+#line 249
         return Iterator(l.End());
     };
     
-#line 239
+#line 245
+    template < class _1 >
+    inline _1 **Array < _1 >::Get() const
+    {
+#line 245
+        return l.Get();
+    };
+    
+#line 285
     template < class _1 >
     inline int Array < _1 >::GetCount() const
     {
-#line 239
+#line 285
         return l.GetCount();
     };
     
-#line 237
+#line 246
+    template < class _1 >
+    inline _1 **Array < _1 >::GetEnd() const
+    {
+#line 246
+        return l.GetEnd();
+    };
+    
+#line 283
     template < class _1 >
     inline _1& Array < _1 >::Insert(int i)
     {
-#line 237
+#line 283
         return *l.Insert(i, new _1);
     };
     
-#line 238
+#line 284
     template < class _1 >
     inline _1& Array < _1 >::Insert(int i, const _1& key)
     {
-#line 238
+#line 284
         return *l.Insert(i, new _1(key));
     };
     
-#line 240
+#line 286
     template < class _1 >
     inline bool Array < _1 >::IsEmpty() const
     {
-#line 240
+#line 286
         return GetCount() == 0;
     };
     
-#line 210
+#line 256
     template < class _1 >
     inline C::BwdPtrIterator < _1 > Array < _1 >::RBegin()
     {
-#line 210
+#line 256
         return RIterator(l.End() - 1);
     };
     
-#line 212
+#line 258
     template < class _1 >
     inline C::ConstBwdPtrIterator < _1 > Array < _1 >::RBegin() const
     {
-#line 212
+#line 258
         return RIterator(l.End() - 1);
     };
     
-#line 211
+#line 257
     template < class _1 >
     inline C::BwdPtrIterator < _1 > Array < _1 >::REnd()
     {
-#line 211
+#line 257
         return RIterator(l.Begin() - 1);
     };
     
-#line 213
+#line 259
     template < class _1 >
     inline C::ConstBwdPtrIterator < _1 > Array < _1 >::REnd() const
     {
-#line 213
+#line 259
         return RIterator(l.Begin() - 1);
     };
     
-#line 260
+#line 306
     template < class _1 >
     inline void Array < _1 >::Remove(const int *sorted_list, int n)
     {
-#line 261
+#line 307
         if (!n)
-#line 261
+#line 307
             return;
         const int * it = sorted_list;
         const int * end = sorted_list + n;
@@ -1601,155 +2010,584 @@ namespace Com
         l.Remove(sorted_list, n);
     };
     
-#line 254
+#line 300
     template < class _1 >
     inline void Array < _1 >::Remove(int i)
     {
         {
-#line 255
+#line 301
             if (!(i >= 0 && i < l.GetCount()))
             {
-#line 255
+#line 301
                 Break("Assertion failed: i >= 0 && i < l.GetCount()");
             }
         }
-#line 256
+#line 302
         ;
-#line 256
+#line 302
         delete *(l.Get() + i);
         l.Remove(i);
     };
     
-#line 269
+#line 315
     template < class _1 >
     inline void Array < _1 >::RemoveLast()
     {
         {
-#line 269
+#line 315
             if (!(GetCount()))
             {
-#line 269
+#line 315
                 Break("Assertion failed: GetCount()");
             }
         }
-#line 269
+#line 315
         ;
-#line 269
+#line 315
         Remove(GetCount() - 1);
     };
     
-#line 219
+#line 265
     template < class _1 >
     inline void Array < _1 >::Reserve(int i)
     {
-#line 219
+#line 265
         l.Reserve(i);
     };
     
-#line 220
+#line 266
     template < class _1 >
     inline void Array < _1 >::SetCount(int new_count)
     {
-#line 221
+#line 267
         int count = l.GetCount();
         if (new_count == count)
-#line 222
+#line 268
             return;
         if (new_count > count)
         {
-#line 224
+#line 270
             l.SetCount(new_count);
             for (int i = count; i < new_count; i ++ )
                 l[i] = new _1;
         }
         else
         {
-#line 229
+#line 275
             for (int i = count - 1; i >= new_count; i -- )
                 delete l[i];
             l.SetCount(new_count);
         }
     };
     
-#line 278
+#line 325
     template < class _1 >
     inline _1& Array < _1 >::Top()
     {
         {
-#line 279
+#line 326
             if (!(GetCount() > 0))
             {
-#line 279
+#line 326
                 Break("Assertion failed: GetCount() > 0");
             }
         }
-#line 280
+#line 327
         ;
-#line 280
+#line 327
         return **(l.Get() + l.GetCount() - 1);
     };
     
-#line 208
+#line 254
     template < class _1 >
     inline C::ConstFwdPtrIterator < _1 > Array < _1 >::begin() const
     {
-#line 208
+#line 254
         return Begin();
     };
     
-#line 206
+#line 252
     template < class _1 >
     inline C::FwdPtrIterator < _1 > Array < _1 >::begin()
     {
-#line 206
+#line 252
         return Begin();
     };
     
     template < class _1 >
     inline C::ConstFwdPtrIterator < _1 > Array < _1 >::end() const
     {
-#line 209
+#line 255
         return End();
     };
     
-#line 207
+#line 253
     template < class _1 >
     inline C::FwdPtrIterator < _1 > Array < _1 >::end()
     {
-#line 207
+#line 253
         return End();
     };
     
-#line 214
+#line 260
     template < class _1 >
     inline C::BwdPtrIterator < _1 > Array < _1 >::rbegin()
     {
-#line 214
+#line 260
         return RBegin();
     };
     
-#line 216
+#line 262
     template < class _1 >
     inline C::ConstBwdPtrIterator < _1 > Array < _1 >::rbegin() const
     {
-#line 216
+#line 262
         return RBegin();
     };
     
-#line 215
+#line 261
     template < class _1 >
     inline C::BwdPtrIterator < _1 > Array < _1 >::rend()
     {
-#line 215
+#line 261
         return REnd();
     };
     
-#line 217
+#line 263
     template < class _1 >
     inline C::ConstBwdPtrIterator < _1 > Array < _1 >::rend() const
     {
-#line 217
+#line 263
         return REnd();
+    };
+    
+#line 422
+    template < class _1, class _2 >
+    inline ArrayMap < _1, _2 >::ArrayMap() {};
+    
+#line 483
+    template < class _1, class _2 >
+    inline void ArrayMap < _1, _2 >::operator<<= (const ArrayMap& a)
+    {
+#line 484
+        keys <<= a.keys;
+        values <<= a.values;
+    };
+    
+#line 466
+    template < class _1, class _2 >
+    inline _2& ArrayMap < _1, _2 >::operator[](int i)
+    {
+#line 466
+        return At(i);
+    };
+    
+#line 465
+    template < class _1, class _2 >
+    inline const _2& ArrayMap < _1, _2 >::operator[](int i) const
+    {
+#line 465
+        return At(i);
+    };
+    
+#line 428
+    template < class _1, class _2 >
+    inline _2& ArrayMap < _1, _2 >::Add(const _1& key)
+    {
+#line 429
+        keys.Add(key);
+        return values.Add();
+    };
+    
+#line 438
+    template < class _1, class _2 >
+    inline _2& ArrayMap < _1, _2 >::Add(const _1& key, _2 *value)
+    {
+#line 439
+        keys.Add(key);
+        return values.Add(value);
+    };
+    
+#line 433
+    template < class _1, class _2 >
+    inline _2& ArrayMap < _1, _2 >::Add(const _1& key, const _2& value)
+    {
+#line 434
+        keys.Add(key);
+        return values.Add(value);
+    };
+    
+#line 460
+    template < class _1, class _2 >
+    inline _2& ArrayMap < _1, _2 >::At(int i)
+    {
+        {
+#line 461
+            if (!(i >= 0 && i < values.GetCount()))
+            {
+#line 461
+                Break("Assertion failed: i >= 0 && i < values.GetCount()");
+            }
+        }
+#line 462
+        ;
+#line 462
+        return values[i];
+    };
+    
+#line 455
+    template < class _1, class _2 >
+    inline const _2& ArrayMap < _1, _2 >::At(int i) const
+    {
+        {
+#line 456
+            if (!(i >= 0 && i < values.GetCount()))
+            {
+#line 456
+                Break("Assertion failed: i >= 0 && i < values.GetCount()");
+            }
+        }
+#line 457
+        ;
+#line 457
+        return values[i];
+    };
+    
+#line 540
+    template < class _1, class _2 >
+    inline C::ConstFwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::Begin() const
+    {
+#line 540
+        return Iterator(keys.Get(), values.Get());
+    };
+    
+#line 538
+    template < class _1, class _2 >
+    inline C::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::Begin()
+    {
+#line 538
+        return Iterator(keys.Get(), values.Get());
+    };
+    
+#line 478
+    template < class _1, class _2 >
+    inline void ArrayMap < _1, _2 >::Clear()
+    {
+#line 479
+        keys.Clear();
+        values.Clear();
+    };
+    
+#line 541
+    template < class _1, class _2 >
+    inline C::ConstFwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::End() const
+    {
+#line 541
+        return Iterator(keys.GetEnd(), values.GetEnd());
+    };
+    
+#line 539
+    template < class _1, class _2 >
+    inline C::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::End()
+    {
+#line 539
+        return Iterator(keys.GetEnd(), values.GetEnd());
+    };
+    
+#line 470
+    template < class _1, class _2 >
+    inline int ArrayMap < _1, _2 >::Find(const _1& key) const
+    {
+#line 470
+        return keys.Find(key);
+    };
+    
+#line 531
+    template < class _1, class _2 >
+    inline C::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::FindIterator(const _1& key) const
+    {
+#line 532
+        Iterator it = Begin();
+        int pos = Find(key);
+        if (pos == - 1)
+#line 534
+            it += GetCount();
+        else
+#line 535
+            it += pos;
+        return it;
+    };
+    
+#line 472
+    template < class _1, class _2 >
+    inline _2 ArrayMap < _1, _2 >::Get(const _1& key, _2 value)
+    {
+#line 472
+        int i = Find(key);
+#line 472
+        if (i < 0)
+#line 472
+            return value;
+#line 472
+        return values[i];
+    };
+    
+#line 471
+    template < class _1, class _2 >
+    inline _2& ArrayMap < _1, _2 >::Get(const _1& key)
+    {
+#line 471
+        return values[Find(key)];
+    };
+    
+#line 443
+    template < class _1, class _2 >
+    inline _2& ArrayMap < _1, _2 >::GetAdd(const _1& key)
+    {
+#line 444
+        int i = keys.Find(key);
+        if (i >= 0)
+#line 445
+            return values[i];
+        keys.Add(key);
+        return values.Add();
+    };
+    
+#line 473
+    template < class _1, class _2 >
+    inline int ArrayMap < _1, _2 >::GetCount() const
+    {
+#line 473
+        return keys.GetCount();
+    };
+    
+#line 453
+    template < class _1, class _2 >
+    inline const _1& ArrayMap < _1, _2 >::GetKey(int i) const
+    {
+#line 453
+        return keys[i];
+    };
+    
+#line 424
+    template < class _1, class _2 >
+    inline const Index < _1 > & ArrayMap < _1, _2 >::GetKeys() const
+    {
+#line 424
+        return keys;
+    };
+    
+#line 521
+    template < class _1, class _2 >
+    inline int ArrayMap < _1, _2 >::GetPos(const Iterator& it)
+    {
+#line 522
+        _1 * begin = keys.Get();
+        _1 * cur = &it.Key();
+        int pos = cur - begin;
+        return pos;
+    };
+    
+#line 426
+    template < class _1, class _2 >
+    inline Array < _2 > & ArrayMap < _1, _2 >::GetValues()
+    {
+#line 426
+        return values;
+    };
+    
+#line 425
+    template < class _1, class _2 >
+    inline const Array < _2 > & ArrayMap < _1, _2 >::GetValues() const
+    {
+#line 425
+        return values;
+    };
+    
+#line 450
+    template < class _1, class _2 >
+    inline _2& ArrayMap < _1, _2 >::Insert(int i, const _1& key)
+    {
+#line 450
+        keys.Insert(i, key);
+#line 450
+        return values.Insert(i);
+    };
+    
+#line 451
+    template < class _1, class _2 >
+    inline _2& ArrayMap < _1, _2 >::Insert(int i, const _1& key, const _2& value)
+    {
+#line 451
+        keys.Insert(i, key);
+#line 451
+        return values.Insert(i, value);
+    };
+    
+#line 530
+    template < class _1, class _2 >
+    inline C::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key)
+    {
+#line 530
+        int pos = GetPos(it);
+#line 530
+        Insert(pos, key);
+#line 530
+        Iterator cur = Begin();
+#line 530
+        cur += pos;
+#line 530
+        return cur;
+    };
+    
+#line 529
+    template < class _1, class _2 >
+    inline C::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key, _2 *value)
+    {
+#line 529
+        int pos = GetPos(it);
+#line 529
+        Insert(pos, key, value);
+#line 529
+        Iterator cur = Begin();
+#line 529
+        cur += pos;
+#line 529
+        return cur;
+    };
+    
+#line 528
+    template < class _1, class _2 >
+    inline C::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key, const _2& value)
+    {
+#line 528
+        int pos = GetPos(it);
+#line 528
+        Insert(pos, key, value);
+#line 528
+        Iterator cur = Begin();
+#line 528
+        cur += pos;
+#line 528
+        return cur;
+    };
+    
+#line 474
+    template < class _1, class _2 >
+    inline bool ArrayMap < _1, _2 >::IsEmpty() const
+    {
+#line 474
+        return GetCount() == 0;
+    };
+    
+#line 527
+    template < class _1, class _2 >
+    inline void ArrayMap < _1, _2 >::Remove(const Iterator& it)
+    {
+#line 527
+        Remove(GetPos(it));
+    };
+    
+#line 477
+    template < class _1, class _2 >
+    inline void ArrayMap < _1, _2 >::Remove(int i)
+    {
+        {
+#line 477
+            if (!(i >= 0 && i < keys.GetCount()))
+            {
+#line 477
+                Break("Assertion failed: i >= 0 && i < keys.GetCount()");
+            }
+        }
+#line 477
+        ;
+#line 477
+        keys.Remove(i);
+#line 477
+        values.Remove(i);
+    };
+    
+#line 476
+    template < class _1, class _2 >
+    inline void ArrayMap < _1, _2 >::RemoveKey(const _1& key)
+    {
+#line 476
+        int i = Find(key);
+#line 476
+        if (i >= 0)
+#line 476
+            Remove(i);
+    };
+    
+#line 468
+    template < class _1, class _2 >
+    inline _2& ArrayMap < _1, _2 >::Top()
+    {
+        {
+#line 468
+            if (!(GetCount() > 0))
+            {
+#line 468
+                Break("Assertion failed: GetCount() > 0");
+            }
+        }
+#line 468
+        ;
+#line 468
+        return values.Top();
+    };
+    
+#line 544
+    template < class _1, class _2 >
+    inline C::ConstFwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::begin() const
+    {
+#line 544
+        return Begin();
+    };
+    
+#line 542
+    template < class _1, class _2 >
+    inline C::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::begin()
+    {
+#line 542
+        return Begin();
+    };
+    
+    template < class _1, class _2 >
+    inline C::ConstFwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::end() const
+    {
+#line 545
+        return End();
+    };
+    
+#line 543
+    template < class _1, class _2 >
+    inline C::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::end()
+    {
+#line 543
+        return End();
+    };
+    
+#line 72 "../../src/Com/Shared.fog"
+    inline void Attachable::Attach(Slot& s)
+    {
+#line 72
+        s.Set(*this);
+    };
+    
+#line 90
+    inline Slot& Attachable::Get(int i) const
+    {
+#line 90
+        return *(Slot * ) slots[i];
+    };
+    
+#line 89
+    inline int Attachable::GetCount() const
+    {
+#line 89
+        return slots.GetCount();
     };
     
 #line 11 "../../src/Com/Hash.fog"
@@ -1942,6 +2780,237 @@ namespace Com
         cond.Wait();
     };
     
+#line 352
+    template < class _1 >
+    inline Index < _1 >::Index() {};
+    
+#line 407
+    template < class _1 >
+    inline void Index < _1 >::operator<<= (const Index& a)
+    {
+#line 407
+        Set(a);
+    };
+    
+#line 363
+    template < class _1 >
+    inline const _1& Index < _1 >::operator[](int i) const
+    {
+        {
+#line 364
+            if (!(i >= 0 && i < values.GetCount()))
+            {
+#line 364
+                Break("Assertion failed: i >= 0 && i < values.GetCount()");
+            }
+        }
+#line 365
+        ;
+#line 365
+        return values[i];
+    };
+    
+#line 373
+    template < class _1 >
+    inline const _1& Index < _1 >::Add(const _1& value)
+    {
+#line 374
+        uint32 hash = GetHashValue(value);
+        if (FindHash(hash) >= 0)
+            throw Exc("Index has value already");
+        hashes.Add(hash);
+        return values.Add(value);
+    };
+    
+#line 358
+    template < class _1 >
+    inline C::ConstFwdPtrIterator < _1 > Index < _1 >::Begin() const
+    {
+#line 358
+        return Iterator(values.Begin());
+    };
+    
+#line 354
+    template < class _1 >
+    inline C::FwdPtrIterator < _1 > Index < _1 >::Begin()
+    {
+#line 354
+        return Iterator(values.Begin());
+    };
+    
+#line 402
+    template < class _1 >
+    inline void Index < _1 >::Clear()
+    {
+#line 402
+        hashes.Clear();
+#line 402
+        values.Clear();
+    };
+    
+#line 359
+    template < class _1 >
+    inline C::ConstFwdPtrIterator < _1 > Index < _1 >::End() const
+    {
+#line 359
+        return Iterator(values.End());
+    };
+    
+#line 356
+    template < class _1 >
+    inline C::FwdPtrIterator < _1 > Index < _1 >::End()
+    {
+#line 356
+        return Iterator(values.End());
+    };
+    
+#line 387
+    template < class _1 >
+    inline int Index < _1 >::Find(const _1& key) const
+    {
+#line 387
+        return FindHash(GetHashValue(key));
+    };
+    
+#line 388
+    template < class _1 >
+    inline int Index < _1 >::FindAdd(const _1& key)
+    {
+#line 388
+        int i = Find(key);
+#line 388
+        if (i >= 0)
+#line 388
+            return i;
+#line 388
+        i = GetCount();
+#line 388
+        Add(key);
+#line 388
+        return i;
+    };
+    
+#line 390
+    template < class _1 >
+    inline int Index < _1 >::FindHash(uint32 hash) const
+    {
+#line 391
+        unsigned int * begin = hashes.Get();
+        unsigned int * it = begin;
+        unsigned int * end = begin + hashes.GetCount();
+        while (it != end)
+            {
+#line 395
+                if (*it == hash)
+                    return it - begin;
+                it ++ ;
+            }
+        return - 1;
+    };
+    
+#line 360
+    template < class _1 >
+    inline _1 *Index < _1 >::Get()
+    {
+#line 360
+        return values.Get();
+    };
+    
+#line 372
+    template < class _1 >
+    inline int Index < _1 >::GetCount() const
+    {
+#line 372
+        return values.GetCount();
+    };
+    
+#line 361
+    template < class _1 >
+    inline _1 *Index < _1 >::GetEnd()
+    {
+#line 361
+        return values.GetEnd();
+    };
+    
+#line 380
+    template < class _1 >
+    inline _1& Index < _1 >::Insert(int i, const _1& value)
+    {
+#line 381
+        uint32 hash = GetHashValue(value);
+        if (FindHash(hash) >= 0)
+            throw Exc("Index has value already");
+        hashes.Insert(i, hash);
+        return values.Insert(i, value);
+    };
+    
+#line 403
+    template < class _1 >
+    inline void Index < _1 >::Remove(int i)
+    {
+#line 403
+        hashes.Remove(i);
+#line 403
+        values.Remove(i);
+    };
+    
+#line 405
+    template < class _1 >
+    inline void Index < _1 >::RemoveKey(const _1& key)
+    {
+#line 405
+        int i = Find(key);
+#line 405
+        if (i >= 0)
+#line 405
+            Remove(i);
+    };
+    
+#line 404
+    template < class _1 >
+    inline void Index < _1 >::RemoveLast()
+    {
+        {
+#line 404
+            if (!(GetCount()))
+            {
+#line 404
+                Break("Assertion failed: GetCount()");
+            }
+        }
+#line 404
+        ;
+#line 404
+        if (GetCount())
+#line 404
+            Remove(GetCount() - 1);
+    };
+    
+#line 368
+    template < class _1 >
+    inline void Index < _1 >::Set(const Index& i)
+    {
+#line 369
+        hashes <<= i.hashes;
+        values <<= i.values;
+    };
+    
+#line 355
+    template < class _1 >
+    inline C::FwdPtrIterator < _1 > Index < _1 >::begin()
+    {
+#line 355
+        return Iterator(values.Begin());
+    };
+    
+#line 357
+    template < class _1 >
+    inline C::FwdPtrIterator < _1 > Index < _1 >::end()
+    {
+#line 357
+        return Iterator(values.End());
+    };
+    
 #line 54
     template < class _1 >
     inline One < _1 >::One()
@@ -2129,141 +3198,172 @@ namespace Com
         obj(0)
     {};
     
-#line 127
+#line 126
     template < class _1 >
     inline Optional < _1 >::Optional(_1 *obj)
     :
         obj(obj)
     {};
     
-#line 126
-    template < class _1 >
-    inline Optional < _1 >::Optional(const Nuller& n)
-    :
-        obj(0)
-    {};
-    
-#line 129
+#line 128
     template < class _1 >
     inline Optional < _1 >::~Optional()
     {
-#line 129
+#line 128
         Clear();
     };
     
-#line 143
+#line 141
     template < class _1 >
     inline _1& Optional < _1 >::operator*()
     {
-#line 143
+#line 141
         return *obj;
     };
     
-#line 134
-    template < class _1 >
-    inline void Optional < _1 >::operator= (const Nuller& )
-    {
-#line 134
-        Clear();
-    };
-    
-#line 135
+#line 133
     template < class _1 >
     inline void Optional < _1 >::operator= (const _1& obj)
     {
-#line 135
+#line 133
         Clear();
-#line 135
+#line 133
         this -> obj = new _1(obj);
     };
     
-#line 142
+#line 140
     template < class _1 >
     inline Optional < _1 >::operator bool() const
     {
-#line 142
+#line 140
         return obj != 0;
     };
     
-#line 133
+#line 132
     template < class _1 >
     inline void Optional < _1 >::Clear()
     {
-#line 133
+#line 132
         if (obj)
         {
-#line 133
+#line 132
             delete obj;
-#line 133
+#line 132
             obj = 0;
         }
     };
     
-#line 131
+#line 130
     template < class _1 >
     inline void Optional < _1 >::Create()
     {
-#line 131
+#line 130
         Clear();
-#line 131
+#line 130
         obj = new _1;
     };
     
-#line 132
+#line 131
     template < class _1 >
     template < class _2 >
     inline void Optional < _1 >::Create1(const _2& arg)
     {
-#line 132
+#line 131
         Clear();
-#line 132
+#line 131
         this -> obj = new _1(arg);
     };
     
-#line 140
+#line 138
     template < class _1 >
     inline _1& Optional < _1 >::GetValue() const
     {
-#line 140
+#line 138
         return *obj;
     };
     
-#line 139
+#line 137
     template < class _1 >
     inline bool Optional < _1 >::IsEmpty() const
     {
-#line 139
+#line 137
         return obj == 0;
     };
     
-#line 19
+#line 18
     template < class _1 >
     inline Pick < _1 >::Pick(_1& var)
     :
         var(&var)
     {};
     
-#line 20
+#line 19
     template < class _1 >
     inline Pick < _1 >::Pick(const Pick& p)
     :
         var(p.var)
     {};
     
-#line 22
+#line 21
     template < class _1 >
     inline _1& Pick < _1 >::Get() const
     {
-#line 22
+#line 21
         return *var;
     };
     
-#line 24
+#line 23
     template < class _1 >
-    inline Pick < _1 > Pick < _1 >::Ptr(_1 *p)
+    inline Pick < _1 > Pick < _1 >::Make(_1 *p)
     {
-#line 24
+#line 23
         return Pick < _1 > (p);
+    };
+    
+#line 26 "../../src/Com/Defs.fog"
+    template < class _1 >
+    inline Ptr < _1 >::Ptr()
+    :
+        value(0)
+    {};
+    
+#line 27
+    template < class _1 >
+    inline Ptr < _1 >::Ptr(_1 *p)
+    :
+        value(p)
+    {};
+    
+#line 28
+    template < class _1 >
+    inline void Ptr < _1 >::operator= (_1 *p)
+    {
+#line 28
+        value = p;
+    };
+    
+#line 30
+    template < class _1 >
+    inline bool Ptr < _1 >::operator== (const Ptr& p) const
+    {
+#line 30
+        return value == p.value;
+    };
+    
+#line 29
+    template < class _1 >
+    inline Ptr < _1 >::operator _1 * () const
+    {
+#line 29
+        return value;
+    };
+    
+#line 33
+    template < class _1 >
+    inline unsigned long long Ptr < _1 >::Int() const
+    {
+#line 33
+        return(unsigned long long) value;
     };
     
 #line 57 "../../src/Com/Algorithm.fog"
@@ -2307,6 +3407,61 @@ namespace Com
     {
 #line 62
         sSeed(state);
+    };
+    
+#line 10 "../../src/Com/Shared.fog"
+    inline Slot::Slot()
+    :
+        ptr(0)
+    {};
+    
+#line 42
+    inline Attachable& Slot::operator*() const
+    {
+#line 42
+        return *ptr;
+    };
+    
+#line 37
+    inline Attachable *Slot::operator-> () const
+    {
+#line 37
+        return ptr;
+    };
+    
+#line 38
+    inline Slot::operator bool() const
+    {
+#line 38
+        return ptr != 0;
+    };
+    
+#line 39
+    inline Attachable& Slot::Get() const
+    {
+#line 39
+        return *ptr;
+    };
+    
+#line 40
+    inline Attachable *Slot::GetPtr() const
+    {
+#line 40
+        return ptr;
+    };
+    
+#line 16
+    inline bool Slot::IsEmpty() const
+    {
+#line 16
+        return ptr == 0;
+    };
+    
+#line 15
+    inline void Slot::SetPtr(Attachable *p)
+    {
+#line 15
+        ptr = p;
     };
     
 #line 417 "../../src/Com/String.fog"
@@ -2455,282 +3610,991 @@ namespace Com
     
     namespace Tester
     {
-#line 26 "ComTest.mfog"
+#line 28 "ComTest.mfog"
         inline void App::Run()
         {
-#line 27
+#line 29
             uint64 v = 4294967295U;
             {
-#line 28
+#line 30
                 if (!(sizeof (v) == 8))
                 {
-#line 28
+#line 30
                     Break("Assertion failed: sizeof(v) == 8");
                 }
             }
-#line 29
+#line 31
             ;
             VoidPtr p;
             {
-#line 31
-                if (!(p == Null))
+#line 33
+                if (!(p == 0))
                 {
-#line 31
-                    Break("Assertion failed: p == Null");
+#line 33
+                    Break("Assertion failed: p == NULL");
                 }
             }
-#line 32
+#line 34
             ;
             {
-#line 33
+#line 35
                 if (!(SignificantBits(0x8000) == 16))
                 {
-#line 33
+#line 35
                     Break("Assertion failed: SignificantBits(0x8000) == 16");
                 }
             }
-#line 34
+#line 36
             ;
             {
-#line 34
+#line 36
                 if (!(SignificantBits64(0x8000) == 16))
                 {
-#line 34
+#line 36
                     Break("Assertion failed: SignificantBits64(0x8000) == 16");
                 }
             }
-#line 35
+#line 37
             ;
             CombineHash ch;
             ch.Put(777999777).Put(123).Put64(0xF0F0F0F0F0F0F0F0);
             dword hash = ch;
             {
-#line 39
+#line 41
                 if (!(hash == 1894504625))
                 {
-#line 39
+#line 41
                     Break("Assertion failed: hash == 1894504625");
                 }
             }
-#line 40
+#line 42
             ;
-#line 40
+#line 42
             int a = 0;
             int b = 1;
             {
-#line 42
+#line 44
                 if (!(min(a, b) < max(a, b)))
                 {
-#line 42
+#line 44
                     Break("Assertion failed: min(a, b) < max(a, b)");
                 }
             }
-#line 43
+#line 45
             ;
             int r = Random();
             double d = Randomf();
             int j = d;
-#line 49
+#line 51
             const char * test_str = "abcdef";
             int test_strlen = C::StringLength(test_str);
             {
-#line 51
-                if (!(FindIf(test_str, test_str + test_strlen, &TestCmp)))
+#line 53
+                if (!(FindIf(test_str, test_str + test_strlen, TestCmp()) == test_str + 2))
                 {
-#line 51
-                    Break("Assertion failed: FindIf(test_str, test_str + test_strlen, &TestCmp)");
+#line 53
+                    Break("Assertion failed: FindIf(test_str, test_str + test_strlen, TestCmp()) == test_str + 2");
                 }
             }
-#line 52
+#line 54
             ;
             {
                 if (!(String("test") == "test"))
                 {
-#line 54
+#line 56
                     Break("Assertion failed: String(\"test\") == \"test\"");
                 }
             }
-#line 55
+#line 57
             ;
             {
-#line 55
+#line 57
                 if (!(String::DblStr(1.2) == "1.2"))
                 {
-#line 55
+#line 57
                     Break("Assertion failed: String::DblStr(1.2) == \"1.2\"");
                 }
             }
-#line 56
+#line 58
             ;
             {
-#line 56
+#line 58
                 if (!("abc" + String("def") == "abcdef"))
                 {
-#line 56
+#line 58
                     Break("Assertion failed: \"abc\" + String(\"def\") == \"abcdef\"");
                 }
             }
-#line 57
+#line 59
             ;
             {
-#line 57
+#line 59
                 if (!(String("abc") + "def" == "abcdef"))
                 {
-#line 57
+#line 59
                     Break("Assertion failed: String(\"abc\") + \"def\" == \"abcdef\"");
                 }
             }
-#line 58
+#line 60
             ;
             {
-#line 58
+#line 60
                 if (!(ToString(ToWString < String > ("abc")) == "abc"))
                 {
-#line 58
+#line 60
                     Break("Assertion failed: ToString(ToWString<String>(\"abc\")) == \"abc\"");
                 }
             }
-#line 59
+#line 61
             ;
             {
-#line 59
+#line 61
                 if (!(ToInt < String > ("123") == 123))
                 {
-#line 59
+#line 61
                     Break("Assertion failed: ToInt<String>(\"123\") == 123");
-                }
-            }
-#line 60
-            ;
-            {
-#line 60
-                if (!(ToString(123) == "123"))
-                {
-#line 60
-                    Break("Assertion failed: ToString(123) == \"123\"");
-                }
-            }
-#line 61
-            ;
-            {
-#line 61
-                if (!(HexStr((void * )0x123f) == "0x123F"))
-                {
-#line 61
-                    Break("Assertion failed: HexStr((void*)0x123f) == \"0x123F\"");
                 }
             }
 #line 62
             ;
+            {
+#line 62
+                if (!(ToString(123) == "123"))
+                {
+#line 62
+                    Break("Assertion failed: ToString(123) == \"123\"");
+                }
+            }
+#line 63
+            ;
+            {
+#line 63
+                if (!(HexStr((void * )0x123f) == "0x123F"))
+                {
+#line 63
+                    Break("Assertion failed: HexStr((void*)0x123f) == \"0x123F\"");
+                }
+            }
 #line 64
+            ;
+#line 66
             SomeTuple2 ttt = 
             {
                 1,
                 1.2
             };
             {
-#line 65
+#line 67
                 if (!(ToString(ttt) == "1, 1.2"))
                 {
-#line 65
+#line 67
                     Break("Assertion failed: ToString(ttt) == \"1, 1.2\"");
                 }
             }
-#line 66
+#line 68
             ;
             SomeRefTuple2 tttref(ttt.a, ttt.b);
             {
-#line 68
+#line 70
                 if (!(ToString(tttref) == "1, 1.2"))
                 {
-#line 68
+#line 70
                     Break("Assertion failed: ToString(tttref) == \"1, 1.2\"");
                 }
             }
-#line 69
+#line 71
             ;
             One < String > onestr;
             onestr.Create();
             *onestr = "hello";
             {
-#line 73
+#line 75
                 if (!(*onestr == "hello"))
                 {
-#line 73
+#line 75
                     Break("Assertion failed: *onestr == \"hello\"");
                 }
             }
-#line 74
+#line 76
             ;
             One < VirtualBase > onebase;
             onebase.CreateDerived < DerivedBase > ();
             {
-#line 77
+#line 79
                 if (!(onebase.GetDerived < DerivedBase > ()-> a == 8))
                 {
-#line 77
+#line 79
                     Break("Assertion failed: onebase.GetDerived<DerivedBase>()->a == 8");
                 }
             }
-#line 78
+#line 80
             ;
             FutureOne < String > fone;
             fone = new String;
             fone.Wait();
-#line 83
+#line 85
             Vector < String > strvec;
             Array < String > strarr;
             for (int i = 0; i < 3; i ++ )
                 {
-#line 86
+#line 88
                     strvec << IntStr(i);
                     strarr << IntStr(i);
                 }
             for (int i = 0; i < 3; i ++ )
                 {
                     {
-#line 90
+#line 92
                         if (!(strvec[i] == strarr[i]))
                         {
-#line 90
+#line 92
                             Break("Assertion failed: strvec[i] == strarr[i]");
                         }
                     }
-#line 91
+#line 93
                     ;
                 }
+            Index < String > stridx;
+            stridx.Add("abc");
+            {
+#line 97
+                if (!(stridx.GetCount() == 1))
+                {
+#line 97
+                    Break("Assertion failed: stridx.GetCount() == 1");
+                }
+            }
+#line 98
+            ;
+            {
+#line 98
+                if (!(stridx.Find("abc") == 0))
+                {
+#line 98
+                    Break("Assertion failed: stridx.Find(\"abc\") == 0");
+                }
+            }
+#line 99
+            ;
+#line 99
+            stridx.Add("def");
+            {
+#line 100
+                if (!(stridx.Find("abc") == 0))
+                {
+#line 100
+                    Break("Assertion failed: stridx.Find(\"abc\") == 0");
+                }
+            }
+#line 101
+            ;
+            {
+#line 101
+                if (!(stridx.Find("def") == 1))
+                {
+#line 101
+                    Break("Assertion failed: stridx.Find(\"def\") == 1");
+                }
+            }
+#line 102
+            ;
+#line 104
+            VectorMap < String, int > vmap;
+            ArrayMap < String, int > amap;
+#line 107
+            vmap.Add("abc", 123);
+            vmap.Add("def", 456);
+            {
+#line 109
+                if (!(vmap.GetKeys().Find("abc") == 0))
+                {
+#line 109
+                    Break("Assertion failed: vmap.GetKeys().Find(\"abc\") == 0");
+                }
+            }
+#line 110
+            ;
+            {
+#line 110
+                if (!(vmap.GetValues()[0] == 123))
+                {
+#line 110
+                    Break("Assertion failed: vmap.GetValues()[0] == 123");
+                }
+            }
+#line 111
+            ;
+            {
+#line 111
+                if (!(vmap.Find("abc") == 0))
+                {
+#line 111
+                    Break("Assertion failed: vmap.Find(\"abc\") == 0");
+                }
+            }
+#line 112
+            ;
+            {
+#line 112
+                if (!(vmap.Find("dfasgsg") == - 1))
+                {
+#line 112
+                    Break("Assertion failed: vmap.Find(\"dfasgsg\") == -1");
+                }
+            }
+#line 113
+            ;
+            {
+#line 113
+                if (!(vmap.GetValues().Join() == "123456"))
+                {
+#line 113
+                    Break("Assertion failed: vmap.GetValues().Join() == \"123456\"");
+                }
+            }
+#line 114
+            ;
+#line 114
+            Vector < int > vmap_keys;
+            vmap_keys.Split(vmap.GetValues().Join(" "), " ");
+            {
+#line 116
+                if (!(vmap_keys.GetCount() == 2 && vmap_keys[0] == 123 && vmap_keys[1] == 456))
+                {
+#line 116
+                    Break("Assertion failed: vmap_keys.GetCount() == 2 && vmap_keys[0] == 123 && vmap_keys[1] == 456");
+                }
+            }
+#line 117
+            ;
+#line 119
+            amap.Add("abc", 123);
+            amap.Add("def", 456);
+            {
+#line 121
+                if (!(amap.GetKeys().Find("abc") == 0))
+                {
+#line 121
+                    Break("Assertion failed: amap.GetKeys().Find(\"abc\") == 0");
+                }
+            }
+#line 122
+            ;
+            {
+#line 122
+                if (!(amap.GetValues()[0] == 123))
+                {
+#line 122
+                    Break("Assertion failed: amap.GetValues()[0] == 123");
+                }
+            }
+#line 123
+            ;
+            {
+#line 123
+                if (!(amap.Find("abc") == 0))
+                {
+#line 123
+                    Break("Assertion failed: amap.Find(\"abc\") == 0");
+                }
+            }
+#line 124
+            ;
+            {
+#line 124
+                if (!(amap.Find("dfasgsg") == - 1))
+                {
+#line 124
+                    Break("Assertion failed: amap.Find(\"dfasgsg\") == -1");
+                }
+            }
+#line 125
+            ;
+#line 125
+            C::FwdPairPtrIterator < String, int > it = amap.Begin();
+            for (int i = 0; i < 2; i ++ )
+                {
+#line 127
+                    if (i == 0)
+                    {
+                        {
+#line 128
+                            if (!(it.Key() == "abc"))
+                            {
+#line 128
+                                Break("Assertion failed: it.Key() == \"abc\"");
+                            }
+                        }
+#line 129
+                        ;
+                        {
+#line 129
+                            if (!(it.Value() == 123))
+                            {
+#line 129
+                                Break("Assertion failed: it.Value() == 123");
+                            }
+                        }
+#line 130
+                        ;
+                    }
+                    else 
+#line 131
+                    if (i == 1)
+                    {
+                        {
+#line 132
+                            if (!(it.Key() == "def"))
+                            {
+#line 132
+                                Break("Assertion failed: it.Key() == \"def\"");
+                            }
+                        }
+#line 133
+                        ;
+                        {
+#line 133
+                            if (!(it.Value() == 456))
+                            {
+#line 133
+                                Break("Assertion failed: it.Value() == 456");
+                            }
+                        }
+#line 134
+                        ;
+                    }
+#line 135
+                    ++ it;
+                }
+            {
+#line 140
+                Attachable a;
+                Slot s;
+                a.Attach(s);
+                s.Clear();
+            }
+#line 146
+            TestShared();
         };
         
-#line 7
-        inline bool App::TestCmp(const char& c, void *)
+#line 166
+        inline void App::TestShared()
         {
-#line 8
-            return c == 'c';
+#line 167
+            struct Dumber;
+#line 171
+            struct Dumb;
+#line 208
+            Break("TODO");
         };
         
-#line 18
+#line 20
         inline App::DerivedBase::DerivedBase()
         :
             a(8)
         {};
         
-#line 12
+#line 8
+        inline bool App::TestCmp::operator()(const char& c)
+        {
+#line 9
+            return c == 'c';
+        };
+        
+#line 14
         inline App::VirtualBase::VirtualBase()
         :
             a(3)
         {};
         
     };
-#line 158 "../../src/Com/Vector.fog"
+#line 160 "../../src/Com/Vector.fog"
     template < class _1 >
     inline Vector < _1 >::Vector() {};
     
-#line 159
+#line 161
     template < class _1 >
     inline Vector < _1 >::Vector(const Vector& v)
     :
         Base(v)
     {};
+    
+#line 166
+    template < class _1 >
+    inline String Vector < _1 >::Join(String join_str, bool ignore_empty) const
+    {
+#line 167
+        String out;
+        ConstIterator end = Base::End();
+        for (ConstIterator it = Base::Begin(); it != end; ++ it)
+            {
+#line 170
+                String s = ToString < _1 > (*it);
+                if (s.IsEmpty() && ignore_empty)
+                    continue;
+                
+#line 173
+                if (!out.IsEmpty())
+                    out << join_str;
+                out << s;
+            }
+        return out;
+    };
+    
+    template < class _1 >
+    inline void Vector < _1 >::Split(String to_split, String split_str, bool ignore_empty)
+    {
+#line 181
+        Base::SetCount(0);
+        if (to_split.IsEmpty() || split_str.IsEmpty())
+            return;
+#line 185
+        int i = to_split.Find(split_str);
+        if (i == - 1)
+            FromString(to_split, Base::Add());
+        else
+        {
+#line 189
+            int j = 0;
+            while (i >= 0)
+                {
+#line 191
+                    String str = to_split.Mid(j, i - j);
+                    if (str.GetCount() == 0)
+                    {
+#line 193
+                        if (!ignore_empty)
+                            FromString(str, Base::Add());
+                    }
+                    else
+                        FromString(str, Base::Add());
+                    i += split_str.GetCount();
+                    j = i;
+                    i = to_split.Find(split_str, i);
+                }
+            i = to_split.GetCount();
+            String str = to_split.Mid(j, i - j);
+            if (str.GetCount() == 0)
+            {
+#line 205
+                if (!ignore_empty)
+                    FromString(str, Base::Add());
+            }
+            else
+            {
+#line 209
+                FromString(str, Base::Add());
+            }
+        }
+    };
+    
+#line 422
+    template < class _1, class _2 >
+    inline VectorMap < _1, _2 >::VectorMap() {};
+    
+#line 483
+    template < class _1, class _2 >
+    inline void VectorMap < _1, _2 >::operator<<= (const VectorMap& a)
+    {
+#line 484
+        keys <<= a.keys;
+        values <<= a.values;
+    };
+    
+#line 466
+    template < class _1, class _2 >
+    inline _2& VectorMap < _1, _2 >::operator[](int i)
+    {
+#line 466
+        return At(i);
+    };
+    
+#line 465
+    template < class _1, class _2 >
+    inline const _2& VectorMap < _1, _2 >::operator[](int i) const
+    {
+#line 465
+        return At(i);
+    };
+    
+#line 428
+    template < class _1, class _2 >
+    inline _2& VectorMap < _1, _2 >::Add(const _1& key)
+    {
+#line 429
+        keys.Add(key);
+        return values.Add();
+    };
+    
+#line 438
+    template < class _1, class _2 >
+    inline _2& VectorMap < _1, _2 >::Add(const _1& key, _2 *value)
+    {
+#line 439
+        keys.Add(key);
+        return values.Add(value);
+    };
+    
+#line 433
+    template < class _1, class _2 >
+    inline _2& VectorMap < _1, _2 >::Add(const _1& key, const _2& value)
+    {
+#line 434
+        keys.Add(key);
+        return values.Add(value);
+    };
+    
+#line 460
+    template < class _1, class _2 >
+    inline _2& VectorMap < _1, _2 >::At(int i)
+    {
+        {
+#line 461
+            if (!(i >= 0 && i < values.GetCount()))
+            {
+#line 461
+                Break("Assertion failed: i >= 0 && i < values.GetCount()");
+            }
+        }
+#line 462
+        ;
+#line 462
+        return values[i];
+    };
+    
+#line 455
+    template < class _1, class _2 >
+    inline const _2& VectorMap < _1, _2 >::At(int i) const
+    {
+        {
+#line 456
+            if (!(i >= 0 && i < values.GetCount()))
+            {
+#line 456
+                Break("Assertion failed: i >= 0 && i < values.GetCount()");
+            }
+        }
+#line 457
+        ;
+#line 457
+        return values[i];
+    };
+    
+#line 511
+    template < class _1, class _2 >
+    inline C::ConstFwdPairIterator < _1, _2 > VectorMap < _1, _2 >::Begin() const
+    {
+#line 511
+        return Iterator(keys.Get(), values.Get());
+    };
+    
+#line 509
+    template < class _1, class _2 >
+    inline C::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::Begin()
+    {
+#line 509
+        return Iterator(keys.Get(), values.Get());
+    };
+    
+#line 478
+    template < class _1, class _2 >
+    inline void VectorMap < _1, _2 >::Clear()
+    {
+#line 479
+        keys.Clear();
+        values.Clear();
+    };
+    
+#line 512
+    template < class _1, class _2 >
+    inline C::ConstFwdPairIterator < _1, _2 > VectorMap < _1, _2 >::End() const
+    {
+#line 512
+        return Iterator(keys.GetEnd(), values.GetEnd());
+    };
+    
+#line 510
+    template < class _1, class _2 >
+    inline C::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::End()
+    {
+#line 510
+        return Iterator(keys.GetEnd(), values.GetEnd());
+    };
+    
+#line 470
+    template < class _1, class _2 >
+    inline int VectorMap < _1, _2 >::Find(const _1& key) const
+    {
+#line 470
+        return keys.Find(key);
+    };
+    
+#line 502
+    template < class _1, class _2 >
+    inline C::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::FindIterator(const _1& key) const
+    {
+#line 503
+        Iterator it = Begin();
+        int pos = Find(key);
+        if (pos == - 1)
+#line 505
+            it += GetCount();
+        else
+#line 506
+            it += pos;
+        return it;
+    };
+    
+#line 472
+    template < class _1, class _2 >
+    inline _2 VectorMap < _1, _2 >::Get(const _1& key, _2 value)
+    {
+#line 472
+        int i = Find(key);
+#line 472
+        if (i < 0)
+#line 472
+            return value;
+#line 472
+        return values[i];
+    };
+    
+#line 471
+    template < class _1, class _2 >
+    inline _2& VectorMap < _1, _2 >::Get(const _1& key)
+    {
+#line 471
+        return values[Find(key)];
+    };
+    
+#line 443
+    template < class _1, class _2 >
+    inline _2& VectorMap < _1, _2 >::GetAdd(const _1& key)
+    {
+#line 444
+        int i = keys.Find(key);
+        if (i >= 0)
+#line 445
+            return values[i];
+        keys.Add(key);
+        return values.Add();
+    };
+    
+#line 473
+    template < class _1, class _2 >
+    inline int VectorMap < _1, _2 >::GetCount() const
+    {
+#line 473
+        return keys.GetCount();
+    };
+    
+#line 453
+    template < class _1, class _2 >
+    inline const _1& VectorMap < _1, _2 >::GetKey(int i) const
+    {
+#line 453
+        return keys[i];
+    };
+    
+#line 424
+    template < class _1, class _2 >
+    inline const Index < _1 > & VectorMap < _1, _2 >::GetKeys() const
+    {
+#line 424
+        return keys;
+    };
+    
+#line 492
+    template < class _1, class _2 >
+    inline int VectorMap < _1, _2 >::GetPos(const Iterator& it)
+    {
+#line 493
+        _1 * begin = keys.Get();
+        _1 * cur = &it.Key();
+        int pos = cur - begin;
+        return pos;
+    };
+    
+#line 426
+    template < class _1, class _2 >
+    inline Vector < _2 > & VectorMap < _1, _2 >::GetValues()
+    {
+#line 426
+        return values;
+    };
+    
+#line 425
+    template < class _1, class _2 >
+    inline const Vector < _2 > & VectorMap < _1, _2 >::GetValues() const
+    {
+#line 425
+        return values;
+    };
+    
+#line 450
+    template < class _1, class _2 >
+    inline _2& VectorMap < _1, _2 >::Insert(int i, const _1& key)
+    {
+#line 450
+        keys.Insert(i, key);
+#line 450
+        return values.Insert(i);
+    };
+    
+#line 451
+    template < class _1, class _2 >
+    inline _2& VectorMap < _1, _2 >::Insert(int i, const _1& key, const _2& value)
+    {
+#line 451
+        keys.Insert(i, key);
+#line 451
+        return values.Insert(i, value);
+    };
+    
+#line 501
+    template < class _1, class _2 >
+    inline C::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key)
+    {
+#line 501
+        int pos = GetPos(it);
+#line 501
+        Insert(pos, key);
+#line 501
+        Iterator cur = Begin();
+#line 501
+        cur += pos;
+#line 501
+        return cur;
+    };
+    
+#line 500
+    template < class _1, class _2 >
+    inline C::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key, _2 *value)
+    {
+#line 500
+        int pos = GetPos(it);
+#line 500
+        Insert(pos, key, value);
+#line 500
+        Iterator cur = Begin();
+#line 500
+        cur += pos;
+#line 500
+        return cur;
+    };
+    
+#line 499
+    template < class _1, class _2 >
+    inline C::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key, const _2& value)
+    {
+#line 499
+        int pos = GetPos(it);
+#line 499
+        Insert(pos, key, value);
+#line 499
+        Iterator cur = Begin();
+#line 499
+        cur += pos;
+#line 499
+        return cur;
+    };
+    
+#line 474
+    template < class _1, class _2 >
+    inline bool VectorMap < _1, _2 >::IsEmpty() const
+    {
+#line 474
+        return GetCount() == 0;
+    };
+    
+#line 498
+    template < class _1, class _2 >
+    inline void VectorMap < _1, _2 >::Remove(const Iterator& it)
+    {
+#line 498
+        Remove(GetPos(it));
+    };
+    
+#line 477
+    template < class _1, class _2 >
+    inline void VectorMap < _1, _2 >::Remove(int i)
+    {
+        {
+#line 477
+            if (!(i >= 0 && i < keys.GetCount()))
+            {
+#line 477
+                Break("Assertion failed: i >= 0 && i < keys.GetCount()");
+            }
+        }
+#line 477
+        ;
+#line 477
+        keys.Remove(i);
+#line 477
+        values.Remove(i);
+    };
+    
+#line 476
+    template < class _1, class _2 >
+    inline void VectorMap < _1, _2 >::RemoveKey(const _1& key)
+    {
+#line 476
+        int i = Find(key);
+#line 476
+        if (i >= 0)
+#line 476
+            Remove(i);
+    };
+    
+#line 468
+    template < class _1, class _2 >
+    inline _2& VectorMap < _1, _2 >::Top()
+    {
+        {
+#line 468
+            if (!(GetCount() > 0))
+            {
+#line 468
+                Break("Assertion failed: GetCount() > 0");
+            }
+        }
+#line 468
+        ;
+#line 468
+        return values.Top();
+    };
+    
+#line 515
+    template < class _1, class _2 >
+    inline C::ConstFwdPairIterator < _1, _2 > VectorMap < _1, _2 >::begin() const
+    {
+#line 515
+        return Begin();
+    };
+    
+#line 513
+    template < class _1, class _2 >
+    inline C::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::begin()
+    {
+#line 513
+        return Begin();
+    };
+    
+    template < class _1, class _2 >
+    inline C::ConstFwdPairIterator < _1, _2 > VectorMap < _1, _2 >::end() const
+    {
+#line 516
+        return End();
+    };
+    
+#line 514
+    template < class _1, class _2 >
+    inline C::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::end()
+    {
+#line 514
+        return End();
+    };
     
 #line 417 "../../src/Com/String.fog"
     inline bool WString::operator!= (const WString& s) const
@@ -2894,17 +4758,88 @@ namespace Com
             return String::DblStr(d);
         };
         
-#line 811
+#line 809
+        inline void FromString(const String& s, String& o)
+        {
+#line 809
+            o = s;
+        };
+        
+#line 805
+        inline void FromString(const String& s, byte& o)
+        {
+#line 805
+            o = StrInt(s);
+        };
+        
+#line 804
+        inline void FromString(const String& s, int64& o)
+        {
+#line 804
+            o = StrInt64(s);
+        };
+        
+#line 803
+        inline void FromString(const String& s, uint32& o)
+        {
+#line 803
+            o = StrInt64(s);
+        };
+        
+#line 800
+        template < class _1 >
+        inline void FromString(const String& s, _1& o)
+        {
+#line 800
+            o.FromString(s);
+        };
+        
+#line 801
+        inline void FromString(const String& s, bool& o)
+        {
+#line 801
+            o = (ToLower(s) != "false" && s != "0" && s.GetCount());
+        };
+        
+#line 806
+        inline void FromString(const String& s, char& o)
+        {
+#line 806
+            o = StrInt(s);
+        };
+        
+#line 808
+        inline void FromString(const String& s, double& o)
+        {
+#line 808
+            o = StrDbl(s);
+        };
+        
+#line 807
+        inline void FromString(const String& s, float& o)
+        {
+#line 807
+            o = StrDbl(s);
+        };
+        
+#line 802
+        inline void FromString(const String& s, int& o)
+        {
+#line 802
+            o = StrInt(s);
+        };
+        
+#line 821
         inline int HexDigit(int c)
         {
-#line 811
+#line 821
             return "0123456789ABCDEF"[c & 15];
         };
         
-#line 812
+#line 822
         inline int HexDigitLower(int c)
         {
-#line 812
+#line 822
             return "0123456789abcdef"[c & 15];
         };
         
@@ -2915,36 +4850,36 @@ namespace Com
             return String::HexInt(s);
         };
         
-#line 813
+#line 823
         inline String HexStr(uint64 p)
         {
-#line 814
+#line 824
             String o("0x");
             bool zero = true;
             uint64 i = 64;
             do
                 {
-#line 818
+#line 828
                     i -= 4;
                     byte b = (p >> i) & 15ULL;
                     if (b || !zero)
                     {
-#line 821
+#line 831
                         zero = false;
                         o.Cat(HexDigit(b));
                     }
                 }while (i);
-#line 826
+#line 836
             if (zero)
-#line 826
+#line 836
                 o.Cat('0');
             return o;
         };
         
-#line 829
+#line 839
         inline String HexStr(void *p)
         {
-#line 829
+#line 839
             return HexStr((uint64) p);
         };
         
@@ -2989,74 +4924,74 @@ namespace Com
             return String::StrInt64(s);
         };
         
-#line 801
+#line 811
         template < class _1 >
         inline int64 ToInt(const _1& o)
         {
-#line 801
+#line 811
             return o.ToInt();
         };
         
-#line 809
+#line 819
         template <>
         inline int64 ToInt < String > (const String& o)
         {
-#line 809
+#line 819
             return StrInt(o);
         };
         
-#line 802
+#line 812
         template <>
         inline int64 ToInt < bool > (const bool& o)
         {
-#line 802
+#line 812
             return(int64) o;
         };
         
         template <>
         inline int64 ToInt < byte > (const byte& o)
         {
-#line 805
+#line 815
             return(int64) o;
         };
         
-#line 806
+#line 816
         template <>
         inline int64 ToInt < char > (const char& o)
         {
-#line 806
+#line 816
             return(int64) o;
         };
         
-#line 808
+#line 818
         template <>
         inline int64 ToInt < double > (const double& o)
         {
-#line 808
+#line 818
             return(int64) o;
         };
         
-#line 807
+#line 817
         template <>
         inline int64 ToInt < float > (const float& o)
         {
-#line 807
+#line 817
             return(int64) o;
         };
         
-#line 803
+#line 813
         template <>
         inline int64 ToInt < int > (const int& o)
         {
-#line 803
+#line 813
             return(int64) o;
         };
         
-#line 804
+#line 814
         template <>
         inline int64 ToInt < int64 > (const int64& o)
         {
-#line 804
+#line 814
             return(int64) o;
         };
         

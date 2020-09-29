@@ -422,11 +422,22 @@ void FogScope::emit_forward_reference(FogStream& s)
     {
         FogStreamEntityInterface nestedStream(s, *outerScope);
         FogStaticEmitContext emitContext(s, s.outer_scope(), FogEmitContext::GLOBAL_INTERFACE);
-        emit_template_prefix(emitContext);
-        emitContext.emit_space_and_text(tag().str());
-        non_virtual_scope().emit_scope(emitContext, emitContext.dynamic_scope());
-        emitContext.emit_space_and_text(local_id().str());  //   Not local_signature_id since < T > suffix not wanted.
-        emitContext.emit_space_and_text(";\n");
+        if (0) {
+            emit_template_prefix(emitContext);
+			emitContext.emit_space_and_text(tag().str());
+			non_virtual_scope().emit_scope(emitContext, emitContext.dynamic_scope());
+			emitContext.emit_space_and_text(local_id().str());  //   Not local_signature_id since < T > suffix not wanted.
+			emitContext.emit_space_and_text(";\n");
+        } else {
+            // HAX
+			emitContext.emit_space_and_text("namespace");
+			non_virtual_scope().emit_scope_namespace(emitContext, emitContext.dynamic_scope());
+			emitContext.emit_space_and_text(" {");
+			emit_template_prefix(emitContext);
+			emitContext.emit_space_and_text(tag().str());
+			emitContext.emit_space_and_text(local_id().str());  //   Not local_signature_id since < T > suffix not wanted.
+			emitContext.emit_space_and_text(";\n}\n");
+        }
     }
     else
     {
@@ -489,12 +500,32 @@ void FogScope::emit_scope(FogEmitContext& emitContext, const FogScope& inScope) 
             return;
     const FogScope *outerScope = outer_scope();
     if (outerScope)                             //   Else need to retry with parent and emit this scope as suffix
-    {                                           
+    {
         outerScope->emit_scope(emitContext, inScope);
         if (!is_global_scope())                         //   Note that root may have ids if given a file name.
             emitContext.emit_identifier(local_signature_id());
     }
     emitContext.emit_space_and_text("::");
+}
+
+// HAX added by sblo: like emit_scope but without "::"
+void FogScope::emit_scope_namespace(FogEmitContext& emitContext, const FogScope& inScope) const
+{
+    for (const FogScope *aScope = &inScope; //   Search for thisScope as a parent of inScope.
+//            !aScope->is_null() && (nesting_depth() <= aScope->nesting_depth());
+//                aScope = &aScope->scope())
+            aScope && (nesting_depth() <= aScope->nesting_depth());
+                aScope = aScope->outer_scope())
+        if (aScope == this)                 //   If this scope visible as a parent of inScope.
+//        if ((aScope == this) && (inScope.find_type(id()) == this))  // Is this necessary to defeat occlusion ?
+            return;
+    const FogScope *outerScope = outer_scope();
+    if (outerScope)                             //   Else need to retry with parent and emit this scope as suffix
+    {
+        outerScope->emit_scope(emitContext, inScope);
+        if (!is_global_scope())                         //   Note that root may have ids if given a file name.
+            emitContext.emit_identifier(local_signature_id());
+    }
 }
 
 //  

@@ -19,6 +19,7 @@ file
 	Algorithm.fog,
 	String.fog,
 	Vector.fog,
+	Shared.fog,
 	Math.fog,
 	Concurrency.fog,
 	Environment.fog,

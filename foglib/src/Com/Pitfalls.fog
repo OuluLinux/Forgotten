@@ -4,6 +4,20 @@
 
 FOG BUGS AND WORKAROUNDS:
 	
+	Methods in template class are not automatically marked as inline.
+	This is very annoying and yet to be fixed. Sorry:
+		WRONG:
+			template <class T> struct Cls {
+				Cls() {}
+				int SomeFn() {return 0;}
+			};
+		RIGHT:
+			template <class T> struct Cls {
+				inline Cls() {}
+				inline int SomeFn() {return 0;}
+			};
+			
+	
 	Inline conditional is broken. Sorry...
 		WRONG:
 			i == 0 ? a : b

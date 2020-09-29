@@ -1,7 +1,4 @@
 
-#ifndef NULL
-	#define NULL 0
-#endif
 
 // TODO translate
 #define t_(x) x

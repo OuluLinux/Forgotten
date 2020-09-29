@@ -1,0 +1,189 @@
+namespace Com {
+
+class Attachable;
+
+// Never moveable
+class Slot {
+	Attachable* ptr = 0;
+	
+public:
+	Slot() {}
+	virtual ~Slot() {Clear();}
+	
+	virtual bool CanAttach(Attachable& a) {return true;}
+	
+	void SetPtr(Attachable* p) {ptr = p;}
+	bool IsEmpty() const {return ptr == 0;}
+	void Set(Attachable& a) {
+		Clear();
+		bool b = CanAttach(a);
+		ASSERT(b);
+		if (b) a.DoAttach(this);
+	}
+	void TestSet(Attachable& a) {
+		if (CanAttach(a)) {
+			Clear();
+			a.DoAttach(this);
+		}
+	}
+	!inline void Clear() {
+		if (ptr) {
+			Attachable* a = ptr;
+			ptr = 0;
+			a->DoDetach(this);
+		}
+	}
+	
+	Attachable* operator->() const {return ptr;}
+	operator bool() const {return ptr != 0;}
+	Attachable& Get() const {return *ptr;}
+	Attachable* GetPtr() const {return ptr;}
+	
+	Attachable& operator*() const {return *ptr;}
+	
+};
+
+// Never moveable
+class Attachable {
+	C::DynArray<void*> slots;
+	$VectorPtr(Slot, Slot, slots);
+	typedef C::FwdIterator<void*> Iter;
+	
+	void DoAttach(Slot* s) {
+		ASSERT(s && s->GetPtr() == 0 && !IsAttached(s));
+		AddSlot(s);
+		s->SetPtr(this);
+	}
+	void DoDetach(Slot* s) {
+		int i = 0;
+		for(Iter it = slots.Begin(), end = slots.End(); it != end; ++it) {
+			if ((Slot*)*it == s) {
+				slots.Remove(i);
+				break;
+			}
+			i++;
+		}
+	}
+	
+public:
+	
+	virtual ~Attachable() {DetachAll();}
+	
+	void Attach(Slot& s) {s.Set(*this);}
+	void DetachAll() {
+		for(Iter it = slots.Begin(), end = slots.End(); it != end; ++it)
+			((Slot*)*it)->SetPtr(0);
+		slots.Clear();
+	}
+	bool IsAttached(Slot* ptr) {
+		for(Iter it = slots.Begin(), end = slots.End(); it != end; ++it) {
+			if ((Slot*)*it == ptr)
+				return true;
+		}
+		return false;
+	}
+	void Detach(Slot* ptr) {
+		DoDetach(ptr);
+		ptr->SetPtr(0);
+	}
+	int GetCount() const {return slots.GetCount();}
+	Slot& Get(int i) const {return *(Slot*)slots[i];}
+	
+	
+};
+
+
+
+#if 0
+
+
+struct WeakBase {
+	virtual void SetDeleted() = 0;
+};
+
+struct RefBase {
+	void* obj = NULL;
+	Vector<WeakBase*> weaks;
+	AtomicInt refs;
+	
+	RefBase() {refs = 1;}
+	virtual ~RefBase() {}
+	void Inc() {refs++;}
+	void Dec() {
+		refs--;
+		if (refs <= 0) {
+			for (int i = 0; i < weaks.GetCount(); i++)
+				weaks[i]->SetDeleted();
+			delete this;
+		}
+	}
+	void IncWeak(WeakBase* w) {weaks.Add(w);}
+	void DecWeak(WeakBase* w) {for(int i = 0; i < weaks.GetCount(); i++) if (weaks[i] == w) {weaks.Remove(i--);}}
+};
+
+template <class T>
+struct RefTemplate : public RefBase {
+	~RefTemplate() {if (obj) delete ((T*)obj); obj = NULL;}
+};
+
+template <class T>
+class Shared {
+	$MakeMoveable();
+	
+protected:
+	RefBase* r = NULL;
+	T* o = NULL;
+
+public:
+	Shared() {}
+	Shared(const Shared& o) {*this = o;}
+	//Shared(Shared&& s) {r = s.r; s.r = NULL; o = s.o; s.o = NULL;}
+	//Shared(const Pick<Shared<T>>& pick) {Swap(pick.Get(), *this);}
+	~Shared() { Clear(); }
+	
+	void Create() { Clear(); r = new RefTemplate<T>(); o = new T(); r->obj = o;}
+	template<class K> void CreateAbstract() { Clear(); r = new RefTemplate<T>(); o = new K(); r->obj = o;}
+	void Clear() { if (r) { r->Dec(); r = NULL; o = NULL;} }
+	void operator=(const Shared<T>& s) {if (r == s.r) return; SetPtr(s.o, s.r);}
+	bool IsEmpty() const { return r == NULL; }
+	T* operator->() {if (r) return o; return NULL;}
+	T* operator->() const {if (r) return o; return NULL;}
+	T* Get() const {if (r) return o; return NULL;}
+	operator bool() const {return !IsEmpty();}
+	T& operator*() const {return *Get();}
+	bool operator==(const T* ptr) const {if (r) return o == ptr; return false;}
+	bool operator==(const Shared& s) const {if (r && s.r) return o == s.o; return false;}
+	template <class K> Shared<K> As() {
+		static_assert(std::is_base_of<T, K>() || std::is_base_of<K, T>(), "K -> T or T -> K inheritance is required");
+		
+		if (o) {
+			K* ptr = dynamic_cast<K*>(o);
+			if (ptr) {
+				Shared<K> s;
+				s.SetPtr(ptr, r);
+				return s;
+			}
+		}
+		return Shared<K>();
+	}
+	void SetPtr(T* o, RefBase* r) {
+		Shared<T> tmp; Swap(*this, tmp); // don't unref until new ref!!!111!1
+		this->o = o;
+		this->r = r;
+		if (r) r->Inc();
+	}
+	Shared& WrapObject(T* obj) {
+		Clear();
+		if (obj) {
+			r = new RefTemplate<T>();
+			r->obj = obj;
+			o = obj;
+		}
+		return *this;
+	}
+	const RefBase* GetBase() const {return r;}
+};
+
+#endif
+
+}

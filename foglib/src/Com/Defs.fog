@@ -5,8 +5,7 @@
 namespace Com {
 using/interface C;
 
-typedef C::Nuller Nuller;
-extern C::Nuller Null;
+
 
 !inline void* MemoryAlloc(int sz) {return C::Memory::Alloc(sz);}
 !inline void MemoryFree(void* ptr) {C::Memory::Free(ptr);}
@@ -19,24 +18,25 @@ extern C::Nuller Null;
 #define ASSERT(e) {if (!(e)) {Break("Assertion failed: " #e);}}
 #define PANIC(msg) Break(msg);
 
-auto character to_character(token t) { $t }
-auto identifier to_identifier(token t) { $t }
-auto number to_number(token t) { $t }
-auto string to_string(token t) { $t }
-auto type to_type(token t) { $t }
 
 
-auto declaration ForceGlobalVisible(token t) {
-	extern typename $t $to_identifier("____unused_"$t);
-}
-
-auto declaration GlobalTypedef(token from, token to) {
-	typedef $from $to;
-	extern $to_identifier($to) $to_identifier("____unused_"$to);
-}
+template<class T> struct Ptr {
+	T* value;
+	
+	Ptr() : value(0) {}
+	Ptr(T* p) : value(p) {}
+	void operator=(T* p) {value = p;}
+	operator T*() const {return value;}
+	bool operator==(const Ptr& p) const {return value == p.value;}
+	
+	auto if ($IsDefined("CPU64"))
+		unsigned long long Int() const {return (unsigned long long)value;}
+	else
+		unsigned long Int() const {return (unsigned long)value;}
+};
 
 auto declaration GlobalTypedefPtr(token from, token to) {
-	typedef C::Ptr<$from> $to;
+	typedef C::CPtr<$from> $to;
 	extern $to_identifier($to) $to_identifier("____unused_"$to);
 }
 
@@ -107,6 +107,7 @@ typedef C::AtomicFlag SpinLock;
 
 template <class T>
 inline void IGNORE_RESULT(const T&) {}
+
 
 
 

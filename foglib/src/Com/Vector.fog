@@ -11,7 +11,6 @@ auto declaration MakeFiller(int size) {
 }
 
 
-
 template <class T>
 class Pick {
 	T* var = NULL;
@@ -21,12 +20,13 @@ public:
 	//Pick(Pick&& p) : var(p.var) {p.var = NULL;}
 	inline T& Get() const {return *var;}
 	
-	static Pick<T> Ptr(T* p) {return Pick<T>(p);}
+	static Pick<T> Make(T* p) {return Pick<T>(p);}
 };
 
 
+
 template <class T>
-void Swap(T& a, T& b) {
+inline void Swap(T& a, T& b) {
 	uint8 tmp[sizeof(T)];
 	MemoryCopy(tmp, &a, sizeof(T));
 	MemoryCopy(&a, &b, sizeof(T));
@@ -46,7 +46,7 @@ inline void Reverse(T& t) {
 
 
 template <class T> inline class One {
-	T* obj = NULL;
+	T* obj = 0;
 
 public:
 	typedef const T ConstT;
@@ -123,7 +123,6 @@ public:
 	//Optional(Optional&& o) {obj = o.obj; o.obj = NULL;}
 	Optional(const Optional& opt) {if (opt.obj) this->obj = new T(*opt.obj);}
 	Optional(const T& obj) {this->obj = new T(obj);}
-	Optional(const Nuller& n) {}
 	Optional(T* obj) : obj(obj) {}
 	Optional(const PickT& n) {*this = n;}
 	~Optional() { Clear(); }
@@ -131,7 +130,6 @@ public:
 	void Create() { Clear(); obj = new T(); }
 	template <class K> void Create1(const K& arg) {Clear(); this->obj = new T(arg);}
 	void Clear() { if (obj) { delete obj; obj = NULL; } }
-	void operator=(const Nuller&) { Clear();}
 	void operator=(const T& obj) { Clear(); this->obj = new T(obj); }
 	void operator=(const Optional& o) { Clear(); if (!o.IsEmpty()) {this->obj = new T(*o.obj); }}
 	void operator=(const PickOpt& n) { Clear(); if (!n.Get().IsEmpty()) {Pick(n.Get());}}
@@ -154,6 +152,10 @@ class Vector : public C::DynArray<K> {
 	$MakeMoveable();
 	
 public:
+	typedef C::ConstFwdIterator<K> ConstIterator;
+	typedef C::ConstBwdIterator<K> ConstRIterator;
+	typedef C::FwdIterator<K> Iterator;
+	typedef C::BwdIterator<K> RIterator;
 	
 	inline Vector() {}
 	inline Vector(const Vector& v) : Base(v) {}
@@ -161,6 +163,53 @@ public:
 	//void Serialize(Stream& s);
 	
 	
+	inline String Join(String join_str = "", bool ignore_empty = true) const {
+		String out;
+		ConstIterator end = Base::End();
+		for (ConstIterator it = Base::Begin(); it != end; ++it) {
+			String s = ToString<K>(*it);
+			if (s.IsEmpty() && ignore_empty)
+				continue;
+			if (!out.IsEmpty())
+				out << join_str;
+			out << s;
+		}
+		return out;
+	}
+	
+	inline void Split(String to_split, String split_str, bool ignore_empty = true) {
+		Base::SetCount(0);
+		if (to_split.IsEmpty() || split_str.IsEmpty())
+			return;
+		
+		int i = to_split.Find(split_str);
+		if (i == -1)
+			FromString(to_split, Base::Add());
+		else {
+			int j = 0;
+			while (i >= 0) {
+				String str = to_split.Mid(j, i - j);
+				if (str.GetCount() == 0) {
+					if (!ignore_empty)
+						FromString(str, Base::Add());
+				}
+				else
+					FromString(str, Base::Add());
+				i += split_str.GetCount();
+				j = i;
+				i = to_split.Find(split_str, i);
+			}
+			i = to_split.GetCount();
+			String str = to_split.Mid(j, i - j);
+			if (str.GetCount() == 0) {
+				if (!ignore_empty)
+					FromString(str, Base::Add());
+			}
+			else {
+				FromString(str, Base::Add());
+			}
+		}
+	}
 };
 
 
@@ -189,15 +238,12 @@ public:
 
 
 	inline Array() {}
-	/*Array(std::initializer_list<K> list) {
-		auto it = list.begin();
-		auto end = list.end();
-		while (it != end)
-			Add(*it++);
-	}*/
 	inline ~Array() { Clear(); }
 	
 	//Vector<K*>& GetPtrVector() {return l;}
+	
+	K** Get() const {return l.Get();}
+	K** GetEnd() const {return l.GetEnd();}
 	
 	inline C::FwdPtrIterator<K>			Begin()			{return Iterator(l.Begin());}
 	inline C::FwdPtrIterator<K>			End()			{return Iterator(l.End());}
@@ -268,11 +314,12 @@ public:
 	}
 	inline void RemoveLast() {ASSERT(GetCount()); Remove(GetCount()-1);}
 	inline void Clear() {
-		K** ptr = l.Get();
-		K** end = ptr + l.GetCount();
+		C::DynArray<K*> tmp;
+		Swap(tmp, l);
+		K** ptr = tmp.Get();
+		K** end = ptr + tmp.GetCount();
 		while (ptr != end)
 			delete *(ptr++);
-		l.Clear();
 	}
 
 	inline K& Top() {
@@ -289,6 +336,244 @@ public:
 	inline Array<K>& operator<<(const K& v) { Add(v); return *this; }
 	
 };
+
+
+
+template <class K> class Index {
+	$MakeMoveable();
+	
+	C::DynArray<unsigned int> hashes;
+	C::DynArray<K> values;
+
+public:
+	typedef C::FwdPtrIterator<K> Iterator;
+	typedef C::BwdPtrIterator<K> RIterator;
+	
+	inline Index() {}
+
+	inline C::FwdPtrIterator<K>			Begin() {return Iterator(values.Begin());}
+	inline C::FwdPtrIterator<K>			begin() {return Iterator(values.Begin());}
+	inline C::FwdPtrIterator<K>			End() {return Iterator(values.End());}
+	inline C::FwdPtrIterator<K>			end() {return Iterator(values.End());}
+	inline C::ConstFwdPtrIterator<K>	Begin() const {return Iterator(values.Begin());}
+	inline C::ConstFwdPtrIterator<K>	End() const {return Iterator(values.End());}
+	inline K* Get() {return values.Get();}
+	inline K* GetEnd() {return values.GetEnd();}
+	
+	inline const K& operator[](int i) const {
+		ASSERT(i >= 0 && i < values.GetCount());
+		return values[i];
+	}
+
+	inline void Set(const Index& i) {
+		hashes <<= i.hashes;
+		values <<= i.values;
+	}
+	inline int GetCount() const { return values.GetCount(); }
+	inline const K& Add(const K& value) {
+		uint32 hash = GetHashValue(value);
+		if (FindHash(hash) >= 0)
+			throw Exc("Index has value already");
+		hashes.Add(hash);
+		return values.Add(value);
+	}
+	inline K& Insert(int i, const K& value) {
+		uint32 hash = GetHashValue(value);
+		if (FindHash(hash) >= 0)
+			throw Exc("Index has value already");
+		hashes.Insert(i, hash);
+		return values.Insert(i, value);
+	}
+	inline int Find(const K& key) const { return FindHash(GetHashValue(key)); }
+	inline int FindAdd(const K& key) {int i = Find(key); if (i >= 0) return i; i = GetCount(); Add(key); return i;}
+
+	inline int FindHash(uint32 hash) const {
+		unsigned int* begin = hashes.Get();
+		unsigned int* it = begin;
+		unsigned int* end = begin + hashes.GetCount();
+		while(it != end) {
+			if (*it == hash)
+				return it - begin;
+			it++;
+		}
+		return -1;
+	}
+
+	inline void Clear() { hashes.Clear(); values.Clear(); }
+	inline void Remove(int i) { hashes.Remove(i); values.Remove(i); }
+	inline void RemoveLast() {ASSERT(GetCount()); if (GetCount()) Remove(GetCount()-1);}
+	inline void RemoveKey(const K& key) {int i = Find(key); if (i >= 0) Remove(i);}
+	
+	inline void operator <<=(const Index& a) {Set(a);}
+};
+
+
+auto declaration MakeMap(identifier Map, identifier Array, bool is_ptr_iter) {
+	template <class K, class V>
+	class $Map {
+		Index<K> keys;
+		${Array}<V> values;
+		
+	public:
+		typedef Index<K> IndexK;
+		typedef ${Array}<V> ArrayV;
+		typedef ${Map}<K, V> MapKV;
+		
+		inline ${Map}() {}
+		
+		inline const Index<K>& GetKeys() const {return keys;}
+		inline const ${Array}<V>& GetValues() const {return values;}
+		inline ${Array}<V>& GetValues() {return values;}
+		
+		inline V& Add(const K& key) {
+			keys.Add(key);
+			return values.Add();
+		}
+	
+		inline V& Add(const K& key, const V& value) {
+			keys.Add(key);
+			return values.Add(value);
+		}
+		
+		inline V& Add(const K& key, V* value) {
+			keys.Add(key);
+			return values.Add(value);
+		}
+		
+		inline V& GetAdd(const K& key) {
+			int i = keys.Find(key);
+			if (i >= 0) return values[i];
+			keys.Add(key);
+			return values.Add();
+		}
+		
+		inline V& Insert(int i, const K& key) {keys.Insert(i, key); return values.Insert(i);}
+		inline V& Insert(int i, const K& key, const V& value) {keys.Insert(i, key); return values.Insert(i, value);}
+		
+		inline const K& GetKey(int i) const { return keys[i]; }
+	
+		inline const V& At(int i) const {
+			ASSERT(i >= 0 && i < values.GetCount());
+			return values[i];
+		}
+	
+		inline V& At(int i) {
+			ASSERT(i >= 0 && i < values.GetCount());
+			return values[i];
+		}
+		
+		inline const V& operator[](int i) const {return At(i);}
+		inline V& operator[](int i) {return At(i);}
+		
+		inline V& Top() { ASSERT(GetCount() > 0); return values.Top(); }
+	
+		inline int Find(const K& key) const { return keys.Find(key); }
+		inline V& Get(const K& key) { return values[Find(key)]; }
+		inline V  Get(const K& key, V value) {int i = Find(key); if (i < 0) return value; return values[i]; }
+		inline int GetCount() const { return keys.GetCount(); }
+		inline bool IsEmpty() const { return GetCount() == 0; }
+	
+		inline void RemoveKey(const K& key) {int i = Find(key); if (i >= 0) Remove(i);}
+		inline void Remove(int i) { ASSERT(i >= 0 && i < keys.GetCount()); keys.Remove(i); values.Remove(i); }
+		inline void Clear() {
+			keys.Clear();
+			values.Clear();
+		}
+		
+		inline void operator <<=(const ${Map}& a) {
+			keys <<= a.keys;
+			values <<= a.values;
+		}
+		
+		
+		auto if (!$is_ptr_iter) {
+			public typedef C::FwdPairIterator<K,V> Iterator;
+			public typedef C::BwdPairIterator<K,V> RIterator;
+			inline int GetPos(const Iterator& it) {
+				K* begin = keys.Get();
+				K* cur = &it.Key();
+				int pos = cur - begin;
+				return pos;
+			}
+			inline void								Remove(const Iterator& it) {Remove(GetPos(it));}
+			inline C::FwdPairIterator<K,V>			InsertIterator(const Iterator& it, const K& key, const V& value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
+			inline C::FwdPairIterator<K,V>			InsertIterator(const Iterator& it, const K& key, V* value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
+			inline C::FwdPairIterator<K,V>			InsertIterator(const Iterator& it, const K& key) {int pos = GetPos(it); Insert(pos, key); Iterator cur = Begin(); cur += pos; return cur;}
+			inline C::FwdPairIterator<K,V>			FindIterator(const K& key) const {
+				Iterator it = Begin();
+				int pos = Find(key);
+				if (pos == -1)	it += GetCount();
+				else			it += pos;
+				return it;
+			}
+			inline C::FwdPairIterator<K,V>			Begin() {return Iterator(keys.Get(), values.Get());}
+			inline C::FwdPairIterator<K,V>			End() {return Iterator(keys.GetEnd(), values.GetEnd());}
+			inline C::ConstFwdPairIterator<K,V>		Begin() const {return Iterator(keys.Get(), values.Get());}
+			inline C::ConstFwdPairIterator<K,V>		End() const {return Iterator(keys.GetEnd(), values.GetEnd());}
+			inline C::FwdPairIterator<K,V>			begin() {return Begin();}
+			inline C::FwdPairIterator<K,V>			end() {return End();}
+			inline C::ConstFwdPairIterator<K,V>		begin() const {return Begin();}
+			inline C::ConstFwdPairIterator<K,V>		end() const {return End();}
+		}
+		else {
+			public typedef C::FwdPairPtrIterator<K,V> Iterator;
+			public typedef C::BwdPairPtrIterator<K,V> RIterator;
+			inline int GetPos(const Iterator& it) {
+				K* begin = keys.Get();
+				K* cur = &it.Key();
+				int pos = cur - begin;
+				return pos;
+			}
+			inline void								Remove(const Iterator& it) {Remove(GetPos(it));}
+			inline C::FwdPairPtrIterator<K,V>		InsertIterator(const Iterator& it, const K& key, const V& value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
+			inline C::FwdPairPtrIterator<K,V>		InsertIterator(const Iterator& it, const K& key, V* value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
+			inline C::FwdPairPtrIterator<K,V>		InsertIterator(const Iterator& it, const K& key) {int pos = GetPos(it); Insert(pos, key); Iterator cur = Begin(); cur += pos; return cur;}
+			inline C::FwdPairPtrIterator<K,V>		FindIterator(const K& key) const {
+				Iterator it = Begin();
+				int pos = Find(key);
+				if (pos == -1)	it += GetCount();
+				else			it += pos;
+				return it;
+			}
+			inline C::FwdPairPtrIterator<K,V>		Begin() {return Iterator(keys.Get(), values.Get());}
+			inline C::FwdPairPtrIterator<K,V>		End() {return Iterator(keys.GetEnd(), values.GetEnd());}
+			inline C::ConstFwdPairPtrIterator<K,V>	Begin() const {return Iterator(keys.Get(), values.Get());}
+			inline C::ConstFwdPairPtrIterator<K,V>	End() const {return Iterator(keys.GetEnd(), values.GetEnd());}
+			inline C::FwdPairPtrIterator<K,V>		begin() {return Begin();}
+			inline C::FwdPairPtrIterator<K,V>		end() {return End();}
+			inline C::ConstFwdPairPtrIterator<K,V>	begin() const {return Begin();}
+			inline C::ConstFwdPairPtrIterator<K,V>	end() const {return End();}
+		}
+	};
+}
+
+$MakeMap(VectorMap, Vector, 0);
+$MakeMap(ArrayMap, Array, 1);
+
+
+
+
+
+template<class I, class P>
+inline I FindIf(I first, I last, P pred) {
+	while (first != last) {
+		int i = pred.P::operator()(*first);
+		if (i) return first;
+			
+		++first;
+	}
+	
+	return last;
+}
+
+
+
+
+
+
+
+
+
 
 
 }

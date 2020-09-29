@@ -207,7 +207,6 @@ void Set(void *dest, int byte_value, int sz) {
 
 NAMESPACE_SDK_BEGIN
 
-C::Nuller Null;
 
 
 

@@ -1,7 +1,7 @@
 /*!$@FOG@$!
- *	Generated at Mon Sep 28 10:34:35 2020
+ *	Generated at Tue Sep 29 13:48:51 2020
  *
- *	by fog 0.1.a of 08:56:34 Sep 28 2020
+ *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
  *	from
  *		../../src/Com/Algorithm.fog
@@ -13,6 +13,7 @@
  *		../../src/Com/Macros.fog
  *		../../src/Com/Meta.fog
  *		../../src/Com/Native.fog
+ *		../../src/Com/Shared.fog
  *		../../src/Com/String.fog
  *		../../src/Com/Vector.fog
  *		ComTest.mfog
@@ -29,63 +30,155 @@
 
 namespace Com
 {
-#line 17 "../../src/Com/Defs.fog"
+#line 16 "../../src/Com/Defs.fog"
     void Break(const char *msg)
     {
-#line 17
+#line 16
         C::SysBreak(msg);
     };
     
-#line 11
+#line 10
     void *MemoryAlloc(int sz)
     {
-#line 11
+#line 10
         return C::Memory::Alloc(sz);
     };
     
-#line 13
+#line 12
     int MemoryCompare(const void *m1, const void *m2, int sz)
     {
-#line 13
+#line 12
         return C::Memory::Compare(m1, m2, sz);
     };
     
-#line 14
+#line 13
     void *MemoryCopy(void *dest, const void *src, int sz)
     {
-#line 14
+#line 13
         return C::Memory::Copy(dest, src, sz);
     };
     
-#line 12
+#line 11
     void MemoryFree(void *ptr)
     {
-#line 12
+#line 11
         C::Memory::Free(ptr);
     };
     
     void *MemoryMove(void *dest, const void *src, int sz)
     {
-#line 15
+#line 14
         return C::Memory::Move(dest, src, sz);
     };
     
-#line 16
+#line 15
     void MemorySet(void *dest, int byte_value, int sz)
     {
-#line 16
+#line 15
         C::Memory::Set(dest, byte_value, sz);
     };
     
-#line 28 "../../src/Com/Vector.fog"
-    template < class _1 >
-    void Swap(_1& a, _1& b)
+#line 70 "../../src/Com/Shared.fog"
+    Attachable::~Attachable()
     {
-#line 30
-        uint8 tmp[sizeof (_1)];
-        MemoryCopy(tmp, &a, sizeof (_1));
-        MemoryCopy(&a, &b, sizeof (_1));
-        MemoryCopy(&b, tmp, sizeof (_1));
+#line 70
+        DetachAll();
+    };
+    
+#line 42 "../../src/Com/Lang.fog"
+    void Attachable::AddSlot(Slot *ptr)
+    {
+#line 42
+        slots.Add(ptr);
+    };
+    
+#line 85 "../../src/Com/Shared.fog"
+    void Attachable::Detach(Slot *ptr)
+    {
+#line 86
+        DoDetach(ptr);
+        ptr -> SetPtr(0);
+    };
+    
+#line 73
+    void Attachable::DetachAll()
+    {
+#line 74
+        for (Iter it = slots.Begin(), end = slots.End(); it != end; ++ it)
+            ((Slot * ) * it)-> SetPtr(0);
+        slots.Clear();
+    };
+    
+#line 52
+    void Attachable::DoAttach(Slot *s)
+    {
+        {
+#line 53
+            if (!(s && s -> GetPtr() == 0 && !IsAttached(s)))
+            {
+#line 53
+                Break("Assertion failed: s && s->GetPtr() == 0 && !IsAttached(s)");
+            }
+        }
+#line 54
+        ;
+#line 54
+        AddSlot(s);
+        s -> SetPtr(this);
+    };
+    
+#line 57
+    void Attachable::DoDetach(Slot *s)
+    {
+#line 58
+        int i = 0;
+        for (Iter it = slots.Begin(), end = slots.End(); it != end; ++ it)
+            {
+#line 60
+                if ((Slot * ) * it == s)
+                {
+#line 61
+                    slots.Remove(i);
+                    break;
+                
+                }
+#line 64
+                i ++ ;
+            }
+    };
+    
+#line 39 "../../src/Com/Lang.fog"
+    Slot& Attachable::GetSlot(int i)
+    {
+#line 39
+        return *(Slot * ) slots[i];
+    };
+    
+#line 41
+    int Attachable::GetSlotCount()
+    {
+#line 41
+        return slots.GetCount();
+    };
+    
+#line 78 "../../src/Com/Shared.fog"
+    bool Attachable::IsAttached(Slot *ptr)
+    {
+#line 79
+        for (Iter it = slots.Begin(), end = slots.End(); it != end; ++ it)
+            {
+#line 80
+                if ((Slot * ) * it == ptr)
+                    return true;
+            }
+        return false;
+    };
+    
+#line 40 "../../src/Com/Lang.fog"
+    void Attachable::RemoveSlot(int i)
+    {
+#line 40
+        slots.Remove(i);
     };
     
 #line 13 "../../src/Com/Hash.fog"
@@ -235,13 +328,12 @@ namespace Com
             this -> obj = new _1(*opt.obj);
     };
     
-#line 128
     template < class _1 >
     Optional < _1 >::Optional(const PickT& n)
     :
         obj(0)
     {
-#line 128
+#line 127
         *this = n;
     };
     
@@ -255,59 +347,59 @@ namespace Com
         this -> obj = new _1(obj);
     };
     
-#line 141
+#line 139
     template < class _1 >
     _1 *Optional < _1 >::operator-> ()
     {
         {
-#line 141
+#line 139
             if (!(obj))
             {
-#line 141
+#line 139
                 Break("Assertion failed: obj");
             }
         }
-#line 141
+#line 139
         ;
-#line 141
+#line 139
         return obj;
     };
     
-#line 136
+#line 134
     template < class _1 >
     void Optional < _1 >::operator= (const Optional& o)
     {
-#line 136
+#line 134
         Clear();
-#line 136
+#line 134
         if (!o.IsEmpty())
         {
-#line 136
+#line 134
             this -> obj = new _1(*o.obj);
         }
     };
     
-#line 137
+#line 135
     template < class _1 >
     void Optional < _1 >::operator= (const PickOpt& n)
     {
-#line 137
+#line 135
         Clear();
-#line 137
+#line 135
         if (!n.Get().IsEmpty())
         {
-#line 137
+#line 135
             Pick(n.Get());
         }
     };
     
-#line 138
+#line 136
     template < class _1 >
     void Optional < _1 >::Pick(Optional& o)
     {
-#line 138
+#line 136
         obj = o.obj;
-#line 138
+#line 136
         o.obj = 0;
     };
     
@@ -368,6 +460,67 @@ namespace Com
     {
 #line 25
         return(x << k) | (x >> (64 - k));
+    };
+    
+#line 11 "../../src/Com/Shared.fog"
+    Slot::~Slot()
+    {
+#line 11
+        Clear();
+    };
+    
+#line 13
+    bool Slot::CanAttach(Attachable& a)
+    {
+#line 13
+        return true;
+    };
+    
+#line 29
+    void Slot::Clear()
+    {
+#line 30
+        if (ptr)
+        {
+#line 31
+            Attachable * a = ptr;
+            ptr = 0;
+            a -> DoDetach(this);
+        }
+    };
+    
+#line 17
+    void Slot::Set(Attachable& a)
+    {
+#line 18
+        Clear();
+        bool b = CanAttach(a);
+        {
+#line 20
+            if (!(b))
+            {
+#line 20
+                Break("Assertion failed: b");
+            }
+        }
+#line 21
+        ;
+#line 21
+        if (b)
+#line 21
+            a.DoAttach(this);
+    };
+    
+#line 23
+    void Slot::TestSet(Attachable& a)
+    {
+#line 24
+        if (CanAttach(a))
+        {
+#line 25
+            Clear();
+            a.DoAttach(this);
+        }
     };
     
 #line 99 "../../src/Com/String.fog"
@@ -1581,7 +1734,7 @@ namespace Com
             return Com::ToString(a) + ", " + Com::ToString(b);
         };
         
-#line 13 "ComTest.mfog"
+#line 15 "ComTest.mfog"
         App::VirtualBase::~VirtualBase() {};
         
     };

@@ -1,4 +1,6 @@
 
+#define NULL 0
+
 auto statement DebugMetaLog(string s) {
 	auto if (true)
 		auto $std::diagnostic($s);
@@ -18,9 +20,82 @@ auto declaration AssertMoveable(identifier id) {
 	//	$std.error("The class is not set as moveable");
 }
 
+auto declaration ForceGlobalVisible(token t) {
+	extern typename $t $to_identifier("____unused_"$t);
+}
 
+auto declaration GlobalTypedef(token from, token to) {
+	typedef $from $to;
+	extern $to_identifier($to) $to_identifier("____unused_"$to);
+}
+
+auto character to_character(token t) { $t }
+auto identifier to_identifier(token t) { $t }
+auto number to_number(token t) { $t }
+auto string to_string(token t) { $t }
+auto type to_type(token t) { $t }
+
+auto declaration VectorPtr(identifier Type, identifier postfix, identifier DynArrayVar) {
+	${Type}& Get${postfix}(int i) {return *(${Type}*)${DynArrayVar}[i];}
+	void Remove${postfix}(int i) {${DynArrayVar}.Remove(i);}
+	int Get${postfix}Count() {return ${DynArrayVar}.GetCount();}
+	void Add${postfix}(${Type}* ptr) {${DynArrayVar}.Add(ptr);}
+}
+
+auto declaration ClassPtr(identifier Type, identifier postfix, identifier PtrVar) {
+	${Type}& Get${postfix}() {return *(${Type}*)${PtrVar};}
+	void Clear${postfix}(int i) {${PtrVar} = 0;}
+	void Set${postfix}(${Type}* ptr) {${PtrVar} = ptr;}
+}
 
 namespace C {
+
+
+template<class T> struct CPtr {
+	
+	T* value;
+	
+	CPtr() : value(0) {}
+	CPtr(T* p) : value(p) {}
+	void operator=(T* p) {value = p;}
+	operator T*() const {return value;}
+	bool operator==(const CPtr& p) const {return value == p.value;}
+	bool operator==(void* p) const {return (void*)value == p;}
+	
+	auto if ($IsDefined("CPU64"))
+		unsigned long long Int() const {return (unsigned long long)value;}
+	else
+		unsigned long Int() const {return (unsigned long)value;}
+};
+
+$GlobalTypedef(unsigned char,		uint8);
+$GlobalTypedef(char,				int8);
+$GlobalTypedef(unsigned short,		uint16);
+$GlobalTypedef(short,				int16);
+$GlobalTypedef(unsigned int,		uint32);
+$GlobalTypedef(int,					int32);
+$GlobalTypedef(unsigned long long,	uint64);
+$GlobalTypedef(long long,			int64);
+$GlobalTypedef(unsigned char,		Byte);
+$GlobalTypedef(unsigned char,		byte);
+$GlobalTypedef(uint16,				word);
+$GlobalTypedef(uint32,				dword);
+$GlobalTypedef(uint64,				qword);
+$GlobalTypedef(unsigned long,		DWORD);
+
+//template<class T> inline void Destruct(T*& o) {o = 0;}
+template<class T> inline void Destruct(T& o) {o.~T();}
+inline void Destruct(uint8& o) {}
+inline void Destruct(int8& o) {}
+inline void Destruct(uint16& o) {}
+inline void Destruct(int16& o) {}
+inline void Destruct(uint32& o) {}
+inline void Destruct(int32& o) {}
+inline void Destruct(uint64& o) {}
+inline void Destruct(int64& o) {}
+inline void Destruct(float& o) {}
+inline void Destruct(double& o) {}
+inline void Destruct(void* o) {}
 
 namespace Memory {
 	
@@ -85,29 +160,6 @@ struct ConditionalVar {
 #define CPANIC(msg) SysBreak(msg);
 
 
-struct Nuller {
-	
-	
-};
-
-template<class T> struct Ptr {
-	
-	T* value;
-	
-	Ptr() : value(0) {}
-	Ptr(T* p) : value(p) {}
-	void operator=(T* p) {value = p;}
-	void operator=(const Nuller& p) {value = 0;}
-	operator T*() const {return value;}
-	bool operator==(const Ptr& p) const {return value == p.value;}
-	bool operator==(const Nuller& p) const {return value == 0;}
-	
-	auto if ($IsDefined("CPU64"))
-		unsigned long long Int() const {return (unsigned long long)value;}
-	else
-		unsigned long Int() const {return (unsigned long)value;}
-};
-
 
 
 
@@ -123,84 +175,112 @@ $MakeCException(MemoryLimitExc);
 
 
 
-auto declaration MakeIterator(bool is_const, identifier name, int step) {
-	template <class K> struct ${name} {
-		${name}() {}
-		${name}(const ${name}& it) {*this = it;}
-		void operator=(const ${name}& it) {kit = it.kit;}
-		${name}<K>& operator++() {kit += $step; return *this;}
-		//${name} operator++(int i) {${name} ret = *this; kit += $step; return ret;}
-		void operator--(int i) {kit -= $step;}
-		void operator+=(int i) {kit += i;}
+auto declaration MakeIterator(bool is_const, bool is_ptr, identifier name, number step) {
+	template <class K> class ${name} {
+		public inline ${name}() {}
+		public inline ${name}(const ${name}& it) {*this = it;}
+		public inline void operator=(const ${name}& it) {kit = it.kit;}
+		public inline ${name}<K>& operator++() {kit += $step; return *this;}
+		public inline void operator--(int i) {kit -= $step;}
+		public inline void operator+=(int i) {kit += i;}
 		
 		auto if ($is_const) {
-			typedef const K ConstK;
-			const K* kit = NULL;
-			${name}(const K* kit) : kit(kit) {}
-			const K* operator->() const {return kit;}
-			const K* Get() const {return kit;}
-			operator ConstK*() const {return kit;}
-			const K& operator*() const {return *kit;}
-			bool operator!=(const ${name}& it) const {return it.kit != kit;}
-			const K& operator()() const {return *kit;}
+			public typedef const K ConstK;
+			auto if ($is_ptr) {
+				const K** kit;
+				public inline ${name}(const K** kit) : kit(kit) {}
+				public inline const K* Get() const {return *kit;}
+			} else {
+				const K* kit;
+				public inline ${name}(const K* kit) : kit(kit) {}
+				public inline const K* Get() const {return kit;}
+			}
+			public inline const K* operator->() const {return Get();}
+			public inline operator ConstK*() const {return Get();}
+			public inline const K& operator*() const {return *Get();}
+			public inline const K& operator()() const {return *Get();}
+			public inline bool operator!=(const ${name}& it) const {return it.kit != kit;}
 		} else {
-			K* kit = NULL;
-			${name}(K* kit) : kit(kit) {}
-			K* operator->() const {return kit;}
-			K* Get() const {return kit;}
-			operator K*() const {return kit;}
-			K& operator*() const {return *kit;}
-			bool operator!=(const ${name}& it) const {return it.kit != kit;}
-			K& operator()() const {return *kit;}
+			auto if ($is_ptr) {
+				K** kit;
+				public inline ${name}(K** kit) : kit(kit) {}
+				public inline K* Get() const {return *kit;}
+			} else {
+				K* kit;
+				public inline ${name}(K* kit) : kit(kit) {}
+				public inline K* Get() const {return kit;}
+			}
+			public inline K* operator->() const {return Get();}
+			public inline operator K*() const {return Get();}
+			public inline K& operator*() const {return *Get();}
+			public inline K& operator()() const {return *Get();}
+			public inline bool operator!=(const ${name}& it) const {return it.kit != kit;}
 		}
 	};
 }
 
-$MakeIterator(0, FwdIterator, +1);
-$MakeIterator(0, BwdIterator, +1);
-$MakeIterator(1, ConstFwdIterator, +1);
-$MakeIterator(1, ConstBwdIterator, +1);
+$MakeIterator(0, 0, FwdIterator, +1);
+$MakeIterator(0, 0, BwdIterator, -1);
+$MakeIterator(1, 0, ConstFwdIterator, +1);
+$MakeIterator(1, 0, ConstBwdIterator, -1);
+$MakeIterator(0, 1, FwdPtrIterator, +1);
+$MakeIterator(0, 1, BwdPtrIterator, -1);
+$MakeIterator(1, 1, ConstFwdPtrIterator, +1);
+$MakeIterator(1, 1, ConstBwdPtrIterator, -1);
 
 
-
-auto declaration MakePtrIterator(bool is_const, identifier name, int step) {
-	template <class K> struct ${name} {
-		${name}() {}
-		${name}(const ${name}& it) {*this = it;}
-		void operator=(const ${name}& it) {kit = it.kit;}
-		${name}<K>& operator++() {kit += $step; return *this;}
-		void operator--(int i) {kit -= $step;}
-		void operator+=(int i) {kit += i;}
+auto declaration MakePairIterator(bool is_const, bool is_ptr, identifier name, number step) {
+	template <class K, class V> class ${name} {
+		public inline ${name}() {}
+		public inline ${name}(const ${name}& it) {*this = it;}
+		public inline void operator=(const ${name}& it) {kit = it.kit; vit = it.vit;}
+		public inline ${name}<K,V>& operator++() {kit += $step; vit += $step; return *this;}
+		public inline void operator--(int i) {kit -= $step; vit -= $step;}
+		public inline void operator+=(int i) {kit += i; vit += i;}
 		
 		auto if ($is_const) {
 			typedef const K ConstK;
-			const K** kit = NULL;
-			${name}(const K** kit) : kit(kit) {}
-			const K* operator->() const {return *kit;}
-			const K* Get() const {return *kit;}
-			operator ConstK*() const {return *kit;}
-			const K& operator*() const {return **kit;}
-			bool operator!=(const ${name}& it) const {return it.kit != kit;}
-			const K& operator()() const {return **kit;}
-		} else {
-			K** kit = NULL;
-			${name}(K** kit) : kit(kit) {}
-			K* operator->() const {return *kit;}
-			K* Get() const {return *kit;}
-			operator K*() const {return *kit;}
-			K& operator*() const {return **kit;}
-			bool operator!=(const ${name}& it) const {return it.kit != kit;}
-			K& operator()() const {return **kit;}
+			typedef const V ConstV;
+			const K* kit;
+			public inline const K& Key() const {return *kit;}
+			public inline bool operator!=(const ${name}& it) const {return it.kit != kit;}
+			auto if ($is_ptr) {
+				const V* vit;
+				public inline ${name}(const K* kit, const V* vit) : kit(kit), vit(vit) {}
+				public inline const V& Value() const {return *vit;}
+			}
+			else {
+				const V** vit;
+				public inline ${name}(const K* kit, const V** vit) : kit(kit), vit(vit) {}
+				public inline const V& Value() const {return **vit;}
+			}
+		}
+		else {
+			const K* kit;
+			const K& Key() const {return *kit;}
+			public inline bool operator!=(const ${name}& it) const {return it.kit != kit;}
+			auto if ($is_ptr) {
+				V** vit;
+				public inline ${name}(const K* kit, V** vit) : kit(kit), vit(vit) {}
+				public inline V& Value() const {return **vit;}
+			}
+			else {
+				V* vit;
+				public inline ${name}(const K* kit, V* vit) : kit(kit), vit(vit) {}
+				public inline V& Value() const {return *vit;}
+			}
 		}
 	};
 }
 
-$MakePtrIterator(0, FwdPtrIterator, +1);
-$MakePtrIterator(0, BwdPtrIterator, +1);
-$MakePtrIterator(1, ConstFwdPtrIterator, +1);
-$MakePtrIterator(1, ConstBwdPtrIterator, +1);
-
-
+$MakePairIterator(0, 0, FwdPairIterator, +1);
+$MakePairIterator(0, 0, BwdPairIterator, -1);
+$MakePairIterator(1, 0, ConstFwdPairIterator, +1);
+$MakePairIterator(1, 0, ConstBwdPairIterator, -1);
+$MakePairIterator(0, 1, FwdPairPtrIterator, +1);
+$MakePairIterator(0, 1, BwdPairPtrIterator, -1);
+$MakePairIterator(1, 1, ConstFwdPairPtrIterator, +1);
+$MakePairIterator(1, 1, ConstBwdPairPtrIterator, -1);
 
 
 template <class K>
@@ -229,20 +309,12 @@ public:
 	typedef K IndirectK;
 	typedef const K ConstK;
 	typedef DynArray<K> DynArrayK;
+	typedef ConstFwdIterator<K> ConstIterator;
+	typedef ConstBwdIterator<K> ConstRIterator;
 	typedef FwdIterator<K> Iterator;
 	typedef BwdIterator<K> RIterator;
-
-	/*DynArray(std::initializer_list<K> l) {
-		Reserve(l.size());
-		auto cur = l.begin();
-		auto end = l.end();
-		while (cur != end) {
-			new (&data[count++]) K(*cur++);
-		}
-	}*/
+	
 	inline DynArray() {}
-	//inline DynArray(DynArray&& v) {Pick0(v);}
-	//inline DynArray(const Pick<DynArray>& pick) {DynArray& v = pick.Get(); Swap(data, v.data); Swap(reserved, v.reserved); Swap(count, v.count);}
 	inline DynArray(const DynArray& v) {*this <<= v;}
 	inline DynArray(int i) {SetCount(i);}
 	inline ~DynArray() {
@@ -258,22 +330,23 @@ public:
 	
 	inline C::FwdIterator<K>		Begin()			{return Iterator(data);}
 	inline C::FwdIterator<K>		End()			{return Iterator(data+count);}
-	inline C::ConstFwdIterator<K>	Begin() const	{return Iterator(data);}
-	inline C::ConstFwdIterator<K>	End() const		{return Iterator(data+count);}
+	inline C::ConstFwdIterator<K>	Begin() const	{return ConstIterator(data);}
+	inline C::ConstFwdIterator<K>	End() const		{return ConstIterator(data+count);}
 	inline C::FwdIterator<K>		begin()			{return Begin();}
 	inline C::FwdIterator<K>		end()			{return End();}
 	inline C::ConstFwdIterator<K>	begin() const	{return Begin();}
 	inline C::ConstFwdIterator<K>	end() const		{return End();}
 	inline C::BwdIterator<K>		RBegin()		{return RIterator(data+count-1);}
 	inline C::BwdIterator<K>		REnd()			{return RIterator(data-1);}
-	inline C::ConstBwdIterator<K>	RBegin() const	{return RIterator(data+count-1);}
-	inline C::ConstBwdIterator<K>	REnd() const	{return RIterator(data-1);}
+	inline C::ConstBwdIterator<K>	RBegin() const	{return ConstRIterator(data+count-1);}
+	inline C::ConstBwdIterator<K>	REnd() const	{return ConstRIterator(data-1);}
 	inline C::BwdIterator<K>		rbegin()		{return RBegin();}
 	inline C::BwdIterator<K>		rend()			{return REnd();}
 	inline C::ConstBwdIterator<K>	rbegin() const	{return RBegin();}
 	inline C::ConstBwdIterator<K>	rend() const	{return REnd();}
 	
 	inline K* Get() const {return data;}
+	inline K* GetEnd() const {return data + count;}
 	
 	inline K& Add() {
 		if (count + 1 > reserved) IncreaseReserved();
@@ -310,7 +383,8 @@ public:
 		}
 		else {
 			for (int i = count - 1; i >= new_count; i--)
-				data[i].~K();
+				Destruct(data[i]);
+				//data[i].~K();
 		}
 		count = new_count;
 	}

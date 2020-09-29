@@ -797,6 +797,16 @@ template <class T> inline WString ToWString(const T& o) {return o.ToWString();}
 template<> inline String ToString(const WString& o) {return NativeUtf16To8(o.Begin());}
 template<> inline WString ToWString(const String& o) {return NativeUtf8To16(o.Begin());}
 
+template <class T> inline void FromString(const String& s, T& o) {o.FromString(s);}
+inline void FromString(const String& s, bool& o) {o = (ToLower(s) != "false" && s != "0" && s.GetCount());}
+inline void FromString(const String& s, int& o) {o = StrInt(s);}
+inline void FromString(const String& s, uint32& o) {o = StrInt64(s);}
+inline void FromString(const String& s, int64& o) {o = StrInt64(s);}
+inline void FromString(const String& s, byte& o) {o = StrInt(s);}
+inline void FromString(const String& s, char& o) {o = StrInt(s);}
+inline void FromString(const String& s, float& o) {o = StrDbl(s);}
+inline void FromString(const String& s, double& o) {o = StrDbl(s);}
+inline void FromString(const String& s, String& o) {o = s;}
 
 template <class T> inline int64 ToInt(const T& o) {return o.ToInt();}
 template<> inline int64 ToInt(const bool& o) {return (int64)o;}

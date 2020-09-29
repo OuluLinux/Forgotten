@@ -1,7 +1,7 @@
 /*!$@FOG@$!
- *	Generated at Mon Sep 28 10:34:35 2020
+ *	Generated at Tue Sep 29 13:48:51 2020
  *
- *	by fog 0.1.a of 08:56:34 Sep 28 2020
+ *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
  *	from
  *		../../src/Com/Algorithm.fog
@@ -13,6 +13,7 @@
  *		../../src/Com/Macros.fog
  *		../../src/Com/Meta.fog
  *		../../src/Com/Native.fog
+ *		../../src/Com/Shared.fog
  *		../../src/Com/String.fog
  *		../../src/Com/Vector.fog
  *		ComTest.mfog

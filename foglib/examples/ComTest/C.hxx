@@ -1,7 +1,7 @@
 /*!$@FOG@$!
- *	Generated at Mon Sep 28 10:34:35 2020
+ *	Generated at Tue Sep 29 13:48:51 2020
  *
- *	by fog 0.1.a of 08:56:34 Sep 28 2020
+ *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
  *	from
  *		../../src/Com/Algorithm.fog
@@ -13,6 +13,7 @@
  *		../../src/Com/Macros.fog
  *		../../src/Com/Meta.fog
  *		../../src/Com/Native.fog
+ *		../../src/Com/Shared.fog
  *		../../src/Com/String.fog
  *		../../src/Com/Vector.fog
  *		ComTest.mfog
@@ -25,27 +26,168 @@
 
 namespace C
 {
-#line 38 "../../src/Com/Lang.fog"
+};
+
+namespace C
+{
+#line 28 "../../src/Com/Lang.fog"
+    typedef unsigned char Byte;
+    
+#line 29
+    extern Byte ____unused_Byte;
+};
+
+namespace C
+{
+#line 28
+    typedef unsigned long DWORD;
+    
+#line 29
+    extern DWORD ____unused_DWORD;
+};
+
+namespace C
+{
+#line 28
+    typedef unsigned char byte;
+    
+#line 29
+    extern byte ____unused_byte;
+};
+
+namespace C
+{
+#line 28
+    typedef unsigned int uint32;
+#line 28
+    typedef uint32 dword;
+    
+#line 29
+    extern dword ____unused_dword;
+};
+
+namespace C
+{
+#line 28
+    typedef short int16;
+    
+#line 29
+    extern int16 ____unused_int16;
+};
+
+namespace C
+{
+#line 28
+    typedef int int32;
+    
+#line 29
+    extern int32 ____unused_int32;
+};
+
+namespace C
+{
+#line 28
+    typedef long long int64;
+    
+#line 29
+    extern int64 ____unused_int64;
+};
+
+namespace C
+{
+#line 28
+    typedef char int8;
+    
+#line 29
+    extern int8 ____unused_int8;
+};
+
+namespace C
+{
+#line 28
+    typedef unsigned long long uint64;
+#line 28
+    typedef uint64 qword;
+    
+#line 29
+    extern qword ____unused_qword;
+};
+
+namespace C
+{
+#line 28
+    typedef unsigned short uint16;
+    
+#line 29
+    extern uint16 ____unused_uint16;
+#line 29
+    extern uint32 ____unused_uint32;
+#line 29
+    extern uint64 ____unused_uint64;
+};
+
+namespace C
+{
+#line 28
+    typedef unsigned char uint8;
+    
+#line 29
+    extern uint8 ____unused_uint8;
+};
+
+namespace C
+{
+#line 28
+    typedef uint16 word;
+    
+#line 29
+    extern word ____unused_word;
+    
+#line 91
+    inline void Destruct(int16& o);
+#line 93
+    inline void Destruct(int32& o);
+#line 95
+    inline void Destruct(int64& o);
+#line 89
+    inline void Destruct(int8& o);
+    inline void Destruct(uint16& o);
+#line 92
+    inline void Destruct(uint32& o);
+#line 94
+    inline void Destruct(uint64& o);
+#line 88
+    inline void Destruct(uint8& o);
+#line 87
+    template < class _1 >
+    inline void Destruct(_1& o);
+#line 97
+    inline void Destruct(double& o);
+#line 96
+    inline void Destruct(float& o);
+#line 98
+    inline void Destruct(void *o);
+#line 113
     int StringLength(const char *c, int max_len = 100000000);
     int StringLength(const short *c, int max_len = 100000000);
-#line 36
+#line 111
     void SysBreak(const char *msg);
     
     struct AtomicBool
     {
-#line 54
+#line 129
         AtomicBool();
         AtomicBool(bool b);
         AtomicBool(const AtomicBool& ai);
-#line 58
+#line 133
         bool operator= (bool b);
-#line 57
+#line 132
         operator bool();
     };
     
     struct AtomicFlag
     {
-#line 44
+#line 119
         void Enter();
         void Leave();
         bool TryEnter();
@@ -53,274 +195,506 @@ namespace C
     
     struct AtomicInt
     {
-#line 64
+#line 139
         AtomicInt();
-#line 66
+#line 141
         AtomicInt(const AtomicInt& ai);
-#line 65
+#line 140
         AtomicInt(int i);
-#line 69
+#line 144
         int operator++ ();
-#line 71
+#line 146
         int operator++ (int);
-#line 70
+#line 145
         int operator-- ();
-#line 72
+#line 147
         int operator-- (int);
-#line 68
+#line 143
         int operator= (int i);
-#line 67
+#line 142
         operator int() const;
     };
     
     template < class _1 >
-    struct BwdIterator
+    class BwdIterator
     {
-#line 147
+#line 209
         _1 *kit;
         
-#line 128
+    public:
+#line 180
         inline BwdIterator();
-#line 148
+#line 210
         inline BwdIterator(_1 *kit);
-#line 129
-        BwdIterator(const BwdIterator& it);
-#line 153
+#line 181
+        inline BwdIterator(const BwdIterator& it);
+#line 217
         inline bool operator!= (const BwdIterator& it) const;
+#line 216
         inline _1& operator()() const;
-#line 152
+#line 215
         inline _1& operator*() const;
-#line 131
-        BwdIterator < _1 > & operator++ ();
-#line 134
+#line 183
+        inline BwdIterator < _1 > & operator++ ();
+#line 185
         inline void operator+= (int i);
-#line 133
-        void operator-- (int i);
-#line 149
+#line 184
+        inline void operator-- (int i);
+#line 213
         inline _1 *operator-> () const;
-#line 130
+#line 182
         inline void operator= (const BwdIterator& it);
-#line 151
+#line 214
         inline operator _1 * () const;
-#line 150
+#line 211
+        inline _1 *Get() const;
+    };
+    
+    template < class _1, class _2 >
+    class BwdPairIterator
+    {
+#line 259
+        const _1 *kit;
+#line 268
+        _2 *vit;
+        
+    public:
+#line 234
+        inline BwdPairIterator();
+        inline BwdPairIterator(const BwdPairIterator& it);
+#line 269
+        inline BwdPairIterator(const _1 *kit, _2 *vit);
+#line 261
+        inline bool operator!= (const BwdPairIterator& it) const;
+#line 237
+        inline BwdPairIterator < _1, _2 > & operator++ ();
+#line 239
+        inline void operator+= (int i);
+#line 238
+        inline void operator-- (int i);
+#line 236
+        inline void operator= (const BwdPairIterator& it);
+#line 270
+        inline _2& Value() const;
+        
+#line 260
+        inline const _1& Key() const;
+    };
+    
+    template < class _1, class _2 >
+    class BwdPairPtrIterator
+    {
+#line 259
+        const _1 *kit;
+#line 263
+        _2 **vit;
+        
+    public:
+#line 234
+        inline BwdPairPtrIterator();
+        inline BwdPairPtrIterator(const BwdPairPtrIterator& it);
+#line 264
+        inline BwdPairPtrIterator(const _1 *kit, _2 **vit);
+#line 261
+        inline bool operator!= (const BwdPairPtrIterator& it) const;
+#line 237
+        inline BwdPairPtrIterator < _1, _2 > & operator++ ();
+#line 239
+        inline void operator+= (int i);
+#line 238
+        inline void operator-- (int i);
+#line 236
+        inline void operator= (const BwdPairPtrIterator& it);
+#line 265
+        inline _2& Value() const;
+        
+#line 260
+        inline const _1& Key() const;
+    };
+    
+    template < class _1 >
+    class BwdPtrIterator
+    {
+#line 205
+        _1 **kit;
+        
+    public:
+#line 180
+        inline BwdPtrIterator();
+#line 206
+        inline BwdPtrIterator(_1 **kit);
+#line 181
+        inline BwdPtrIterator(const BwdPtrIterator& it);
+#line 217
+        inline bool operator!= (const BwdPtrIterator& it) const;
+#line 216
+        inline _1& operator()() const;
+#line 215
+        inline _1& operator*() const;
+#line 183
+        inline BwdPtrIterator < _1 > & operator++ ();
+#line 185
+        inline void operator+= (int i);
+#line 184
+        inline void operator-- (int i);
+#line 213
+        inline _1 *operator-> () const;
+#line 182
+        inline void operator= (const BwdPtrIterator& it);
+#line 214
+        inline operator _1 * () const;
+#line 207
         inline _1 *Get() const;
     };
     
     template < class _1 >
-    struct BwdPtrIterator
+    struct CPtr
     {
-#line 186
-        _1 **kit;
+#line 56
+        _1 *value;
         
-#line 168
-        inline BwdPtrIterator();
-#line 187
-        inline BwdPtrIterator(_1 **kit);
-#line 169
-        BwdPtrIterator(const BwdPtrIterator& it);
-#line 192
-        inline bool operator!= (const BwdPtrIterator& it) const;
-        inline _1& operator()() const;
-#line 191
-        inline _1& operator*() const;
-#line 171
-        BwdPtrIterator < _1 > & operator++ ();
-#line 173
-        inline void operator+= (int i);
-#line 172
-        void operator-- (int i);
-#line 188
-        inline _1 *operator-> () const;
-#line 170
-        inline void operator= (const BwdPtrIterator& it);
-#line 190
+        inline CPtr();
+        inline CPtr(_1 *p);
+        inline void operator= (_1 *p);
+#line 62
+        inline bool operator== (const CPtr& p) const;
+        inline bool operator== (void *p) const;
+#line 61
         inline operator _1 * () const;
-#line 189
-        inline _1 *Get() const;
+#line 66
+        inline unsigned long long Int() const;
     };
     
     struct ConditionalVar
     {
-#line 77
+#line 152
         ConditionalVar();
-#line 80
+#line 155
         bool IsReady() const;
-#line 79
+#line 154
         void SetReady(bool b = true);
-#line 78
+#line 153
         void Wait();
     };
     
     template < class _1 >
-    struct ConstBwdIterator
+    class ConstBwdIterator
     {
-#line 137
+    public:
+#line 188
         typedef const _1 ConstK;
         
-#line 138
+#line 194
         const _1 *kit;
         
-#line 128
+    public:
+#line 180
         inline ConstBwdIterator();
-        ConstBwdIterator(const ConstBwdIterator& it);
-#line 139
+        inline ConstBwdIterator(const ConstBwdIterator& it);
+#line 195
         inline ConstBwdIterator(const _1 *kit);
-#line 144
+#line 202
         inline bool operator!= (const ConstBwdIterator& it) const;
+#line 201
         inline const _1& operator()() const;
-#line 143
+#line 200
         inline const _1& operator*() const;
-#line 131
-        ConstBwdIterator < _1 > & operator++ ();
-#line 134
+#line 183
+        inline ConstBwdIterator < _1 > & operator++ ();
+#line 185
         inline void operator+= (int i);
-#line 133
-        void operator-- (int i);
-#line 140
+#line 184
+        inline void operator-- (int i);
+#line 198
         inline const _1 *operator-> () const;
-#line 130
+#line 182
         inline void operator= (const ConstBwdIterator& it);
-#line 142
+#line 199
         inline operator ConstK * () const;
-#line 141
+#line 196
         inline const _1 *Get() const;
     };
     
-    template < class _1 >
-    struct ConstBwdPtrIterator
+    template < class _1, class _2 >
+    class ConstBwdPairIterator
     {
-#line 176
+#line 242
+        typedef const _1 ConstK;
+        typedef const _2 ConstV;
+        
+#line 244
+        const _1 *kit;
+#line 253
+        const _2 **vit;
+        
+    public:
+#line 234
+        inline ConstBwdPairIterator();
+        inline ConstBwdPairIterator(const ConstBwdPairIterator& it);
+#line 254
+        inline ConstBwdPairIterator(const _1 *kit, const _2 **vit);
+#line 246
+        inline bool operator!= (const ConstBwdPairIterator& it) const;
+#line 237
+        inline ConstBwdPairIterator < _1, _2 > & operator++ ();
+#line 239
+        inline void operator+= (int i);
+#line 238
+        inline void operator-- (int i);
+#line 236
+        inline void operator= (const ConstBwdPairIterator& it);
+#line 245
+        inline const _1& Key() const;
+#line 255
+        inline const _2& Value() const;
+    };
+    
+    template < class _1, class _2 >
+    class ConstBwdPairPtrIterator
+    {
+#line 242
+        typedef const _1 ConstK;
+        typedef const _2 ConstV;
+        
+#line 244
+        const _1 *kit;
+#line 248
+        const _2 *vit;
+        
+    public:
+#line 234
+        inline ConstBwdPairPtrIterator();
+        inline ConstBwdPairPtrIterator(const ConstBwdPairPtrIterator& it);
+#line 249
+        inline ConstBwdPairPtrIterator(const _1 *kit, const _2 *vit);
+#line 246
+        inline bool operator!= (const ConstBwdPairPtrIterator& it) const;
+#line 237
+        inline ConstBwdPairPtrIterator < _1, _2 > & operator++ ();
+#line 239
+        inline void operator+= (int i);
+#line 238
+        inline void operator-- (int i);
+#line 236
+        inline void operator= (const ConstBwdPairPtrIterator& it);
+#line 245
+        inline const _1& Key() const;
+#line 250
+        inline const _2& Value() const;
+    };
+    
+    template < class _1 >
+    class ConstBwdPtrIterator
+    {
+    public:
+#line 188
         typedef const _1 ConstK;
         
-#line 177
         const _1 **kit;
         
-#line 168
-        inline ConstBwdPtrIterator();
-        ConstBwdPtrIterator(const ConstBwdPtrIterator& it);
-#line 178
-        inline ConstBwdPtrIterator(const _1 **kit);
-#line 183
-        inline bool operator!= (const ConstBwdPtrIterator& it) const;
-        inline const _1& operator()() const;
-#line 182
-        inline const _1& operator*() const;
-#line 171
-        ConstBwdPtrIterator < _1 > & operator++ ();
-#line 173
-        inline void operator+= (int i);
-#line 172
-        void operator-- (int i);
-#line 179
-        inline const _1 *operator-> () const;
-#line 170
-        inline void operator= (const ConstBwdPtrIterator& it);
-#line 181
-        inline operator ConstK * () const;
+    public:
 #line 180
+        inline ConstBwdPtrIterator();
+        inline ConstBwdPtrIterator(const ConstBwdPtrIterator& it);
+#line 191
+        inline ConstBwdPtrIterator(const _1 **kit);
+#line 202
+        inline bool operator!= (const ConstBwdPtrIterator& it) const;
+#line 201
+        inline const _1& operator()() const;
+#line 200
+        inline const _1& operator*() const;
+#line 183
+        inline ConstBwdPtrIterator < _1 > & operator++ ();
+#line 185
+        inline void operator+= (int i);
+#line 184
+        inline void operator-- (int i);
+#line 198
+        inline const _1 *operator-> () const;
+#line 182
+        inline void operator= (const ConstBwdPtrIterator& it);
+#line 199
+        inline operator ConstK * () const;
+#line 192
         inline const _1 *Get() const;
     };
     
     template < class _1 >
-    struct ConstFwdIterator
+    class ConstFwdIterator
     {
-#line 137
+    public:
+#line 188
         typedef const _1 ConstK;
         
-#line 138
+#line 194
         const _1 *kit;
         
-#line 128
+    public:
+#line 180
         inline ConstFwdIterator();
-        ConstFwdIterator(const ConstFwdIterator& it);
-#line 139
+        inline ConstFwdIterator(const ConstFwdIterator& it);
+#line 195
         inline ConstFwdIterator(const _1 *kit);
-#line 144
+#line 202
         inline bool operator!= (const ConstFwdIterator& it) const;
+#line 201
         inline const _1& operator()() const;
-#line 143
+#line 200
         inline const _1& operator*() const;
-#line 131
-        ConstFwdIterator < _1 > & operator++ ();
-#line 134
+#line 183
+        inline ConstFwdIterator < _1 > & operator++ ();
+#line 185
         inline void operator+= (int i);
-#line 133
-        void operator-- (int i);
-#line 140
+#line 184
+        inline void operator-- (int i);
+#line 198
         inline const _1 *operator-> () const;
-#line 130
+#line 182
         inline void operator= (const ConstFwdIterator& it);
-#line 142
+#line 199
         inline operator ConstK * () const;
-#line 141
+#line 196
         inline const _1 *Get() const;
     };
     
-    template < class _1 >
-    struct ConstFwdPtrIterator
+    template < class _1, class _2 >
+    class ConstFwdPairIterator
     {
-#line 176
+#line 242
+        typedef const _1 ConstK;
+        typedef const _2 ConstV;
+        
+#line 244
+        const _1 *kit;
+#line 253
+        const _2 **vit;
+        
+    public:
+#line 234
+        inline ConstFwdPairIterator();
+        inline ConstFwdPairIterator(const ConstFwdPairIterator& it);
+#line 254
+        inline ConstFwdPairIterator(const _1 *kit, const _2 **vit);
+#line 246
+        inline bool operator!= (const ConstFwdPairIterator& it) const;
+#line 237
+        inline ConstFwdPairIterator < _1, _2 > & operator++ ();
+#line 239
+        inline void operator+= (int i);
+#line 238
+        inline void operator-- (int i);
+#line 236
+        inline void operator= (const ConstFwdPairIterator& it);
+#line 245
+        inline const _1& Key() const;
+#line 255
+        inline const _2& Value() const;
+    };
+    
+    template < class _1, class _2 >
+    class ConstFwdPairPtrIterator
+    {
+#line 242
+        typedef const _1 ConstK;
+        typedef const _2 ConstV;
+        
+#line 244
+        const _1 *kit;
+#line 248
+        const _2 *vit;
+        
+    public:
+#line 234
+        inline ConstFwdPairPtrIterator();
+        inline ConstFwdPairPtrIterator(const ConstFwdPairPtrIterator& it);
+#line 249
+        inline ConstFwdPairPtrIterator(const _1 *kit, const _2 *vit);
+#line 246
+        inline bool operator!= (const ConstFwdPairPtrIterator& it) const;
+#line 237
+        inline ConstFwdPairPtrIterator < _1, _2 > & operator++ ();
+#line 239
+        inline void operator+= (int i);
+#line 238
+        inline void operator-- (int i);
+#line 236
+        inline void operator= (const ConstFwdPairPtrIterator& it);
+#line 245
+        inline const _1& Key() const;
+#line 250
+        inline const _2& Value() const;
+    };
+    
+    template < class _1 >
+    class ConstFwdPtrIterator
+    {
+    public:
+#line 188
         typedef const _1 ConstK;
         
-#line 177
         const _1 **kit;
         
-#line 168
-        inline ConstFwdPtrIterator();
-        ConstFwdPtrIterator(const ConstFwdPtrIterator& it);
-#line 178
-        inline ConstFwdPtrIterator(const _1 **kit);
-#line 183
-        inline bool operator!= (const ConstFwdPtrIterator& it) const;
-        inline const _1& operator()() const;
-#line 182
-        inline const _1& operator*() const;
-#line 171
-        ConstFwdPtrIterator < _1 > & operator++ ();
-#line 173
-        inline void operator+= (int i);
-#line 172
-        void operator-- (int i);
-#line 179
-        inline const _1 *operator-> () const;
-#line 170
-        inline void operator= (const ConstFwdPtrIterator& it);
-#line 181
-        inline operator ConstK * () const;
+    public:
 #line 180
+        inline ConstFwdPtrIterator();
+        inline ConstFwdPtrIterator(const ConstFwdPtrIterator& it);
+#line 191
+        inline ConstFwdPtrIterator(const _1 **kit);
+#line 202
+        inline bool operator!= (const ConstFwdPtrIterator& it) const;
+#line 201
+        inline const _1& operator()() const;
+#line 200
+        inline const _1& operator*() const;
+#line 183
+        inline ConstFwdPtrIterator < _1 > & operator++ ();
+#line 185
+        inline void operator+= (int i);
+#line 184
+        inline void operator-- (int i);
+#line 198
+        inline const _1 *operator-> () const;
+#line 182
+        inline void operator= (const ConstFwdPtrIterator& it);
+#line 199
+        inline operator ConstK * () const;
+#line 192
         inline const _1 *Get() const;
     };
     
     template < class _1 >
-    struct FwdIterator
+    class FwdIterator
     {
-#line 147
+#line 209
         _1 *kit;
         
-#line 128
+    public:
+#line 180
         inline FwdIterator();
-#line 148
+#line 210
         inline FwdIterator(_1 *kit);
-#line 129
-        FwdIterator(const FwdIterator& it);
-#line 153
+#line 181
+        inline FwdIterator(const FwdIterator& it);
+#line 217
         inline bool operator!= (const FwdIterator& it) const;
+#line 216
         inline _1& operator()() const;
-#line 152
+#line 215
         inline _1& operator*() const;
-#line 131
-        FwdIterator < _1 > & operator++ ();
-#line 134
+#line 183
+        inline FwdIterator < _1 > & operator++ ();
+#line 185
         inline void operator+= (int i);
-#line 133
-        void operator-- (int i);
-#line 149
+#line 184
+        inline void operator-- (int i);
+#line 213
         inline _1 *operator-> () const;
-#line 130
+#line 182
         inline void operator= (const FwdIterator& it);
-#line 151
+#line 214
         inline operator _1 * () const;
-#line 150
+#line 211
         inline _1 *Get() const;
     };
     
@@ -328,733 +702,1524 @@ namespace C
     class DynArray
     {
     public:
-#line 230
+#line 312
+        typedef ConstFwdIterator < _1 > ConstIterator;
+#line 310
         typedef const _1 ConstK;
+#line 313
+        typedef ConstBwdIterator < _1 > ConstRIterator;
+#line 311
         typedef DynArray < _1 > DynArrayK;
-#line 229
+#line 309
         typedef _1 IndirectK;
-#line 232
+#line 314
         typedef FwdIterator < _1 > Iterator;
         typedef BwdIterator < _1 > RIterator;
         
     private:
-#line 208
+#line 288
         typedef unsigned long long uint64;
         
-#line 211
+#line 291
         _1 *data;
         int reserved;
         int count;
         
     public:
-#line 243
+#line 317
         inline DynArray();
-#line 246
         inline DynArray(const DynArray& v);
         inline DynArray(int i);
         inline ~DynArray();
-#line 300
-        inline DynArray < _1 > & operator<< (const _1& v);
-#line 332
-        inline void operator<<= (const DynArray& a);
-#line 364
-        inline _1& operator[](int i);
-#line 368
-        inline const _1& operator[](int i) const;
-#line 278
-        inline _1& Add();
-#line 285
-        inline _1& Add(const _1& v);
-#line 339
-        inline void Append(const DynArray& a);
-#line 261
-        inline C::ConstFwdIterator < _1 > Begin() const;
-#line 259
-        inline C::FwdIterator < _1 > Begin();
-#line 466
-        inline void Clear();
-#line 262
-        inline C::ConstFwdIterator < _1 > End() const;
-#line 260
-        inline C::FwdIterator < _1 > End();
-#line 276
-        inline _1 *Get() const;
-#line 360
-        inline int GetCount() const;
-        inline int GetReserved() const;
-#line 347
-        inline void IncreaseReserve(int more_reserved);
-#line 427
-        inline _1& Insert(int i);
-#line 438
-        inline _1& Insert(int i, ConstK& key);
-#line 362
-        inline bool IsEmpty() const;
-#line 452
-        inline _1 Pop();
-#line 267
-        inline C::BwdIterator < _1 > RBegin();
-#line 269
-        inline C::ConstBwdIterator < _1 > RBegin() const;
-#line 268
-        inline C::BwdIterator < _1 > REnd();
-#line 270
-        inline C::ConstBwdIterator < _1 > REnd() const;
-#line 406
-        inline void Remove(const DynArray < int > & sorted_list);
-#line 388
-        inline void Remove(const Iterator& it);
-#line 395
-        inline void Remove(const Iterator& it, const Iterator& end);
-#line 407
-        inline void Remove(const int *sorted_list, int n);
 #line 373
-        inline void Remove(int i);
-#line 380
-        inline void Remove(int i, int count);
-#line 461
-        inline void RemoveLast();
+        inline DynArray < _1 > & operator<< (const _1& v);
+#line 406
+        inline void operator<<= (const DynArray& a);
+#line 438
+        inline _1& operator[](int i);
+#line 442
+        inline const _1& operator[](int i) const;
+#line 351
+        inline _1& Add();
+#line 358
+        inline _1& Add(const _1& v);
+#line 413
+        inline void Append(const DynArray& a);
+#line 333
+        inline C::ConstFwdIterator < _1 > Begin() const;
+#line 331
+        inline C::FwdIterator < _1 > Begin();
+#line 540
+        inline void Clear();
+#line 334
+        inline C::ConstFwdIterator < _1 > End() const;
+#line 332
+        inline C::FwdIterator < _1 > End();
 #line 348
+        inline _1 *Get() const;
+#line 434
+        inline int GetCount() const;
+#line 349
+        inline _1 *GetEnd() const;
+#line 435
+        inline int GetReserved() const;
+#line 421
+        inline void IncreaseReserve(int more_reserved);
+#line 501
+        inline _1& Insert(int i);
+#line 512
+        inline _1& Insert(int i, ConstK& key);
+#line 436
+        inline bool IsEmpty() const;
+#line 526
+        inline _1 Pop();
+#line 339
+        inline C::BwdIterator < _1 > RBegin();
+#line 341
+        inline C::ConstBwdIterator < _1 > RBegin() const;
+#line 340
+        inline C::BwdIterator < _1 > REnd();
+#line 342
+        inline C::ConstBwdIterator < _1 > REnd() const;
+#line 480
+        inline void Remove(const DynArray < int > & sorted_list);
+#line 462
+        inline void Remove(const Iterator& it);
+#line 469
+        inline void Remove(const Iterator& it, const Iterator& end);
+#line 481
+        inline void Remove(const int *sorted_list, int n);
+#line 447
+        inline void Remove(int i);
+#line 454
+        inline void Remove(int i, int count);
+#line 535
+        inline void RemoveLast();
+#line 422
         inline void Reserve(int new_reserved);
-#line 302
+#line 375
         inline void SetCount(int new_count);
-#line 317
+#line 391
         inline void SetCount(int new_count, ConstK& value);
-#line 450
+#line 524
         inline _1& Top();
-#line 265
+#line 337
         inline C::ConstFwdIterator < _1 > begin() const;
-#line 263
+#line 335
         inline C::FwdIterator < _1 > begin();
-#line 266
+#line 338
         inline C::ConstFwdIterator < _1 > end() const;
-#line 264
+#line 336
         inline C::FwdIterator < _1 > end();
-#line 271
+#line 343
         inline C::BwdIterator < _1 > rbegin();
-#line 273
+#line 345
         inline C::ConstBwdIterator < _1 > rbegin() const;
-#line 272
+#line 344
         inline C::BwdIterator < _1 > rend();
-#line 274
+#line 346
         inline C::ConstBwdIterator < _1 > rend() const;
         
-#line 216
+#line 296
         inline void IncreaseReserved();
-#line 225
+#line 305
         inline void Pick0(DynArray& v);
     };
     
-    template < class _1 >
-    struct FwdPtrIterator
+    template < class _1, class _2 >
+    class FwdPairIterator
     {
-#line 186
+#line 259
+        const _1 *kit;
+#line 268
+        _2 *vit;
+        
+    public:
+#line 234
+        inline FwdPairIterator();
+        inline FwdPairIterator(const FwdPairIterator& it);
+#line 269
+        inline FwdPairIterator(const _1 *kit, _2 *vit);
+#line 261
+        inline bool operator!= (const FwdPairIterator& it) const;
+#line 237
+        inline FwdPairIterator < _1, _2 > & operator++ ();
+#line 239
+        inline void operator+= (int i);
+#line 238
+        inline void operator-- (int i);
+#line 236
+        inline void operator= (const FwdPairIterator& it);
+#line 270
+        inline _2& Value() const;
+        
+#line 260
+        inline const _1& Key() const;
+    };
+    
+    template < class _1, class _2 >
+    class FwdPairPtrIterator
+    {
+#line 259
+        const _1 *kit;
+#line 263
+        _2 **vit;
+        
+    public:
+#line 234
+        inline FwdPairPtrIterator();
+        inline FwdPairPtrIterator(const FwdPairPtrIterator& it);
+#line 264
+        inline FwdPairPtrIterator(const _1 *kit, _2 **vit);
+#line 261
+        inline bool operator!= (const FwdPairPtrIterator& it) const;
+#line 237
+        inline FwdPairPtrIterator < _1, _2 > & operator++ ();
+#line 239
+        inline void operator+= (int i);
+#line 238
+        inline void operator-- (int i);
+#line 236
+        inline void operator= (const FwdPairPtrIterator& it);
+#line 265
+        inline _2& Value() const;
+        
+#line 260
+        inline const _1& Key() const;
+    };
+    
+    template < class _1 >
+    class FwdPtrIterator
+    {
+#line 205
         _1 **kit;
         
-#line 168
+    public:
+#line 180
         inline FwdPtrIterator();
-#line 187
+#line 206
         inline FwdPtrIterator(_1 **kit);
-#line 169
-        FwdPtrIterator(const FwdPtrIterator& it);
-#line 192
+#line 181
+        inline FwdPtrIterator(const FwdPtrIterator& it);
+#line 217
         inline bool operator!= (const FwdPtrIterator& it) const;
+#line 216
         inline _1& operator()() const;
-#line 191
+#line 215
         inline _1& operator*() const;
-#line 171
-        FwdPtrIterator < _1 > & operator++ ();
-#line 173
+#line 183
+        inline FwdPtrIterator < _1 > & operator++ ();
+#line 185
         inline void operator+= (int i);
-#line 172
-        void operator-- (int i);
-#line 188
+#line 184
+        inline void operator-- (int i);
+#line 213
         inline _1 *operator-> () const;
-#line 170
+#line 182
         inline void operator= (const FwdPtrIterator& it);
-#line 190
+#line 214
         inline operator _1 * () const;
-#line 189
+#line 207
         inline _1 *Get() const;
     };
     
     namespace Memory
     {
-#line 27
+#line 102
         void *Alloc(int sz);
-#line 29
+#line 104
         int Compare(const void *m1, const void *m2, int sz);
         void *Copy(void *dest, const void *src, int sz);
-#line 28
+#line 103
         void Free(void *ptr);
-#line 31
+#line 106
         void *Move(void *dest, const void *src, int sz);
         void Set(void *dest, int byte_value, int sz);
     };
     
     struct MemoryLimitExc
     {
-#line 116
+#line 168
         const char *msg;
         
-#line 117
+#line 169
         inline MemoryLimitExc();
         inline MemoryLimitExc(const char *s);
-    };
-    
-    struct Nuller
-    {
-    };
-    
-    template < class _1 >
-    struct Ptr
-    {
-#line 95
-        _1 *value;
-        
-        inline Ptr();
-        inline Ptr(_1 *p);
-        inline void operator= (_1 *p);
-        inline void operator= (const Nuller& p);
-#line 103
-        inline bool operator== (const Nuller& p) const;
-#line 102
-        inline bool operator== (const Ptr& p) const;
-#line 101
-        inline operator _1 * () const;
-#line 106
-        inline unsigned long long Int() const;
     };
 };
 
 namespace C
 {
-#line 128
-    template < class _1 >
-    inline BwdIterator < _1 >::BwdIterator()
-    :
-        kit(NULL)
-    {};
+#line 91
+    inline void Destruct(int16& o) {};
     
-#line 148
+    inline void Destruct(int32& o) {};
+    
+    inline void Destruct(int64& o) {};
+    
+#line 89
+    inline void Destruct(int8& o) {};
+    
+#line 90
+    inline void Destruct(uint16& o) {};
+    
+    inline void Destruct(uint32& o) {};
+    
+    inline void Destruct(uint64& o) {};
+    
+#line 88
+    inline void Destruct(uint8& o) {};
+    
+#line 87
+    template < class _1 >
+    inline void Destruct(_1& o)
+    {
+#line 87
+        o.~T();
+    };
+    
+#line 97
+    inline void Destruct(double& o) {};
+    
+#line 96
+    inline void Destruct(float& o) {};
+    
+    inline void Destruct(void *o) {};
+    
+#line 180
+    template < class _1 >
+    inline BwdIterator < _1 >::BwdIterator() {};
+    
+#line 210
     template < class _1 >
     inline BwdIterator < _1 >::BwdIterator(_1 *kit)
     :
         kit(kit)
     {};
     
-#line 153
+#line 181
+    template < class _1 >
+    inline BwdIterator < _1 >::BwdIterator(const BwdIterator& it)
+    {
+#line 181
+        *this = it;
+    };
+    
+#line 217
     template < class _1 >
     inline bool BwdIterator < _1 >::operator!= (const BwdIterator& it) const
     {
-#line 153
+#line 217
         return it.kit != kit;
     };
     
-#line 154
+#line 216
     template < class _1 >
     inline _1& BwdIterator < _1 >::operator()() const
     {
-#line 154
-        return *kit;
+#line 216
+        return *Get();
     };
     
-#line 152
+#line 215
     template < class _1 >
     inline _1& BwdIterator < _1 >::operator*() const
     {
-#line 152
-        return *kit;
+#line 215
+        return *Get();
     };
     
-#line 134
+#line 183
+    template < class _1 >
+    inline BwdIterator < _1 > & BwdIterator < _1 >::operator++ ()
+    {
+#line 183
+        kit += -1;
+#line 183
+        return *this;
+    };
+    
+#line 185
     template < class _1 >
     inline void BwdIterator < _1 >::operator+= (int i)
     {
-#line 134
+#line 185
         kit += i;
     };
     
-#line 149
+#line 184
+    template < class _1 >
+    inline void BwdIterator < _1 >::operator-- (int i)
+    {
+#line 184
+        kit -= -1;
+    };
+    
+#line 213
     template < class _1 >
     inline _1 *BwdIterator < _1 >::operator-> () const
     {
-#line 149
-        return kit;
+#line 213
+        return Get();
     };
     
-#line 130
+#line 182
     template < class _1 >
     inline void BwdIterator < _1 >::operator= (const BwdIterator& it)
     {
-#line 130
+#line 182
         kit = it.kit;
     };
     
-#line 151
+#line 214
     template < class _1 >
     inline BwdIterator < _1 >::operator _1 * () const
     {
-#line 151
-        return kit;
+#line 214
+        return Get();
     };
     
-#line 150
+#line 211
     template < class _1 >
     inline _1 *BwdIterator < _1 >::Get() const
     {
-#line 150
+#line 211
         return kit;
     };
     
-#line 168
-    template < class _1 >
-    inline BwdPtrIterator < _1 >::BwdPtrIterator()
+#line 234
+    template < class _1, class _2 >
+    inline BwdPairIterator < _1, _2 >::BwdPairIterator() {};
+    
+#line 235
+    template < class _1, class _2 >
+    inline BwdPairIterator < _1, _2 >::BwdPairIterator(const BwdPairIterator& it)
+    {
+#line 235
+        *this = it;
+    };
+    
+#line 269
+    template < class _1, class _2 >
+    inline BwdPairIterator < _1, _2 >::BwdPairIterator(const _1 *kit, _2 *vit)
     :
-        kit(NULL)
+        kit(kit),
+        vit(vit)
     {};
     
-#line 187
+#line 261
+    template < class _1, class _2 >
+    inline bool BwdPairIterator < _1, _2 >::operator!= (const BwdPairIterator& it) const
+    {
+#line 261
+        return it.kit != kit;
+    };
+    
+#line 237
+    template < class _1, class _2 >
+    inline BwdPairIterator < _1, _2 > & BwdPairIterator < _1, _2 >::operator++ ()
+    {
+#line 237
+        kit += -1;
+#line 237
+        vit += -1;
+#line 237
+        return *this;
+    };
+    
+#line 239
+    template < class _1, class _2 >
+    inline void BwdPairIterator < _1, _2 >::operator+= (int i)
+    {
+#line 239
+        kit += i;
+#line 239
+        vit += i;
+    };
+    
+#line 238
+    template < class _1, class _2 >
+    inline void BwdPairIterator < _1, _2 >::operator-- (int i)
+    {
+#line 238
+        kit -= -1;
+#line 238
+        vit -= -1;
+    };
+    
+#line 236
+    template < class _1, class _2 >
+    inline void BwdPairIterator < _1, _2 >::operator= (const BwdPairIterator& it)
+    {
+#line 236
+        kit = it.kit;
+#line 236
+        vit = it.vit;
+    };
+    
+#line 260
+    template < class _1, class _2 >
+    inline const _1& BwdPairIterator < _1, _2 >::Key() const
+    {
+#line 260
+        return *kit;
+    };
+    
+#line 270
+    template < class _1, class _2 >
+    inline _2& BwdPairIterator < _1, _2 >::Value() const
+    {
+#line 270
+        return *vit;
+    };
+    
+#line 234
+    template < class _1, class _2 >
+    inline BwdPairPtrIterator < _1, _2 >::BwdPairPtrIterator() {};
+    
+#line 235
+    template < class _1, class _2 >
+    inline BwdPairPtrIterator < _1, _2 >::BwdPairPtrIterator(const BwdPairPtrIterator& it)
+    {
+#line 235
+        *this = it;
+    };
+    
+#line 264
+    template < class _1, class _2 >
+    inline BwdPairPtrIterator < _1, _2 >::BwdPairPtrIterator(const _1 *kit, _2 **vit)
+    :
+        kit(kit),
+        vit(vit)
+    {};
+    
+#line 261
+    template < class _1, class _2 >
+    inline bool BwdPairPtrIterator < _1, _2 >::operator!= (const BwdPairPtrIterator& it) const
+    {
+#line 261
+        return it.kit != kit;
+    };
+    
+#line 237
+    template < class _1, class _2 >
+    inline BwdPairPtrIterator < _1, _2 > & BwdPairPtrIterator < _1, _2 >::operator++ ()
+    {
+#line 237
+        kit += -1;
+#line 237
+        vit += -1;
+#line 237
+        return *this;
+    };
+    
+#line 239
+    template < class _1, class _2 >
+    inline void BwdPairPtrIterator < _1, _2 >::operator+= (int i)
+    {
+#line 239
+        kit += i;
+#line 239
+        vit += i;
+    };
+    
+#line 238
+    template < class _1, class _2 >
+    inline void BwdPairPtrIterator < _1, _2 >::operator-- (int i)
+    {
+#line 238
+        kit -= -1;
+#line 238
+        vit -= -1;
+    };
+    
+#line 236
+    template < class _1, class _2 >
+    inline void BwdPairPtrIterator < _1, _2 >::operator= (const BwdPairPtrIterator& it)
+    {
+#line 236
+        kit = it.kit;
+#line 236
+        vit = it.vit;
+    };
+    
+#line 260
+    template < class _1, class _2 >
+    inline const _1& BwdPairPtrIterator < _1, _2 >::Key() const
+    {
+#line 260
+        return *kit;
+    };
+    
+#line 265
+    template < class _1, class _2 >
+    inline _2& BwdPairPtrIterator < _1, _2 >::Value() const
+    {
+#line 265
+        return **vit;
+    };
+    
+#line 180
+    template < class _1 >
+    inline BwdPtrIterator < _1 >::BwdPtrIterator() {};
+    
+#line 206
     template < class _1 >
     inline BwdPtrIterator < _1 >::BwdPtrIterator(_1 **kit)
     :
         kit(kit)
     {};
     
-#line 192
+#line 181
+    template < class _1 >
+    inline BwdPtrIterator < _1 >::BwdPtrIterator(const BwdPtrIterator& it)
+    {
+#line 181
+        *this = it;
+    };
+    
+#line 217
     template < class _1 >
     inline bool BwdPtrIterator < _1 >::operator!= (const BwdPtrIterator& it) const
     {
-#line 192
+#line 217
         return it.kit != kit;
     };
     
-#line 193
+#line 216
     template < class _1 >
     inline _1& BwdPtrIterator < _1 >::operator()() const
     {
-#line 193
-        return **kit;
+#line 216
+        return *Get();
     };
     
-#line 191
+#line 215
     template < class _1 >
     inline _1& BwdPtrIterator < _1 >::operator*() const
     {
-#line 191
-        return **kit;
+#line 215
+        return *Get();
     };
     
-#line 173
+#line 183
+    template < class _1 >
+    inline BwdPtrIterator < _1 > & BwdPtrIterator < _1 >::operator++ ()
+    {
+#line 183
+        kit += -1;
+#line 183
+        return *this;
+    };
+    
+#line 185
     template < class _1 >
     inline void BwdPtrIterator < _1 >::operator+= (int i)
     {
-#line 173
+#line 185
         kit += i;
     };
     
-#line 188
+#line 184
+    template < class _1 >
+    inline void BwdPtrIterator < _1 >::operator-- (int i)
+    {
+#line 184
+        kit -= -1;
+    };
+    
+#line 213
     template < class _1 >
     inline _1 *BwdPtrIterator < _1 >::operator-> () const
     {
-#line 188
-        return *kit;
+#line 213
+        return Get();
     };
     
-#line 170
+#line 182
     template < class _1 >
     inline void BwdPtrIterator < _1 >::operator= (const BwdPtrIterator& it)
     {
-#line 170
+#line 182
         kit = it.kit;
     };
     
-#line 190
+#line 214
     template < class _1 >
     inline BwdPtrIterator < _1 >::operator _1 * () const
     {
-#line 190
-        return *kit;
+#line 214
+        return Get();
     };
     
-#line 189
+#line 207
     template < class _1 >
     inline _1 *BwdPtrIterator < _1 >::Get() const
     {
-#line 189
+#line 207
         return *kit;
     };
     
-#line 128
+#line 58
     template < class _1 >
-    inline ConstBwdIterator < _1 >::ConstBwdIterator()
+    inline CPtr < _1 >::CPtr()
     :
-        kit(NULL)
+        value(0)
     {};
     
-#line 139
+#line 59
+    template < class _1 >
+    inline CPtr < _1 >::CPtr(_1 *p)
+    :
+        value(p)
+    {};
+    
+#line 60
+    template < class _1 >
+    inline void CPtr < _1 >::operator= (_1 *p)
+    {
+#line 60
+        value = p;
+    };
+    
+#line 62
+    template < class _1 >
+    inline bool CPtr < _1 >::operator== (const CPtr& p) const
+    {
+#line 62
+        return value == p.value;
+    };
+    
+#line 63
+    template < class _1 >
+    inline bool CPtr < _1 >::operator== (void *p) const
+    {
+#line 63
+        return(void * ) value == p;
+    };
+    
+#line 61
+    template < class _1 >
+    inline CPtr < _1 >::operator _1 * () const
+    {
+#line 61
+        return value;
+    };
+    
+#line 66
+    template < class _1 >
+    inline unsigned long long CPtr < _1 >::Int() const
+    {
+#line 66
+        return(unsigned long long) value;
+    };
+    
+#line 180
+    template < class _1 >
+    inline ConstBwdIterator < _1 >::ConstBwdIterator() {};
+    
+#line 181
+    template < class _1 >
+    inline ConstBwdIterator < _1 >::ConstBwdIterator(const ConstBwdIterator& it)
+    {
+#line 181
+        *this = it;
+    };
+    
+#line 195
     template < class _1 >
     inline ConstBwdIterator < _1 >::ConstBwdIterator(const _1 *kit)
     :
         kit(kit)
     {};
     
-#line 144
+#line 202
     template < class _1 >
     inline bool ConstBwdIterator < _1 >::operator!= (const ConstBwdIterator& it) const
     {
-#line 144
+#line 202
         return it.kit != kit;
     };
     
-#line 145
+#line 201
     template < class _1 >
     inline const _1& ConstBwdIterator < _1 >::operator()() const
     {
-#line 145
-        return *kit;
+#line 201
+        return *Get();
     };
     
-#line 143
+#line 200
     template < class _1 >
     inline const _1& ConstBwdIterator < _1 >::operator*() const
     {
-#line 143
-        return *kit;
+#line 200
+        return *Get();
     };
     
-#line 134
+#line 183
+    template < class _1 >
+    inline ConstBwdIterator < _1 > & ConstBwdIterator < _1 >::operator++ ()
+    {
+#line 183
+        kit += -1;
+#line 183
+        return *this;
+    };
+    
+#line 185
     template < class _1 >
     inline void ConstBwdIterator < _1 >::operator+= (int i)
     {
-#line 134
+#line 185
         kit += i;
     };
     
-#line 140
+#line 184
+    template < class _1 >
+    inline void ConstBwdIterator < _1 >::operator-- (int i)
+    {
+#line 184
+        kit -= -1;
+    };
+    
+#line 198
     template < class _1 >
     inline const _1 *ConstBwdIterator < _1 >::operator-> () const
     {
-#line 140
-        return kit;
+#line 198
+        return Get();
     };
     
-#line 130
+#line 182
     template < class _1 >
     inline void ConstBwdIterator < _1 >::operator= (const ConstBwdIterator& it)
     {
-#line 130
+#line 182
         kit = it.kit;
     };
     
-#line 142
+#line 199
     template < class _1 >
     inline ConstBwdIterator < _1 >::operator ConstK * () const
     {
-#line 142
-        return kit;
+#line 199
+        return Get();
     };
     
-#line 141
+#line 196
     template < class _1 >
     inline const _1 *ConstBwdIterator < _1 >::Get() const
     {
-#line 141
+#line 196
         return kit;
     };
     
-#line 168
-    template < class _1 >
-    inline ConstBwdPtrIterator < _1 >::ConstBwdPtrIterator()
+#line 234
+    template < class _1, class _2 >
+    inline ConstBwdPairIterator < _1, _2 >::ConstBwdPairIterator() {};
+    
+#line 235
+    template < class _1, class _2 >
+    inline ConstBwdPairIterator < _1, _2 >::ConstBwdPairIterator(const ConstBwdPairIterator& it)
+    {
+#line 235
+        *this = it;
+    };
+    
+#line 254
+    template < class _1, class _2 >
+    inline ConstBwdPairIterator < _1, _2 >::ConstBwdPairIterator(const _1 *kit, const _2 **vit)
     :
-        kit(NULL)
+        kit(kit),
+        vit(vit)
     {};
     
-#line 178
+#line 246
+    template < class _1, class _2 >
+    inline bool ConstBwdPairIterator < _1, _2 >::operator!= (const ConstBwdPairIterator& it) const
+    {
+#line 246
+        return it.kit != kit;
+    };
+    
+#line 237
+    template < class _1, class _2 >
+    inline ConstBwdPairIterator < _1, _2 > & ConstBwdPairIterator < _1, _2 >::operator++ ()
+    {
+#line 237
+        kit += -1;
+#line 237
+        vit += -1;
+#line 237
+        return *this;
+    };
+    
+#line 239
+    template < class _1, class _2 >
+    inline void ConstBwdPairIterator < _1, _2 >::operator+= (int i)
+    {
+#line 239
+        kit += i;
+#line 239
+        vit += i;
+    };
+    
+#line 238
+    template < class _1, class _2 >
+    inline void ConstBwdPairIterator < _1, _2 >::operator-- (int i)
+    {
+#line 238
+        kit -= -1;
+#line 238
+        vit -= -1;
+    };
+    
+#line 236
+    template < class _1, class _2 >
+    inline void ConstBwdPairIterator < _1, _2 >::operator= (const ConstBwdPairIterator& it)
+    {
+#line 236
+        kit = it.kit;
+#line 236
+        vit = it.vit;
+    };
+    
+#line 245
+    template < class _1, class _2 >
+    inline const _1& ConstBwdPairIterator < _1, _2 >::Key() const
+    {
+#line 245
+        return *kit;
+    };
+    
+#line 255
+    template < class _1, class _2 >
+    inline const _2& ConstBwdPairIterator < _1, _2 >::Value() const
+    {
+#line 255
+        return **vit;
+    };
+    
+#line 234
+    template < class _1, class _2 >
+    inline ConstBwdPairPtrIterator < _1, _2 >::ConstBwdPairPtrIterator() {};
+    
+#line 235
+    template < class _1, class _2 >
+    inline ConstBwdPairPtrIterator < _1, _2 >::ConstBwdPairPtrIterator(const ConstBwdPairPtrIterator& it)
+    {
+#line 235
+        *this = it;
+    };
+    
+#line 249
+    template < class _1, class _2 >
+    inline ConstBwdPairPtrIterator < _1, _2 >::ConstBwdPairPtrIterator(const _1 *kit, const _2 *vit)
+    :
+        kit(kit),
+        vit(vit)
+    {};
+    
+#line 246
+    template < class _1, class _2 >
+    inline bool ConstBwdPairPtrIterator < _1, _2 >::operator!= (const ConstBwdPairPtrIterator& it) const
+    {
+#line 246
+        return it.kit != kit;
+    };
+    
+#line 237
+    template < class _1, class _2 >
+    inline ConstBwdPairPtrIterator < _1, _2 > & ConstBwdPairPtrIterator < _1, _2 >::operator++ ()
+    {
+#line 237
+        kit += -1;
+#line 237
+        vit += -1;
+#line 237
+        return *this;
+    };
+    
+#line 239
+    template < class _1, class _2 >
+    inline void ConstBwdPairPtrIterator < _1, _2 >::operator+= (int i)
+    {
+#line 239
+        kit += i;
+#line 239
+        vit += i;
+    };
+    
+#line 238
+    template < class _1, class _2 >
+    inline void ConstBwdPairPtrIterator < _1, _2 >::operator-- (int i)
+    {
+#line 238
+        kit -= -1;
+#line 238
+        vit -= -1;
+    };
+    
+#line 236
+    template < class _1, class _2 >
+    inline void ConstBwdPairPtrIterator < _1, _2 >::operator= (const ConstBwdPairPtrIterator& it)
+    {
+#line 236
+        kit = it.kit;
+#line 236
+        vit = it.vit;
+    };
+    
+#line 245
+    template < class _1, class _2 >
+    inline const _1& ConstBwdPairPtrIterator < _1, _2 >::Key() const
+    {
+#line 245
+        return *kit;
+    };
+    
+#line 250
+    template < class _1, class _2 >
+    inline const _2& ConstBwdPairPtrIterator < _1, _2 >::Value() const
+    {
+#line 250
+        return *vit;
+    };
+    
+#line 180
+    template < class _1 >
+    inline ConstBwdPtrIterator < _1 >::ConstBwdPtrIterator() {};
+    
+#line 181
+    template < class _1 >
+    inline ConstBwdPtrIterator < _1 >::ConstBwdPtrIterator(const ConstBwdPtrIterator& it)
+    {
+#line 181
+        *this = it;
+    };
+    
+#line 191
     template < class _1 >
     inline ConstBwdPtrIterator < _1 >::ConstBwdPtrIterator(const _1 **kit)
     :
         kit(kit)
     {};
     
-#line 183
+#line 202
     template < class _1 >
     inline bool ConstBwdPtrIterator < _1 >::operator!= (const ConstBwdPtrIterator& it) const
     {
-#line 183
+#line 202
         return it.kit != kit;
     };
     
-#line 184
+#line 201
     template < class _1 >
     inline const _1& ConstBwdPtrIterator < _1 >::operator()() const
     {
-#line 184
-        return **kit;
+#line 201
+        return *Get();
     };
     
-#line 182
+#line 200
     template < class _1 >
     inline const _1& ConstBwdPtrIterator < _1 >::operator*() const
     {
-#line 182
-        return **kit;
+#line 200
+        return *Get();
     };
     
-#line 173
+#line 183
+    template < class _1 >
+    inline ConstBwdPtrIterator < _1 > & ConstBwdPtrIterator < _1 >::operator++ ()
+    {
+#line 183
+        kit += -1;
+#line 183
+        return *this;
+    };
+    
+#line 185
     template < class _1 >
     inline void ConstBwdPtrIterator < _1 >::operator+= (int i)
     {
-#line 173
+#line 185
         kit += i;
     };
     
-#line 179
+#line 184
+    template < class _1 >
+    inline void ConstBwdPtrIterator < _1 >::operator-- (int i)
+    {
+#line 184
+        kit -= -1;
+    };
+    
+#line 198
     template < class _1 >
     inline const _1 *ConstBwdPtrIterator < _1 >::operator-> () const
     {
-#line 179
-        return *kit;
+#line 198
+        return Get();
     };
     
-#line 170
+#line 182
     template < class _1 >
     inline void ConstBwdPtrIterator < _1 >::operator= (const ConstBwdPtrIterator& it)
     {
-#line 170
+#line 182
         kit = it.kit;
     };
     
-#line 181
+#line 199
     template < class _1 >
     inline ConstBwdPtrIterator < _1 >::operator ConstK * () const
     {
-#line 181
-        return *kit;
+#line 199
+        return Get();
     };
     
-#line 180
+#line 192
     template < class _1 >
     inline const _1 *ConstBwdPtrIterator < _1 >::Get() const
     {
-#line 180
+#line 192
         return *kit;
     };
     
-#line 128
+#line 180
     template < class _1 >
-    inline ConstFwdIterator < _1 >::ConstFwdIterator()
-    :
-        kit(NULL)
-    {};
+    inline ConstFwdIterator < _1 >::ConstFwdIterator() {};
     
-#line 139
+#line 181
+    template < class _1 >
+    inline ConstFwdIterator < _1 >::ConstFwdIterator(const ConstFwdIterator& it)
+    {
+#line 181
+        *this = it;
+    };
+    
+#line 195
     template < class _1 >
     inline ConstFwdIterator < _1 >::ConstFwdIterator(const _1 *kit)
     :
         kit(kit)
     {};
     
-#line 144
+#line 202
     template < class _1 >
     inline bool ConstFwdIterator < _1 >::operator!= (const ConstFwdIterator& it) const
     {
-#line 144
+#line 202
         return it.kit != kit;
     };
     
-#line 145
+#line 201
     template < class _1 >
     inline const _1& ConstFwdIterator < _1 >::operator()() const
     {
-#line 145
-        return *kit;
+#line 201
+        return *Get();
     };
     
-#line 143
+#line 200
     template < class _1 >
     inline const _1& ConstFwdIterator < _1 >::operator*() const
     {
-#line 143
-        return *kit;
+#line 200
+        return *Get();
     };
     
-#line 134
+#line 183
+    template < class _1 >
+    inline ConstFwdIterator < _1 > & ConstFwdIterator < _1 >::operator++ ()
+    {
+#line 183
+        kit += 1;
+#line 183
+        return *this;
+    };
+    
+#line 185
     template < class _1 >
     inline void ConstFwdIterator < _1 >::operator+= (int i)
     {
-#line 134
+#line 185
         kit += i;
     };
     
-#line 140
+#line 184
+    template < class _1 >
+    inline void ConstFwdIterator < _1 >::operator-- (int i)
+    {
+#line 184
+        kit -= 1;
+    };
+    
+#line 198
     template < class _1 >
     inline const _1 *ConstFwdIterator < _1 >::operator-> () const
     {
-#line 140
-        return kit;
+#line 198
+        return Get();
     };
     
-#line 130
+#line 182
     template < class _1 >
     inline void ConstFwdIterator < _1 >::operator= (const ConstFwdIterator& it)
     {
-#line 130
+#line 182
         kit = it.kit;
     };
     
-#line 142
+#line 199
     template < class _1 >
     inline ConstFwdIterator < _1 >::operator ConstK * () const
     {
-#line 142
-        return kit;
+#line 199
+        return Get();
     };
     
-#line 141
+#line 196
     template < class _1 >
     inline const _1 *ConstFwdIterator < _1 >::Get() const
     {
-#line 141
+#line 196
         return kit;
     };
     
-#line 168
-    template < class _1 >
-    inline ConstFwdPtrIterator < _1 >::ConstFwdPtrIterator()
+#line 234
+    template < class _1, class _2 >
+    inline ConstFwdPairIterator < _1, _2 >::ConstFwdPairIterator() {};
+    
+#line 235
+    template < class _1, class _2 >
+    inline ConstFwdPairIterator < _1, _2 >::ConstFwdPairIterator(const ConstFwdPairIterator& it)
+    {
+#line 235
+        *this = it;
+    };
+    
+#line 254
+    template < class _1, class _2 >
+    inline ConstFwdPairIterator < _1, _2 >::ConstFwdPairIterator(const _1 *kit, const _2 **vit)
     :
-        kit(NULL)
+        kit(kit),
+        vit(vit)
     {};
     
-#line 178
+#line 246
+    template < class _1, class _2 >
+    inline bool ConstFwdPairIterator < _1, _2 >::operator!= (const ConstFwdPairIterator& it) const
+    {
+#line 246
+        return it.kit != kit;
+    };
+    
+#line 237
+    template < class _1, class _2 >
+    inline ConstFwdPairIterator < _1, _2 > & ConstFwdPairIterator < _1, _2 >::operator++ ()
+    {
+#line 237
+        kit += 1;
+#line 237
+        vit += 1;
+#line 237
+        return *this;
+    };
+    
+#line 239
+    template < class _1, class _2 >
+    inline void ConstFwdPairIterator < _1, _2 >::operator+= (int i)
+    {
+#line 239
+        kit += i;
+#line 239
+        vit += i;
+    };
+    
+#line 238
+    template < class _1, class _2 >
+    inline void ConstFwdPairIterator < _1, _2 >::operator-- (int i)
+    {
+#line 238
+        kit -= 1;
+#line 238
+        vit -= 1;
+    };
+    
+#line 236
+    template < class _1, class _2 >
+    inline void ConstFwdPairIterator < _1, _2 >::operator= (const ConstFwdPairIterator& it)
+    {
+#line 236
+        kit = it.kit;
+#line 236
+        vit = it.vit;
+    };
+    
+#line 245
+    template < class _1, class _2 >
+    inline const _1& ConstFwdPairIterator < _1, _2 >::Key() const
+    {
+#line 245
+        return *kit;
+    };
+    
+#line 255
+    template < class _1, class _2 >
+    inline const _2& ConstFwdPairIterator < _1, _2 >::Value() const
+    {
+#line 255
+        return **vit;
+    };
+    
+#line 234
+    template < class _1, class _2 >
+    inline ConstFwdPairPtrIterator < _1, _2 >::ConstFwdPairPtrIterator() {};
+    
+#line 235
+    template < class _1, class _2 >
+    inline ConstFwdPairPtrIterator < _1, _2 >::ConstFwdPairPtrIterator(const ConstFwdPairPtrIterator& it)
+    {
+#line 235
+        *this = it;
+    };
+    
+#line 249
+    template < class _1, class _2 >
+    inline ConstFwdPairPtrIterator < _1, _2 >::ConstFwdPairPtrIterator(const _1 *kit, const _2 *vit)
+    :
+        kit(kit),
+        vit(vit)
+    {};
+    
+#line 246
+    template < class _1, class _2 >
+    inline bool ConstFwdPairPtrIterator < _1, _2 >::operator!= (const ConstFwdPairPtrIterator& it) const
+    {
+#line 246
+        return it.kit != kit;
+    };
+    
+#line 237
+    template < class _1, class _2 >
+    inline ConstFwdPairPtrIterator < _1, _2 > & ConstFwdPairPtrIterator < _1, _2 >::operator++ ()
+    {
+#line 237
+        kit += 1;
+#line 237
+        vit += 1;
+#line 237
+        return *this;
+    };
+    
+#line 239
+    template < class _1, class _2 >
+    inline void ConstFwdPairPtrIterator < _1, _2 >::operator+= (int i)
+    {
+#line 239
+        kit += i;
+#line 239
+        vit += i;
+    };
+    
+#line 238
+    template < class _1, class _2 >
+    inline void ConstFwdPairPtrIterator < _1, _2 >::operator-- (int i)
+    {
+#line 238
+        kit -= 1;
+#line 238
+        vit -= 1;
+    };
+    
+#line 236
+    template < class _1, class _2 >
+    inline void ConstFwdPairPtrIterator < _1, _2 >::operator= (const ConstFwdPairPtrIterator& it)
+    {
+#line 236
+        kit = it.kit;
+#line 236
+        vit = it.vit;
+    };
+    
+#line 245
+    template < class _1, class _2 >
+    inline const _1& ConstFwdPairPtrIterator < _1, _2 >::Key() const
+    {
+#line 245
+        return *kit;
+    };
+    
+#line 250
+    template < class _1, class _2 >
+    inline const _2& ConstFwdPairPtrIterator < _1, _2 >::Value() const
+    {
+#line 250
+        return *vit;
+    };
+    
+#line 180
+    template < class _1 >
+    inline ConstFwdPtrIterator < _1 >::ConstFwdPtrIterator() {};
+    
+#line 181
+    template < class _1 >
+    inline ConstFwdPtrIterator < _1 >::ConstFwdPtrIterator(const ConstFwdPtrIterator& it)
+    {
+#line 181
+        *this = it;
+    };
+    
+#line 191
     template < class _1 >
     inline ConstFwdPtrIterator < _1 >::ConstFwdPtrIterator(const _1 **kit)
     :
         kit(kit)
     {};
     
-#line 183
+#line 202
     template < class _1 >
     inline bool ConstFwdPtrIterator < _1 >::operator!= (const ConstFwdPtrIterator& it) const
     {
-#line 183
+#line 202
         return it.kit != kit;
     };
     
-#line 184
+#line 201
     template < class _1 >
     inline const _1& ConstFwdPtrIterator < _1 >::operator()() const
     {
-#line 184
-        return **kit;
+#line 201
+        return *Get();
     };
     
-#line 182
+#line 200
     template < class _1 >
     inline const _1& ConstFwdPtrIterator < _1 >::operator*() const
     {
-#line 182
-        return **kit;
+#line 200
+        return *Get();
     };
     
-#line 173
+#line 183
+    template < class _1 >
+    inline ConstFwdPtrIterator < _1 > & ConstFwdPtrIterator < _1 >::operator++ ()
+    {
+#line 183
+        kit += 1;
+#line 183
+        return *this;
+    };
+    
+#line 185
     template < class _1 >
     inline void ConstFwdPtrIterator < _1 >::operator+= (int i)
     {
-#line 173
+#line 185
         kit += i;
     };
     
-#line 179
+#line 184
+    template < class _1 >
+    inline void ConstFwdPtrIterator < _1 >::operator-- (int i)
+    {
+#line 184
+        kit -= 1;
+    };
+    
+#line 198
     template < class _1 >
     inline const _1 *ConstFwdPtrIterator < _1 >::operator-> () const
     {
-#line 179
-        return *kit;
+#line 198
+        return Get();
     };
     
-#line 170
+#line 182
     template < class _1 >
     inline void ConstFwdPtrIterator < _1 >::operator= (const ConstFwdPtrIterator& it)
     {
-#line 170
+#line 182
         kit = it.kit;
     };
     
-#line 181
+#line 199
     template < class _1 >
     inline ConstFwdPtrIterator < _1 >::operator ConstK * () const
     {
-#line 181
-        return *kit;
+#line 199
+        return Get();
     };
     
-#line 180
+#line 192
     template < class _1 >
     inline const _1 *ConstFwdPtrIterator < _1 >::Get() const
     {
-#line 180
+#line 192
         return *kit;
     };
     
-#line 243
+#line 317
     template < class _1 >
     inline DynArray < _1 >::DynArray()
     :
-        data(NULL),
+        data(0),
         reserved(0),
         count(0)
     {};
     
-#line 246
+#line 318
     template < class _1 >
     inline DynArray < _1 >::DynArray(const DynArray& v)
     :
-        data(NULL),
+        data(0),
         reserved(0),
         count(0)
     {
-#line 246
+#line 318
         *this <<= v;
     };
     
-#line 247
+#line 319
     template < class _1 >
     inline DynArray < _1 >::DynArray(int i)
     :
-        data(NULL),
+        data(0),
         reserved(0),
         count(0)
     {
-#line 247
+#line 319
         SetCount(i);
     };
     
-#line 248
+#line 320
     template < class _1 >
     inline DynArray < _1 >::~DynArray()
     {
-#line 249
+#line 321
         Clear();
         return;
         ;
     };
     
-#line 300
+#line 373
     template < class _1 >
     inline DynArray < _1 > & DynArray < _1 >::operator<< (const _1& v)
     {
-#line 300
+#line 373
         Add(v);
-#line 300
+#line 373
         return *this;
     };
     
-#line 332
+#line 406
     template < class _1 >
     inline void DynArray < _1 >::operator<<= (const DynArray& a)
     {
-#line 333
+#line 407
         SetCount(0);
         Reserve(a.GetCount());
         for (int i = 0; i < a.GetCount(); i ++ )
@@ -1062,49 +2227,49 @@ namespace C
         count = a.GetCount();
     };
     
-#line 364
+#line 438
     template < class _1 >
     inline _1& DynArray < _1 >::operator[](int i)
     {
         {
-#line 365
+#line 439
             if (!(i >= 0 && i < count))
             {
-#line 365
+#line 439
                 SysBreak("Assertion failed: i >= 0 && i < count");
             }
         }
-#line 366
+#line 440
         ;
-#line 366
+#line 440
         return *(data + i);
     };
     
-#line 368
+#line 442
     template < class _1 >
     inline const _1& DynArray < _1 >::operator[](int i) const
     {
         {
-#line 369
+#line 443
             if (!(i >= 0 && i < count))
             {
-#line 369
+#line 443
                 SysBreak("Assertion failed: i >= 0 && i < count");
             }
         }
-#line 370
+#line 444
         ;
-#line 370
+#line 444
         return *(data + i);
     };
     
-#line 278
+#line 351
     template < class _1 >
     inline _1& DynArray < _1 >::Add()
     {
-#line 279
+#line 352
         if (count + 1 > reserved)
-#line 279
+#line 352
             IncreaseReserved();
         if (count >= reserved)
             throw MemoryLimitExc("DynArray maximum size exceeded");
@@ -1112,13 +2277,13 @@ namespace C
         return data[count ++ ];
     };
     
-#line 285
+#line 358
     template < class _1 >
     inline _1& DynArray < _1 >::Add(const _1& v)
     {
-#line 286
+#line 359
         if (count + 1 > reserved)
-#line 286
+#line 359
             IncreaseReserved();
         if (count >= reserved)
             throw MemoryLimitExc("DynArray maximum size exceeded");
@@ -1127,11 +2292,11 @@ namespace C
         return data[count ++ ];
     };
     
-#line 339
+#line 413
     template < class _1 >
     inline void DynArray < _1 >::Append(const DynArray& a)
     {
-#line 340
+#line 414
         int begin = count;
         int new_count = count + a.GetCount();
         Reserve(new_count);
@@ -1140,29 +2305,29 @@ namespace C
         count = new_count;
     };
     
-#line 261
+#line 333
     template < class _1 >
     inline C::ConstFwdIterator < _1 > DynArray < _1 >::Begin() const
     {
-#line 261
-        return Iterator(data);
+#line 333
+        return ConstIterator(data);
     };
     
-#line 259
+#line 331
     template < class _1 >
     inline C::FwdIterator < _1 > DynArray < _1 >::Begin()
     {
-#line 259
+#line 331
         return Iterator(data);
     };
     
-#line 466
+#line 540
     template < class _1 >
     inline void DynArray < _1 >::Clear()
     {
-#line 467
+#line 541
         if (!reserved)
-#line 467
+#line 541
             return;
         _1 * it = data;
         _1 * end = data + count;
@@ -1170,63 +2335,71 @@ namespace C
             it ++ -> ~IndirectK();
         count = 0;
         Memory::Free(data);
-        data = NULL;
+        data = 0;
         reserved = 0;
     };
     
-#line 262
+#line 334
     template < class _1 >
     inline C::ConstFwdIterator < _1 > DynArray < _1 >::End() const
     {
-#line 262
-        return Iterator(data + count);
+#line 334
+        return ConstIterator(data + count);
     };
     
-#line 260
+#line 332
     template < class _1 >
     inline C::FwdIterator < _1 > DynArray < _1 >::End()
     {
-#line 260
+#line 332
         return Iterator(data + count);
     };
     
-#line 276
+#line 348
     template < class _1 >
     inline _1 *DynArray < _1 >::Get() const
     {
-#line 276
+#line 348
         return data;
     };
     
-#line 360
+#line 434
     template < class _1 >
     inline int DynArray < _1 >::GetCount() const
     {
-#line 360
+#line 434
         return count;
     };
     
-#line 361
+#line 349
+    template < class _1 >
+    inline _1 *DynArray < _1 >::GetEnd() const
+    {
+#line 349
+        return data + count;
+    };
+    
+#line 435
     template < class _1 >
     inline int DynArray < _1 >::GetReserved() const
     {
-#line 361
+#line 435
         return reserved;
     };
     
-#line 347
+#line 421
     template < class _1 >
     inline void DynArray < _1 >::IncreaseReserve(int more_reserved)
     {
-#line 347
+#line 421
         Reserve(GetCount() + more_reserved);
     };
     
-#line 216
+#line 296
     template < class _1 >
     inline void DynArray < _1 >::IncreaseReserved()
     {
-#line 217
+#line 297
         uint64 new_reserved = 1;
         while (new_reserved <= reserved)
             new_reserved <<= 1;
@@ -1235,13 +2408,13 @@ namespace C
         Reserve((int) new_reserved);
     };
     
-#line 427
+#line 501
     template < class _1 >
     inline _1& DynArray < _1 >::Insert(int i)
     {
-#line 428
+#line 502
         if (count + 1 > reserved)
-#line 428
+#line 502
             IncreaseReserved();
         if (count >= reserved)
             throw MemoryLimitExc("DynArray maximum size exceeded");
@@ -1253,13 +2426,13 @@ namespace C
         return data[i];
     };
     
-#line 438
+#line 512
     template < class _1 >
     inline _1& DynArray < _1 >::Insert(int i, ConstK& key)
     {
-#line 439
+#line 513
         if (count + 1 > reserved)
-#line 439
+#line 513
             IncreaseReserved();
         if (count >= reserved)
             throw MemoryLimitExc("DynArray maximum size exceeded");
@@ -1271,47 +2444,47 @@ namespace C
         return data[i];
     };
     
-#line 362
+#line 436
     template < class _1 >
     inline bool DynArray < _1 >::IsEmpty() const
     {
-#line 362
+#line 436
         return GetCount() == 0;
     };
     
-#line 225
+#line 305
     template < class _1 >
     inline void DynArray < _1 >::Pick0(DynArray& v)
     {
-#line 225
+#line 305
         data = v.data;
-#line 225
+#line 305
         v.data = 0;
-#line 225
+#line 305
         reserved = v.reserved;
-#line 225
+#line 305
         v.reserved = 0;
-#line 225
+#line 305
         count = v.count;
-#line 225
+#line 305
         v.count = 0;
     };
     
-#line 452
+#line 526
     template < class _1 >
     inline _1 DynArray < _1 >::Pop()
     {
         {
-#line 453
+#line 527
             if (!(GetCount() > 0))
             {
-#line 453
+#line 527
                 SysBreak("Assertion failed: GetCount() > 0");
             }
         }
-#line 454
+#line 528
         ;
-#line 454
+#line 528
         int i = count - 1;
         _1 ret(data[i]);
         data[i].~K();
@@ -1319,51 +2492,51 @@ namespace C
         return ret;
     };
     
-#line 267
+#line 339
     template < class _1 >
     inline C::BwdIterator < _1 > DynArray < _1 >::RBegin()
     {
-#line 267
+#line 339
         return RIterator(data + count - 1);
     };
     
-#line 269
+#line 341
     template < class _1 >
     inline C::ConstBwdIterator < _1 > DynArray < _1 >::RBegin() const
     {
-#line 269
-        return RIterator(data + count - 1);
+#line 341
+        return ConstRIterator(data + count - 1);
     };
     
-#line 268
+#line 340
     template < class _1 >
     inline C::BwdIterator < _1 > DynArray < _1 >::REnd()
     {
-#line 268
+#line 340
         return RIterator(data - 1);
     };
     
-#line 270
+#line 342
     template < class _1 >
     inline C::ConstBwdIterator < _1 > DynArray < _1 >::REnd() const
     {
-#line 270
-        return RIterator(data - 1);
+#line 342
+        return ConstRIterator(data - 1);
     };
     
-#line 406
+#line 480
     template < class _1 >
     inline void DynArray < _1 >::Remove(const DynArray < int > & sorted_list)
     {
-#line 406
+#line 480
         Remove(sorted_list.Begin(), sorted_list.GetCount());
     };
     
-#line 388
+#line 462
     template < class _1 >
     inline void DynArray < _1 >::Remove(const Iterator& it)
     {
-#line 389
+#line 463
         _1 * begin = data;
         _1 * cur = it.Get();
         int pos = cur - begin;
@@ -1373,7 +2546,7 @@ namespace C
     template < class _1 >
     inline void DynArray < _1 >::Remove(const Iterator& it, const Iterator& end)
     {
-#line 396
+#line 470
         _1 * begin = data;
         _1 * cur = it.Get();
         _1 * cur_end = end.Get();
@@ -1381,57 +2554,57 @@ namespace C
         int pos1 = cur_end - begin;
         int len = pos1 - pos0;
         if (!len)
-#line 402
+#line 476
             return;
         Remove(pos0, len);
     };
     
-#line 407
+#line 481
     template < class _1 >
     inline void DynArray < _1 >::Remove(const int *sorted_list, int n)
     {
-#line 408
+#line 482
         if (!n)
-#line 408
+#line 482
             return;
         int pos = *sorted_list;
         int npos = pos;
         for (;;)
             {
                 {
-#line 412
+#line 486
                     if (!(pos < count))
                     {
-#line 412
+#line 486
                         SysBreak("Assertion failed: pos < count");
                     }
                 }
-#line 413
+#line 487
                 ;
-#line 413
+#line 487
                 if (pos == *sorted_list)
                 {
-#line 414
+#line 488
                     (data + pos)-> ~K();
                     pos ++ ;
                     sorted_list ++ ;
                     if (-- n == 0)
-#line 417
+#line 491
                         break;
                     
                     {
-#line 418
+#line 492
                         if (!(*sorted_list >= pos))
                         {
-#line 418
+#line 492
                             SysBreak("Assertion failed: *sorted_list >= pos");
                         }
                     }
-#line 419
+#line 493
                     ;
                 }
                 else
-#line 421
+#line 495
                     Memory::Copy(data + npos ++ , data + pos ++ , sizeof (_1));
             }
         while (pos < count)
@@ -1439,87 +2612,87 @@ namespace C
         count = npos;
     };
     
-#line 373
+#line 447
     template < class _1 >
     inline void DynArray < _1 >::Remove(int i)
     {
         {
-#line 374
+#line 448
             if (!(i >= 0 && i < count))
             {
-#line 374
+#line 448
                 SysBreak("Assertion failed: i >= 0 && i < count");
             }
         }
-#line 375
+#line 449
         ;
-#line 375
+#line 449
         int tail = count - (i + 1);
         if (tail > 0)
             Memory::Move(data + i, data + i + 1, tail * sizeof (_1));
         count -- ;
     };
     
-#line 380
+#line 454
     template < class _1 >
     inline void DynArray < _1 >::Remove(int i, int count)
     {
         {
-#line 381
+#line 455
             if (!(count > 0))
             {
-#line 381
+#line 455
                 SysBreak("Assertion failed: count > 0");
             }
         }
-#line 382
+#line 456
         ;
         {
-#line 382
+#line 456
             if (!(i >= 0 && i + count <= this -> count))
             {
-#line 382
+#line 456
                 SysBreak("Assertion failed: i >= 0 && i + count <= this->count");
             }
         }
-#line 383
+#line 457
         ;
-#line 383
+#line 457
         int tail = this -> count - (i + count);
         if (tail > 0)
             Memory::Move(data + i, data + i + count, tail * sizeof (_1));
         this -> count -= count;
     };
     
-#line 461
+#line 535
     template < class _1 >
     inline void DynArray < _1 >::RemoveLast()
     {
         {
-#line 462
+#line 536
             if (!(GetCount() > 0))
             {
-#line 462
+#line 536
                 SysBreak("Assertion failed: GetCount() > 0");
             }
         }
-#line 463
+#line 537
         ;
-#line 463
+#line 537
         data[-- count].~K();
     };
     
-#line 348
+#line 422
     template < class _1 >
     inline void DynArray < _1 >::Reserve(int new_reserved)
     {
-#line 349
+#line 423
         if (new_reserved <= reserved || new_reserved <= 0)
             return;
         _1 * new_data = (_1 * ) Memory::Alloc(new_reserved * sizeof (_1));
         if (data)
         {
-#line 353
+#line 427
             if (count > 0)
                 Memory::Copy((void * ) new_data, (void * ) data, sizeof (_1) * count);
             Memory::Free(data);
@@ -1528,393 +2701,551 @@ namespace C
         reserved = new_reserved;
     };
     
-#line 302
+#line 375
     template < class _1 >
     inline void DynArray < _1 >::SetCount(int new_count)
     {
         {
-#line 303
+#line 376
             if (!(new_count >= 0))
             {
-#line 303
+#line 376
                 SysBreak("Assertion failed: new_count >= 0");
             }
         }
-#line 304
+#line 377
         ;
-#line 304
+#line 377
         if (new_count < 0)
-#line 304
+#line 377
             return;
         if (new_count > reserved)
-#line 305
+#line 378
             Reserve(new_count);
         if (new_count == count)
-#line 306
+#line 379
             return;
         if (new_count > count)
         {
-#line 308
+#line 381
             for (int i = count; i < new_count; i ++ )
                 new (&data[i])_1;
         }
         else
         {
-#line 312
+#line 385
             for (int i = count - 1; i >= new_count; i -- )
-                data[i].~K();
+                Destruct(data[i]);
         }
+#line 389
         count = new_count;
     };
     
-#line 317
+#line 391
     template < class _1 >
     inline void DynArray < _1 >::SetCount(int new_count, ConstK& value)
     {
         {
-#line 318
+#line 392
             if (!(new_count >= 0))
             {
-#line 318
+#line 392
                 SysBreak("Assertion failed: new_count >= 0");
             }
         }
-#line 319
+#line 393
         ;
-#line 319
+#line 393
         if (new_count < 0)
-#line 319
+#line 393
             return;
         if (new_count > reserved)
-#line 320
+#line 394
             Reserve(new_count);
         if (new_count == count)
-#line 321
+#line 395
             return;
         if (new_count > count)
         {
-#line 323
+#line 397
             for (int i = count; i < new_count; i ++ )
                 new (&data[i])_1(value);
         }
         else
         {
-#line 327
+#line 401
             for (int i = count - 1; i >= new_count; i -- )
                 data[i].~K();
         }
         count = new_count;
     };
     
-#line 450
+#line 524
     template < class _1 >
     inline _1& DynArray < _1 >::Top()
     {
         {
-#line 450
+#line 524
             if (!(GetCount() > 0))
             {
-#line 450
+#line 524
                 SysBreak("Assertion failed: GetCount() > 0");
             }
         }
-#line 450
+#line 524
         ;
-#line 450
+#line 524
         return data[count - 1];
     };
     
-#line 265
+#line 337
     template < class _1 >
     inline C::ConstFwdIterator < _1 > DynArray < _1 >::begin() const
     {
-#line 265
+#line 337
         return Begin();
     };
     
-#line 263
+#line 335
     template < class _1 >
     inline C::FwdIterator < _1 > DynArray < _1 >::begin()
     {
-#line 263
+#line 335
         return Begin();
     };
     
     template < class _1 >
     inline C::ConstFwdIterator < _1 > DynArray < _1 >::end() const
     {
-#line 266
+#line 338
         return End();
     };
     
-#line 264
+#line 336
     template < class _1 >
     inline C::FwdIterator < _1 > DynArray < _1 >::end()
     {
-#line 264
+#line 336
         return End();
     };
     
-#line 271
+#line 343
     template < class _1 >
     inline C::BwdIterator < _1 > DynArray < _1 >::rbegin()
     {
-#line 271
+#line 343
         return RBegin();
     };
     
-#line 273
+#line 345
     template < class _1 >
     inline C::ConstBwdIterator < _1 > DynArray < _1 >::rbegin() const
     {
-#line 273
+#line 345
         return RBegin();
     };
     
-#line 272
+#line 344
     template < class _1 >
     inline C::BwdIterator < _1 > DynArray < _1 >::rend()
     {
-#line 272
+#line 344
         return REnd();
     };
     
-#line 274
+#line 346
     template < class _1 >
     inline C::ConstBwdIterator < _1 > DynArray < _1 >::rend() const
     {
-#line 274
+#line 346
         return REnd();
     };
     
-#line 128
+#line 180
     template < class _1 >
-    inline FwdIterator < _1 >::FwdIterator()
-    :
-        kit(NULL)
-    {};
+    inline FwdIterator < _1 >::FwdIterator() {};
     
-#line 148
+#line 210
     template < class _1 >
     inline FwdIterator < _1 >::FwdIterator(_1 *kit)
     :
         kit(kit)
     {};
     
-#line 153
+#line 181
+    template < class _1 >
+    inline FwdIterator < _1 >::FwdIterator(const FwdIterator& it)
+    {
+#line 181
+        *this = it;
+    };
+    
+#line 217
     template < class _1 >
     inline bool FwdIterator < _1 >::operator!= (const FwdIterator& it) const
     {
-#line 153
+#line 217
         return it.kit != kit;
     };
     
-#line 154
+#line 216
     template < class _1 >
     inline _1& FwdIterator < _1 >::operator()() const
     {
-#line 154
-        return *kit;
+#line 216
+        return *Get();
     };
     
-#line 152
+#line 215
     template < class _1 >
     inline _1& FwdIterator < _1 >::operator*() const
     {
-#line 152
-        return *kit;
+#line 215
+        return *Get();
     };
     
-#line 134
+#line 183
+    template < class _1 >
+    inline FwdIterator < _1 > & FwdIterator < _1 >::operator++ ()
+    {
+#line 183
+        kit += 1;
+#line 183
+        return *this;
+    };
+    
+#line 185
     template < class _1 >
     inline void FwdIterator < _1 >::operator+= (int i)
     {
-#line 134
+#line 185
         kit += i;
     };
     
-#line 149
+#line 184
+    template < class _1 >
+    inline void FwdIterator < _1 >::operator-- (int i)
+    {
+#line 184
+        kit -= 1;
+    };
+    
+#line 213
     template < class _1 >
     inline _1 *FwdIterator < _1 >::operator-> () const
     {
-#line 149
-        return kit;
+#line 213
+        return Get();
     };
     
-#line 130
+#line 182
     template < class _1 >
     inline void FwdIterator < _1 >::operator= (const FwdIterator& it)
     {
-#line 130
+#line 182
         kit = it.kit;
     };
     
-#line 151
+#line 214
     template < class _1 >
     inline FwdIterator < _1 >::operator _1 * () const
     {
-#line 151
-        return kit;
+#line 214
+        return Get();
     };
     
-#line 150
+#line 211
     template < class _1 >
     inline _1 *FwdIterator < _1 >::Get() const
     {
-#line 150
+#line 211
         return kit;
     };
     
-#line 168
-    template < class _1 >
-    inline FwdPtrIterator < _1 >::FwdPtrIterator()
+#line 234
+    template < class _1, class _2 >
+    inline FwdPairIterator < _1, _2 >::FwdPairIterator() {};
+    
+#line 235
+    template < class _1, class _2 >
+    inline FwdPairIterator < _1, _2 >::FwdPairIterator(const FwdPairIterator& it)
+    {
+#line 235
+        *this = it;
+    };
+    
+#line 269
+    template < class _1, class _2 >
+    inline FwdPairIterator < _1, _2 >::FwdPairIterator(const _1 *kit, _2 *vit)
     :
-        kit(NULL)
+        kit(kit),
+        vit(vit)
     {};
     
-#line 187
+#line 261
+    template < class _1, class _2 >
+    inline bool FwdPairIterator < _1, _2 >::operator!= (const FwdPairIterator& it) const
+    {
+#line 261
+        return it.kit != kit;
+    };
+    
+#line 237
+    template < class _1, class _2 >
+    inline FwdPairIterator < _1, _2 > & FwdPairIterator < _1, _2 >::operator++ ()
+    {
+#line 237
+        kit += 1;
+#line 237
+        vit += 1;
+#line 237
+        return *this;
+    };
+    
+#line 239
+    template < class _1, class _2 >
+    inline void FwdPairIterator < _1, _2 >::operator+= (int i)
+    {
+#line 239
+        kit += i;
+#line 239
+        vit += i;
+    };
+    
+#line 238
+    template < class _1, class _2 >
+    inline void FwdPairIterator < _1, _2 >::operator-- (int i)
+    {
+#line 238
+        kit -= 1;
+#line 238
+        vit -= 1;
+    };
+    
+#line 236
+    template < class _1, class _2 >
+    inline void FwdPairIterator < _1, _2 >::operator= (const FwdPairIterator& it)
+    {
+#line 236
+        kit = it.kit;
+#line 236
+        vit = it.vit;
+    };
+    
+#line 260
+    template < class _1, class _2 >
+    inline const _1& FwdPairIterator < _1, _2 >::Key() const
+    {
+#line 260
+        return *kit;
+    };
+    
+#line 270
+    template < class _1, class _2 >
+    inline _2& FwdPairIterator < _1, _2 >::Value() const
+    {
+#line 270
+        return *vit;
+    };
+    
+#line 234
+    template < class _1, class _2 >
+    inline FwdPairPtrIterator < _1, _2 >::FwdPairPtrIterator() {};
+    
+#line 235
+    template < class _1, class _2 >
+    inline FwdPairPtrIterator < _1, _2 >::FwdPairPtrIterator(const FwdPairPtrIterator& it)
+    {
+#line 235
+        *this = it;
+    };
+    
+#line 264
+    template < class _1, class _2 >
+    inline FwdPairPtrIterator < _1, _2 >::FwdPairPtrIterator(const _1 *kit, _2 **vit)
+    :
+        kit(kit),
+        vit(vit)
+    {};
+    
+#line 261
+    template < class _1, class _2 >
+    inline bool FwdPairPtrIterator < _1, _2 >::operator!= (const FwdPairPtrIterator& it) const
+    {
+#line 261
+        return it.kit != kit;
+    };
+    
+#line 237
+    template < class _1, class _2 >
+    inline FwdPairPtrIterator < _1, _2 > & FwdPairPtrIterator < _1, _2 >::operator++ ()
+    {
+#line 237
+        kit += 1;
+#line 237
+        vit += 1;
+#line 237
+        return *this;
+    };
+    
+#line 239
+    template < class _1, class _2 >
+    inline void FwdPairPtrIterator < _1, _2 >::operator+= (int i)
+    {
+#line 239
+        kit += i;
+#line 239
+        vit += i;
+    };
+    
+#line 238
+    template < class _1, class _2 >
+    inline void FwdPairPtrIterator < _1, _2 >::operator-- (int i)
+    {
+#line 238
+        kit -= 1;
+#line 238
+        vit -= 1;
+    };
+    
+#line 236
+    template < class _1, class _2 >
+    inline void FwdPairPtrIterator < _1, _2 >::operator= (const FwdPairPtrIterator& it)
+    {
+#line 236
+        kit = it.kit;
+#line 236
+        vit = it.vit;
+    };
+    
+#line 260
+    template < class _1, class _2 >
+    inline const _1& FwdPairPtrIterator < _1, _2 >::Key() const
+    {
+#line 260
+        return *kit;
+    };
+    
+#line 265
+    template < class _1, class _2 >
+    inline _2& FwdPairPtrIterator < _1, _2 >::Value() const
+    {
+#line 265
+        return **vit;
+    };
+    
+#line 180
+    template < class _1 >
+    inline FwdPtrIterator < _1 >::FwdPtrIterator() {};
+    
+#line 206
     template < class _1 >
     inline FwdPtrIterator < _1 >::FwdPtrIterator(_1 **kit)
     :
         kit(kit)
     {};
     
-#line 192
+#line 181
+    template < class _1 >
+    inline FwdPtrIterator < _1 >::FwdPtrIterator(const FwdPtrIterator& it)
+    {
+#line 181
+        *this = it;
+    };
+    
+#line 217
     template < class _1 >
     inline bool FwdPtrIterator < _1 >::operator!= (const FwdPtrIterator& it) const
     {
-#line 192
+#line 217
         return it.kit != kit;
     };
     
-#line 193
+#line 216
     template < class _1 >
     inline _1& FwdPtrIterator < _1 >::operator()() const
     {
-#line 193
-        return **kit;
+#line 216
+        return *Get();
     };
     
-#line 191
+#line 215
     template < class _1 >
     inline _1& FwdPtrIterator < _1 >::operator*() const
     {
-#line 191
-        return **kit;
+#line 215
+        return *Get();
     };
     
-#line 173
+#line 183
+    template < class _1 >
+    inline FwdPtrIterator < _1 > & FwdPtrIterator < _1 >::operator++ ()
+    {
+#line 183
+        kit += 1;
+#line 183
+        return *this;
+    };
+    
+#line 185
     template < class _1 >
     inline void FwdPtrIterator < _1 >::operator+= (int i)
     {
-#line 173
+#line 185
         kit += i;
     };
     
-#line 188
+#line 184
+    template < class _1 >
+    inline void FwdPtrIterator < _1 >::operator-- (int i)
+    {
+#line 184
+        kit -= 1;
+    };
+    
+#line 213
     template < class _1 >
     inline _1 *FwdPtrIterator < _1 >::operator-> () const
     {
-#line 188
-        return *kit;
+#line 213
+        return Get();
     };
     
-#line 170
+#line 182
     template < class _1 >
     inline void FwdPtrIterator < _1 >::operator= (const FwdPtrIterator& it)
     {
-#line 170
+#line 182
         kit = it.kit;
     };
     
-#line 190
+#line 214
     template < class _1 >
     inline FwdPtrIterator < _1 >::operator _1 * () const
     {
-#line 190
-        return *kit;
+#line 214
+        return Get();
     };
     
-#line 189
+#line 207
     template < class _1 >
     inline _1 *FwdPtrIterator < _1 >::Get() const
     {
-#line 189
+#line 207
         return *kit;
     };
     
-#line 117
+#line 169
     inline MemoryLimitExc::MemoryLimitExc()
     :
         msg(0)
     {};
     
-#line 118
+#line 170
     inline MemoryLimitExc::MemoryLimitExc(const char *s)
     :
         msg(s)
     {};
-    
-#line 97
-    template < class _1 >
-    inline Ptr < _1 >::Ptr()
-    :
-        value(0)
-    {};
-    
-#line 98
-    template < class _1 >
-    inline Ptr < _1 >::Ptr(_1 *p)
-    :
-        value(p)
-    {};
-    
-#line 99
-    template < class _1 >
-    inline void Ptr < _1 >::operator= (_1 *p)
-    {
-#line 99
-        value = p;
-    };
-    
-#line 100
-    template < class _1 >
-    inline void Ptr < _1 >::operator= (const Nuller& p)
-    {
-#line 100
-        value = 0;
-    };
-    
-    template < class _1 >
-    inline bool Ptr < _1 >::operator== (const Nuller& p) const
-    {
-#line 103
-        return value == 0;
-    };
-    
-#line 102
-    template < class _1 >
-    inline bool Ptr < _1 >::operator== (const Ptr& p) const
-    {
-#line 102
-        return value == p.value;
-    };
-    
-#line 101
-    template < class _1 >
-    inline Ptr < _1 >::operator _1 * () const
-    {
-#line 101
-        return value;
-    };
-    
-#line 106
-    template < class _1 >
-    inline unsigned long long Ptr < _1 >::Int() const
-    {
-#line 106
-        return(unsigned long long) value;
-    };
     
 };
 

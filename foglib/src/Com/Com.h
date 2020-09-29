@@ -105,7 +105,6 @@ using namespace std::chrono;
 
 namespace C {
 
-struct Nuller {};
 template <class T> struct Ptr;
 
 int StringLength(const char* c, int max_len);

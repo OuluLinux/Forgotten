@@ -78,15 +78,6 @@ uint64 Random64(uint64 n) {return RNG::Local().Random(n);}
 double Randomf() {return RNG::Local().Randomf();}
 void SeedRandom() {return RNG::Local().Seed();}
 
-template <class I, class T>
-inline I FindIf(I begin, I end, bool (*fn)(T&, void*), void* arg=0) {
-	while (begin != end) {
-		if (fn(*begin, arg))
-			return begin;
-		begin++;
-	}
-	return end;
-}
 
 
 

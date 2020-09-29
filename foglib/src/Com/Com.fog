@@ -10,6 +10,7 @@ using "Com/Hash.fog";
 using "Com/Algorithm.fog";
 using "Com/String.fog";
 using "Com/Vector.fog";
+using "Com/Shared.fog";
 
 /*using "Com/Math.fog";
 using "Com/Concurrency.fog";

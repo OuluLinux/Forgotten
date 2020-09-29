@@ -4,8 +4,10 @@ namespace Com::Tester {
 
 class App {
 	
-	static bool TestCmp(const char& c, void*) {
-		return c == 'c';
+	struct TestCmp {
+		bool operator()(const char& c) {
+			return c == 'c';
+		}
 	};
 	
 	struct VirtualBase {
@@ -28,7 +30,7 @@ class App {
 		ASSERT(sizeof(v) == 8);
 		
 		VoidPtr p;
-		ASSERT(p == Null);
+		ASSERT(p == NULL);
 		
 		ASSERT(SignificantBits(0x8000) == 16);
 		ASSERT(SignificantBits64(0x8000) == 16);
@@ -48,7 +50,7 @@ class App {
 		
 		const char* test_str = "abcdef";
 		int test_strlen = C::StringLength(test_str);
-		ASSERT(FindIf(test_str, test_str + test_strlen, &TestCmp));
+		ASSERT(FindIf(test_str, test_str + test_strlen, TestCmp()) == test_str + 2);
 		
 		
 		ASSERT(String("test") == "test");
@@ -90,6 +92,59 @@ class App {
 			ASSERT(strvec[i] == strarr[i]);
 		}
 		
+		Index<String> stridx;
+		stridx.Add("abc");
+		ASSERT(stridx.GetCount() == 1);
+		ASSERT(stridx.Find("abc") == 0);
+		stridx.Add("def");
+		ASSERT(stridx.Find("abc") == 0);
+		ASSERT(stridx.Find("def") == 1);
+		
+		
+		VectorMap<String, int> vmap;
+		ArrayMap<String, int> amap;
+		
+		vmap.Add("abc", 123);
+		vmap.Add("def", 456);
+		ASSERT(vmap.GetKeys().Find("abc") == 0);
+		ASSERT(vmap.GetValues()[0] == 123);
+		ASSERT(vmap.Find("abc") == 0);
+		ASSERT(vmap.Find("dfasgsg") == -1);
+		ASSERT(vmap.GetValues().Join() == "123456");
+		Vector<int> vmap_keys;
+		vmap_keys.Split(vmap.GetValues().Join(" "), " ");
+		ASSERT(vmap_keys.GetCount() == 2 && vmap_keys[0] == 123 && vmap_keys[1] == 456);
+		
+		
+		amap.Add("abc", 123);
+		amap.Add("def", 456);
+		ASSERT(amap.GetKeys().Find("abc") == 0);
+		ASSERT(amap.GetValues()[0] == 123);
+		ASSERT(amap.Find("abc") == 0);
+		ASSERT(amap.Find("dfasgsg") == -1);
+		C::FwdPairPtrIterator<String,int> it = amap.Begin();
+		for(int i = 0; i < 2; i++) {
+			if (i == 0) {
+				ASSERT(it.Key() == "abc");
+				ASSERT(it.Value() == 123);
+			}
+			else if (i == 1) {
+				ASSERT(it.Key() == "def");
+				ASSERT(it.Value() == 456);
+			}
+			++it;
+		}
+		
+		
+		{
+			Attachable a;
+			Slot s;
+			a.Attach(s);
+			s.Clear();
+		}
+		
+		TestShared();
+		
 		//for (char& c: strvec) c += 1;
 		//for (char& c: strarr) c += 1;
 		
@@ -105,6 +160,54 @@ class App {
 		Console::Put(program.GetFragmentSource());*/
 		
 	}
+	
+	
+	
+	void TestShared() {
+		struct Dumber {
+			Dumber() {LOG("Dumber ctor +++");}
+			virtual ~Dumber() {LOG("Dumber dtor ---");}
+		};
+		struct Dumb : public Dumber {
+			Dumb() {LOG("Dumb ctor ++++++");}
+			~Dumb() {LOG("Dumb dtor ------");}
+		};
+		
+		#if 0
+		
+		#define DUMPDUMB(x, y) LOG(#x ": " #y ": refs " << (y.GetBase() ? (int)y.GetBase()->refs : -1) << ", " << IntStr64((uint64)y.GetBase()));
+		
+		Shared<Dumb> s0a;
+		DUMPDUMB(0, s0a);
+		{
+			Shared<Dumber> s1a;
+			Shared<Dumb> s1b;
+			DUMPDUMB(1, s1a);
+			DUMPDUMB(2, s1b);
+			
+			s1b = Shared<Dumb>().WrapObject(new Dumb());
+			DUMPDUMB(3, s1b);
+			
+			s1a = s1b.template As<Dumber>();
+			DUMPDUMB(4, s1a);
+			
+			{
+				Shared<Dumber> s2;
+				DUMPDUMB(5, s2);
+				s2 = s1a;
+				DUMPDUMB(6, s2);
+				s0a = s2.template As<Dumb>();
+				DUMPDUMB(7, s0a);
+			}
+			DUMPDUMB(8, s0a);
+		}
+		DUMPDUMB(9, s0a);
+		
+		#endif
+		
+		Break("TODO");
+	}
+	
 };
 
 
