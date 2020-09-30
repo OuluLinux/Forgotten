@@ -1,14 +1,14 @@
 
-namespace Com {
+namespace Algorithm {
 
-template <class T> const T& min(const T& a, const T& b) {
+template <class T> const T& Minimum(const T& a, const T& b) {
 	if (a < b)
 		return a;
 	else
 		return b;
 }
 
-template <class T> const T& max(const T& a, const T& b) {
+template <class T> const T& Maximum(const T& a, const T& b) {
 	if (a >= b)
 		return a;
 	else
@@ -16,72 +16,7 @@ template <class T> const T& max(const T& a, const T& b) {
 }
 
 
-class RNG {
-	$MakeMoveable();
-	
-	uint64 state[4];
-	
-	uint64 s_rotl(const uint64 x, int k) {
-		return (x << k) | (x >> (64 - k)); // GCC/CLANG/MSC happily optimize this
-	}
-	
-	uint64 sNext(uint64 *s) {
-		const uint64 result_starstar = s_rotl(s[1] * 5, 7) * 9;
-		const uint64 t = s[1] << 17;
-	
-		s[2] ^= s[0];
-		s[3] ^= s[1];
-		s[1] ^= s[2];
-		s[0] ^= s[3];
-	
-		s[2] ^= t;
-	
-		s[3] = s_rotl(s[3], 45);
-	
-		return result_starstar;
-	}
-	
-	void sSeed(uint64 *s) {
-		for(int pass = 0; pass < 4; pass++) {
-			for(int i = 0; i < 4; i++) {
-				CombineHash h;
-				h.Put64(NativeCurrentTime());
-				h.Put64(NativeNanoSeconds());
-				h.Put64(NativeMilliSeconds());
-				s[i] ^= h;
-			}
-		}
-	}
-	
-public:
-	RNG() {Seed();}
-	double Randomf() {return (sNext(state) >> 11) * (1. / (UINT64_C(1) << 53));}
-	uint64 Random(uint64 max) {return Get() % max;}
-	uint64 Get() {return sNext(state);}
-	operator uint64 () {return Get();}
-	void Seed() {sSeed(state);}
-	void Seed(dword seed) {
-		for(int i = 0; i < 4; i++)
-			state[i] = 12345678 + seed + i; // xoshiro does not work well if all is zero
-	}
-	
-	static RNG& Local() {static thread_local RNG r; return r;}
-};
-
-
-
-
-dword Random() {return RNG::Local().Random(UINT32_MAX);}
-uint64 Random64() {return RNG::Local().Get();}
-dword Random(dword n) {return RNG::Local().Random(n);}
-uint64 Random64(uint64 n) {return RNG::Local().Random(n);}
-double Randomf() {return RNG::Local().Randomf();}
-void SeedRandom() {return RNG::Local().Seed();}
-
-
-
-
-
-
-
 }
+
+#define Min		Algorithm::Minimum
+#define Max		Algorithm::Maximum

@@ -1,12 +1,57 @@
 
-namespace Com {
+auto string PLATFORM = "UNKNOWN";
+auto number CPU_32 = 0;
+auto number CPU_64 = 0;
+auto number PTRSIZE = 0;
+
+
+auto bool IsDefined(identifier id) {$std::defined(id);}
+auto statement DebugMetaLog(string s) {auto if (true) auto $std::diagnostic($s);};
+
+
+auto if ($IsDefined("CPU64")) {
+	$DebugMetaLog("Using 64bit cpu");
+	
+	auto CPU_64 = 1;
+	auto PTRSIZE = 8;
+}
+else if ($IsDefined("CPU32")) {
+	$DebugMetaLog("Using 32bit cpu");
+	
+	auto CPU_64 = 1;
+	auto PTRSIZE = 4;
+}
+else $std::error("Define cpu bits: CPU32 or CPU64");
+
+auto if ($IsDefined("POSIX")) {
+	$DebugMetaLog("Using Posix OS");
+	
+	auto string DIR_SEPS = "/";
+	auto char DIR_SEP = '/';
+	auto string ENDL = "\n";
+	auto PLATFORM = "POSIX";
+}
+else if ($IsDefined("WIN32")) {
+	$DebugMetaLog("Using Windows OS");
+	
+	auto string DIR_SEPS = "\\";
+	auto char DIR_SEP = '\\';
+	auto string ENDL = "\r\n";
+	auto PLATFORM = "POSIX";
+}
+else
+	$std::error("No OS defined. Define POSIX or WIN32");
+
+
+
+
 
 auto declaration Tuple2(identifier cls, identifier a, identifier b) {
 	struct ::${Scope}:: $cls {
 		$a a;
 		$b b;
 		
-		String ToString() const {return Com::ToString(a) + ", " + Com::ToString(b);}
+		Text::String ToString() const {return Text::ToString(a) + ", " + Text::ToString(b);}
 	};
 }
 
@@ -16,7 +61,7 @@ auto declaration Tuple3(identifier cls, identifier a, identifier b, identifier c
 		$b b;
 		$c c;
 		
-		String ToString() const {return Com::ToString(a) + ", " + Com::ToString(b) + ", " + Com::ToString(c);}
+		Text::String ToString() const {return Text::ToString(a) + ", " + Text::ToString(b) + ", " + Text::ToString(c);}
 	};
 }
 
@@ -26,7 +71,7 @@ auto declaration RefTuple2(identifier cls, identifier a, identifier b) {
 		$b& b;
 		
 		${cls}($a& a, $b& b) : a(a), b(b) {}
-		String ToString() const {return Com::ToString(a) + ", " + Com::ToString(b);}
+		Text::String ToString() const {return Text::ToString(a) + ", " + Text::ToString(b);}
 	};
 }
 
@@ -37,13 +82,13 @@ auto declaration RefTuple3(identifier cls, identifier a, identifier b, identifie
 		$c& c;
 		
 		${cls}($a& a, $b& b, $c& c) : a(a), b(b), c(c) {}
-		String ToString() const {return Com::ToString(a) + ", " + Com::ToString(b) + ", " + Com::ToString(c);}
+		String ToString() const {return Text::ToString(a) + ", " + Text::ToString(b) + ", " + Text::ToString(c);}
 	};
 }
 
 auto declaration AddRefCounter(identifier Class) {
 	class $Class {
-		private C::AtomicInt refs;
+		private Lang::AtomicInt refs;
 		public !inline int GetRefs() const { return refs; }
 		public !inline void Inc() { refs++; }
 		public !inline void Dec() { refs--; if (refs <= 0) delete this; }
@@ -51,36 +96,68 @@ auto declaration AddRefCounter(identifier Class) {
 }
 
 auto declaration ZeroFunction() {
-	!inline void Zero() {MemorySet(this, 0, sizeof(${Scope}));}
+	!inline void Zero() {Lang::Memory::Set(this, 0, sizeof(${Scope}));}
 }
 
 
-
-
-} // end of Com
-
-
-
-
-
-auto statement MainClass(token id) {
+auto statement MainClass(token AppClass) {
 	
 	// Indirect including of the main class.
 	// This requires that the MainClass is in Main namespace.
 	// You create a dummy global object, which 'requires' the Main interface,
 	// which makes the Main.hxx to be included in Global.hxx.
-	struct ComInterfaceLinker {
-		export/interface Com;
-		export/implementation Com;
+	struct NamespaceInterfaceLinker {
+		export/interface Main;
+		export/implementation Main;
+		
 	};
-	ComInterfaceLinker loader;
+	NamespaceInterfaceLinker loader;
 	
 	
 	extern "C" !inline int main(int argc, const char** argv) {
 		Com::Env& e = Com::Env::Local();
 		e.Init(argc, argv);
-		${id}().Run();
+		Main::${AppClass}().Run();
 		return e.Deinit();
 	};
 }
 
+auto statement MainClassApp() {$MainClass(App);}
+
+auto declaration MakeMoveable() {
+	auto bool is_moveable = true;
+}
+
+auto declaration AssertMoveable(identifier id) {
+	// TODO
+	//auto if ($Scope.is_moveable == false)
+	//	$std.error("The class is not set as moveable");
+}
+
+auto declaration ForceGlobalVisible(token t) {
+	extern typename $t $to_identifier("____unused_"$t);
+}
+
+auto declaration GlobalTypedef(token from, token to) {
+	typedef $from $to;
+	extern $to_identifier($to) $to_identifier("____unused_"$to);
+}
+
+auto character to_character(token t) { $t }
+auto identifier to_identifier(token t) { $t }
+auto number to_number(token t) { $t }
+auto string to_string(token t) { $t }
+auto type to_type(token t) { $t }
+
+auto declaration MakeVectorPtr(identifier Type, identifier postfix, identifier DynArrayVar) {
+	${Type}& Get${postfix}(int i) {return *(${Type}*)${DynArrayVar}[i];}
+	void Remove${postfix}(int i) {${DynArrayVar}.Remove(i);}
+	int Get${postfix}Count() {return ${DynArrayVar}.GetCount();}
+	void Add${postfix}(${Type}* ptr) {${DynArrayVar}.Add(ptr);}
+}
+
+auto declaration MakeClassPtr(identifier Type, identifier postfix, identifier PtrVar) {
+	${Type}& Get${postfix}() {return *(${Type}*)${PtrVar};}
+	void Clear${postfix}(int i) {${PtrVar} = 0;}
+	void Set${postfix}(${Type}* ptr) {${PtrVar} = ptr;}
+}

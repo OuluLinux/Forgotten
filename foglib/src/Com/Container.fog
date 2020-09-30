@@ -1,6 +1,6 @@
+namespace Container {
+using/interface Text;
 
-
-namespace Com {
 
 auto declaration MakeFiller(int size) {
 	struct Filler {
@@ -79,7 +79,7 @@ public:
 };
 
 template <class T> inline class FutureOne {
-	C::ConditionalVar cond;
+	ConditionalVar cond;
 	One<T> one;
 	
 public:
@@ -116,8 +116,8 @@ class Optional {
 	T* obj = NULL;
 
 public:
-	typedef Com::Pick<T>			PickT;
-	typedef Com::Pick<Optional>	PickOpt;
+	typedef Container::Pick<T>			PickT;
+	typedef Container::Pick<Optional>	PickOpt;
 	
 	Optional() {}
 	//Optional(Optional&& o) {obj = o.obj; o.obj = NULL;}
@@ -146,16 +146,16 @@ public:
 
 
 template <class K>
-class Vector : public C::DynArray<K> {
-	typedef C::DynArray<K> Base;
+class Vector : public DynArray<K> {
+	typedef DynArray<K> Base;
 	
 	$MakeMoveable();
 	
 public:
-	typedef C::ConstFwdIterator<K> ConstIterator;
-	typedef C::ConstBwdIterator<K> ConstRIterator;
-	typedef C::FwdIterator<K> Iterator;
-	typedef C::BwdIterator<K> RIterator;
+	typedef ConstFwdIterator<K> ConstIterator;
+	typedef ConstBwdIterator<K> ConstRIterator;
+	typedef FwdIterator<K> Iterator;
+	typedef BwdIterator<K> RIterator;
 	
 	inline Vector() {}
 	inline Vector(const Vector& v) : Base(v) {}
@@ -225,16 +225,63 @@ public:
 
 
 template <class K>
+class VectorPtr {
+	DynArray<K*> data;
+	
+	$MakeMoveable();
+	
+public:
+	typedef ConstFwdPtrIterator<K> ConstIterator;
+	typedef ConstBwdPtrIterator<K> ConstRIterator;
+	typedef FwdPtrIterator<K> Iterator;
+	typedef BwdPtrIterator<K> RIterator;
+	
+	inline VectorPtr() {}
+	inline VectorPtr(const VectorPtr& v) : data(v) {}
+	
+	//void Serialize(Stream& s);
+	
+	
+	inline String Join(String join_str = "", bool ignore_empty = true) const {
+		String out;
+		ConstIterator end = data.End();
+		for (ConstIterator it = data.Begin(); it != end; ++it) {
+			String s = ToString<K>(**it);
+			if (s.IsEmpty() && ignore_empty)
+				continue;
+			if (!out.IsEmpty())
+				out << join_str;
+			out << s;
+		}
+		return out;
+	}
+	
+	
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+template <class K>
 class Array {
 	
-	C::DynArray<K*> l;
+	DynArray<K*> l;
 	
 
 public:
 	typedef K IndirectK;
 	typedef const K ConstK;
-	typedef C::FwdPtrIterator<K> Iterator;
-	typedef C::BwdPtrIterator<K> RIterator;
+	typedef FwdPtrIterator<K> Iterator;
+	typedef BwdPtrIterator<K> RIterator;
 
 
 	inline Array() {}
@@ -245,22 +292,22 @@ public:
 	K** Get() const {return l.Get();}
 	K** GetEnd() const {return l.GetEnd();}
 	
-	inline C::FwdPtrIterator<K>			Begin()			{return Iterator(l.Begin());}
-	inline C::FwdPtrIterator<K>			End()			{return Iterator(l.End());}
-	inline C::ConstFwdPtrIterator<K>	Begin() const	{return Iterator(l.Begin());}
-	inline C::ConstFwdPtrIterator<K>	End() const		{return Iterator(l.End());}
-	inline C::FwdPtrIterator<K>			begin()			{return Begin();}
-	inline C::FwdPtrIterator<K>			end()			{return End();}
-	inline C::ConstFwdPtrIterator<K>	begin() const	{return Begin();}
-	inline C::ConstFwdPtrIterator<K>	end() const		{return End();}
-	inline C::BwdPtrIterator<K>			RBegin()		{return RIterator(l.End() - 1);}
-	inline C::BwdPtrIterator<K>			REnd()			{return RIterator(l.Begin() - 1);}
-	inline C::ConstBwdPtrIterator<K>	RBegin() const	{return RIterator(l.End() - 1);}
-	inline C::ConstBwdPtrIterator<K>	REnd() const	{return RIterator(l.Begin() - 1);}
-	inline C::BwdPtrIterator<K>			rbegin()		{return RBegin();}
-	inline C::BwdPtrIterator<K>			rend()			{return REnd();}
-	inline C::ConstBwdPtrIterator<K>	rbegin() const	{return RBegin();}
-	inline C::ConstBwdPtrIterator<K>	rend() const	{return REnd();}
+	inline FwdPtrIterator<K>			Begin()			{return Iterator(l.Begin());}
+	inline FwdPtrIterator<K>			End()			{return Iterator(l.End());}
+	inline ConstFwdPtrIterator<K>	Begin() const	{return Iterator(l.Begin());}
+	inline ConstFwdPtrIterator<K>	End() const		{return Iterator(l.End());}
+	inline FwdPtrIterator<K>			begin()			{return Begin();}
+	inline FwdPtrIterator<K>			end()			{return End();}
+	inline ConstFwdPtrIterator<K>	begin() const	{return Begin();}
+	inline ConstFwdPtrIterator<K>	end() const		{return End();}
+	inline BwdPtrIterator<K>			RBegin()		{return RIterator(l.End() - 1);}
+	inline BwdPtrIterator<K>			REnd()			{return RIterator(l.Begin() - 1);}
+	inline ConstBwdPtrIterator<K>	RBegin() const	{return RIterator(l.End() - 1);}
+	inline ConstBwdPtrIterator<K>	REnd() const	{return RIterator(l.Begin() - 1);}
+	inline BwdPtrIterator<K>			rbegin()		{return RBegin();}
+	inline BwdPtrIterator<K>			rend()			{return REnd();}
+	inline ConstBwdPtrIterator<K>	rbegin() const	{return RBegin();}
+	inline ConstBwdPtrIterator<K>	rend() const	{return REnd();}
 	
 	inline void Reserve(int i) {l.Reserve(i);}
 	inline void SetCount(int new_count) {
@@ -314,7 +361,7 @@ public:
 	}
 	inline void RemoveLast() {ASSERT(GetCount()); Remove(GetCount()-1);}
 	inline void Clear() {
-		C::DynArray<K*> tmp;
+		DynArray<K*> tmp;
 		Swap(tmp, l);
 		K** ptr = tmp.Get();
 		K** end = ptr + tmp.GetCount();
@@ -342,21 +389,21 @@ public:
 template <class K> class Index {
 	$MakeMoveable();
 	
-	C::DynArray<unsigned int> hashes;
-	C::DynArray<K> values;
+	DynArray<unsigned int> hashes;
+	DynArray<K> values;
 
 public:
-	typedef C::FwdPtrIterator<K> Iterator;
-	typedef C::BwdPtrIterator<K> RIterator;
+	typedef FwdPtrIterator<K> Iterator;
+	typedef BwdPtrIterator<K> RIterator;
 	
 	inline Index() {}
 
-	inline C::FwdPtrIterator<K>			Begin() {return Iterator(values.Begin());}
-	inline C::FwdPtrIterator<K>			begin() {return Iterator(values.Begin());}
-	inline C::FwdPtrIterator<K>			End() {return Iterator(values.End());}
-	inline C::FwdPtrIterator<K>			end() {return Iterator(values.End());}
-	inline C::ConstFwdPtrIterator<K>	Begin() const {return Iterator(values.Begin());}
-	inline C::ConstFwdPtrIterator<K>	End() const {return Iterator(values.End());}
+	inline FwdPtrIterator<K>			Begin() {return Iterator(values.Begin());}
+	inline FwdPtrIterator<K>			begin() {return Iterator(values.Begin());}
+	inline FwdPtrIterator<K>			End() {return Iterator(values.End());}
+	inline FwdPtrIterator<K>			end() {return Iterator(values.End());}
+	inline ConstFwdPtrIterator<K>	Begin() const {return Iterator(values.Begin());}
+	inline ConstFwdPtrIterator<K>	End() const {return Iterator(values.End());}
 	inline K* Get() {return values.Get();}
 	inline K* GetEnd() {return values.GetEnd();}
 	
@@ -371,20 +418,20 @@ public:
 	}
 	inline int GetCount() const { return values.GetCount(); }
 	inline const K& Add(const K& value) {
-		uint32 hash = GetHashValue(value);
+		uint32 hash = GetValueHash(value);
 		if (FindHash(hash) >= 0)
 			throw Exc("Index has value already");
 		hashes.Add(hash);
 		return values.Add(value);
 	}
 	inline K& Insert(int i, const K& value) {
-		uint32 hash = GetHashValue(value);
+		uint32 hash = GetValueHash(value);
 		if (FindHash(hash) >= 0)
 			throw Exc("Index has value already");
 		hashes.Insert(i, hash);
 		return values.Insert(i, value);
 	}
-	inline int Find(const K& key) const { return FindHash(GetHashValue(key)); }
+	inline int Find(const K& key) const { return FindHash(GetValueHash(key)); }
 	inline int FindAdd(const K& key) {int i = Find(key); if (i >= 0) return i; i = GetCount(); Add(key); return i;}
 
 	inline int FindHash(uint32 hash) const {
@@ -487,8 +534,8 @@ auto declaration MakeMap(identifier Map, identifier Array, bool is_ptr_iter) {
 		
 		
 		auto if (!$is_ptr_iter) {
-			public typedef C::FwdPairIterator<K,V> Iterator;
-			public typedef C::BwdPairIterator<K,V> RIterator;
+			public typedef FwdPairIterator<K,V> Iterator;
+			public typedef BwdPairIterator<K,V> RIterator;
 			inline int GetPos(const Iterator& it) {
 				K* begin = keys.Get();
 				K* cur = &it.Key();
@@ -496,28 +543,28 @@ auto declaration MakeMap(identifier Map, identifier Array, bool is_ptr_iter) {
 				return pos;
 			}
 			inline void								Remove(const Iterator& it) {Remove(GetPos(it));}
-			inline C::FwdPairIterator<K,V>			InsertIterator(const Iterator& it, const K& key, const V& value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
-			inline C::FwdPairIterator<K,V>			InsertIterator(const Iterator& it, const K& key, V* value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
-			inline C::FwdPairIterator<K,V>			InsertIterator(const Iterator& it, const K& key) {int pos = GetPos(it); Insert(pos, key); Iterator cur = Begin(); cur += pos; return cur;}
-			inline C::FwdPairIterator<K,V>			FindIterator(const K& key) const {
+			inline FwdPairIterator<K,V>			InsertIterator(const Iterator& it, const K& key, const V& value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
+			inline FwdPairIterator<K,V>			InsertIterator(const Iterator& it, const K& key, V* value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
+			inline FwdPairIterator<K,V>			InsertIterator(const Iterator& it, const K& key) {int pos = GetPos(it); Insert(pos, key); Iterator cur = Begin(); cur += pos; return cur;}
+			inline FwdPairIterator<K,V>			FindIterator(const K& key) const {
 				Iterator it = Begin();
 				int pos = Find(key);
 				if (pos == -1)	it += GetCount();
 				else			it += pos;
 				return it;
 			}
-			inline C::FwdPairIterator<K,V>			Begin() {return Iterator(keys.Get(), values.Get());}
-			inline C::FwdPairIterator<K,V>			End() {return Iterator(keys.GetEnd(), values.GetEnd());}
-			inline C::ConstFwdPairIterator<K,V>		Begin() const {return Iterator(keys.Get(), values.Get());}
-			inline C::ConstFwdPairIterator<K,V>		End() const {return Iterator(keys.GetEnd(), values.GetEnd());}
-			inline C::FwdPairIterator<K,V>			begin() {return Begin();}
-			inline C::FwdPairIterator<K,V>			end() {return End();}
-			inline C::ConstFwdPairIterator<K,V>		begin() const {return Begin();}
-			inline C::ConstFwdPairIterator<K,V>		end() const {return End();}
+			inline FwdPairIterator<K,V>			Begin() {return Iterator(keys.Get(), values.Get());}
+			inline FwdPairIterator<K,V>			End() {return Iterator(keys.GetEnd(), values.GetEnd());}
+			inline ConstFwdPairIterator<K,V>		Begin() const {return Iterator(keys.Get(), values.Get());}
+			inline ConstFwdPairIterator<K,V>		End() const {return Iterator(keys.GetEnd(), values.GetEnd());}
+			inline FwdPairIterator<K,V>			begin() {return Begin();}
+			inline FwdPairIterator<K,V>			end() {return End();}
+			inline ConstFwdPairIterator<K,V>		begin() const {return Begin();}
+			inline ConstFwdPairIterator<K,V>		end() const {return End();}
 		}
 		else {
-			public typedef C::FwdPairPtrIterator<K,V> Iterator;
-			public typedef C::BwdPairPtrIterator<K,V> RIterator;
+			public typedef FwdPairPtrIterator<K,V> Iterator;
+			public typedef BwdPairPtrIterator<K,V> RIterator;
 			inline int GetPos(const Iterator& it) {
 				K* begin = keys.Get();
 				K* cur = &it.Key();
@@ -525,24 +572,24 @@ auto declaration MakeMap(identifier Map, identifier Array, bool is_ptr_iter) {
 				return pos;
 			}
 			inline void								Remove(const Iterator& it) {Remove(GetPos(it));}
-			inline C::FwdPairPtrIterator<K,V>		InsertIterator(const Iterator& it, const K& key, const V& value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
-			inline C::FwdPairPtrIterator<K,V>		InsertIterator(const Iterator& it, const K& key, V* value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
-			inline C::FwdPairPtrIterator<K,V>		InsertIterator(const Iterator& it, const K& key) {int pos = GetPos(it); Insert(pos, key); Iterator cur = Begin(); cur += pos; return cur;}
-			inline C::FwdPairPtrIterator<K,V>		FindIterator(const K& key) const {
+			inline FwdPairPtrIterator<K,V>		InsertIterator(const Iterator& it, const K& key, const V& value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
+			inline FwdPairPtrIterator<K,V>		InsertIterator(const Iterator& it, const K& key, V* value) {int pos = GetPos(it); Insert(pos, key, value); Iterator cur = Begin(); cur += pos; return cur;}
+			inline FwdPairPtrIterator<K,V>		InsertIterator(const Iterator& it, const K& key) {int pos = GetPos(it); Insert(pos, key); Iterator cur = Begin(); cur += pos; return cur;}
+			inline FwdPairPtrIterator<K,V>		FindIterator(const K& key) const {
 				Iterator it = Begin();
 				int pos = Find(key);
 				if (pos == -1)	it += GetCount();
 				else			it += pos;
 				return it;
 			}
-			inline C::FwdPairPtrIterator<K,V>		Begin() {return Iterator(keys.Get(), values.Get());}
-			inline C::FwdPairPtrIterator<K,V>		End() {return Iterator(keys.GetEnd(), values.GetEnd());}
-			inline C::ConstFwdPairPtrIterator<K,V>	Begin() const {return Iterator(keys.Get(), values.Get());}
-			inline C::ConstFwdPairPtrIterator<K,V>	End() const {return Iterator(keys.GetEnd(), values.GetEnd());}
-			inline C::FwdPairPtrIterator<K,V>		begin() {return Begin();}
-			inline C::FwdPairPtrIterator<K,V>		end() {return End();}
-			inline C::ConstFwdPairPtrIterator<K,V>	begin() const {return Begin();}
-			inline C::ConstFwdPairPtrIterator<K,V>	end() const {return End();}
+			inline FwdPairPtrIterator<K,V>		Begin() {return Iterator(keys.Get(), values.Get());}
+			inline FwdPairPtrIterator<K,V>		End() {return Iterator(keys.GetEnd(), values.GetEnd());}
+			inline ConstFwdPairPtrIterator<K,V>	Begin() const {return Iterator(keys.Get(), values.Get());}
+			inline ConstFwdPairPtrIterator<K,V>	End() const {return Iterator(keys.GetEnd(), values.GetEnd());}
+			inline FwdPairPtrIterator<K,V>		begin() {return Begin();}
+			inline FwdPairPtrIterator<K,V>		end() {return End();}
+			inline ConstFwdPairPtrIterator<K,V>	begin() const {return Begin();}
+			inline ConstFwdPairPtrIterator<K,V>	end() const {return End();}
 		}
 	};
 }
@@ -569,11 +616,19 @@ inline I FindIf(I first, I last, P pred) {
 
 
 
-
-
-
-
-
-
-
 }
+
+#define Pick		Container::Pick
+#define Swap		Container::Swap
+#define Reverse		Container::Reverse
+#define One			Container::One
+#define FutureOne	Container::FutureOne
+#define Optional	Container::Optional
+#define Vector		Container::Vector
+#define VectorPtr	Container::VectorPtr
+#define Array		Container::Array
+#define Index		Container::Index
+#define VectorMap	Container::VectorMap
+#define ArrayMap	Container::ArrayMap
+#define FindIf		Container::FindIf
+

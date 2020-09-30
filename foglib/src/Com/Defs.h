@@ -2,7 +2,7 @@
 #define _Com_Defs_h_
 
 
-NAMESPACE_SDK_BEGIN
+NAMESPACE_COM_BEGIN
 
 #if defined __linux__ || defined __freebsd__ || defined flagPOSIX
 	#define DIR_SEPS "/"
@@ -81,7 +81,7 @@ typedef void*			VoidPtr;
 typedef const void*		ConstVoidPtr;
 
 
-NAMESPACE_SDK_END
+NAMESPACE_COM_END
 
 
 #endif

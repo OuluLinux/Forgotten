@@ -21,25 +21,46 @@
  *		ComTest.mfog
  */
 
-#ifndef GLOBAL_CXX
-#define GLOBAL_CXX
+#ifndef HASH_CXX
+#define HASH_CXX
 
 #include <new>
 
-#ifndef GLOBAL_HXX
-#include <Global.hxx>
+#ifndef HASH_HXX
+#include <Hash.hxx>
 #endif
 
-extern "C"
+namespace Hash
 {
-#line 117 "../../src/Com/Meta.fog"
-    int main(int argc, const char **argv)
+#line 12 "../../src/Com/Hash.fog"
+    Combine::Combine(int v0, int v1)
+    :
+        hash(123456789)
     {
-#line 118
-        Com::Env & e = Com::Env::Local();
-        e.Init(argc, argv);
-        Main::App().Run();
-        return e.Deinit();
+#line 12
+        Put(v0);
+#line 12
+        Put(v1);
+    };
+    
+#line 17
+    Combine& Combine::Put(int value)
+    {
+#line 17
+        hash = ((hash << 5) + hash) + value;
+#line 17
+        return *this;
+    };
+    
+#line 18
+    Combine& Combine::Put64(Lang::int64 value)
+    {
+#line 18
+        Put((int)(value >> 32));
+#line 18
+        Put((int)(value & 0xFFFFFFFFULL));
+#line 18
+        return *this;
     };
     
 };

@@ -99,11 +99,13 @@ using namespace std::chrono;
 
 #define DLOG(x) LOG(x)
 
-#define NAMESPACE_SDK_BEGIN namespace  Com {
-#define NAMESPACE_SDK_END }
+#define NAMESPACE_LANG_BEGIN	namespace  Lang {
+#define NAMESPACE_LANG_END		}
+#define NAMESPACE_COM_BEGIN		namespace  Com {
+#define NAMESPACE_COM_END		}
 
 
-namespace C {
+namespace Lang {
 
 template <class T> struct Ptr;
 
@@ -152,7 +154,7 @@ public:
 
 #include "Defs.h"
 
-NAMESPACE_SDK_BEGIN
+NAMESPACE_COM_BEGIN
 
 struct Console {
 	
@@ -163,6 +165,6 @@ struct Console {
 };
 
 
-NAMESPACE_SDK_END
+NAMESPACE_COM_END
 
 #endif

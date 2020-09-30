@@ -21,27 +21,23 @@
  *		ComTest.mfog
  */
 
-#ifndef GLOBAL_CXX
-#define GLOBAL_CXX
+#ifndef ABSTRACT_HXX
+#define ABSTRACT_HXX
 
 #include <new>
 
-#ifndef GLOBAL_HXX
-#include <Global.hxx>
+#ifndef RANDOM_HXX
+#include <Random.hxx>
+#endif
+#ifndef ALGORITHM_HXX
+#include <Algorithm.hxx>
 #endif
 
-extern "C"
+namespace Abstract
 {
-#line 117 "../../src/Com/Meta.fog"
-    int main(int argc, const char **argv)
+    class Stream
     {
-#line 118
-        Com::Env & e = Com::Env::Local();
-        e.Init(argc, argv);
-        Main::App().Run();
-        return e.Deinit();
     };
-    
 };
 
 #endif

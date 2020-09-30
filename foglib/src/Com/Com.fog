@@ -1,15 +1,19 @@
 
 namespace Com {};
 
-using "Com/Lang.fog";
-using "Com/Defs.fog";
+#define NULL 0
+
 using "Com/Macros.fog";
 using "Com/Meta.fog";
+using "Com/Prim.fog";
+using "Com/Lang.fog";
 using "Com/Native.fog";
 using "Com/Hash.fog";
+using "Com/Random.fog";
 using "Com/Algorithm.fog";
-using "Com/String.fog";
-using "Com/Vector.fog";
+using "Com/Abstract.fog";
+using "Com/Text.fog";
+using "Com/Container.fog";
 using "Com/Shared.fog";
 
 /*using "Com/Math.fog";

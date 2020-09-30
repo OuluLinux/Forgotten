@@ -1,72 +1,14 @@
 
-#define NULL 0
 
-auto statement DebugMetaLog(string s) {
-	auto if (true)
-		auto $std::diagnostic($s);
-};
+namespace Lang {
+using/interface Prim;
 
-auto bool IsDefined(identifier id) {
-	$std::defined(id);
-}
+//template <class T> struct LangPtr : public CPtr<T> {};
 
-auto declaration MakeMoveable() {
-	auto bool is_moveable = true;
-}
-
-auto declaration AssertMoveable(identifier id) {
-	// TODO
-	//auto if ($Scope.is_moveable == false)
-	//	$std.error("The class is not set as moveable");
-}
-
-auto declaration ForceGlobalVisible(token t) {
-	extern typename $t $to_identifier("____unused_"$t);
-}
-
-auto declaration GlobalTypedef(token from, token to) {
-	typedef $from $to;
+auto declaration GlobalTypedefPtr(token from, token to) {
+	typedef CPtr<$from> $to;
 	extern $to_identifier($to) $to_identifier("____unused_"$to);
 }
-
-auto character to_character(token t) { $t }
-auto identifier to_identifier(token t) { $t }
-auto number to_number(token t) { $t }
-auto string to_string(token t) { $t }
-auto type to_type(token t) { $t }
-
-auto declaration VectorPtr(identifier Type, identifier postfix, identifier DynArrayVar) {
-	${Type}& Get${postfix}(int i) {return *(${Type}*)${DynArrayVar}[i];}
-	void Remove${postfix}(int i) {${DynArrayVar}.Remove(i);}
-	int Get${postfix}Count() {return ${DynArrayVar}.GetCount();}
-	void Add${postfix}(${Type}* ptr) {${DynArrayVar}.Add(ptr);}
-}
-
-auto declaration ClassPtr(identifier Type, identifier postfix, identifier PtrVar) {
-	${Type}& Get${postfix}() {return *(${Type}*)${PtrVar};}
-	void Clear${postfix}(int i) {${PtrVar} = 0;}
-	void Set${postfix}(${Type}* ptr) {${PtrVar} = ptr;}
-}
-
-namespace C {
-
-
-template<class T> struct CPtr {
-	
-	T* value;
-	
-	CPtr() : value(0) {}
-	CPtr(T* p) : value(p) {}
-	void operator=(T* p) {value = p;}
-	operator T*() const {return value;}
-	bool operator==(const CPtr& p) const {return value == p.value;}
-	bool operator==(void* p) const {return (void*)value == p;}
-	
-	auto if ($IsDefined("CPU64"))
-		unsigned long long Int() const {return (unsigned long long)value;}
-	else
-		unsigned long Int() const {return (unsigned long)value;}
-};
 
 $GlobalTypedef(unsigned char,		uint8);
 $GlobalTypedef(char,				int8);
@@ -76,12 +18,13 @@ $GlobalTypedef(unsigned int,		uint32);
 $GlobalTypedef(int,					int32);
 $GlobalTypedef(unsigned long long,	uint64);
 $GlobalTypedef(long long,			int64);
-$GlobalTypedef(unsigned char,		Byte);
 $GlobalTypedef(unsigned char,		byte);
 $GlobalTypedef(uint16,				word);
 $GlobalTypedef(uint32,				dword);
 $GlobalTypedef(uint64,				qword);
-$GlobalTypedef(unsigned long,		DWORD);
+$GlobalTypedefPtr(const char,		CString);
+$GlobalTypedefPtr(void,				VoidPtr);
+$GlobalTypedefPtr(const void,		ConstVoidPtr);
 
 //template<class T> inline void Destruct(T*& o) {o = 0;}
 template<class T> inline void Destruct(T& o) {o.~T();}
@@ -121,8 +64,6 @@ struct AtomicFlag {
 	bool TryEnter() :{ export/noimplementation; };
 };
 
-
-
 struct AtomicBool {
 	$MakeMoveable();
 	
@@ -156,8 +97,8 @@ struct ConditionalVar {
 	
 };
 
-#define CASSERT(e) {if (!(e)) {SysBreak("Assertion failed: " #e);}}
-#define CPANIC(msg) SysBreak(msg);
+#define ASSERT(e) {if (!(e)) {Lang::SysBreak("Assertion failed: " #e);}}
+#define PANIC(msg) Lang::SysBreak(msg);
 
 
 
@@ -328,22 +269,22 @@ public:
 	//void operator=(DynArray&& v) {Pick0(v);}
 	
 	
-	inline C::FwdIterator<K>		Begin()			{return Iterator(data);}
-	inline C::FwdIterator<K>		End()			{return Iterator(data+count);}
-	inline C::ConstFwdIterator<K>	Begin() const	{return ConstIterator(data);}
-	inline C::ConstFwdIterator<K>	End() const		{return ConstIterator(data+count);}
-	inline C::FwdIterator<K>		begin()			{return Begin();}
-	inline C::FwdIterator<K>		end()			{return End();}
-	inline C::ConstFwdIterator<K>	begin() const	{return Begin();}
-	inline C::ConstFwdIterator<K>	end() const		{return End();}
-	inline C::BwdIterator<K>		RBegin()		{return RIterator(data+count-1);}
-	inline C::BwdIterator<K>		REnd()			{return RIterator(data-1);}
-	inline C::ConstBwdIterator<K>	RBegin() const	{return ConstRIterator(data+count-1);}
-	inline C::ConstBwdIterator<K>	REnd() const	{return ConstRIterator(data-1);}
-	inline C::BwdIterator<K>		rbegin()		{return RBegin();}
-	inline C::BwdIterator<K>		rend()			{return REnd();}
-	inline C::ConstBwdIterator<K>	rbegin() const	{return RBegin();}
-	inline C::ConstBwdIterator<K>	rend() const	{return REnd();}
+	inline Lang::FwdIterator<K>			Begin()			{return Iterator(data);}
+	inline Lang::FwdIterator<K>			End()			{return Iterator(data+count);}
+	inline Lang::ConstFwdIterator<K>	Begin() const	{return ConstIterator(data);}
+	inline Lang::ConstFwdIterator<K>	End() const		{return ConstIterator(data+count);}
+	inline Lang::FwdIterator<K>			begin()			{return Begin();}
+	inline Lang::FwdIterator<K>			end()			{return End();}
+	inline Lang::ConstFwdIterator<K>	begin() const	{return Begin();}
+	inline Lang::ConstFwdIterator<K>	end() const		{return End();}
+	inline Lang::BwdIterator<K>			RBegin()		{return RIterator(data+count-1);}
+	inline Lang::BwdIterator<K>			REnd()			{return RIterator(data-1);}
+	inline Lang::ConstBwdIterator<K>	RBegin() const	{return ConstRIterator(data+count-1);}
+	inline Lang::ConstBwdIterator<K>	REnd() const	{return ConstRIterator(data-1);}
+	inline Lang::BwdIterator<K>			rbegin()		{return RBegin();}
+	inline Lang::BwdIterator<K>			rend()			{return REnd();}
+	inline Lang::ConstBwdIterator<K>	rbegin() const	{return RBegin();}
+	inline Lang::ConstBwdIterator<K>	rend() const	{return REnd();}
 	
 	inline K* Get() const {return data;}
 	inline K* GetEnd() const {return data + count;}
@@ -373,7 +314,7 @@ public:
 	inline DynArray<K>& operator<<(const K& v) { Add(v); return *this; }
 
 	inline void SetCount(int new_count) {
-		CASSERT(new_count >= 0);
+		ASSERT(new_count >= 0);
 		if (new_count < 0) return;
 		if (new_count > reserved) Reserve(new_count);
 		if (new_count == count) return;
@@ -389,7 +330,7 @@ public:
 		count = new_count;
 	}
 	inline void SetCount(int new_count, ConstK& value) {
-		CASSERT(new_count >= 0);
+		ASSERT(new_count >= 0);
 		if (new_count < 0) return;
 		if (new_count > reserved) Reserve(new_count);
 		if (new_count == count) return;
@@ -436,24 +377,24 @@ public:
 	inline bool IsEmpty() const { return GetCount() == 0; }
 
 	inline K& operator[](int i) {
-		CASSERT(i >= 0 && i < count);
+		ASSERT(i >= 0 && i < count);
 		return *(data + i);
 	}
 	inline const K& operator[](int i) const {
-		CASSERT(i >= 0 && i < count);
+		ASSERT(i >= 0 && i < count);
 		return *(data + i);
 	}
 
 	inline void Remove(int i) {
-		CASSERT(i >= 0 && i < count);
+		ASSERT(i >= 0 && i < count);
 		int tail = count - (i + 1);
 		if (tail > 0)
 			Memory::Move(data + i, data + i + 1, tail * sizeof(K));
 		count--;
 	}
 	inline void Remove(int i, int count) {
-		CASSERT(count > 0);
-		CASSERT(i >= 0 && i + count <= this->count);
+		ASSERT(count > 0);
+		ASSERT(i >= 0 && i + count <= this->count);
 		int tail = this->count - (i + count);
 		if (tail > 0)
 			Memory::Move(data + i, data + i + count, tail * sizeof(K));
@@ -483,13 +424,13 @@ public:
 		int pos = *sorted_list;
 		int npos = pos;
 		for(;;) {
-			CASSERT(pos < count);
+			ASSERT(pos < count);
 			if(pos == *sorted_list) {
 				(data + pos)->~K();
 				pos++;
 				sorted_list++;
 				if(--n == 0) break;
-				CASSERT(*sorted_list >= pos);
+				ASSERT(*sorted_list >= pos);
 			}
 			else
 				Memory::Copy(data + npos++, data + pos++, sizeof(K));
@@ -521,10 +462,10 @@ public:
 		return data[i];
 	}
 
-	inline K& Top() { CASSERT(GetCount() > 0); return data[count - 1]; }
+	inline K& Top() { ASSERT(GetCount() > 0); return data[count - 1]; }
 
 	inline K Pop() {
-		CASSERT(GetCount() > 0);
+		ASSERT(GetCount() > 0);
 		int i = count - 1;
 		K ret(data[i]);
 		data[i].~K();
@@ -533,7 +474,7 @@ public:
 	}
 	
 	inline void RemoveLast() {
-		CASSERT(GetCount() > 0);
+		ASSERT(GetCount() > 0);
 		data[--count].~K();
 	}
 
@@ -551,4 +492,59 @@ public:
 };
 
 }
+
+
+#define uint8		Lang::uint8
+#define int8		Lang::int8
+#define uint16		Lang::uint16
+#define int16		Lang::int16
+#define uint32		Lang::uint32
+#define int32		Lang::int32
+#define uint64		Lang::uint64
+#define int64		Lang::int64
+#define byte		Lang::byte
+#define word		Lang::word
+#define dword		Lang::dword
+#define qword		Lang::qword
+#define CString		Lang::CString
+#define VoidPtr		Lang::VoidPtr
+#define ConstVoidPtr	Lang::ConstVoidPtr
+#define Destruct		Lang::Destruct
+#define MemoryAlloc		Lang::Memory::Alloc
+#define MemoryFree		Lang::Memory::Free
+#define MemoryCompare	Lang::Memory::Compare
+#define MemoryCopy		Lang::Memory::Copy
+#define MemoryMove		Lang::Memory::Move
+#define MemorySet		Lang::Memory::Set
+#define SysBreak		Lang::SysBreak
+#define StringLength	Lang::StringLength
+#define AtomicFlag		Lang::AtomicFlag
+#define SpinLock		Lang::AtomicFlag
+#define AtomicBool		Lang::AtomicBool
+#define AtomicInt		Lang::AtomicInt
+#define ConditionalVar	Lang::ConditionalVar
+#define MemoryLimitExc	Lang::MemoryLimitExc
+#define FwdIterator			Lang::FwdIterator
+#define BwdIterator			Lang::BwdIterator
+#define ConstFwdIterator	Lang::ConstFwdIterator
+#define ConstBwdIterator	Lang::ConstBwdIterator
+#define FwdPtrIterator		Lang::FwdPtrIterator
+#define BwdPtrIterator		Lang::BwdPtrIterator
+#define ConstFwdPtrIterator	Lang::ConstFwdPtrIterator
+#define ConstBwdPtrIterator	Lang::ConstBwdPtrIterator
+#define FwdPairIterator			Lang::FwdPairIterator
+#define BwdPairIterator			Lang::BwdPairIterator
+#define ConstFwdPairIterator	Lang::ConstFwdPairIterator
+#define ConstBwdPairIterator	Lang::ConstBwdPairIterator
+#define FwdPairPtrIterator		Lang::FwdPairPtrIterator
+#define BwdPairPtrIterator		Lang::BwdPairPtrIterator
+#define ConstFwdPairPtrIterator	Lang::ConstFwdPairPtrIterator
+#define ConstBwdPairPtrIterator	Lang::ConstBwdPairPtrIterator
+#define DynArray		Lang::DynArray
+
+#undef ASSERT
+#undef PANIC
+#define ASSERT(e) {if (!(e)) {SysBreak("Assertion failed: " #e);}}
+#define PANIC(msg) SysBreak(msg);
+
 

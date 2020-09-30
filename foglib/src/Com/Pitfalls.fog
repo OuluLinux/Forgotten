@@ -4,6 +4,13 @@
 
 FOG BUGS AND WORKAROUNDS:
 	
+	The "using namespace" is not implemented in fog yet... sorry.
+		WRONG:
+			using namespace Fog;
+		RIGHT (for now):
+			namespace Fog {struct Cls {};}
+			#define Cls Fog::Cls
+	
 	Methods in template class are not automatically marked as inline.
 	This is very annoying and yet to be fixed. Sorry:
 		WRONG:
@@ -28,7 +35,7 @@ FOG BUGS AND WORKAROUNDS:
 		WRONG:
 			typedef const char* CString;
 		RIGHT:
-			typedef C::Ptr<const char> CString;
+			typedef Lang::Ptr<const char> CString;
 	
 	Functions like "operator Type()" requires, that the Type is only one word.
 		WRONG:

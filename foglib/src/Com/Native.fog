@@ -11,23 +11,35 @@ template <class T> struct initializer_list {
 
 }*/
 
-namespace Com {
+namespace Native {
+using/interface Lang;
 
 int SignificantBits(uint32 x) :{ export/noimplementation; };
 int SignificantBits64(uint64 x) :{ export/noimplementation; };
 
 int64 DateSeconds(uint64 year, uint64 month, uint64 day) :{ export/noimplementation; };
 int64 TimeSeconds(uint64 year, uint64 month, uint64 day, uint64 hour, uint64 minute, uint64 second) :{ export/noimplementation; };
-uint64 NativeCurrentTime() :{ export/noimplementation; };
-uint64 NativeNanoSeconds() :{ export/noimplementation; };
-uint64 NativeMilliSeconds() :{ export/noimplementation; };
+uint64 CurrentTime() :{ export/noimplementation; };
+uint64 NanoSeconds() :{ export/noimplementation; };
+uint64 MilliSeconds() :{ export/noimplementation; };
 
-void NativeDblStr(double d, char* buf, int buf_size);
-void NativeDblStr(double d, short* buf, int buf_size);
+void DblStr(double d, char* buf, int buf_size);
+void DblStr(double d, short* buf, int buf_size);
 
-const short* NativeUtf8To16(const char* in);
-const char*  NativeUtf16To8(const short* in);
+const short* Utf8To16(const char* in);
+const char*  Utf16To8(const short* in);
 
 
 };
 
+
+#define SignificantBits				Native::SignificantBits
+#define SignificantBits64			Native::SignificantBits64
+#define DateSeconds					Native::DateSeconds
+#define TimeSeconds					Native::TimeSeconds
+#define NativeCurrentTime			Native::CurrentTime
+#define NativeNanoSeconds			Native::NanoSeconds
+#define NativeMilliSeconds			Native::MilliSeconds
+#define NativeDblStr				Native::DblStr
+#define NativeUtf8To16				Native::Utf8To16
+#define NativeUtf16To8				Native::Utf16To8

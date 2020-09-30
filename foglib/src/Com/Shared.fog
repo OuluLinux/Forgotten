@@ -1,4 +1,10 @@
-namespace Com {
+namespace Shared {
+using/interface Prim;
+using/interface Lang;
+using/interface Native;
+using/interface Container;
+using/interface Com;
+using/implementation Com;
 
 class Attachable;
 
@@ -45,9 +51,9 @@ public:
 
 // Never moveable
 class Attachable {
-	C::DynArray<void*> slots;
-	$VectorPtr(Slot, Slot, slots);
-	typedef C::FwdIterator<void*> Iter;
+	DynArray<void*> slots;
+	$MakeVectorPtr(Slot, Slot, slots);
+	typedef FwdIterator<void*> Iter;
 	
 	void DoAttach(Slot* s) {
 		ASSERT(s && s->GetPtr() == 0 && !IsAttached(s));
@@ -94,32 +100,55 @@ public:
 
 
 
-#if 0
 
 
 struct WeakBase {
 	virtual void SetDeleted() = 0;
+	
+	//typedef CPtr<WeakBase> Ptr;
 };
 
-struct RefBase {
+struct WeakBasePtr : public CPtr<WeakBase> {};
+
+
+class RefBase {
+public:
 	void* obj = NULL;
-	Vector<WeakBase*> weaks;
-	AtomicInt refs;
+	//Vector<void*> weaks;
 	
-	RefBase() {refs = 1;}
-	virtual ~RefBase() {}
-	void Inc() {refs++;}
-	void Dec() {
+	// TODO: solve why these doesn't work
+	//WeakBasePtr weaks;
+	//CPtr<WeakBase::Ptr> weaks;
+	//DynArray<CPtr<WeakBase> > weaks;
+	//Vector<WeakBase::Ptr> weaks;
+	//Vector<Shared::WeakBase*> weaks;
+	//VectorPtr<WeakBase> weaks;
+	//DynArray<void*> weaks;
+	
+	DynArray<void*> weaks;
+	AtomicInt refs;
+	$MakeVectorPtr(WeakBase, Weak, weaks);
+	
+	!inline RefBase() {refs = 1;}
+	!inline virtual ~RefBase() {}
+	!inline void Inc() {refs++;}
+	!inline void Dec() {
 		refs--;
 		if (refs <= 0) {
-			for (int i = 0; i < weaks.GetCount(); i++)
-				weaks[i]->SetDeleted();
+			for (int i = 0; i < GetWeakCount(); i++)
+				GetWeak(i).SetDeleted();
 			delete this;
 		}
 	}
-	void IncWeak(WeakBase* w) {weaks.Add(w);}
-	void DecWeak(WeakBase* w) {for(int i = 0; i < weaks.GetCount(); i++) if (weaks[i] == w) {weaks.Remove(i--);}}
+	!inline void IncWeak(WeakBase* w) {AddWeak(w);}
+	!inline void DecWeak(WeakBase* w) {
+		for(int i = 0; i < GetWeakCount(); i++)
+			if (&GetWeak(i) == w)
+				RemoveWeak(i--);
+	}
 };
+
+
 
 template <class T>
 struct RefTemplate : public RefBase {
@@ -127,7 +156,7 @@ struct RefTemplate : public RefBase {
 };
 
 template <class T>
-class Shared {
+class Ptr {
 	$MakeMoveable();
 	
 protected:
@@ -135,44 +164,44 @@ protected:
 	T* o = NULL;
 
 public:
-	Shared() {}
-	Shared(const Shared& o) {*this = o;}
-	//Shared(Shared&& s) {r = s.r; s.r = NULL; o = s.o; s.o = NULL;}
-	//Shared(const Pick<Shared<T>>& pick) {Swap(pick.Get(), *this);}
-	~Shared() { Clear(); }
+	inline Ptr() {}
+	inline Ptr(const Ptr& o) {*this = o;}
+	//Ptr(Ptr&& s) {r = s.r; s.r = NULL; o = s.o; s.o = NULL;}
+	//Ptr(const Pick<Ptr<T>>& pick) {Swap(pick.Get(), *this);}
+	inline ~Ptr() { Clear(); }
 	
-	void Create() { Clear(); r = new RefTemplate<T>(); o = new T(); r->obj = o;}
-	template<class K> void CreateAbstract() { Clear(); r = new RefTemplate<T>(); o = new K(); r->obj = o;}
-	void Clear() { if (r) { r->Dec(); r = NULL; o = NULL;} }
-	void operator=(const Shared<T>& s) {if (r == s.r) return; SetPtr(s.o, s.r);}
-	bool IsEmpty() const { return r == NULL; }
-	T* operator->() {if (r) return o; return NULL;}
-	T* operator->() const {if (r) return o; return NULL;}
-	T* Get() const {if (r) return o; return NULL;}
-	operator bool() const {return !IsEmpty();}
-	T& operator*() const {return *Get();}
-	bool operator==(const T* ptr) const {if (r) return o == ptr; return false;}
-	bool operator==(const Shared& s) const {if (r && s.r) return o == s.o; return false;}
-	template <class K> Shared<K> As() {
+	inline void Create() { Clear(); r = new RefTemplate<T>(); o = new T(); r->obj = o;}
+	template<class K> inline void CreateAbstract() { Clear(); r = new RefTemplate<T>(); o = new K(); r->obj = o;}
+	inline void Clear() { if (r) { r->Dec(); r = NULL; o = NULL;} }
+	inline void operator=(const Ptr<T>& s) {if (r == s.r) return; SetPtr(s.o, s.r);}
+	inline bool IsEmpty() const { return r == NULL; }
+	inline T* operator->() {if (r) return o; return NULL;}
+	inline T* operator->() const {if (r) return o; return NULL;}
+	inline T* Get() const {if (r) return o; return NULL;}
+	inline operator bool() const {return !IsEmpty();}
+	inline T& operator*() const {return *Get();}
+	inline bool operator==(const T* ptr) const {if (r) return o == ptr; return false;}
+	inline bool operator==(const Ptr& s) const {if (r && s.r) return o == s.o; return false;}
+	template <class K> inline Ptr<K> As() {
 		static_assert(std::is_base_of<T, K>() || std::is_base_of<K, T>(), "K -> T or T -> K inheritance is required");
 		
 		if (o) {
 			K* ptr = dynamic_cast<K*>(o);
 			if (ptr) {
-				Shared<K> s;
+				Ptr<K> s;
 				s.SetPtr(ptr, r);
 				return s;
 			}
 		}
-		return Shared<K>();
+		return Ptr<K>();
 	}
-	void SetPtr(T* o, RefBase* r) {
-		Shared<T> tmp; Swap(*this, tmp); // don't unref until new ref!!!111!1
+	inline void SetPtr(T* o, RefBase* r) {
+		Ptr<T> tmp; Swap(*this, tmp); // don't unref until new ref!!!111!1
 		this->o = o;
 		this->r = r;
 		if (r) r->Inc();
 	}
-	Shared& WrapObject(T* obj) {
+	inline Ptr<T>& WrapObject(T* obj) {
 		Clear();
 		if (obj) {
 			r = new RefTemplate<T>();
@@ -181,9 +210,74 @@ public:
 		}
 		return *this;
 	}
-	const RefBase* GetBase() const {return r;}
+	inline const RefBase* GetBase() const {return r;}
 };
 
-#endif
+
+
+
+
+
+template <class T> inline Ptr<T> MakePtr() {return Ptr<T>(new T());}
+//template <class T, class P> inline Ptr<T> MakePtrBase() {Ptr<P> s; s.Create(); return s.As<T>();}
+
+//template <class T, class A0, class A1, class A2> inline Ptr<T> MakePtr(A0& a0, A1& a1, A2& a2) {return Ptr<T>(new T(a0, a1, a2));}
+template <class T, class A0> inline Ptr<T> MakePtr1(A0 a0) {return Ptr<T>(new T(a0));}
+template <class T, class A0, class A1> inline Ptr<T> MakePtr2(A0 a0, A1 a1) {return Ptr<T>(new T(a0, a1));}
+template <class T, class A0, class A1, class A2> inline Ptr<T> MakePtr3(A0 a0, A1 a1, A2 a2) {return Ptr<T>(new T(a0, a1, a2));}
+template <class T, class A0, class A1, class A2, class A3> inline Ptr<T> MakePtr4(A0 a0, A1 a1, A2 a2, A3 a3) {return Ptr<T>(new T(a0, a1, a2, a3));}
+template <class T, class A0, class A1, class A2, class A3, class A4> inline Ptr<T> MakePtr5(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4) {return Ptr<T>(new T(a0, a1, a2, a3, a4));}
+template <class T, class A0, class A1, class A2, class A3, class A4, class A5> inline Ptr<T> MakePtr6(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5) {return Ptr<T>(new T(a0, a1, a2, a3, a4, a5));}
+template <class T, class A0, class A1, class A2, class A3, class A4, class A5, class A6> inline Ptr<T> MakePtr7(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6) {return Ptr<T>(new T(a0, a1, a2, a3, a4, a5, a6));}
+
+
+
+template <class T>
+class Weak : public WeakBase {
+	struct RefBase* r = NULL;
+	T* o = NULL;
+	
+public:
+	inline Weak() {}
+	inline Weak(const Weak& w) : r(w.r), o(w.o) {if (r) r->IncWeak(this);}
+	inline Weak(const Ptr<T>& s) : r(s.r), o(s.o) {if (r) r->IncWeak(this);}
+	inline ~Weak() {Clear();}
+	
+	virtual inline void SetDeleted() {r = NULL;}
+	inline void Clear() {if (r) r->DecWeak(this); r = NULL; o = NULL;}
+	inline void operator=(const Ptr<T>& s) { Clear(); r = s.r; o = s.o; if (r) r->IncWeak(this);}
+	//inline void operator=(Pick<Weak<T>>& p) { Clear(); r = p.Get().r; o = p.Get().o; if (r) r->IncWeak(this);}
+	inline void operator=(const Weak<T>& p) { Clear(); r = p.r; o = p.o; if (r) r->IncWeak(this);}
+	inline bool IsEmpty() const { return r == NULL; }
+	inline T* operator->() {return o;}
+	inline T* Get() {return o;}
+	inline operator bool() {return !IsEmpty();}
+	inline Ptr<T> Enter() const {Ptr<T> s; s.r = r; s.o = o; if (s.r) s.r->Inc(); return s;}
+};
+
+
+template <class T>
+class EnablePtrFromThis {
+	Weak<T> weak;
+	
+public:
+	virtual inline ~EnablePtrFromThis() {}
+	
+	inline void InitWeak(const Ptr<T>& s) {ASSERT(weak.IsEmpty()); weak = s;}
+	
+	inline bool HasWeak() const {return !weak.IsEmpty();}
+	
+	template <class V>
+	inline Ptr<V> AsPtr() {ASSERT(!weak.IsEmpty()); return weak.Enter();}
+};
+
+template <class T, class I>
+Ptr<T> StaticPointerCast(I it) {
+	
+}
+
+
 
 }
+
+

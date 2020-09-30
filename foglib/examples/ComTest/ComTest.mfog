@@ -1,8 +1,21 @@
 using "Com/Com.fog";
 
-namespace Com::Tester {
+namespace Main {
+using/interface Native;
+using/interface Container;
+using/interface Com;
+using/interface Shared;
+using/implementation Com;
+
+$HaveTextOperators();
 
 class App {
+	//typedef Vector<String> StrVec;
+	//StrVec strvec;
+	//VectorMap<int, int> map;
+	//Vector<int> arr;
+	VectorMap<int, int> arr;
+	//DynArray<int> arr;
 	
 	struct TestCmp {
 		bool operator()(const char& c) {
@@ -41,20 +54,21 @@ class App {
 		ASSERT(hash == 1894504625);
 		int a = 0;
 		int b = 1;
-		ASSERT(min(a, b) < max(a, b));
+		ASSERT(Min(a, b) < Max(a, b));
 		
-		int r = Random();
-		double d = Randomf();
+		int r = Random::Int();
+		float f = Random::Float();
+		float d = Random::Double();
 		int j = d;
 		
 		
 		const char* test_str = "abcdef";
-		int test_strlen = C::StringLength(test_str);
+		int test_strlen = StringLength(test_str);
 		ASSERT(FindIf(test_str, test_str + test_strlen, TestCmp()) == test_str + 2);
 		
 		
 		ASSERT(String("test") == "test");
-		ASSERT(String::DblStr(1.2) == "1.2");
+		ASSERT(DblStr(1.2) == "1.2");
 		ASSERT("abc" + String("def") == "abcdef");
 		ASSERT(String("abc") + "def" == "abcdef");
 		ASSERT(ToString(ToWString<String>("abc")) == "abc");
@@ -122,7 +136,7 @@ class App {
 		ASSERT(amap.GetValues()[0] == 123);
 		ASSERT(amap.Find("abc") == 0);
 		ASSERT(amap.Find("dfasgsg") == -1);
-		C::FwdPairPtrIterator<String,int> it = amap.Begin();
+		FwdPairPtrIterator<String,int> it = amap.Begin();
 		for(int i = 0; i < 2; i++) {
 			if (i == 0) {
 				ASSERT(it.Key() == "abc");
@@ -137,13 +151,13 @@ class App {
 		
 		
 		{
-			Attachable a;
-			Slot s;
+			Shared::Attachable a;
+			Shared::Slot s;
 			a.Attach(s);
 			s.Clear();
 		}
 		
-		TestShared();
+		//TestShared();
 		
 		//for (char& c: strvec) c += 1;
 		//for (char& c: strarr) c += 1;
@@ -162,7 +176,7 @@ class App {
 	}
 	
 	
-	
+	#if 0
 	void TestShared() {
 		struct Dumber {
 			Dumber() {LOG("Dumber ctor +++");}
@@ -173,9 +187,12 @@ class App {
 			~Dumb() {LOG("Dumb dtor ------");}
 		};
 		
-		#if 0
 		
-		#define DUMPDUMB(x, y) LOG(#x ": " #y ": refs " << (y.GetBase() ? (int)y.GetBase()->refs : -1) << ", " << IntStr64((uint64)y.GetBase()));
+		#define DUMPDUMB(x, y) {\
+			LOG(#x ": " #y ": refs ");\
+			if (y.GetBase()) {LOG((int)y.GetBase()->refs);} else {LOG(-1);}\
+			LOG(", " << IntStr64((uint64)y.GetBase()));\
+		}
 		
 		Shared<Dumb> s0a;
 		DUMPDUMB(0, s0a);
@@ -203,22 +220,36 @@ class App {
 		}
 		DUMPDUMB(9, s0a);
 		
-		#endif
-		
-		Break("TODO");
 	}
-	
+	#endif
 };
 
 
 }
 
 
-$MainClass(Com::Tester::App);
+$MainClassApp();
 
 
 
 
+
+/*namespace Test {
+using/interface Native;
+using/interface Container;
+using/interface Com;
+using/interface Text;
+
+struct Tester {
+	
+	!inline Tester() {
+		Container::Vector<String> strvec;
+		strvec.Add("abc");
+	}
+};
+
+
+}*/
 
 
 /*

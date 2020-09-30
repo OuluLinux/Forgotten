@@ -1,10 +1,8 @@
 
 namespace Com {
-	
+using/interface Container;
 
 class Env {
-	export / implementation Com;
-	export / interface Com;
 	
 	
 public:
@@ -28,7 +26,7 @@ public:
 	
 protected:
 	void SetExeFilePath(const char* path) {}
-	void SeedRandom() {RNG::Local().Seed();}
+	void SeedRandom() {Random::Generator::Local().Seed();}
 	void ParseCommandLine(int argc, const char** argv) {}
 	void ReadComCmdlineArgs() {}
 	void RunInitBlocks() {}

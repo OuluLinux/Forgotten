@@ -1,6 +1,6 @@
 #include "Com.h"
 
-namespace C {
+NAMESPACE_LANG_BEGIN
 	
 
 int StringLength(const char* c, int max_len) {
@@ -87,4 +87,4 @@ bool ConditionalVar::IsReady() const {
 }
 
 
-}
+NAMESPACE_LANG_END

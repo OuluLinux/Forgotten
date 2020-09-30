@@ -1,0 +1,21 @@
+namespace Abstract {
+using/interface Prim;
+using/interface Lang;
+using/interface Lang;
+using/interface Native;
+using/interface Hash;
+using/interface Random;
+using/interface Algorithm;
+
+
+
+
+class Stream {
+	
+	
+	
+};
+
+
+}
+

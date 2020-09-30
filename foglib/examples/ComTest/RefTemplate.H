@@ -1,5 +1,5 @@
 /*!$@FOG@$!
- *	Generated at Wed Sep 30 06:41:10 2020
+ *	Generated at Wed Sep 30 06:32:22 2020
  *
  *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
@@ -8,7 +8,6 @@
  *		../../src/Com/Algorithm.fog
  *		../../src/Com/Com.fog
  *		../../src/Com/Container.fog
- *		../../src/Com/Environment.fog
  *		../../src/Com/Hash.fog
  *		../../src/Com/Lang.fog
  *		../../src/Com/Macros.fog
@@ -21,27 +20,20 @@
  *		ComTest.mfog
  */
 
-#ifndef GLOBAL_CXX
-#define GLOBAL_CXX
+#ifndef REFTEMPLATE_H
+#define REFTEMPLATE_H
 
 #include <new>
 
-#ifndef GLOBAL_HXX
-#include <Global.hxx>
+#ifndef REFBASE_HXX
+#include <RefBase.hxx>
 #endif
 
-extern "C"
+template < class _1 >
+struct RefTemplate : public RefBase
 {
-#line 117 "../../src/Com/Meta.fog"
-    int main(int argc, const char **argv)
-    {
-#line 118
-        Com::Env & e = Com::Env::Local();
-        e.Init(argc, argv);
-        Main::App().Run();
-        return e.Deinit();
-    };
-    
+#line 150 "../../src/Com/Shared.fog"
+    ~RefTemplate();
 };
 
 #endif

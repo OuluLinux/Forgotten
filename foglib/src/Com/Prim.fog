@@ -1,0 +1,23 @@
+
+namespace Prim {
+
+template<class T> struct CPtr {
+	
+	T* value;
+	
+	CPtr() : value(0) {}
+	CPtr(T* p) : value(p) {}
+	void operator=(T* p) {value = p;}
+	operator T*() const {return value;}
+	bool operator==(const CPtr& p) const {return value == p.value;}
+	bool operator==(void* p) const {return (void*)value == p;}
+	
+	auto if ($IsDefined("CPU64"))
+		unsigned long long Int() const {return (unsigned long long)value;}
+	else
+		unsigned long Int() const {return (unsigned long)value;}
+};
+
+}
+
+#define CPtr			Prim::CPtr

@@ -1,5 +1,5 @@
 /*!$@FOG@$!
- *	Generated at Wed Sep 30 06:41:10 2020
+ *	Generated at Wed Sep 30 06:32:22 2020
  *
  *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
@@ -8,7 +8,6 @@
  *		../../src/Com/Algorithm.fog
  *		../../src/Com/Com.fog
  *		../../src/Com/Container.fog
- *		../../src/Com/Environment.fog
  *		../../src/Com/Hash.fog
  *		../../src/Com/Lang.fog
  *		../../src/Com/Macros.fog
@@ -21,27 +20,25 @@
  *		ComTest.mfog
  */
 
-#ifndef GLOBAL_CXX
-#define GLOBAL_CXX
+#ifndef REFTEMPLATE_C
+#define REFTEMPLATE_C
 
 #include <new>
 
-#ifndef GLOBAL_HXX
-#include <Global.hxx>
+#ifndef REFTEMPLATE_H
+#include <RefTemplate.H>
 #endif
 
-extern "C"
+#line 150 "../../src/Com/Shared.fog"
+template < class _1 >
+RefTemplate < _1 >::~RefTemplate()
 {
-#line 117 "../../src/Com/Meta.fog"
-    int main(int argc, const char **argv)
-    {
-#line 118
-        Com::Env & e = Com::Env::Local();
-        e.Init(argc, argv);
-        Main::App().Run();
-        return e.Deinit();
-    };
-    
+#line 150
+    if (obj)
+#line 150
+        delete ((_1 * ) obj);
+#line 150
+    obj = 0;
 };
 
 #endif

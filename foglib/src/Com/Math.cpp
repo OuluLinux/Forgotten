@@ -1,39 +1,9 @@
 #include "Com.h"
 
-NAMESPACE_SDK_BEGIN
+NAMESPACE_COM_BEGIN
 
 	
-int SignificantBits(dword x) {
-	// basically log2(x) + 1 except that for 0 this is 0, number of significant bits of x
-#ifdef COMPILER_MSC
-	DWORD index;
-	return _BitScanReverse(&index, x) ? index + 1 : 0;
-#else
-	return x ? 32 - __builtin_clz(x) : 0;
-#endif
-}
 
-
-int SignificantBits64(uint64 x) {
-	static_assert(sizeof(uint64) == 8, "Expecting 8-byte uint64");
-	
-	// basically log2(x) + 1 except that for 0 this is 0, number of significant bits of x
-#ifdef COMPILER_MSC
-#ifdef CPU_64
-	DWORD index;
-	return _BitScanReverse64(&index, x) ? index + 1 : 0;
-#else
-	if (x & 0xffffffff00000000)
-		return SignificantBits(HIDWORD(x)) + 32;
-	else
-		return SignificantBits((DWORD)x);
-#endif
-#else
-	return x ? 64 - __builtin_clzl(x) : 0;
-#endif
-}
-
-
-NAMESPACE_SDK_END
+NAMESPACE_COM_END
 
 
