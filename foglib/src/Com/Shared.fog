@@ -152,7 +152,7 @@ public:
 
 template <class T>
 struct RefTemplate : public RefBase {
-	~RefTemplate() {if (obj) delete ((T*)obj); obj = NULL;}
+	inline ~RefTemplate() {if (obj) delete ((T*)obj); obj = NULL;}
 };
 
 template <class T>
@@ -280,4 +280,5 @@ Ptr<T> StaticPointerCast(I it) {
 
 }
 
+#define SharedPtr	Shared::Ptr
 

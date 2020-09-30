@@ -5,6 +5,7 @@ using/interface Native;
 using/interface Container;
 using/interface Com;
 using/interface Shared;
+using/interface Stream;
 using/implementation Com;
 
 $HaveTextOperators();
@@ -157,7 +158,11 @@ class App {
 			s.Clear();
 		}
 		
-		//TestShared();
+		
+		TestShared();
+		
+		FileOut fout;
+		fout % r % f % d;
 		
 		//for (char& c: strvec) c += 1;
 		//for (char& c: strarr) c += 1;
@@ -175,41 +180,44 @@ class App {
 		
 	}
 	
+	#undef LOG
+	#define LOG(x)
 	
-	#if 0
+	struct Dumber {
+		Dumber() {LOG("Dumber ctor +++");}
+		virtual ~Dumber() {LOG("Dumber dtor ---");}
+	};
+	struct Dumb : public Dumber {
+		Dumb() {LOG("Dumb ctor ++++++");}
+		~Dumb() {LOG("Dumb dtor ------");}
+	};
+	
 	void TestShared() {
-		struct Dumber {
-			Dumber() {LOG("Dumber ctor +++");}
-			virtual ~Dumber() {LOG("Dumber dtor ---");}
-		};
-		struct Dumb : public Dumber {
-			Dumb() {LOG("Dumb ctor ++++++");}
-			~Dumb() {LOG("Dumb dtor ------");}
-		};
 		
 		
-		#define DUMPDUMB(x, y) {\
+		#define DUMPDUMB(x, y)
+		/*#define DUMPDUMB(x, y) {\
 			LOG(#x ": " #y ": refs ");\
 			if (y.GetBase()) {LOG((int)y.GetBase()->refs);} else {LOG(-1);}\
 			LOG(", " << IntStr64((uint64)y.GetBase()));\
-		}
+		}*/
 		
-		Shared<Dumb> s0a;
+		SharedPtr<Dumb> s0a;
 		DUMPDUMB(0, s0a);
 		{
-			Shared<Dumber> s1a;
-			Shared<Dumb> s1b;
+			SharedPtr<Dumber> s1a;
+			SharedPtr<Dumb> s1b;
 			DUMPDUMB(1, s1a);
 			DUMPDUMB(2, s1b);
 			
-			s1b = Shared<Dumb>().WrapObject(new Dumb());
+			s1b = SharedPtr<Dumb>().WrapObject(new Dumb());
 			DUMPDUMB(3, s1b);
 			
 			s1a = s1b.template As<Dumber>();
 			DUMPDUMB(4, s1a);
 			
 			{
-				Shared<Dumber> s2;
+				SharedPtr<Dumber> s2;
 				DUMPDUMB(5, s2);
 				s2 = s1a;
 				DUMPDUMB(6, s2);
@@ -221,7 +229,6 @@ class App {
 		DUMPDUMB(9, s0a);
 		
 	}
-	#endif
 };
 
 

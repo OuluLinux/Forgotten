@@ -1,13 +1,133 @@
 
+struct FILE;
 
-struct Console {
-	export/interface Com;
-	
+
+namespace Stream {
+using/interface Container;
+using/interface Abstract;
+
+
+/*struct Console {
 	
 	static int Get(char* buf, int size);
 	static void Put(const char* msg);
 	
+};*/
+
+
+struct CharStream : public Abstract::Stream {
+	
+	CharStream& operator << (String s) {s.Serialize(*this); return *this;}
+	CharStream& operator << (int i) {IntStr(i).Serialize(*this); return *this;}
+	String Get(int size) {
+		Vector<char> v;
+		v.SetCount(size, 0);
+		Get(v.Begin(), size);
+		return String(v.Begin());
+	}
+	String GetLine(int max = UINT16_MAX) {
+		String out;
+		while (!IsEof() && out.GetCount() < max) {
+			char chr;
+			Get(&chr, 1);
+			if (chr == '\n')
+				break;
+			out.Cat(chr);
+		}
+		return out;
+	}
+	
+};
+
+class FileIn : public Abstract::Stream {
+	mutable FILE* s = 0;
+
+public:
+	FileIn() {}
+	FileIn(FILE* s) : s(s) {}
+	FileIn(String path) {Open(path);}
+	~FileIn() { Close(); }
+	
+	virtual bool IsLoading() { return true; }
+	virtual bool IsOpen() const { return s != NULL; }
+	virtual bool IsEof() { if (!s) return true; return feof(s); }
+
+	bool Open(String path) {
+		if (s) fclose(s);
+		fopen_s(&s, path.Begin(), "rb");
+		return s != NULL;
+	}
+
+	void Close() {
+		if (s) fclose(s); s = NULL;
+	}
+
+	virtual String Get(int size) {
+		if (!s || !size) return String();
+		ASSERT(size > 0);
+		int pos = ftell(s);
+		Vector<char> v;
+		v.SetCount(size + 1, 0);
+		char* it = v.Begin();
+		int left = size;
+		int total_read = 0;
+		while (left > 0) {
+			int read_size = (int)fread(it, 1, left, s);
+			left -= read_size;
+			it += read_size;
+			total_read += read_size;
+			if (!read_size)
+				break;
+		}
+		String out;
+		out.SetData(v.Begin(), total_read+1);
+		return out;
+	}
+
+	String GetText(int size) {
+		if (!s) return "";
+		Vector<char> v;
+		v.SetCount(size+1);
+		v[size] = 0;
+		size_t read_size = fread(v.Begin(), 1, size, s);
+		return v.Get();
+	}
+
+	virtual int Get(void* mem, int size) {
+		if (!s) return 0;
+		int64 ret = fread(mem, size, 1, s) * size;
+		ASSERT(ret < INT_MAX);
+		return (int)ret;
+	}
+
+	virtual int64 GetCursor() { if (!s) return 0; return ftell(s); }
+
+	virtual int64 GetSize() const {
+		if (!s) return 0;
+		long pos = ftell(s);
+		fseek(s, 0, SEEK_END);
+		int size = ftell(s);
+		fseek(s, pos, SEEK_SET);
+		return size;
+	}
+
+	virtual void Seek(int64 pos) { fseek(s, (long)pos, SEEK_SET); }
+
 };
 
 
+String LoadFile(String path);
 
+
+struct FileOut : public Abstract::Stream {
+	
+	
+	FileOut() {
+		ASSERT_(false, "test");
+	}
+};
+
+
+}
+
+#define FileOut		Stream::FileOut

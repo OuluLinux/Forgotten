@@ -8,9 +8,47 @@ using/interface Random;
 using/interface Algorithm;
 
 
+struct Stream;
 
+auto declaration PrimSerialize(token type_id) {
+	inline void Serialize(${type_id}& o, Stream& s) {
+		if (s.IsLoading())
+			s.Get(&o, sizeof(${type_id}));
+		else if (s.IsStoring())
+			s.Put(&o, sizeof(${type_id}));
+	};
+};
+template <class T> inline void Serialize(T& o, Stream& s) {o.Serialize(s);}
+$PrimSerialize(bool);
+$PrimSerialize(char);
+$PrimSerialize(unsigned char);
+$PrimSerialize(short);
+$PrimSerialize(unsigned short);
+$PrimSerialize(int);
+$PrimSerialize(unsigned int);
+$PrimSerialize(long long);
+$PrimSerialize(unsigned long long);
+$PrimSerialize(float);
+$PrimSerialize(double);
 
-class Stream {
+struct Stream {
+	virtual bool IsOpen() const { return false; }
+
+	virtual bool IsLoading() { return false; }
+	virtual bool IsStoring() { return false; }
+	virtual bool IsEof() { return false; }
+
+	virtual int Put(const void* mem, int size) { return 0; }
+	virtual int Put(char c) { return Put(&c, 1); }
+	virtual int Get(void* mem, int size) { return 0; }
+	virtual int64 GetCursor() { return 0; }
+	virtual void Seek(int64 pos) {}
+	virtual int64 GetSize() const {return 0;}
+	
+	virtual void Flush() {};
+	
+	template <class T>
+	Stream& operator%(T& o) {Serialize(o, *this); return *this;}
 	
 	
 	

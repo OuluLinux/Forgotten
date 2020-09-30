@@ -1,5 +1,5 @@
 /*!$@FOG@$!
- *	Generated at Wed Sep 30 06:41:10 2020
+ *	Generated at Wed Sep 30 12:25:17 2020
  *
  *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
@@ -17,6 +17,7 @@
  *		../../src/Com/Prim.fog
  *		../../src/Com/Random.fog
  *		../../src/Com/Shared.fog
+ *		../../src/Com/Stream.fog
  *		../../src/Com/Text.fog
  *		ComTest.mfog
  */
@@ -251,7 +252,7 @@ namespace Shared
     struct RefTemplate : public Shared::RefBase
     {
 #line 155 "../../src/Com/Shared.fog"
-        ~RefTemplate();
+        inline ~RefTemplate();
     };
     
     class Slot
@@ -713,6 +714,18 @@ namespace Shared
             o = obj;
         }
         return *this;
+    };
+    
+#line 155
+    template < class _1 >
+    inline RefTemplate < _1 >::~RefTemplate()
+    {
+#line 155
+        if (obj)
+#line 155
+            delete ((_1 * ) obj);
+#line 155
+        obj = 0;
     };
     
 #line 16

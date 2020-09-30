@@ -450,7 +450,7 @@ class C : auto virtual Meta {};
 	Adding serializer for a class
 
 */
-class Stream {};
+struct Stream {};
 class Object {};
 
 class CustomObject : public Object {
