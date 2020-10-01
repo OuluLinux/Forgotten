@@ -1,5 +1,5 @@
 /*!$@FOG@$!
- *	Generated at Wed Sep 30 12:25:17 2020
+ *	Generated at Thu Oct  1 09:26:12 2020
  *
  *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
@@ -19,6 +19,7 @@
  *		../../src/Com/Shared.fog
  *		../../src/Com/Stream.fog
  *		../../src/Com/Text.fog
+ *		../../src/Com/Util.fog
  *		ComTest.mfog
  */
 
@@ -212,6 +213,66 @@ namespace Container
         obj = o.obj;
 #line 136
         o.obj = 0;
+    };
+    
+#line 163
+    template < class _1 >
+    void Vector < _1 >::Serialize(Abstract::Stream& s)
+    {
+#line 164
+        static const Lang::byte correct_pre = 0xA;
+        static const Lang::byte correct_post = 0xB;
+        Lang::byte pre_magic;
+        Lang::byte post_magic;
+        Lang::uint32 len = 0;
+        if (s.IsLoading())
+        {
+#line 170
+            s.Get(&pre_magic, 1);
+            if (pre_magic != correct_pre)
+            {
+#line 172
+                s.SetCorrupted();
+                return;
+            }
+#line 176
+            s.Get(&len, sizeof (len));
+            if (len > 2000000000)
+            {
+#line 178
+                s.SetCorrupted();
+                return;
+            }
+            Base::SetCount(len);
+            Iterator it = Base::Begin();
+            Iterator end = Base::End();
+            for (; it != end; ++ it)
+                Abstract::Serialize(*it, *this);
+#line 187
+            s.Get(&post_magic, 1);
+            if (post_magic != correct_post)
+            {
+#line 189
+                s.SetCorrupted();
+                return;
+            }
+        }
+        else 
+#line 193
+        if (s.IsStoring())
+        {
+#line 194
+            s.Put(&correct_pre, 1);
+#line 196
+            len = Base::GetCount();
+            s.Put(&len, sizeof (len));
+            Iterator it = Base::Begin();
+            Iterator end = Base::End();
+            for (; it != end; ++ it)
+                Abstract::Serialize(*it, *this);
+#line 203
+            s.Put(&correct_post, 1);
+        }
     };
     
 };

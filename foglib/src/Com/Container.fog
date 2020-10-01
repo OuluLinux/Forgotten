@@ -160,7 +160,49 @@ public:
 	inline Vector() {}
 	inline Vector(const Vector& v) : Base(v) {}
 	
-	//void Serialize(Stream& s);
+	void Serialize(Abstract::Stream& s) {
+		static const byte correct_pre = 0xA;
+		static const byte correct_post = 0xB;
+		byte pre_magic;
+		byte post_magic;
+		uint32 len = 0;
+		if (s.IsLoading()) {
+			s.Get(&pre_magic, 1);
+			if (pre_magic != correct_pre) {
+				s.SetCorrupted();
+				return;
+			}
+			
+			s.Get(&len, sizeof(len));
+			if (len > 2000000000) {
+				s.SetCorrupted();
+				return;
+			}
+			Base::SetCount(len);
+			Iterator it = Base::Begin();
+			Iterator end = Base::End();
+			for(; it != end; ++it)
+				Abstract::Serialize(*it, *this);
+			
+			s.Get(&post_magic, 1);
+			if (post_magic != correct_post) {
+				s.SetCorrupted();
+				return;
+			}
+		}
+		else if (s.IsStoring()) {
+			s.Put(&correct_pre, 1);
+			
+			len = Base::GetCount();
+			s.Put(&len, sizeof(len));
+			Iterator it = Base::Begin();
+			Iterator end = Base::End();
+			for(; it != end; ++it)
+				Abstract::Serialize(*it, *this);
+			
+			s.Put(&correct_post, 1);
+		}
+	}
 	
 	
 	inline String Join(String join_str = "", bool ignore_empty = true) const {

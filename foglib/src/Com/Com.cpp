@@ -24,7 +24,7 @@
 #include <windows.h>
 #include <fileapi.h>
 #include <stdlib.h>
-#include <string.h>*/
+#include <string.h>
 
 #endif
 
@@ -158,51 +158,6 @@ void rewinddir(DIR *dir)
 
 
 
-
-
-NAMESPACE_LANG_BEGIN
-
-
-void SysBreak(const char* msg) {
-	fprintf(stderr, "%s\n", msg);
-	__BREAK__;
-}
-
-namespace Memory {
-	
-void* Alloc(int sz) {return malloc(sz);}
-void Free(void* ptr) {return free(ptr);}
-int Compare( const void *m1, const void *m2, int sz) {
-	#if defined flagGCC || flagCLANG
-	return __builtin_memcmp(m1, m2, sz);
-	#else
-	return memcmp(m1, m2, sz);
-	#endif
-}
-
-void* Copy(void *dest, const void *src, int sz) {
-	#if defined flagGCC || flagCLANG
-	return __builtin_memcpy(dest, src, sz);
-	#else
-	return memcpy(dest, src, sz);
-	#endif
-}
-
-void* Move(void *dest, const void *src, int sz) {
-	#if defined flagGCC || flagCLANG
-	return __builtin_memmove(dest, src, sz);
-	#else
-	return memmove(dest, src, sz);
-	#endif
-}
-
-void Set(void *dest, int byte_value, int sz) {
-	memset(dest, byte_value, sz);
-}
-
-}
-
-NAMESPACE_LANG_END
 
 
 

@@ -33,6 +33,7 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 			int reserved = 0;
 			
 		public:
+			!inline RefData() : data(0), reserved(0) {}
 			!inline RefData(Char* str, int reserved) : data(str), reserved(reserved) {}
 			!inline ~RefData() {Clear();}
 			
@@ -107,11 +108,45 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 			count = 0;
 		}
 		
-		void Serialize(Abstract::Stream& s);
-		${Scope}& Set(const Char* c, int len) {
+		void Serialize(Abstract::Stream& s) {
+			if (s.IsStoring()) {
+				s.Put(&count, sizeof(count));
+				if (count) {
+					if (!is_ref)
+						s.Put(buf, count);
+					else
+						s.Put(REF->Get(), count);
+				}
+			}
+			else if (s.IsLoading()) {
+				Clear();
+				s.Get(&count, sizeof(count));
+				ASSERT(count >= 0);
+				if (count < 0) count = 0;
+				if (count > 0) {
+					if (count < $BufSize) {
+						s.Get(buf, sizeof(Char) * count);
+						buf[count] = 0;
+					}
+					else {
+						REF = new RefData;
+						REF->Inc();
+						REF->Reserve(count + 1);
+						Char* buf = REF->Begin();
+						s.Get(buf, sizeof(Char) * count);
+						int c = count;
+						buf[c] = 0;
+						is_ref = true;
+					}
+				}
+			}
+		}
+		
+		${Scope}& Set(const Char* c, int len, bool find_end=true) {
 			Clear();
 			if (!c) return *this;
-			count = Min(StringLength(c, len), len);
+			if (find_end)	count = Min(StringLength(c, len), len);
+			else			count = len;
 			if (count < $BufSize) {
 				MemoryCopy(buf, c, sizeof(Char) * count);
 				buf[count] = 0;

@@ -10,8 +10,8 @@ file
 	Readme.txt,
 	ComTest.mfog highlight cpp,
 	"FOG Generated" readonly separator,
-	Abstract.cxx,
 	Abstract.hxx,
+	Abstract.cxx,
 	Algorithm.cxx,
 	Algorithm.hxx,
 	Com.cxx,
@@ -36,6 +36,8 @@ file
 	Text.hxx,
 	Shared.hxx,
 	Shared.cxx,
+	Stream.hxx,
+	Stream.cxx,
 	_ readonly separator;
 
 mainconfig

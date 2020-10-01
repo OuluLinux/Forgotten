@@ -14,6 +14,8 @@ template <class T> struct initializer_list {
 namespace Native {
 using/interface Lang;
 
+struct FILE;
+
 int SignificantBits(uint32 x) :{ export/noimplementation; };
 int SignificantBits64(uint64 x) :{ export/noimplementation; };
 
@@ -29,6 +31,15 @@ void DblStr(double d, short* buf, int buf_size);
 const short* Utf8To16(const char* in);
 const char*  Utf16To8(const short* in);
 
+void FileClose(FILE* s);
+void FileOpen(FILE** s, const char* path, bool rw, bool append);
+int  FileTell(FILE* s);
+int  FileWrite(const void* buf, int size, int nmemb, FILE* s);
+int  FileRead(void* buf, int size, int nmemb, FILE* s);
+void FileSeekSet(FILE* s, int offset);
+void FileSeekEnd(FILE* s, int offset=0);
+bool IsFileEnd(FILE* s);
+void FileFlush(FILE* s);
 
 };
 

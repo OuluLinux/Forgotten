@@ -30,8 +30,25 @@ $PrimSerialize(long long);
 $PrimSerialize(unsigned long long);
 $PrimSerialize(float);
 $PrimSerialize(double);
+inline void Serialize(const char* o, Stream& s) {
+	ASSERT(s.IsStoring());
+	if (s.IsStoring()) {
+		int len = StringLength(o);
+		s.Put(&len, sizeof(len));
+		if (len > 0)
+			s.Put(o, len);
+	}
+}
 
-struct Stream {
+class Stream {
+	bool corrupted = false;
+public:
+	typedef Native::FILE FILE;
+	Stream() {}
+	
+	bool IsCorrupted() const {return corrupted;}
+	void SetCorrupted(bool b=true) {corrupted = b;}
+	
 	virtual bool IsOpen() const { return false; }
 
 	virtual bool IsLoading() { return false; }
@@ -42,7 +59,7 @@ struct Stream {
 	virtual int Put(char c) { return Put(&c, 1); }
 	virtual int Get(void* mem, int size) { return 0; }
 	virtual int64 GetCursor() { return 0; }
-	virtual void Seek(int64 pos) {}
+	virtual void Seek(int64 i) {}
 	virtual int64 GetSize() const {return 0;}
 	
 	virtual void Flush() {};

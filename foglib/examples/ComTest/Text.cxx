@@ -1,5 +1,5 @@
 /*!$@FOG@$!
- *	Generated at Wed Sep 30 12:25:17 2020
+ *	Generated at Thu Oct  1 09:26:12 2020
  *
  *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
@@ -19,6 +19,7 @@
  *		../../src/Com/Shared.fog
  *		../../src/Com/Stream.fog
  *		../../src/Com/Text.fog
+ *		../../src/Com/Util.fog
  *		ComTest.mfog
  */
 
@@ -33,13 +34,13 @@
 
 namespace Text
 {
-#line 743 "../../src/Com/Text.fog"
+#line 778 "../../src/Com/Text.fog"
     String ToLower(const String& s)
     {
-#line 744
+#line 779
         int count = s.GetCount();
         if (!count)
-#line 745
+#line 780
             return String();
         char * v = (char * ) Lang::Memory::Alloc(count + 1);
         char * it = v;
@@ -52,10 +53,10 @@ namespace Text
         return o;
     };
     
-#line 723
+#line 758
     int ToLowerChar(int chr)
     {
-#line 724
+#line 759
         if (chr >= 'A' && chr <= 'Z')
             return 'a' + (chr - 'A');
         return chr;
@@ -63,10 +64,10 @@ namespace Text
     
     String ToUpper(const String& s)
     {
-#line 730
+#line 765
         int count = s.GetCount();
         if (!count)
-#line 731
+#line 766
             return String();
         char * v = (char * ) Lang::Memory::Alloc(count + 1);
         char * it = v;
@@ -79,22 +80,22 @@ namespace Text
         return o;
     };
     
-#line 717
+#line 752
     int ToUpperChar(int chr)
     {
-#line 718
+#line 753
         if (chr >= 'a' && chr <= 'z')
             return 'A' + (chr - 'a');
         return chr;
     };
     
-#line 97
+#line 98
     String::String()
     :
         is_ref(false),
         count(0)
     {
-#line 97
+#line 98
         Zero();
     };
     
@@ -103,77 +104,77 @@ namespace Text
         is_ref(false),
         count(0)
     {
-#line 100
+#line 101
         Zero();
-#line 100
+#line 101
         *this = s;
     };
     
-#line 98
+#line 99
     String::String(const Char *c)
     :
         is_ref(false),
         count(0)
     {
-#line 98
+#line 99
         Zero();
-#line 98
+#line 99
         *this = c;
     };
     
-#line 99
+#line 100
     String::String(const Char *c, int len)
     :
         is_ref(false),
         count(0)
     {
-#line 99
+#line 100
         Zero();
-#line 99
+#line 100
         Set(c, len);
     };
     
-#line 101
+#line 102
     String::~String()
     {
-#line 101
+#line 102
         Clear();
     };
     
-#line 423
+#line 458
     String String::operator+ (const String& s)
     {
-#line 423
+#line 458
         String out(*this);
-#line 423
+#line 458
         out.Cat(s);
-#line 423
+#line 458
         return out;
     };
     
-#line 148
+#line 183
     String String::operator+ (const String& l) const
     {
-#line 149
+#line 184
         String s(*this);
         s.Cat(l);
         return s;
     };
     
-#line 130
+#line 165
     String& String::operator= (const String& str)
     {
-#line 131
+#line 166
         if (!str.is_ref)
         {
-#line 132
+#line 167
             Clear();
             Lang::Memory::Copy(buf, str.buf, sizeof (buf));
             is_ref = false;
         }
         else
         {
-#line 137
+#line 172
             if (is_ref && ref[0] == str.ref[0])
                 return *this;
             Clear();
@@ -185,66 +186,66 @@ namespace Text
         return *this;
     };
     
-#line 410
+#line 445
     bool String::operator== (const String& s) const
     {
-#line 411
+#line 446
         if (s.GetCount() != GetCount())
-#line 411
+#line 446
             return false;
         if (s.IsEmpty())
-#line 412
+#line 447
             return true;
         return Compare(s.Begin(), Begin()) == 0;
     };
     
-#line 418
+#line 453
     String::Char String::At(int i) const
     {
         {
-#line 418
+#line 453
             if (!(i >= 0 && i < count))
             {
-#line 418
+#line 453
                 Lang::SysBreak("Assertion failed: i >= 0 && i < count");
             }
         }
-#line 418
+#line 453
         ;
-#line 418
+#line 453
         return *(Begin() + i);
     };
     
-#line 407
+#line 442
     const String::Char *String::Begin() const
     {
-#line 407
+#line 442
         if (is_ref)
-#line 407
+#line 442
             return ref[0] -> Get();
         else
-#line 407
+#line 442
             return buf;
     };
     
-#line 160
+#line 195
     String& String::Cat(Char i)
     {
-#line 161
+#line 196
         if (!is_ref)
         {
-#line 162
+#line 197
             is_ref = count + 1 >= 8;
             if (!is_ref)
             {
-#line 164
+#line 199
                 buf[count] = i;
                 count ++ ;
                 buf[count] = 0;
             }
             else
             {
-#line 169
+#line 204
                 Char * buf = (Char * ) Lang::Memory::Alloc(sizeof (Char) * (count + 1 + 1));
                 Lang::Memory::Copy(buf, this -> buf, sizeof (Char) * count);
                 buf[count] = i;
@@ -256,10 +257,10 @@ namespace Text
         }
         else
         {
-#line 179
+#line 214
             if (ref[0] -> GetRefs() == 1)
             {
-#line 180
+#line 215
                 int new_count = count + 1 + 1;
                 if (new_count > ref[0] -> GetReserved())
                     ref[0] -> IncreaseReserved();
@@ -270,7 +271,7 @@ namespace Text
             }
             else
             {
-#line 189
+#line 224
                 Char * buf = (Char * ) Lang::Memory::Alloc(sizeof (Char) * (count + 1 + 1));
                 Lang::Memory::Copy(buf, ref[0] -> Get(), sizeof (Char) * count);
                 buf[count] = i;
@@ -283,32 +284,32 @@ namespace Text
         return *this;
     };
     
-#line 154
+#line 189
     String& String::Cat(Char c, int count)
     {
         for (int i = 0; i < count; i ++ )
-#line 156
+#line 191
             Cat(c);
         return *this;
     };
     
-#line 203
+#line 238
     String& String::Cat(const String& str)
     {
-#line 204
+#line 239
         if (!is_ref)
         {
-#line 205
+#line 240
             is_ref = count + str.GetCount() >= 8;
             if (!is_ref)
             {
-#line 207
+#line 242
                 Lang::Memory::Copy(&buf[count], str.Begin(), sizeof (Char) * (str.GetCount() + 1));
                 count += str.GetCount();
             }
             else
             {
-#line 211
+#line 246
                 int reserved = count + str.GetCount() + 1;
                 Char * buf = (Char * ) Lang::Memory::Alloc(sizeof (Char) * (reserved));
                 Lang::Memory::Copy(buf, this -> buf, sizeof (Char) * count);
@@ -320,10 +321,10 @@ namespace Text
         }
         else
         {
-#line 221
+#line 256
             if (ref[0] -> GetRefs() == 1)
             {
-#line 222
+#line 257
                 int new_count = count + str.GetCount() + 1;
                 if (new_count > ref[0] -> GetReserved())
                     ref[0] -> IncreaseReserved(new_count);
@@ -334,7 +335,7 @@ namespace Text
             }
             else
             {
-#line 231
+#line 266
                 int reserved = count + str.GetCount() + 1;
                 Char * buf = (Char * ) Lang::Memory::Alloc(sizeof (Char) * (reserved));
                 Lang::Memory::Copy(buf, ref[0] -> Get(), sizeof (Char) * count);
@@ -348,96 +349,96 @@ namespace Text
         return *this;
     };
     
-#line 527
+#line 562
     double String::CharDbl(const Char *s)
     {
-#line 528
+#line 563
         double a = 0.0;
         int e = 0;
         int c;
-#line 532
+#line 567
         while ((c = *s ++ ) != '\000' && IsDigit(c))
             {
-#line 533
+#line 568
                 a = a * 10.0 + (c - '0');
             }
-#line 536
+#line 571
         if (c == '.')
         {
-#line 537
+#line 572
             while ((c = *s ++ ) != '\000' && IsDigit(c))
                 {
-#line 538
+#line 573
                     a = a * 10.0 + (c - '0');
                     e = e - 1;
                 }
         }
-#line 543
+#line 578
         if (c == 'e' || c == 'E')
         {
-#line 544
+#line 579
             int sign = 1;
             int i = 0;
             c = *s ++ ;
-#line 548
+#line 583
             if (c == '+')
                 c = *s ++ ;
             else 
             if (c == '-')
             {
-#line 552
+#line 587
                 c = *s ++ ;
                 sign = - 1;
             }
-#line 556
+#line 591
             while (IsDigit(c))
                 {
-#line 557
+#line 592
                     i = i * 10 + (c - '0');
                     c = *s ++ ;
                 }
-#line 561
+#line 596
             e += i * sign;
         }
-#line 564
+#line 599
         while (e > 0)
             {
-#line 565
+#line 600
                 a *= 10.0;
                 e -- ;
             }
-#line 569
+#line 604
         while (e < 0)
             {
-#line 570
+#line 605
                 a *= 0.1;
                 e ++ ;
             }
-#line 574
+#line 609
         return a;
     };
     
-#line 473
+#line 508
     int String::CharHexInt(const Char *s)
     {
-#line 474
+#line 509
         if (!s)
-#line 474
+#line 509
             return 0;
         while (IsSpace(*s))
-#line 475
+#line 510
             s ++ ;
         int n = 0;
-#line 476
+#line 511
         int neg = 0;
         switch (*s)
         {
-#line 478
+#line 513
             case '-':
-#line 478
+#line 513
                 neg = 1;
             case '+':
-#line 479
+#line 514
                 s ++ ;
         }
         if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
@@ -445,66 +446,66 @@ namespace Text
         while (IsHexDigit(*s))
             n = 16 * n - GetHexDigit(*s ++ );
         if (neg)
-#line 485
+#line 520
             return n;
         else
-#line 485
+#line 520
             return - n;
     };
     
     int String::CharInt(const Char *s)
     {
         int n = 0;
-#line 490
+#line 525
         int neg = 0;
         while (IsSpace(*s))
-#line 491
+#line 526
             s ++ ;
         switch (*s)
         {
-#line 493
+#line 528
             case '-':
-#line 493
+#line 528
                 neg = 1;
             case '+':
-#line 494
+#line 529
                 s ++ ;
         }
         while (IsDigit(*s))
             n = 10 * n - (*s ++ - '0');
         if (neg)
-#line 498
+#line 533
             return n;
         else
-#line 498
+#line 533
             return - n;
     };
     
     Lang::int64 String::CharInt64(const Char *s)
     {
         Lang::int64 n = 0;
-#line 503
+#line 538
         Lang::int64 neg = 0;
         while (IsSpace(*s))
-#line 504
+#line 539
             s ++ ;
         switch (*s)
         {
-#line 506
+#line 541
             case '-':
-#line 506
+#line 541
                 neg = 1;
             case '+':
-#line 507
+#line 542
                 s ++ ;
         }
         while (IsDigit(*s))
             n = 10 * n - (*s ++ - '0');
         if (neg)
-#line 511
+#line 546
             return n;
         else
-#line 511
+#line 546
             return - n;
     };
     
@@ -512,16 +513,16 @@ namespace Text
     {
         Lang::uint64 n = 0;
         while (IsSpace(*s))
-#line 517
+#line 552
             s ++ ;
         switch (*s)
         {
-#line 519
+#line 554
             case '-':
-#line 519
+#line 554
                 return 0;
             case '+':
-#line 520
+#line 555
                 s ++ ;
         }
         while (IsDigit(*s))
@@ -529,71 +530,71 @@ namespace Text
         return n;
     };
     
-#line 459
+#line 494
     int String::CharOctInt(const Char *s)
     {
-#line 460
+#line 495
         if (!s)
-#line 460
+#line 495
             return 0;
         while (IsSpace(*s))
-#line 461
+#line 496
             s ++ ;
         int n = 0;
-#line 462
+#line 497
         int neg = 0;
         switch (*s)
         {
-#line 464
+#line 499
             case '-':
-#line 464
+#line 499
                 neg = 1;
             case '+':
-#line 465
+#line 500
                 s ++ ;
         }
         while (*s == '0')
-#line 467
+#line 502
             s ++ ;
         while (IsOctDigit(*s))
             n = 8 * n - (*s ++ - '0');
         if (neg)
-#line 470
+#line 505
             return n;
         else
-#line 470
+#line 505
             return - n;
     };
     
-#line 104
+#line 105
     void String::Clear()
     {
-#line 105
+#line 106
         if (is_ref)
         {
-#line 105
+#line 106
             ref[0] -> Dec();
-#line 105
+#line 106
             ref[0] = 0;
-#line 105
+#line 106
             is_ref = false;
         }
         else
         {
-#line 106
+#line 107
             ref[0] = 0;
         }
-#line 107
+#line 108
         count = 0;
     };
     
-#line 653
+#line 688
     int String::Compare(const Char *a, const Char *b)
     {
-#line 654
+#line 689
         while (*a || *b)
             {
-#line 655
+#line 690
                 Char ac = *a ++ ;
                 Char bc = *b ++ ;
                 int diff = ac - bc;
@@ -605,10 +606,10 @@ namespace Text
     
     int String::Compare(const Char *a, const Char *b, int len)
     {
-#line 665
+#line 700
         while ((*a || *b) && len > 0)
             {
-#line 666
+#line 701
                 Char ac = *a ++ ;
                 Char bc = *b ++ ;
                 int diff = ac - bc;
@@ -622,98 +623,98 @@ namespace Text
     void String::Copy(Char *dst, const Char *src)
     {
         {
-#line 677
+#line 712
             if (!(dst && src))
             {
-#line 677
+#line 712
                 Lang::SysBreak("Assertion failed: dst && src");
             }
         }
-#line 678
+#line 713
         ;
-#line 678
+#line 713
         if (!dst || !src)
-#line 678
+#line 713
             return;
         while (*src)
             *dst ++ = *src ++ ;
         *dst = 0;
     };
     
-#line 443
+#line 478
     String String::DblStr(double d)
     {
-#line 444
+#line 479
         Char output[50];
         Native::DblStr(d, output, 50);
         return String(output);
     };
     
-#line 284
+#line 319
     int String::Find(const String& str, int pos) const
     {
-#line 285
+#line 320
         if (GetCount() == 0)
-#line 285
+#line 320
             return - 1;
         if (pos == count)
             return - 1;
         {
-#line 288
+#line 323
             if (!(pos >= 0 && pos < GetCount()))
             {
-#line 288
+#line 323
                 Lang::SysBreak("Assertion failed: pos >= 0 && pos < GetCount()");
             }
         }
-#line 289
+#line 324
         ;
-#line 289
+#line 324
         const Char * cur = Begin();
         const Char * cmp = str.Begin();
         int len = str.GetCount();
         for (int i = pos; i < count; i ++ )
             {
-#line 293
+#line 328
                 if (Compare(cur + i, cmp, len) == 0)
                     return i;
             }
         return - 1;
     };
     
-#line 311
+#line 346
     int String::FindFirstNotOf(const Char *str) const
     {
-#line 312
+#line 347
         if (GetCount() <= 0 || !str)
-#line 312
+#line 347
             return - 1;
         const Char * it = Begin();
         const Char * end = End();
         int i = 0;
         while (it != end)
             {
-#line 317
+#line 352
                 Char chr = *it ++ ;
                 const Char * cmp_it = str;
                 bool match = false;
                 while (1)
                     {
-#line 321
+#line 356
                         Char cmp_chr = *cmp_it ++ ;
                         if (!cmp_chr)
                             break;
                         
-#line 324
+#line 359
                         if (chr == cmp_chr)
                         {
-#line 325
+#line 360
                             match = true;
                             break;
                         
                         }
                     }
-#line 329
+#line 364
                 if (!match)
                     return i;
                 i ++ ;
@@ -721,10 +722,10 @@ namespace Text
         return - 1;
     };
     
-#line 451
+#line 486
     Lang::uint32 String::GetHashValue() const
     {
-#line 452
+#line 487
         Hash::Combine ch;
         const Char * buf = Begin();
         for (int i = 0; i < count; i ++ )
@@ -732,23 +733,23 @@ namespace Text
         return ch;
     };
     
-#line 389
+#line 424
     bool String::Insert(int begin, const Char *str, int n)
     {
-#line 390
+#line 425
         if (begin < 0 || begin > GetCount() || !str || n <= 0)
             return false;
         {
-#line 392
+#line 427
             if (!(begin >= 0 && begin <= GetCount()))
             {
-#line 392
+#line 427
                 Lang::SysBreak("Assertion failed: begin >= 0 && begin <= GetCount()");
             }
         }
-#line 393
+#line 428
         ;
-#line 393
+#line 428
         begin = Algorithm::Maximum(0, Algorithm::Minimum(begin, GetCount()));
         String part(str, n);
         int l = begin;
@@ -756,11 +757,11 @@ namespace Text
         if (l && r)
             *this = Left(l) + part + Right(r);
         else 
-#line 399
+#line 434
         if (l)
             *this = Left(l) + part;
         else 
-#line 401
+#line 436
         if (r)
             *this = part + Right(r);
         else
@@ -768,26 +769,26 @@ namespace Text
         return true;
     };
     
-#line 577
+#line 612
     const String::Char *String::IntChar(Char *p, int bufsize, int x)
     {
-#line 578
+#line 613
         p += bufsize;
         bool is_neg = false;
         if (x < 0)
         {
-#line 581
+#line 616
             is_neg = true;
             x *= - 1;
         }
         *-- p = 0;
         do
             {
-#line 586
+#line 621
                 *-- p = '0' + x % 10;
                 x /= 10;
             }while (x);
-#line 590
+#line 625
         if (is_neg)
             *-- p = '-';
         return p;
@@ -795,23 +796,23 @@ namespace Text
     
     const String::Char *String::IntChar64(Char *p, int bufsize, Lang::int64 x)
     {
-#line 596
+#line 631
         p += bufsize;
         bool is_neg = false;
         if (x < 0)
         {
-#line 599
+#line 634
             is_neg = true;
             x *= - 1;
         }
         *-- p = 0;
         do
             {
-#line 604
+#line 639
                 *-- p = '0' + x % 10;
                 x /= 10;
             }while (x);
-#line 608
+#line 643
         if (is_neg)
             *-- p = '-';
         return p;
@@ -819,32 +820,32 @@ namespace Text
     
     const String::Char *String::IntCharU64(Char *p, int bufsize, Lang::uint64 x)
     {
-#line 614
+#line 649
         p += bufsize;
         bool is_neg = false;
         if (x < 0)
         {
-#line 617
+#line 652
             is_neg = true;
             x *= - 1;
         }
         *-- p = 0;
         do
             {
-#line 622
+#line 657
                 *-- p = '0' + x % 10;
                 x /= 10;
             }while (x);
-#line 626
+#line 661
         if (is_neg)
             *-- p = '-';
         return p;
     };
     
-#line 431
+#line 466
     String String::IntStr(int i)
     {
-#line 432
+#line 467
         Char buf[10];
         const Char * value = IntChar(buf, 10, i);
         return String(value);
@@ -852,36 +853,36 @@ namespace Text
     
     String String::IntStr64(Lang::int64 i)
     {
-#line 438
+#line 473
         Char buf[30];
         const Char * value = IntChar64(buf, 30, i);
         return String(value);
     };
     
-#line 632
+#line 667
     int String::Length(const Char *c, int max_len)
     {
         {
-#line 633
+#line 668
             if (!(c))
             {
-#line 633
+#line 668
                 Lang::SysBreak("Assertion failed: c");
             }
         }
-#line 634
+#line 669
         ;
-#line 634
+#line 669
         if (!c)
-#line 634
+#line 669
             return 0;
         int count = 0;
         if (max_len < 0)
         {
-#line 637
+#line 672
             while (*c)
                 {
-#line 638
+#line 673
                     count ++ ;
                     c ++ ;
                 }
@@ -889,10 +890,10 @@ namespace Text
         }
         else
         {
-#line 644
+#line 679
             while (max_len > 0 && *c)
                 {
-#line 645
+#line 680
                     count ++ ;
                     c ++ ;
                     max_len -- ;
@@ -901,72 +902,72 @@ namespace Text
         }
     };
     
-#line 359
+#line 394
     String String::Mid(int i) const
     {
-#line 359
+#line 394
         if (i >= GetCount())
-#line 359
+#line 394
             return Empty();
-#line 359
+#line 394
         if (i < 0)
-#line 359
+#line 394
             i = 0;
-#line 359
+#line 394
         return Mid(i, GetCount() - i);
     };
     
-#line 360
+#line 395
     String String::Mid(int i, int size) const
     {
-#line 361
+#line 396
         size = Algorithm::Minimum(size, count - i);
         if (size <= 0)
-#line 362
+#line 397
             return String();
         {
-#line 363
+#line 398
             if (!(i >= 0 && i + size <= count))
             {
-#line 363
+#line 398
                 Lang::SysBreak("Assertion failed: i >= 0 && i + size <= count");
             }
         }
-#line 364
+#line 399
         ;
-#line 364
+#line 399
         return String(Begin() + i, size);
     };
     
-#line 369
+#line 404
     void String::Remove(int begin, int count)
     {
         {
-#line 370
+#line 405
             if (!(begin >= 0 && count >= 0))
             {
-#line 370
+#line 405
                 Lang::SysBreak("Assertion failed: begin >= 0 && count >= 0");
             }
         }
-#line 371
+#line 406
         ;
-#line 371
+#line 406
         begin = Algorithm::Maximum(0, begin);
         count = Algorithm::Maximum(0, count);
         int end = begin + count;
         int c = GetCount();
         {
-#line 375
+#line 410
             if (!(begin <= c && end <= c))
             {
-#line 375
+#line 410
                 Lang::SysBreak("Assertion failed: begin <= c && end <= c");
             }
         }
-#line 376
+#line 411
         ;
-#line 376
+#line 411
         end = Algorithm::Minimum(c, end);
         begin = Algorithm::Minimum(c, begin);
         int l = begin;
@@ -974,28 +975,28 @@ namespace Text
         if (l && r)
             *this = Left(l) + Right(r);
         else 
-#line 382
+#line 417
         if (l)
             *this = Left(l);
         else 
-#line 384
+#line 419
         if (r)
             *this = Right(r);
         else
             Clear();
     };
     
-#line 244
+#line 279
     void String::Replace(const String& s, const String& value)
     {
-#line 245
+#line 280
         if (s == value)
-#line 245
+#line 280
             return;
         int i = Find(s);
         while (i >= 0)
             {
-#line 248
+#line 283
                 Replace(i, s.GetCount(), value);
                 i = Find(s, i + value.GetCount());
             }
@@ -1003,7 +1004,7 @@ namespace Text
     
     void String::Replace(int i, int len, const String& value)
     {
-#line 254
+#line 289
         int new_len = this -> count - len + value.GetCount();
         const Char * begin = Begin();
         int reserved = new_len + 1;
@@ -1011,13 +1012,13 @@ namespace Text
         int cursor = 0;
         if (i > 0)
         {
-#line 260
+#line 295
             Lang::Memory::Copy(buf, begin, sizeof (Char) * i);
             cursor += i;
         }
         if (value.GetCount() > 0)
         {
-#line 264
+#line 299
             Lang::Memory::Copy(buf + cursor, value.Begin(), sizeof (Char) * value.GetCount());
             cursor += value.GetCount();
         }
@@ -1025,91 +1026,91 @@ namespace Text
         int end_len = this -> count - c;
         if (end_len > 0)
         {
-#line 270
+#line 305
             Lang::Memory::Copy(buf + cursor, begin + c, sizeof (Char) * end_len);
             cursor += end_len;
         }
         buf[cursor ++ ] = 0;
-#line 275
+#line 310
         Clear();
         this -> is_ref = true;
         this -> count = new_len;
         ref[0] = new RefData(buf, reserved);
         {
-#line 279
+#line 314
             if (!(cursor == new_len + 1))
             {
-#line 279
+#line 314
                 Lang::SysBreak("Assertion failed: cursor == new_len+1");
             }
         }
-#line 280
+#line 315
         ;
     };
     
-#line 299
+#line 334
     int String::ReverseFind(const String& str, int pos) const
     {
-#line 300
+#line 335
         if (GetCount() == 0)
-#line 300
+#line 335
             return - 1;
         {
-#line 301
+#line 336
             if (!(pos >= 0 && pos < GetCount()))
             {
-#line 301
+#line 336
                 Lang::SysBreak("Assertion failed: pos >= 0 && pos < GetCount()");
             }
         }
-#line 302
+#line 337
         ;
-#line 302
+#line 337
         const Char * cur = Begin();
         const Char * cmp = str.Begin();
         int len = str.GetCount();
         for (int i = pos; i >= 0; i -- )
             {
-#line 306
+#line 341
                 if (Compare(cur + i, cmp, len) == 0)
                     return i;
             }
         return - 1;
     };
     
-#line 335
+#line 370
     int String::ReverseFindFirstNotOf(const Char *str) const
     {
-#line 336
+#line 371
         if (GetCount() <= 0 || !str)
-#line 336
+#line 371
             return - 1;
         const Char * begin = Begin();
         const Char * it = End();
         int i = GetCount();
         while (it != begin)
             {
-#line 341
+#line 376
                 Char chr = *-- it;
                 const Char * cmp_it = str;
                 bool match = false;
                 while (1)
                     {
-#line 345
+#line 380
                         Char cmp_chr = *cmp_it ++ ;
                         if (!cmp_chr)
                             break;
                         
-#line 348
+#line 383
                         if (chr == cmp_chr)
                         {
-#line 349
+#line 384
                             match = true;
                             break;
                         
                         }
                     }
-#line 353
+#line 388
                 i -- ;
                 if (!match)
                     return i;
@@ -1118,23 +1119,90 @@ namespace Text
     };
     
 #line 111
-    String& String::Set(const Char *c, int len)
+    void String::Serialize(Abstract::Stream& s)
     {
 #line 112
+        if (s.IsStoring())
+        {
+#line 113
+            s.Put(&count, sizeof (count));
+            if (count)
+            {
+#line 115
+                if (!is_ref)
+                    s.Put(buf, count);
+                else
+                    s.Put(ref[0] -> Get(), count);
+            }
+        }
+        else 
+#line 121
+        if (s.IsLoading())
+        {
+#line 122
+            Clear();
+            s.Get(&count, sizeof (count));
+            {
+#line 124
+                if (!(count >= 0))
+                {
+#line 124
+                    Lang::SysBreak("Assertion failed: count >= 0");
+                }
+            }
+#line 125
+            ;
+#line 125
+            if (count < 0)
+#line 125
+                count = 0;
+            if (count > 0)
+            {
+#line 127
+                if (count < 8)
+                {
+#line 128
+                    s.Get(buf, sizeof (Char) * count);
+                    buf[count] = 0;
+                }
+                else
+                {
+#line 132
+                    ref[0] = new RefData;
+                    ref[0] -> Inc();
+                    ref[0] -> Reserve(count + 1);
+                    Char * buf = ref[0] -> Begin();
+                    s.Get(buf, sizeof (Char) * count);
+                    int c = count;
+                    buf[c] = 0;
+                    is_ref = true;
+                }
+            }
+        }
+    };
+    
+    String& String::Set(const Char *c, int len, bool find_end)
+    {
+#line 146
         Clear();
         if (!c)
-#line 113
+#line 147
             return *this;
-        count = Algorithm::Minimum(Lang::StringLength(c, len), len);
+        if (find_end)
+#line 148
+            count = Algorithm::Minimum(Lang::StringLength(c, len), len);
+        else
+#line 149
+            count = len;
         if (count < 8)
         {
-#line 116
+#line 151
             Lang::Memory::Copy(buf, c, sizeof (Char) * count);
             buf[count] = 0;
         }
         else
         {
-#line 120
+#line 155
             Char * buf = (Char * ) Lang::Memory::Alloc(sizeof (Char) * (count + 1));
             Lang::Memory::Copy(buf, c, sizeof (Char) * count);
             buf[count] = 0;
@@ -1145,7 +1213,7 @@ namespace Text
         return *this;
     };
     
-#line 92
+#line 93
     void String::Zero()
     {
 #line 99 "../../src/Com/Meta.fog"
@@ -1153,46 +1221,53 @@ namespace Text
     };
     
 #line 36 "../../src/Com/Text.fog"
+    String::RefData::RefData()
+    :
+        data(0),
+        reserved(0)
+    {};
+    
+#line 37
     String::RefData::RefData(Char *str, int reserved)
     :
         data(str),
         reserved(reserved)
     {};
     
-#line 37
+#line 38
     String::RefData::~RefData()
     {
-#line 37
+#line 38
         Clear();
     };
     
-#line 74
+#line 75
     String::RefData::operator ConstChar * () const
     {
+#line 75
+        return data;
+    };
+    
+#line 74
+    String::Char *String::RefData::Begin()
+    {
 #line 74
         return data;
     };
     
-#line 73
-    String::Char *String::RefData::Begin()
-    {
-#line 73
-        return data;
-    };
-    
-#line 39
+#line 40
     void String::RefData::Clear()
     {
-#line 39
+#line 40
         if (data)
         {
-#line 39
+#line 40
             Lang::Memory::Free(data);
-#line 39
+#line 40
             data = 0;
-#line 39
+#line 40
             refs = 0;
-#line 39
+#line 40
             reserved = 0;
         }
     };
@@ -1208,10 +1283,10 @@ namespace Text
             delete this;
     };
     
-#line 72 "../../src/Com/Text.fog"
+#line 73 "../../src/Com/Text.fog"
     String::ConstChar *String::RefData::Get() const
     {
-#line 72
+#line 73
         return data;
     };
     
@@ -1222,10 +1297,10 @@ namespace Text
         return refs;
     };
     
-#line 76 "../../src/Com/Text.fog"
+#line 77 "../../src/Com/Text.fog"
     int String::RefData::GetReserved() const
     {
-#line 76
+#line 77
         return reserved;
     };
     
@@ -1236,10 +1311,10 @@ namespace Text
         refs ++ ;
     };
     
-#line 41 "../../src/Com/Text.fog"
+#line 42 "../../src/Com/Text.fog"
     void String::RefData::IncreaseReserved()
     {
-#line 42
+#line 43
         Lang::uint64 new_reserved = 1;
         while (new_reserved <= reserved)
             new_reserved <<= 1;
@@ -1250,7 +1325,7 @@ namespace Text
     
     void String::RefData::IncreaseReserved(int min_reserved)
     {
-#line 51
+#line 52
         Lang::uint64 new_reserved = 1;
         while (new_reserved <= min_reserved)
             new_reserved <<= 1;
@@ -1261,13 +1336,13 @@ namespace Text
     
     void String::RefData::Reserve(int new_reserved)
     {
-#line 60
+#line 61
         if (new_reserved <= reserved)
             return;
         Char * new_data = (Char * ) Lang::Memory::Alloc(new_reserved * sizeof (Char));
         if (data)
         {
-#line 64
+#line 65
             if (reserved > 0)
                 Lang::Memory::Copy(new_data, data, sizeof (Char) * reserved);
             Lang::Memory::Free(data);
@@ -1276,13 +1351,13 @@ namespace Text
         reserved = new_reserved;
     };
     
-#line 97
+#line 98
     WString::WString()
     :
         is_ref(false),
         count(0)
     {
-#line 97
+#line 98
         Zero();
     };
     
@@ -1291,77 +1366,77 @@ namespace Text
         is_ref(false),
         count(0)
     {
-#line 100
+#line 101
         Zero();
-#line 100
+#line 101
         *this = s;
     };
     
-#line 98
+#line 99
     WString::WString(const Char *c)
     :
         is_ref(false),
         count(0)
     {
-#line 98
+#line 99
         Zero();
-#line 98
+#line 99
         *this = c;
     };
     
-#line 99
+#line 100
     WString::WString(const Char *c, int len)
     :
         is_ref(false),
         count(0)
     {
-#line 99
+#line 100
         Zero();
-#line 99
+#line 100
         Set(c, len);
     };
     
-#line 101
+#line 102
     WString::~WString()
     {
-#line 101
+#line 102
         Clear();
     };
     
-#line 423
+#line 458
     WString WString::operator+ (const WString& s)
     {
-#line 423
+#line 458
         WString out(*this);
-#line 423
+#line 458
         out.Cat(s);
-#line 423
+#line 458
         return out;
     };
     
-#line 148
+#line 183
     WString WString::operator+ (const WString& l) const
     {
-#line 149
+#line 184
         WString s(*this);
         s.Cat(l);
         return s;
     };
     
-#line 130
+#line 165
     WString& WString::operator= (const WString& str)
     {
-#line 131
+#line 166
         if (!str.is_ref)
         {
-#line 132
+#line 167
             Clear();
             Lang::Memory::Copy(buf, str.buf, sizeof (buf));
             is_ref = false;
         }
         else
         {
-#line 137
+#line 172
             if (is_ref && ref[0] == str.ref[0])
                 return *this;
             Clear();
@@ -1373,66 +1448,66 @@ namespace Text
         return *this;
     };
     
-#line 410
+#line 445
     bool WString::operator== (const WString& s) const
     {
-#line 411
+#line 446
         if (s.GetCount() != GetCount())
-#line 411
+#line 446
             return false;
         if (s.IsEmpty())
-#line 412
+#line 447
             return true;
         return Compare(s.Begin(), Begin()) == 0;
     };
     
-#line 418
+#line 453
     WString::Char WString::At(int i) const
     {
         {
-#line 418
+#line 453
             if (!(i >= 0 && i < count))
             {
-#line 418
+#line 453
                 Lang::SysBreak("Assertion failed: i >= 0 && i < count");
             }
         }
-#line 418
+#line 453
         ;
-#line 418
+#line 453
         return *(Begin() + i);
     };
     
-#line 407
+#line 442
     const WString::Char *WString::Begin() const
     {
-#line 407
+#line 442
         if (is_ref)
-#line 407
+#line 442
             return ref[0] -> Get();
         else
-#line 407
+#line 442
             return buf;
     };
     
-#line 160
+#line 195
     WString& WString::Cat(Char i)
     {
-#line 161
+#line 196
         if (!is_ref)
         {
-#line 162
+#line 197
             is_ref = count + 1 >= 8;
             if (!is_ref)
             {
-#line 164
+#line 199
                 buf[count] = i;
                 count ++ ;
                 buf[count] = 0;
             }
             else
             {
-#line 169
+#line 204
                 Char * buf = (Char * ) Lang::Memory::Alloc(sizeof (Char) * (count + 1 + 1));
                 Lang::Memory::Copy(buf, this -> buf, sizeof (Char) * count);
                 buf[count] = i;
@@ -1444,10 +1519,10 @@ namespace Text
         }
         else
         {
-#line 179
+#line 214
             if (ref[0] -> GetRefs() == 1)
             {
-#line 180
+#line 215
                 int new_count = count + 1 + 1;
                 if (new_count > ref[0] -> GetReserved())
                     ref[0] -> IncreaseReserved();
@@ -1458,7 +1533,7 @@ namespace Text
             }
             else
             {
-#line 189
+#line 224
                 Char * buf = (Char * ) Lang::Memory::Alloc(sizeof (Char) * (count + 1 + 1));
                 Lang::Memory::Copy(buf, ref[0] -> Get(), sizeof (Char) * count);
                 buf[count] = i;
@@ -1471,32 +1546,32 @@ namespace Text
         return *this;
     };
     
-#line 154
+#line 189
     WString& WString::Cat(Char c, int count)
     {
         for (int i = 0; i < count; i ++ )
-#line 156
+#line 191
             Cat(c);
         return *this;
     };
     
-#line 203
+#line 238
     WString& WString::Cat(const WString& str)
     {
-#line 204
+#line 239
         if (!is_ref)
         {
-#line 205
+#line 240
             is_ref = count + str.GetCount() >= 8;
             if (!is_ref)
             {
-#line 207
+#line 242
                 Lang::Memory::Copy(&buf[count], str.Begin(), sizeof (Char) * (str.GetCount() + 1));
                 count += str.GetCount();
             }
             else
             {
-#line 211
+#line 246
                 int reserved = count + str.GetCount() + 1;
                 Char * buf = (Char * ) Lang::Memory::Alloc(sizeof (Char) * (reserved));
                 Lang::Memory::Copy(buf, this -> buf, sizeof (Char) * count);
@@ -1508,10 +1583,10 @@ namespace Text
         }
         else
         {
-#line 221
+#line 256
             if (ref[0] -> GetRefs() == 1)
             {
-#line 222
+#line 257
                 int new_count = count + str.GetCount() + 1;
                 if (new_count > ref[0] -> GetReserved())
                     ref[0] -> IncreaseReserved(new_count);
@@ -1522,7 +1597,7 @@ namespace Text
             }
             else
             {
-#line 231
+#line 266
                 int reserved = count + str.GetCount() + 1;
                 Char * buf = (Char * ) Lang::Memory::Alloc(sizeof (Char) * (reserved));
                 Lang::Memory::Copy(buf, ref[0] -> Get(), sizeof (Char) * count);
@@ -1536,96 +1611,96 @@ namespace Text
         return *this;
     };
     
-#line 527
+#line 562
     double WString::CharDbl(const Char *s)
     {
-#line 528
+#line 563
         double a = 0.0;
         int e = 0;
         int c;
-#line 532
+#line 567
         while ((c = *s ++ ) != '\000' && IsDigit(c))
             {
-#line 533
+#line 568
                 a = a * 10.0 + (c - '0');
             }
-#line 536
+#line 571
         if (c == '.')
         {
-#line 537
+#line 572
             while ((c = *s ++ ) != '\000' && IsDigit(c))
                 {
-#line 538
+#line 573
                     a = a * 10.0 + (c - '0');
                     e = e - 1;
                 }
         }
-#line 543
+#line 578
         if (c == 'e' || c == 'E')
         {
-#line 544
+#line 579
             int sign = 1;
             int i = 0;
             c = *s ++ ;
-#line 548
+#line 583
             if (c == '+')
                 c = *s ++ ;
             else 
             if (c == '-')
             {
-#line 552
+#line 587
                 c = *s ++ ;
                 sign = - 1;
             }
-#line 556
+#line 591
             while (IsDigit(c))
                 {
-#line 557
+#line 592
                     i = i * 10 + (c - '0');
                     c = *s ++ ;
                 }
-#line 561
+#line 596
             e += i * sign;
         }
-#line 564
+#line 599
         while (e > 0)
             {
-#line 565
+#line 600
                 a *= 10.0;
                 e -- ;
             }
-#line 569
+#line 604
         while (e < 0)
             {
-#line 570
+#line 605
                 a *= 0.1;
                 e ++ ;
             }
-#line 574
+#line 609
         return a;
     };
     
-#line 473
+#line 508
     int WString::CharHexInt(const Char *s)
     {
-#line 474
+#line 509
         if (!s)
-#line 474
+#line 509
             return 0;
         while (IsSpace(*s))
-#line 475
+#line 510
             s ++ ;
         int n = 0;
-#line 476
+#line 511
         int neg = 0;
         switch (*s)
         {
-#line 478
+#line 513
             case '-':
-#line 478
+#line 513
                 neg = 1;
             case '+':
-#line 479
+#line 514
                 s ++ ;
         }
         if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
@@ -1633,66 +1708,66 @@ namespace Text
         while (IsHexDigit(*s))
             n = 16 * n - GetHexDigit(*s ++ );
         if (neg)
-#line 485
+#line 520
             return n;
         else
-#line 485
+#line 520
             return - n;
     };
     
     int WString::CharInt(const Char *s)
     {
         int n = 0;
-#line 490
+#line 525
         int neg = 0;
         while (IsSpace(*s))
-#line 491
+#line 526
             s ++ ;
         switch (*s)
         {
-#line 493
+#line 528
             case '-':
-#line 493
+#line 528
                 neg = 1;
             case '+':
-#line 494
+#line 529
                 s ++ ;
         }
         while (IsDigit(*s))
             n = 10 * n - (*s ++ - '0');
         if (neg)
-#line 498
+#line 533
             return n;
         else
-#line 498
+#line 533
             return - n;
     };
     
     Lang::int64 WString::CharInt64(const Char *s)
     {
         Lang::int64 n = 0;
-#line 503
+#line 538
         Lang::int64 neg = 0;
         while (IsSpace(*s))
-#line 504
+#line 539
             s ++ ;
         switch (*s)
         {
-#line 506
+#line 541
             case '-':
-#line 506
+#line 541
                 neg = 1;
             case '+':
-#line 507
+#line 542
                 s ++ ;
         }
         while (IsDigit(*s))
             n = 10 * n - (*s ++ - '0');
         if (neg)
-#line 511
+#line 546
             return n;
         else
-#line 511
+#line 546
             return - n;
     };
     
@@ -1700,16 +1775,16 @@ namespace Text
     {
         Lang::uint64 n = 0;
         while (IsSpace(*s))
-#line 517
+#line 552
             s ++ ;
         switch (*s)
         {
-#line 519
+#line 554
             case '-':
-#line 519
+#line 554
                 return 0;
             case '+':
-#line 520
+#line 555
                 s ++ ;
         }
         while (IsDigit(*s))
@@ -1717,71 +1792,71 @@ namespace Text
         return n;
     };
     
-#line 459
+#line 494
     int WString::CharOctInt(const Char *s)
     {
-#line 460
+#line 495
         if (!s)
-#line 460
+#line 495
             return 0;
         while (IsSpace(*s))
-#line 461
+#line 496
             s ++ ;
         int n = 0;
-#line 462
+#line 497
         int neg = 0;
         switch (*s)
         {
-#line 464
+#line 499
             case '-':
-#line 464
+#line 499
                 neg = 1;
             case '+':
-#line 465
+#line 500
                 s ++ ;
         }
         while (*s == '0')
-#line 467
+#line 502
             s ++ ;
         while (IsOctDigit(*s))
             n = 8 * n - (*s ++ - '0');
         if (neg)
-#line 470
+#line 505
             return n;
         else
-#line 470
+#line 505
             return - n;
     };
     
-#line 104
+#line 105
     void WString::Clear()
     {
-#line 105
+#line 106
         if (is_ref)
         {
-#line 105
+#line 106
             ref[0] -> Dec();
-#line 105
+#line 106
             ref[0] = 0;
-#line 105
+#line 106
             is_ref = false;
         }
         else
         {
-#line 106
+#line 107
             ref[0] = 0;
         }
-#line 107
+#line 108
         count = 0;
     };
     
-#line 653
+#line 688
     int WString::Compare(const Char *a, const Char *b)
     {
-#line 654
+#line 689
         while (*a || *b)
             {
-#line 655
+#line 690
                 Char ac = *a ++ ;
                 Char bc = *b ++ ;
                 int diff = ac - bc;
@@ -1793,10 +1868,10 @@ namespace Text
     
     int WString::Compare(const Char *a, const Char *b, int len)
     {
-#line 665
+#line 700
         while ((*a || *b) && len > 0)
             {
-#line 666
+#line 701
                 Char ac = *a ++ ;
                 Char bc = *b ++ ;
                 int diff = ac - bc;
@@ -1810,98 +1885,98 @@ namespace Text
     void WString::Copy(Char *dst, const Char *src)
     {
         {
-#line 677
+#line 712
             if (!(dst && src))
             {
-#line 677
+#line 712
                 Lang::SysBreak("Assertion failed: dst && src");
             }
         }
-#line 678
+#line 713
         ;
-#line 678
+#line 713
         if (!dst || !src)
-#line 678
+#line 713
             return;
         while (*src)
             *dst ++ = *src ++ ;
         *dst = 0;
     };
     
-#line 443
+#line 478
     WString WString::DblStr(double d)
     {
-#line 444
+#line 479
         Char output[50];
         Native::DblStr(d, output, 50);
         return WString(output);
     };
     
-#line 284
+#line 319
     int WString::Find(const WString& str, int pos) const
     {
-#line 285
+#line 320
         if (GetCount() == 0)
-#line 285
+#line 320
             return - 1;
         if (pos == count)
             return - 1;
         {
-#line 288
+#line 323
             if (!(pos >= 0 && pos < GetCount()))
             {
-#line 288
+#line 323
                 Lang::SysBreak("Assertion failed: pos >= 0 && pos < GetCount()");
             }
         }
-#line 289
+#line 324
         ;
-#line 289
+#line 324
         const Char * cur = Begin();
         const Char * cmp = str.Begin();
         int len = str.GetCount();
         for (int i = pos; i < count; i ++ )
             {
-#line 293
+#line 328
                 if (Compare(cur + i, cmp, len) == 0)
                     return i;
             }
         return - 1;
     };
     
-#line 311
+#line 346
     int WString::FindFirstNotOf(const Char *str) const
     {
-#line 312
+#line 347
         if (GetCount() <= 0 || !str)
-#line 312
+#line 347
             return - 1;
         const Char * it = Begin();
         const Char * end = End();
         int i = 0;
         while (it != end)
             {
-#line 317
+#line 352
                 Char chr = *it ++ ;
                 const Char * cmp_it = str;
                 bool match = false;
                 while (1)
                     {
-#line 321
+#line 356
                         Char cmp_chr = *cmp_it ++ ;
                         if (!cmp_chr)
                             break;
                         
-#line 324
+#line 359
                         if (chr == cmp_chr)
                         {
-#line 325
+#line 360
                             match = true;
                             break;
                         
                         }
                     }
-#line 329
+#line 364
                 if (!match)
                     return i;
                 i ++ ;
@@ -1909,10 +1984,10 @@ namespace Text
         return - 1;
     };
     
-#line 451
+#line 486
     Lang::uint32 WString::GetHashValue() const
     {
-#line 452
+#line 487
         Hash::Combine ch;
         const Char * buf = Begin();
         for (int i = 0; i < count; i ++ )
@@ -1920,23 +1995,23 @@ namespace Text
         return ch;
     };
     
-#line 389
+#line 424
     bool WString::Insert(int begin, const Char *str, int n)
     {
-#line 390
+#line 425
         if (begin < 0 || begin > GetCount() || !str || n <= 0)
             return false;
         {
-#line 392
+#line 427
             if (!(begin >= 0 && begin <= GetCount()))
             {
-#line 392
+#line 427
                 Lang::SysBreak("Assertion failed: begin >= 0 && begin <= GetCount()");
             }
         }
-#line 393
+#line 428
         ;
-#line 393
+#line 428
         begin = Algorithm::Maximum(0, Algorithm::Minimum(begin, GetCount()));
         WString part(str, n);
         int l = begin;
@@ -1944,11 +2019,11 @@ namespace Text
         if (l && r)
             *this = Left(l) + part + Right(r);
         else 
-#line 399
+#line 434
         if (l)
             *this = Left(l) + part;
         else 
-#line 401
+#line 436
         if (r)
             *this = part + Right(r);
         else
@@ -1956,26 +2031,26 @@ namespace Text
         return true;
     };
     
-#line 577
+#line 612
     const WString::Char *WString::IntChar(Char *p, int bufsize, int x)
     {
-#line 578
+#line 613
         p += bufsize;
         bool is_neg = false;
         if (x < 0)
         {
-#line 581
+#line 616
             is_neg = true;
             x *= - 1;
         }
         *-- p = 0;
         do
             {
-#line 586
+#line 621
                 *-- p = '0' + x % 10;
                 x /= 10;
             }while (x);
-#line 590
+#line 625
         if (is_neg)
             *-- p = '-';
         return p;
@@ -1983,23 +2058,23 @@ namespace Text
     
     const WString::Char *WString::IntChar64(Char *p, int bufsize, Lang::int64 x)
     {
-#line 596
+#line 631
         p += bufsize;
         bool is_neg = false;
         if (x < 0)
         {
-#line 599
+#line 634
             is_neg = true;
             x *= - 1;
         }
         *-- p = 0;
         do
             {
-#line 604
+#line 639
                 *-- p = '0' + x % 10;
                 x /= 10;
             }while (x);
-#line 608
+#line 643
         if (is_neg)
             *-- p = '-';
         return p;
@@ -2007,32 +2082,32 @@ namespace Text
     
     const WString::Char *WString::IntCharU64(Char *p, int bufsize, Lang::uint64 x)
     {
-#line 614
+#line 649
         p += bufsize;
         bool is_neg = false;
         if (x < 0)
         {
-#line 617
+#line 652
             is_neg = true;
             x *= - 1;
         }
         *-- p = 0;
         do
             {
-#line 622
+#line 657
                 *-- p = '0' + x % 10;
                 x /= 10;
             }while (x);
-#line 626
+#line 661
         if (is_neg)
             *-- p = '-';
         return p;
     };
     
-#line 431
+#line 466
     WString WString::IntStr(int i)
     {
-#line 432
+#line 467
         Char buf[10];
         const Char * value = IntChar(buf, 10, i);
         return WString(value);
@@ -2040,36 +2115,36 @@ namespace Text
     
     WString WString::IntStr64(Lang::int64 i)
     {
-#line 438
+#line 473
         Char buf[30];
         const Char * value = IntChar64(buf, 30, i);
         return WString(value);
     };
     
-#line 632
+#line 667
     int WString::Length(const Char *c, int max_len)
     {
         {
-#line 633
+#line 668
             if (!(c))
             {
-#line 633
+#line 668
                 Lang::SysBreak("Assertion failed: c");
             }
         }
-#line 634
+#line 669
         ;
-#line 634
+#line 669
         if (!c)
-#line 634
+#line 669
             return 0;
         int count = 0;
         if (max_len < 0)
         {
-#line 637
+#line 672
             while (*c)
                 {
-#line 638
+#line 673
                     count ++ ;
                     c ++ ;
                 }
@@ -2077,10 +2152,10 @@ namespace Text
         }
         else
         {
-#line 644
+#line 679
             while (max_len > 0 && *c)
                 {
-#line 645
+#line 680
                     count ++ ;
                     c ++ ;
                     max_len -- ;
@@ -2089,72 +2164,72 @@ namespace Text
         }
     };
     
-#line 359
+#line 394
     WString WString::Mid(int i) const
     {
-#line 359
+#line 394
         if (i >= GetCount())
-#line 359
+#line 394
             return Empty();
-#line 359
+#line 394
         if (i < 0)
-#line 359
+#line 394
             i = 0;
-#line 359
+#line 394
         return Mid(i, GetCount() - i);
     };
     
-#line 360
+#line 395
     WString WString::Mid(int i, int size) const
     {
-#line 361
+#line 396
         size = Algorithm::Minimum(size, count - i);
         if (size <= 0)
-#line 362
+#line 397
             return WString();
         {
-#line 363
+#line 398
             if (!(i >= 0 && i + size <= count))
             {
-#line 363
+#line 398
                 Lang::SysBreak("Assertion failed: i >= 0 && i + size <= count");
             }
         }
-#line 364
+#line 399
         ;
-#line 364
+#line 399
         return WString(Begin() + i, size);
     };
     
-#line 369
+#line 404
     void WString::Remove(int begin, int count)
     {
         {
-#line 370
+#line 405
             if (!(begin >= 0 && count >= 0))
             {
-#line 370
+#line 405
                 Lang::SysBreak("Assertion failed: begin >= 0 && count >= 0");
             }
         }
-#line 371
+#line 406
         ;
-#line 371
+#line 406
         begin = Algorithm::Maximum(0, begin);
         count = Algorithm::Maximum(0, count);
         int end = begin + count;
         int c = GetCount();
         {
-#line 375
+#line 410
             if (!(begin <= c && end <= c))
             {
-#line 375
+#line 410
                 Lang::SysBreak("Assertion failed: begin <= c && end <= c");
             }
         }
-#line 376
+#line 411
         ;
-#line 376
+#line 411
         end = Algorithm::Minimum(c, end);
         begin = Algorithm::Minimum(c, begin);
         int l = begin;
@@ -2162,28 +2237,28 @@ namespace Text
         if (l && r)
             *this = Left(l) + Right(r);
         else 
-#line 382
+#line 417
         if (l)
             *this = Left(l);
         else 
-#line 384
+#line 419
         if (r)
             *this = Right(r);
         else
             Clear();
     };
     
-#line 244
+#line 279
     void WString::Replace(const WString& s, const WString& value)
     {
-#line 245
+#line 280
         if (s == value)
-#line 245
+#line 280
             return;
         int i = Find(s);
         while (i >= 0)
             {
-#line 248
+#line 283
                 Replace(i, s.GetCount(), value);
                 i = Find(s, i + value.GetCount());
             }
@@ -2191,7 +2266,7 @@ namespace Text
     
     void WString::Replace(int i, int len, const WString& value)
     {
-#line 254
+#line 289
         int new_len = this -> count - len + value.GetCount();
         const Char * begin = Begin();
         int reserved = new_len + 1;
@@ -2199,13 +2274,13 @@ namespace Text
         int cursor = 0;
         if (i > 0)
         {
-#line 260
+#line 295
             Lang::Memory::Copy(buf, begin, sizeof (Char) * i);
             cursor += i;
         }
         if (value.GetCount() > 0)
         {
-#line 264
+#line 299
             Lang::Memory::Copy(buf + cursor, value.Begin(), sizeof (Char) * value.GetCount());
             cursor += value.GetCount();
         }
@@ -2213,91 +2288,91 @@ namespace Text
         int end_len = this -> count - c;
         if (end_len > 0)
         {
-#line 270
+#line 305
             Lang::Memory::Copy(buf + cursor, begin + c, sizeof (Char) * end_len);
             cursor += end_len;
         }
         buf[cursor ++ ] = 0;
-#line 275
+#line 310
         Clear();
         this -> is_ref = true;
         this -> count = new_len;
         ref[0] = new RefData(buf, reserved);
         {
-#line 279
+#line 314
             if (!(cursor == new_len + 1))
             {
-#line 279
+#line 314
                 Lang::SysBreak("Assertion failed: cursor == new_len+1");
             }
         }
-#line 280
+#line 315
         ;
     };
     
-#line 299
+#line 334
     int WString::ReverseFind(const WString& str, int pos) const
     {
-#line 300
+#line 335
         if (GetCount() == 0)
-#line 300
+#line 335
             return - 1;
         {
-#line 301
+#line 336
             if (!(pos >= 0 && pos < GetCount()))
             {
-#line 301
+#line 336
                 Lang::SysBreak("Assertion failed: pos >= 0 && pos < GetCount()");
             }
         }
-#line 302
+#line 337
         ;
-#line 302
+#line 337
         const Char * cur = Begin();
         const Char * cmp = str.Begin();
         int len = str.GetCount();
         for (int i = pos; i >= 0; i -- )
             {
-#line 306
+#line 341
                 if (Compare(cur + i, cmp, len) == 0)
                     return i;
             }
         return - 1;
     };
     
-#line 335
+#line 370
     int WString::ReverseFindFirstNotOf(const Char *str) const
     {
-#line 336
+#line 371
         if (GetCount() <= 0 || !str)
-#line 336
+#line 371
             return - 1;
         const Char * begin = Begin();
         const Char * it = End();
         int i = GetCount();
         while (it != begin)
             {
-#line 341
+#line 376
                 Char chr = *-- it;
                 const Char * cmp_it = str;
                 bool match = false;
                 while (1)
                     {
-#line 345
+#line 380
                         Char cmp_chr = *cmp_it ++ ;
                         if (!cmp_chr)
                             break;
                         
-#line 348
+#line 383
                         if (chr == cmp_chr)
                         {
-#line 349
+#line 384
                             match = true;
                             break;
                         
                         }
                     }
-#line 353
+#line 388
                 i -- ;
                 if (!match)
                     return i;
@@ -2306,23 +2381,90 @@ namespace Text
     };
     
 #line 111
-    WString& WString::Set(const Char *c, int len)
+    void WString::Serialize(Abstract::Stream& s)
     {
 #line 112
+        if (s.IsStoring())
+        {
+#line 113
+            s.Put(&count, sizeof (count));
+            if (count)
+            {
+#line 115
+                if (!is_ref)
+                    s.Put(buf, count);
+                else
+                    s.Put(ref[0] -> Get(), count);
+            }
+        }
+        else 
+#line 121
+        if (s.IsLoading())
+        {
+#line 122
+            Clear();
+            s.Get(&count, sizeof (count));
+            {
+#line 124
+                if (!(count >= 0))
+                {
+#line 124
+                    Lang::SysBreak("Assertion failed: count >= 0");
+                }
+            }
+#line 125
+            ;
+#line 125
+            if (count < 0)
+#line 125
+                count = 0;
+            if (count > 0)
+            {
+#line 127
+                if (count < 8)
+                {
+#line 128
+                    s.Get(buf, sizeof (Char) * count);
+                    buf[count] = 0;
+                }
+                else
+                {
+#line 132
+                    ref[0] = new RefData;
+                    ref[0] -> Inc();
+                    ref[0] -> Reserve(count + 1);
+                    Char * buf = ref[0] -> Begin();
+                    s.Get(buf, sizeof (Char) * count);
+                    int c = count;
+                    buf[c] = 0;
+                    is_ref = true;
+                }
+            }
+        }
+    };
+    
+    WString& WString::Set(const Char *c, int len, bool find_end)
+    {
+#line 146
         Clear();
         if (!c)
-#line 113
+#line 147
             return *this;
-        count = Algorithm::Minimum(Lang::StringLength(c, len), len);
+        if (find_end)
+#line 148
+            count = Algorithm::Minimum(Lang::StringLength(c, len), len);
+        else
+#line 149
+            count = len;
         if (count < 8)
         {
-#line 116
+#line 151
             Lang::Memory::Copy(buf, c, sizeof (Char) * count);
             buf[count] = 0;
         }
         else
         {
-#line 120
+#line 155
             Char * buf = (Char * ) Lang::Memory::Alloc(sizeof (Char) * (count + 1));
             Lang::Memory::Copy(buf, c, sizeof (Char) * count);
             buf[count] = 0;
@@ -2333,7 +2475,7 @@ namespace Text
         return *this;
     };
     
-#line 92
+#line 93
     void WString::Zero()
     {
 #line 99 "../../src/Com/Meta.fog"
@@ -2341,46 +2483,53 @@ namespace Text
     };
     
 #line 36 "../../src/Com/Text.fog"
+    WString::RefData::RefData()
+    :
+        data(0),
+        reserved(0)
+    {};
+    
+#line 37
     WString::RefData::RefData(Char *str, int reserved)
     :
         data(str),
         reserved(reserved)
     {};
     
-#line 37
+#line 38
     WString::RefData::~RefData()
     {
-#line 37
+#line 38
         Clear();
     };
     
-#line 74
+#line 75
     WString::RefData::operator ConstChar * () const
     {
+#line 75
+        return data;
+    };
+    
+#line 74
+    WString::Char *WString::RefData::Begin()
+    {
 #line 74
         return data;
     };
     
-#line 73
-    WString::Char *WString::RefData::Begin()
-    {
-#line 73
-        return data;
-    };
-    
-#line 39
+#line 40
     void WString::RefData::Clear()
     {
-#line 39
+#line 40
         if (data)
         {
-#line 39
+#line 40
             Lang::Memory::Free(data);
-#line 39
+#line 40
             data = 0;
-#line 39
+#line 40
             refs = 0;
-#line 39
+#line 40
             reserved = 0;
         }
     };
@@ -2396,10 +2545,10 @@ namespace Text
             delete this;
     };
     
-#line 72 "../../src/Com/Text.fog"
+#line 73 "../../src/Com/Text.fog"
     WString::ConstChar *WString::RefData::Get() const
     {
-#line 72
+#line 73
         return data;
     };
     
@@ -2410,10 +2559,10 @@ namespace Text
         return refs;
     };
     
-#line 76 "../../src/Com/Text.fog"
+#line 77 "../../src/Com/Text.fog"
     int WString::RefData::GetReserved() const
     {
-#line 76
+#line 77
         return reserved;
     };
     
@@ -2424,10 +2573,10 @@ namespace Text
         refs ++ ;
     };
     
-#line 41 "../../src/Com/Text.fog"
+#line 42 "../../src/Com/Text.fog"
     void WString::RefData::IncreaseReserved()
     {
-#line 42
+#line 43
         Lang::uint64 new_reserved = 1;
         while (new_reserved <= reserved)
             new_reserved <<= 1;
@@ -2438,7 +2587,7 @@ namespace Text
     
     void WString::RefData::IncreaseReserved(int min_reserved)
     {
-#line 51
+#line 52
         Lang::uint64 new_reserved = 1;
         while (new_reserved <= min_reserved)
             new_reserved <<= 1;
@@ -2449,13 +2598,13 @@ namespace Text
     
     void WString::RefData::Reserve(int new_reserved)
     {
-#line 60
+#line 61
         if (new_reserved <= reserved)
             return;
         Char * new_data = (Char * ) Lang::Memory::Alloc(new_reserved * sizeof (Char));
         if (data)
         {
-#line 64
+#line 65
             if (reserved > 0)
                 Lang::Memory::Copy(new_data, data, sizeof (Char) * reserved);
             Lang::Memory::Free(data);

@@ -161,6 +161,19 @@ class App {
 		
 		TestShared();
 		
+		{
+			StringStream ss;
+			ss << "abc";
+		}
+		
+		String s;
+		{
+			FileIn fin;
+			ASSERT(fin.Open("/home/sblo/Fuck.cxx"));
+			s = fin.Get(fin.GetSize());
+			int sz = s.GetCount();
+		}
+		
 		FileOut fout;
 		fout % r % f % d;
 		

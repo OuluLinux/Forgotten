@@ -1,5 +1,5 @@
 /*!$@FOG@$!
- *	Generated at Wed Sep 30 12:25:17 2020
+ *	Generated at Thu Oct  1 09:26:12 2020
  *
  *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
@@ -19,6 +19,7 @@
  *		../../src/Com/Shared.fog
  *		../../src/Com/Stream.fog
  *		../../src/Com/Text.fog
+ *		../../src/Com/Util.fog
  *		ComTest.mfog
  */
 

@@ -4,6 +4,14 @@
 
 FOG BUGS AND WORKAROUNDS:
 	
+	Having different variable name in virtual function params will give warning:
+		WRONG:
+			virtual void Base::Fn(int a);
+			virtual void Derived::Fn(int b);
+		RIGHT:
+			virtual void Base::Fn(int a);
+			virtual void Derived::Fn(int a);
+
 	The "using namespace" is not implemented in fog yet... sorry.
 		WRONG:
 			using namespace Fog;

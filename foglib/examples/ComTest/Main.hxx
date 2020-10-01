@@ -1,5 +1,5 @@
 /*!$@FOG@$!
- *	Generated at Wed Sep 30 12:25:17 2020
+ *	Generated at Thu Oct  1 09:45:53 2020
  *
  *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
@@ -19,7 +19,8 @@
  *		../../src/Com/Shared.fog
  *		../../src/Com/Stream.fog
  *		../../src/Com/Text.fog
- *		ComTest.mfog
+ *		../../src/Com/Util.fog
+ *		/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog
  */
 
 #ifndef MAIN_HXX
@@ -44,7 +45,7 @@ struct NamespaceInterfaceLinker
 
 namespace Main
 {
-#line 11 "ComTest.mfog"
+#line 11 "/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog"
     inline Text::String operator+ (const char *c, const Text::String& l);
     
     class App
@@ -56,19 +57,19 @@ namespace Main
 #line 42
         inline void Run();
         
-#line 195
+#line 208
         void TestShared();
         
         struct Dumber
         {
-#line 187
+#line 200
             inline Dumber();
             virtual ~Dumber();
         };
         
         struct Dumb : public Main::App::Dumber
         {
-#line 191
+#line 204
             inline Dumb();
             inline ~Dumb();
         };
@@ -94,7 +95,7 @@ namespace Main
         
         struct TestCmp
         {
-#line 22 "ComTest.mfog"
+#line 22 "/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog"
             inline bool operator()(const char& c);
         };
         
@@ -124,13 +125,13 @@ namespace Main
 #line 11
     inline Text::String operator+ (const char *c, const Text::String& l)
     {
-#line 838 "../../src/Com/Text.fog"
+#line 873 "../../src/Com/Text.fog"
         Text::String s(c);
         s.Cat(l);
         return s;
     };
     
-#line 42 "ComTest.mfog"
+#line 42 "/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog"
     inline void App::Run()
     {
 #line 43
@@ -596,7 +597,30 @@ namespace Main
         }
 #line 162
         TestShared();
-#line 164
+        {
+#line 165
+            Stream::StringStream ss;
+            ss << "abc";
+        }
+#line 169
+        Text::String s;
+        {
+            Stream::FileIn fin;
+            {
+#line 172
+                if (!(fin.Open("/home/sblo/Fuck.cxx")))
+                {
+#line 172
+                    Lang::SysBreak("Assertion failed: fin.Open(\"/home/sblo/Fuck.cxx\")");
+                }
+            }
+#line 173
+            ;
+#line 173
+            s = fin.Get(fin.GetSize());
+            int sz = s.GetCount();
+        }
+#line 177
         Stream::FileOut fout;
         fout % r % f % d;
     };
@@ -607,24 +631,24 @@ namespace Main
         a(8)
     {};
     
-#line 191
+#line 204
     inline App::Dumb::Dumb()
     {
-#line 191
+#line 204
         ;
     };
     
-#line 192
+#line 205
     inline App::Dumb::~Dumb()
     {
-#line 192
+#line 205
         ;
     };
     
-#line 187
+#line 200
     inline App::Dumber::Dumber()
     {
-#line 187
+#line 200
         ;
     };
     

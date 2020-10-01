@@ -1,5 +1,5 @@
 /*!$@FOG@$!
- *	Generated at Wed Sep 30 12:25:17 2020
+ *	Generated at Thu Oct  1 09:26:12 2020
  *
  *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
@@ -19,6 +19,7 @@
  *		../../src/Com/Shared.fog
  *		../../src/Com/Stream.fog
  *		../../src/Com/Text.fog
+ *		../../src/Com/Util.fog
  *		ComTest.mfog
  */
 
@@ -39,7 +40,7 @@ namespace Abstract
 };
 
 namespace Abstract {
-struct Stream;
+class Stream;
 }
 
 namespace Abstract
@@ -51,6 +52,8 @@ namespace Abstract
     inline void Serialize(bool& o, Stream& s);
 #line 14
     inline void Serialize(char& o, Stream& s);
+#line 33
+    inline void Serialize(const char *o, Stream& s);
 #line 14
     inline void Serialize(double& o, Stream& s);
 #line 14
@@ -70,32 +73,45 @@ namespace Abstract
 #line 14
     inline void Serialize(unsigned short& o, Stream& s);
     
-    struct Stream
+    class Stream
     {
-#line 50
+    public:
+#line 46
+        typedef Native::FILE FILE;
+        
+#line 44
+        bool corrupted;
+        
+    public:
+        inline Stream();
+#line 67
         template < class _1 >
         inline Stream& operator% (_1& o);
-#line 48
+#line 65
         virtual void Flush();
-#line 43
+#line 60
         virtual int Get(void *mem, int size);
         virtual Lang::int64 GetCursor();
-#line 46
+#line 63
         virtual Lang::int64 GetSize() const;
-#line 39
+#line 49
+        inline bool IsCorrupted() const;
+#line 56
         virtual bool IsEof();
-#line 37
+#line 54
         virtual bool IsLoading();
-#line 35
+#line 52
         virtual bool IsOpen() const;
-#line 38
+#line 55
         virtual bool IsStoring();
-#line 42
+#line 59
         virtual int Put(char c);
-#line 41
+#line 58
         virtual int Put(const void *mem, int size);
-#line 45
-        virtual void Seek(Lang::int64 pos);
+#line 62
+        virtual void Seek(Lang::int64 i);
+#line 50
+        inline void SetCorrupted(bool b = true);
     };
 };
 
@@ -131,6 +147,30 @@ namespace Abstract
 #line 17
         if (s.IsStoring())
             s.Put(&o, sizeof (char));
+    };
+    
+#line 33
+    inline void Serialize(const char *o, Stream& s)
+    {
+        {
+#line 34
+            if (!(s.IsStoring()))
+            {
+#line 34
+                Lang::SysBreak("Assertion failed: s.IsStoring()");
+            }
+        }
+#line 35
+        ;
+#line 35
+        if (s.IsStoring())
+        {
+#line 36
+            int len = Lang::StringLength(o);
+            s.Put(&len, sizeof (len));
+            if (len > 0)
+                s.Put(o, len);
+        }
     };
     
 #line 14
@@ -241,14 +281,34 @@ namespace Abstract
             s.Put(&o, sizeof (unsigned short));
     };
     
-#line 50
+#line 47
+    inline Stream::Stream()
+    :
+        corrupted(false)
+    {};
+    
+#line 67
     template < class _1 >
     inline Stream& Stream::operator% (_1& o)
     {
-#line 51
+#line 68
         Serialize(o, *this);
-#line 51
+#line 68
         return *this;
+    };
+    
+#line 49
+    inline bool Stream::IsCorrupted() const
+    {
+#line 49
+        return corrupted;
+    };
+    
+#line 50
+    inline void Stream::SetCorrupted(bool b)
+    {
+#line 50
+        corrupted = b;
     };
     
 };

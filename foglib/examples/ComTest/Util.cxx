@@ -1,5 +1,5 @@
 /*!$@FOG@$!
- *	Generated at Thu Oct  1 09:26:12 2020
+ *	Generated at Thu Oct  1 09:45:53 2020
  *
  *	by fog 0.1.a of 12:17:36 Sep 29 2020
  *
@@ -20,11 +20,11 @@
  *		../../src/Com/Stream.fog
  *		../../src/Com/Text.fog
  *		../../src/Com/Util.fog
- *		ComTest.mfog
+ *		/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog
  */
 
-#ifndef ALGORITHM_CXX
-#define ALGORITHM_CXX
+#ifndef UTIL_CXX
+#define UTIL_CXX
 
 #include <new>
 

@@ -45,7 +45,7 @@ NAMESPACE_COM_BEGIN
 #undef ASSERT
 #undef ASSERT_
 #define ASSERT(x) {if (!(x)) {__BREAK__;}}
-#define ASSERT_(x, msg) {if (!(x)) {LOG(UScript::String("Assertion failed: ") + msg); __BREAK__;}}
+#define ASSERT_(x, msg) {if (!(x)) {std::cout << "Assertion failed: " << msg << endl; __BREAK__;}}
 #define PANIC(msg) ASSERT_(false, msg)
 
 

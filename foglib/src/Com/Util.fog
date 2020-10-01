@@ -1,0 +1,69 @@
+namespace Util {
+using/interface Lang;
+
+#if 0
+
+!inline void Panic(String s) {
+	Lang::SysBreak(s.Begin());
+}
+
+
+template <class T>
+T& PtrRef(T* o, String throw_msg) {
+	if (!o) throw throw_msg;
+	return *o;
+}
+
+Abstract:Stream& Log() {
+	static FileOut fout;
+	static StringStream ss; // for early logging
+	if (!fout.IsOpen()) {
+		String exepath = GetExeFilePath();
+		if (exepath.IsEmpty()) {
+			return ss;
+		}
+		else {
+			String exe_title = GetFileTitle(exepath);
+			String path = ConfigFile(exe_title + ".log");
+			int r0 = (path.GetString0()->GetRefs());
+			const char* p = path.Begin();
+			int r1 = (path.GetString0()->GetRefs());
+			RealizeDirectory(GetFileDirectory(path));
+			int r2 = (path.GetString0()->GetRefs());
+			//cout << path << ENDL;
+			fout.Open(path);
+			int r3 = (path.GetString0()->GetRefs());
+			fout << " *** " << GetSysTime().ToString() << " ***" << ENDL
+				 << " *** " << GetExeFilePath() << " ***" << ENDL;
+			
+			if (ss.GetSize())
+				fout << ss.GetResult();
+			
+			fout.Flush();
+			
+			int r4 = (path.GetString0()->GetRefs());
+			
+			int s = r0 + r1 + r2 + r3 + r4;
+		}
+	}
+	return fout;
+}
+
+Abstract:Stream& Cout() {
+	static FileOut fout(stdout);
+	return fout;
+}
+
+Abstract:Stream& Cin() {
+	static FileOut fout(stderr);
+	return fout;
+}
+
+Abstract:Stream& Cerr() {
+	static FileOut fout(stdin);
+	return fout;
+}
+
+#endif
+
+}

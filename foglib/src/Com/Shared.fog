@@ -219,9 +219,6 @@ public:
 
 
 template <class T> inline Ptr<T> MakePtr() {return Ptr<T>(new T());}
-//template <class T, class P> inline Ptr<T> MakePtrBase() {Ptr<P> s; s.Create(); return s.As<T>();}
-
-//template <class T, class A0, class A1, class A2> inline Ptr<T> MakePtr(A0& a0, A1& a1, A2& a2) {return Ptr<T>(new T(a0, a1, a2));}
 template <class T, class A0> inline Ptr<T> MakePtr1(A0 a0) {return Ptr<T>(new T(a0));}
 template <class T, class A0, class A1> inline Ptr<T> MakePtr2(A0 a0, A1 a1) {return Ptr<T>(new T(a0, a1));}
 template <class T, class A0, class A1, class A2> inline Ptr<T> MakePtr3(A0 a0, A1 a1, A2 a2) {return Ptr<T>(new T(a0, a1, a2));}
