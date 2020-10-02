@@ -78,8 +78,7 @@ void FogStream::append(const char *aString, int aSize) {
 FogStream& FogStream::change_to_access(const FogAccess& anAccess) {
 	if (access().value() != anAccess.value()) {
 		// Skip "public:" for namespaces
-		if (_emit_scope->tag().is_namespace_tag() &&
-			!_access->is_valid() && anAccess.is_public()) {
+		if (_emit_scope->tag().is_namespace_tag()) {
 			next();
 		}
 		// Skip "private:" for class
