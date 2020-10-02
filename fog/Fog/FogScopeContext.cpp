@@ -72,6 +72,25 @@ void FogScopeContext::find_entities(FogEntityFinder& theFinder)
 {
     dynamic_token().find_entities(theFinder);
     //  .bugbug diagnose missing template arguments and/or select those corresponding to default template
+    
+    /*Not working HAX
+    if (!theFinder.is_found()) {
+        //static_token().find_entities(theFinder);
+        FogScopeContext* ctx = (FogScopeContext*)get_parent();
+        if (!ctx) {
+            FogEmitContext* ectx = dynamic_cast<FogEmitContext*>(this);
+            if (ectx)
+                ctx = (FogScopeContext*)ectx->get_parent();
+            if (!ctx)
+                ctx = &ctx->static_scope();
+        }
+        while (ctx) {
+            ctx->find_entities(theFinder);
+            if (theFinder.is_found())
+                break;
+            ctx = (FogScopeContext*)ctx->get_parent();
+        }
+    }*/
 }
 
 bool FogScopeContext::find_formal_slots(FogMetaSlotFinder& theFinder) { return false; }

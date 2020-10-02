@@ -62,8 +62,10 @@ bool FogExpr::compile_parsed(FogParseContext& parseContext)
     }
     
     FogWeakSemanticsContext weakSemantics(FogScopeContext::null());
-    if (!resolve_semantics(weakSemantics) || !weakSemantics)
+    if (!resolve_semantics(weakSemantics) || !weakSemantics) {
+        if (1) {resolve_semantics(weakSemantics);}
         ERRMSG("Failed to resolve semantics of " << viz(*this));
+    }
     else
     {
         const char *weakReason = weakSemantics.reason();
