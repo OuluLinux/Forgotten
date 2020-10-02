@@ -9,37 +9,37 @@
 
 namespace Main
 {
-#line 227 "ComTest.mfog"
+#line 242 "ComTest.mfog"
     void App::TestShared()
     {
-#line 237
+#line 252
         Shared::Ptr < Dumb > s0a;
-#line 239
+#line 254
         ;
         {
-#line 240
+#line 255
             Shared::Ptr < Dumber > s1a;
             Shared::Ptr < Dumb > s1b;
-#line 243
+#line 258
             ;
             ;
             s1b = Shared::Ptr < Dumb > ().WrapObject(new Dumb);
-#line 247
+#line 262
             ;
             s1a = s1b.As < Dumber > ();
-#line 250
+#line 265
             ;
             {
                 Shared::Ptr < Dumber > s2;
-#line 254
+#line 269
                 ;
-#line 254
+#line 269
                 s2 = s1a;
-#line 256
+#line 271
                 ;
-#line 256
+#line 271
                 s0a = s2.As < Dumb > ();
-#line 258
+#line 273
                 ;
             }
             ;
@@ -47,35 +47,35 @@ namespace Main
         ;
     };
     
-#line 220
+#line 235
     App::Dumber::~Dumber()
     {
-#line 220
+#line 235
         ;
     };
     
-#line 73 "../../src/Com/Meta.fog"
+#line 76 "../../src/Com/Meta.fog"
     App::SomeRefTuple2::SomeRefTuple2(int& a, double& b)
     :
         a(a),
         b(b)
     {};
     
-#line 74
+#line 77
     Text::String App::SomeRefTuple2::AsString() const
     {
-#line 74
+#line 77
         return Text::ToString(a) + ", " + Text::ToString(b);
     };
     
-#line 54
+#line 57
     Text::String App::SomeTuple2::AsString() const
     {
-#line 54
+#line 57
         return Text::ToString(a) + ", " + Text::ToString(b);
     };
     
-#line 29 "ComTest.mfog"
+#line 30 "ComTest.mfog"
     App::VirtualBase::~VirtualBase() {};
     
 };

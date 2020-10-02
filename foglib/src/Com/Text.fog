@@ -207,6 +207,7 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 					count++;
 					buf[count] = 0;
 					REF = new RefData(buf, count + 1);
+					REF->Inc();
 					is_ref = true;
 				}
 			}
@@ -228,6 +229,7 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 					buf[count] = 0;
 					REF->Dec();
 					REF = new RefData(buf, count + 1);
+					REF->Inc();
 				}
 			}
 			return *this;
@@ -249,6 +251,7 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 					MemoryCopy(&buf[count], str.Begin(), sizeof(Char) * (str.GetCount() + 1));
 					count += str.GetCount();
 					REF = new RefData(buf, reserved);
+					REF->Inc();
 					is_ref = true;
 				}
 			}
@@ -271,6 +274,7 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 					buf[count] = 0;
 					REF->Dec();
 					REF = new RefData(buf, reserved);
+					REF->Inc();
 				}
 			}
 			return *this;
@@ -311,6 +315,7 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 			this->is_ref = true;
 			this->count = new_len;
 			REF = new RefData(buf, reserved);
+			REF->Inc();
 			ASSERT(cursor == new_len+1);
 		}
 	
@@ -439,7 +444,7 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 				*this = part;
 			return true;
 		}
-		const Char* Begin() const {if (is_ref) return REF->Get(); else return buf; }
+		const Char* Begin() const {if (is_ref) {ASSERT(REF && REF->Get()); return REF->Get();} else return buf; }
 		const Char* End() const { return Begin() + GetCount(); }
 	
 		bool operator==(const ${Scope}& s) const {

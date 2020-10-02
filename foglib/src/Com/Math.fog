@@ -1,9 +1,551 @@
+namespace Math {
+using/interface Util;
+using/interface Container;
 
-namespace Com {
+
+namespace Native {
+
+double Floor(double a);
+double Round(double a);
+double Sin(double a);
+double Cos(double a);
+double Tan(double a);
+double ASin(double a);
+double ACos(double a);
+double ATan(double a);
+
+double exp_fast_lb(double a);
+double exp_fast_ub(double a);
+double exp_fast(double a);
+double better_exp_fast(double a);
+double exp_fast_schraudolph(double a);
+float expf_fast_ub(float a);
+float expf_fast(float a);
+double better_expf_fast(float a);
+float expf_fast_lb(float a);
+double log_fast_ankerl(double a);
+double log_fast_ub(double a);
+double log_fast(double a);
+double log_fast_lb(double a);
+float logf_fast_ub(float a);
+float logf_fast(float a);
+float logf_fast_lb(float a);
+double pow_fast_ankerl(double a, double b);
+float powf_fast(float a, float b);
+float powf_fast_lb(float a, float b);
+float powf_fast_ub(float a, float b);
+double pow_fast_ub(double a, double b);
+double pow_fast(double a, double b);
+double pow_fast_lb(double a, double b);
+double pow_fast_precise_ankerl(double a, double b);
+double pow_fast_precise(double a, double b);
+double better_pow_fast_precise(double a, double b);
+float powf_fast_precise(float a, float b);
+float better_powf_fast_precise(float a, float b);
+
+float fast_atan2(float y, float x);
+
+class StdRandomGaussian {
+public:
+	double Get() const :{ export/noimplementation; };
+	void Seed() :{ export/noimplementation; };
+};
+
+StdRandomGaussian* CreateStdRandomGaussian(int length);
+
+}
+
+
+
+inline double FastLn(double a) {return Native::log_fast(a);}
+inline double FastExp(double a) {return Native::exp_fast(a);}
+inline double FastPow(double a, double b) {return Native::pow_fast(a, b);}
+inline double FastSqrt(double a) {return Native::pow_fast(a, 0.5);}
+
+template <class T> inline T PowFastT(T v, T e);
+template <> inline double PowFastT(double v, double e) {return Native::pow_fast_precise(v, e);}
+template <> inline float PowFastT(float v, float e) {return Native::powf_fast_precise(v, e);}
+
+struct FastTrig {
+	static const int accuracy = 10000;
+	Vector<double> sin, cos, tan, asin, acos, atan;
+	
+	FastTrig();
+	int Pos(double a) const;
+	double Sin(double a) const {return sin[Pos(a)];}
+	double Cos(double a) const {return cos[Pos(a)];}
+	double Tan(double a) const {return tan[Pos(a)];}
+	double ASin(double a) const {return asin[Pos(a)];}
+	double ACos(double a) const {return acos[Pos(a)];}
+	double ATan(double a) const {return atan[Pos(a)];}
+};
+
+inline FastTrig& GetFastTrig() {return Single<FastTrig>();}
+
+inline double FastSin(double a) {return GetFastTrig().Sin(a);}
+inline double FastCos(double a) {return GetFastTrig().Cos(a);}
+inline double FastTan(double a) {return GetFastTrig().Tan(a);}
+inline double FastASin(double a) {return GetFastTrig().ASin(a);}
+inline double FastACos(double a) {return GetFastTrig().ACos(a);}
+inline double FastATan(double a) {return GetFastTrig().ATan(a);}
+inline float FastATan2(float y, float x) {return Native::fast_atan2(y, x);}
+
+double nround (double n, unsigned int c);
+double StandardNormalCDF(double x);
+double NormalPDF(double x, double mean, double dev);
+double NormalPDFRelative(double value, double mean, double deviation);
+double NormalCDF(double value, double mean, double deviation);
+int Choose(int n, int k);
+
+struct OnlineAverage {
+	$MakeMoveable();
+	
+	double mean;
+	int64 count;
+	SpinLock lock;
+	OnlineAverage() : mean(0), count(0) {}
+	
+	void Clear() {mean = 0.0; count = 0;}
+	void Resize(int64 i) {count = i;}
+	void Add(double a);
+	double GetMean() const {return mean;}
+	void Serialize(StreamBase& s) {s % mean % count;}
+	bool operator()(const OnlineAverage& a, const OnlineAverage& b) const {return a.mean < b.mean;}
+};
+
+struct OnlineVariance {
+	$MakeMoveable();
+	
+	double k = 0;
+	double count = 0;
+	double ex = 0;
+	double ex2 = 0;
+	
+	
+	void Clear();
+	void Resize(double d);
+	void Add(double x);
+	void Add(double x, double weight);
+	void Remove(double x);
+	double GetMean() const;
+	double GetVariance() const {return (ex2 - (ex * ex) / count) / (count - 1);}
+	double GetDeviation() const {return FastPow(GetVariance(), 0.5);}
+	double GetCDF() const;
+	double GetCDF(double limit, bool rside) const;
+	void Serialize(StreamBase& s) {s % k % count % ex % ex2;}
+	
+	//String AsString() const {return Format("k=%v count=%v ex=%v ex2=%v mean=%v", k, count, ex, ex2, GetMean());}
+	
+};
+
+class MovingOnlineVariance {
+	$MakeMoveable();
+	
+	Vector<OnlineVariance> vec;
+	int period;
+	bool skip;
+public:
+	
+	MovingOnlineVariance() {skip = false; period = 10; vec.Add();}
+	OnlineVariance& Get() {return vec[0];}
+	void SetPeriod(int i) {if (i > 0) {period = i; skip = false;} else {period = 1; skip = true; vec.SetCount(1);}}
+	void AddResult(double d) {for(int i = 0; i < vec.GetCount(); i++) {vec[i].Add(d);}}
+	void Next() {if (skip) return; while (vec.GetCount() >= period) {vec.Remove(0);} vec.Add();}
+	void Clear() {vec.SetCount(1); vec[0].Clear();}
+	double GetMean() {return Get().GetMean();}
+	double GetDeviation() {return Get().GetDeviation();}
+	double GetCDF(double cursor, int type) {return Get().GetCDF(cursor, type);}
+	
+};
+
+struct StdDeviant {
+	$MakeMoveable();
+	
+	double mean = 0;
+	double dev = 0;
+	
+	void Serialize(StreamBase& s) {s % mean % dev;}
+	void Clear() {mean = 0; dev = 0;}
+	double GetMean() const {return mean;}
+	double GetDeviation() const {return dev;}
+	double GetVariance() const {return dev * dev;}
+	double GetCDF() const {return NormalCDF(0, GetMean(), GetDeviation());}
+	double GetCDF(double limit, bool rside) const;
+	String AsString() const;
+	operator double() const {return mean;}
+	void operator+=(const StdDeviant& s) {mean += s.mean; dev += s.dev;}
+	void operator-=(const StdDeviant& s) {mean -= s.mean; dev -= s.dev;}
+	void operator*=(double d) {mean *= d; dev *= d;}
+	void operator/=(double d) {mean /= d; dev /= d;}
+	void operator=(double d) {mean = d; dev = 0;}
+	bool operator<=(const StdDeviant& s) const {return mean <= s.GetMean();}
+	bool operator>(const StdDeviant& s) const {return mean > s.GetMean();}
+};
+
+struct OnlineCovariance {
+	$MakeMoveable();
+	
+	double meanx, meany, C;
+	dword n;
+	
+	OnlineCovariance() {Clear();}
+	OnlineCovariance(const OnlineCovariance& s) {*this = s;}
+	void operator=(const OnlineCovariance& s) {meanx = s.meanx; meany = s.meany; C = s.C; n = s.n;}
+	void Clear() {meanx = 0; meany = 0; C = 0; n = 0;}
+	void Add(double x, double y);
+	double Get() const {return C / n;}
+	void Serialize(StreamBase& s) {s % meanx % meany % C % n;}
+};
+
+struct OnlineBivariate {
+	$MakeMoveable();
+	
+	OnlineVariance x, y;
+	OnlineCovariance co;
+	
+	OnlineBivariate() {}
+	OnlineBivariate(const OnlineBivariate& s) {*this = s;}
+	void operator=(const OnlineBivariate& s) {x = s.x; y = s.y; co = s.co;}
+	void Add(double x, double y);
+	void Serialize(StreamBase& s) {s % x % y % co;}
+	double GetPDF(double x, double y) const;
+};
+
+/*
+What is the exponent of the ratio to get the outcome value?
+r = ratio, x = return value, y = outcome
+solve(r^x=y, x) = ln(y)/ln(r)
+*/
+!inline double FindPowFrom1(double ratio, double outcome);
+!inline double FindPowTo1(double begin, double ratio);
+
+class StepDistribution {
+	$MakeMoveable();
+	
+	Vector<int> values;
+	double mean, M2;
+	double value_step;
+	
+public:
+	StepDistribution();
+	void Serialize(StreamBase& s) {s % values % mean % M2 % value_step;}
+	void AddResult(double value);
+	void Clear();
+	double Get(double prob);
+	int GetCount() const {return values.GetCount();}
+	double GetMean() {return mean;}
+};
+
+class MovingStepDistribution {
+	$MakeMoveable();
+	
+	Vector<StepDistribution> vec;
+	int period;
+	bool skip;
+public:
+	MovingStepDistribution() {skip = false; period = 10; vec.Add();}
+	StepDistribution& Get() {return vec[0];}
+	void SetPeriod(int i) {if (i > 0) {period = i; skip = false;} else {period = 1; skip = true; vec.SetCount(1);}}
+	void AddResult(double d) {for(int i = 0; i < vec.GetCount(); i++) {vec[i].AddResult(d);}}
+	void Next() {if (skip) return; while (vec.GetCount() >= period) {vec.Remove(0);} vec.Add();}
+	void Clear() {vec.SetCount(1); vec[0].Clear();}
+	double GetMean() {return Get().GetMean();}
+	double Get(double prob) {return Get().Get(prob);}
+	void Serialize(StreamBase& s) {s % vec % period % skip;}
+};
+
+inline class RandomGaussian {
+	One<StdRandomGaussian> n;
+	
+public:
+	RandomGaussian(int length) {n = Native::CreateStdRandomGaussian(length);}
+	double Get() {return n->Get();}
+	operator double() {return n->Get();}
+	void Seed() {n->Seed();}
+};
+
+struct RandomGaussianCache {
+	ArrayMap<int, RandomGaussian> cache;
+	SpinLock lock;
+	
+	RandomGaussian& Get(int length) {
+		lock.Enter();
+		int i = cache.Find(length);
+		RandomGaussian* g;
+		if (i >= 0)		g = &cache[i];
+		else			g = &cache.Add(length, new RandomGaussian(length));
+		lock.Leave();
+		return *g;
+	}
+};
+
+inline RandomGaussian& GetRandomGaussian(int length) {
+	static RandomGaussianCache cache;
+	return cache.Get(length);
+}
 
 
 
 
+
+
+
+
+
+
+
+!inline FastTrig::FastTrig() {
+	sin.SetCount(accuracy);
+	cos.SetCount(accuracy);
+	tan.SetCount(accuracy);
+	asin.SetCount(accuracy);
+	acos.SetCount(accuracy);
+	atan.SetCount(accuracy);
+	double *s = sin.Begin();
+	double *c = cos.Begin();
+	double *t = tan.Begin();
+	double *as = asin.Begin();
+	double *ac = acos.Begin();
+	double *at = atan.Begin();
+	for(int i = 0; i < accuracy; i++) {
+		double a = (M_2PI * i) / accuracy;
+		*s  = Native::Sin(a);  *c  = Native::Cos(a);  *t  = Native::Tan(a);
+		*as = Native::ASin(a); *ac = Native::ACos(a); *at = Native::ATan(a);
+		//LOG(Format("%d %3n: sin %3n, cos %3n, tan %3n", i, a, *s, *c, *t));
+		s++;  c++;  t++;
+		as++; ac++; at++;
+	}
+}
+
+!inline int FastTrig::Pos(double a) const {
+	double posf = a / M_2PI;
+	posf -= Native::Floor(posf);
+	int pos = posf * accuracy;
+	return pos;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+double nround (double n, unsigned int c) {
+    double marge = Native::pow_fast_precise(10, c);
+    double up    = n * marge;
+    double ret   = Native::Round (up) / marge;
+    return ret;
+}
+
+double StandardNormalCDF(double x) {
+	double sum = x;
+	double value = x;
+	for (int i = 1; i < 100; i++) {
+		value = (value * x * x / (2 * i + 1));
+		sum += value;
+	}
+	return 0.5 + (sum / Native::pow_fast_precise(2*M_PI, 0.5)) * Native::pow_fast_precise(M_E, -1* x*x / 2);
+}
+
+double NormalPDF(double x, double mean, double dev) {
+	double a = dev * Native::pow_fast_precise(2 * M_PI, 0.5);
+	double b = 1.0 / a;
+	double c = x  - mean;
+	double d = -(c * c) / (2 * dev * dev);
+	double e = Native::exp_fast(d);
+	return b * e;
+}
+
+
+
+
+
+
+double NormalPDFRelative(double value, double mean, double deviation) {
+	if (deviation == 0)
+		return 0;
+	
+	double low = mean - 4 * deviation;
+	double high = mean + 4 * deviation;
+	if (mean < low || high < mean)
+		return 0;
+	
+	double a = (value - mean) / deviation;
+	double b = -0.5 * a * a;
+	if (b < -10)
+		return 0;
+	double c = FastExp(b);
+	return c;
+}
+
+double NormalCDF(double value, double mean, double deviation) {
+	if (deviation == 0) {
+		if (value < mean) return 0;
+		else return 1;
+	}
+	double d = (value - mean) / deviation;
+	d = StandardNormalCDF(d);
+	if (!::Native::IsFinite(d)) {
+		if (value < mean) return 0;
+		else return 1;
+	}
+	return d;
+}
+
+int Choose(int n, int k) {
+	// A fast way to calculate binomial coefficients by Andrew Dalke (contrib).
+	if (0 <= k && k <= n) {
+		int64 ntok = 1;
+		int64 ktok = 1;
+		int count = Min(k, n - k) + 1;
+		for (int t = 1; t < count; t++) {
+			ntok *= n;
+			ktok *= t;
+			n -= 1;
+		}
+		ASSERT(ktok != 0);
+		return (int)(ntok / ktok);
+	}
+	else
+		return 0;
+}
+
+
+
+
+
+
+
+
+void OnlineAverage::Add(double a) {
+	lock.Enter();
+	if (count == 0) {
+		mean = a;
+	}
+	else {
+		double delta = a - mean;
+		mean += delta / count;
+	}
+	count++;
+	lock.Leave();
+}
+
+
+
+
+
+
+
+
+void OnlineVariance::Clear() {
+	k = 0;
+	count = 0;
+	ex = 0;
+	ex2 = 0;
+}
+
+void OnlineVariance::Resize(double d) {
+	if (count > 0.0) {
+		ex /= count;
+		ex2 /= count;
+		count = 1.0;
+		ex *= d;
+		ex2 *= d;
+		count = d;
+	}
+}
+
+void OnlineVariance::Add(double x) {
+    if (count == 0)
+        k = x;
+    count = count + 1;
+    double diff = x - k;
+    ex += diff;
+    ex2 += diff * diff;
+}
+
+void OnlineVariance::Add(double x, double weight) {
+    if (count == 0)
+        k = x;
+    count += weight;
+    double diff = x - k;
+    ex += diff * weight;
+    ex2 += diff * diff * weight;
+}
+
+void OnlineVariance::Remove(double x) {
+    count = count - 1;
+    double diff = x - k;
+    ex -= diff;
+    ex2 -= diff * diff;
+}
+
+double OnlineVariance::GetMean() const {
+	if (count == 0.0)
+		return 0.0;
+	else
+		return k + ex / count;
+}
+
+double OnlineVariance::GetCDF() const {
+	if (count == 0.0) return 0;
+	return NormalCDF(0, GetMean(), GetDeviation());
+}
+
+double OnlineVariance::GetCDF(double limit, bool rside) const {
+	if (count == 0.0) return 0;
+	if (rside == 1)
+		return 1 - NormalCDF(limit, GetMean(), GetDeviation());
+	else
+		return     NormalCDF(limit, GetMean(), GetDeviation());
+}
+
+
+
+
+
+
+
+
+
+double StdDeviant::GetCDF(double limit, bool rside) const {
+	if (rside == 1)
+		return 1 - NormalCDF(limit, GetMean(), GetDeviation());
+	else
+		return     NormalCDF(limit, GetMean(), GetDeviation());
+}
+
+String StdDeviant::AsString() const {
+	return (String)"mean=" + DblStr(mean) + (String)", dev=" + DblStr(dev);
+}
+
+
+
+
+
+
+
+
+
+!inline double FindPowFrom1(double ratio, double outcome) {
+	double a = FastLn(ratio);
+	double b = FastLn(outcome);
+	double res = b / a;
+	return res;
+}
+
+
+!inline double FindPowTo1(double begin, double ratio) {
+	double a = FastLn(ratio);
+	double b = FastLn(begin);
+	double res = -(b / a);
+	return res;
+}
 /*
 double Multiply(double prev_norm, int64 count, double multiplier) {
 	if (count <= 0)
@@ -15,4 +557,96 @@ double Multiply(double prev_norm, int64 count, double multiplier) {
 }
 */
 
+
+
+
+
+
+
+
+
+
+
+
+StepDistribution::StepDistribution() {
+	mean = 0;
+	M2 = 0;
+	value_step = 0.01;
 }
+
+void StepDistribution::AddResult(double value) {
+	double delta = value - mean;
+    mean += delta / values.GetCount();
+    M2 += delta*(value - mean);
+	
+	int valuei = (int)(value / value_step);
+	for(int i = 0; i < values.GetCount(); i++) {
+		if (valuei < values[i]) {
+			values.Insert(i, valuei);
+			return;
+		}
+	}
+	values.Add(valuei);
+}
+
+void StepDistribution::Clear() {
+	values.SetCount(0);
+	mean = 0;
+	M2 = 0;
+}
+
+double StepDistribution::Get(double prob) {
+	ASSERT(prob >= 0.0 && prob <= 1.0);
+	ASSERT(values.GetCount());
+	int count = values.GetCount() - 1;
+	if (count < 0)
+		return 0.0;
+	double pos_step = 1.0 / (double)count;
+	int pos = (int)(prob / pos_step);
+	if (pos >= count)
+		return values.Top() * value_step;
+	if (pos < 0)
+		return values[0] * value_step;
+	double begin = pos * pos_step;
+	double v0 = values[pos] * value_step;
+	double v1 = values[pos+1] * value_step;
+	double f = (prob - begin) / pos_step;
+	double linear_value = v0 * f + v1 * (1.0 - f);
+	return linear_value;
+}
+
+}
+
+#define	FastLn			Math::FastLn
+#define	FastExp			Math::FastExp
+#define	FastPow			Math::FastPow
+#define	FastSqrt		Math::FastSqrt
+#define	PowFastT			Math::PowFastT
+#define	FastTrig			Math::FastTrig
+#define	GetFastTrig			Math::GetFastTrig
+#define	FastSin				Math::FastSin
+#define	FastCos				Math::FastCos
+#define	FastTan				Math::FastTan
+#define	FastASin			Math::FastASin
+#define	FastACos			Math::FastACos
+#define	FastATan			Math::FastATan
+#define	FastATan2			Math::FastATan2
+#define	nround				Math::nround
+#define	StandardNormalCDF	Math::StandardNormalCDF
+#define	NormalPDF			Math::NormalPDF
+#define	NormalPDFRelative	Math::NormalPDFRelative
+#define	NormalCDF			Math::NormalCDF
+#define	Choose				Math::Choose
+#define	OnlineAverage		Math::OnlineAverage
+#define	OnlineVariance		Math::OnlineVariance
+#define	MovingOnlineVariance		Math::MovingOnlineVariance
+#define	StdDeviant			Math::StdDeviant
+#define	OnlineCovariance	Math::OnlineCovariance
+#define	OnlineBivariate		Math::OnlineBivariate
+#define	FindPowFrom1		Math::FindPowFrom1
+#define	FindPowTo1			Math::FindPowTo1
+#define	StepDistribution	Math::StepDistribution
+#define	MovingStepDistribution	Math::MovingStepDistribution
+#define	RandomGaussian		Math::RandomGaussian
+#define	RandomGaussianCache	Math::RandomGaussianCache
+#define	GetRandomGaussian	Math::GetRandomGaussian

@@ -26,7 +26,6 @@ file
 	Util.fog,
 	Math.fog,
 	Concurrency.fog,
-	Environment.fog,
 	StringUtil.fog,
 	"Basic Compiler" readonly separator,
 	CompilerBase.fog,

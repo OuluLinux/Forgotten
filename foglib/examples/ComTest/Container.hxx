@@ -291,14 +291,14 @@ namespace Container
         inline _1& operator*();
         inline const _1& operator*() const;
 #line 64
-        _1 *operator-> ();
-        const _1 *operator-> () const;
+        inline _1 *operator-> ();
+        inline const _1 *operator-> () const;
 #line 61
         inline void operator= (_1 *obj);
 #line 75
-        operator ConstT & () const;
+        inline operator ConstT & () const;
 #line 74
-        operator _1 & ();
+        inline operator _1 & ();
 #line 72
         inline operator bool() const;
 #line 60
@@ -309,7 +309,7 @@ namespace Container
         template < class _2 >
         inline void CreateDerived();
 #line 71
-        _1 *Detach();
+        inline _1 *Detach();
 #line 68
         inline _1 *Get();
         inline const _1 *Get() const;
@@ -436,7 +436,7 @@ namespace Container
 #line 208
         inline Text::String Join(Text::String join_str = "", bool ignore_empty = true) const;
 #line 163
-        void Serialize(Abstract::StreamBase& s);
+        inline void Serialize(Abstract::StreamBase& s);
 #line 222
         inline void Split(Text::String to_split, Text::String split_str, bool ignore_empty = true);
     };
@@ -1830,6 +1830,42 @@ namespace Container
         return *obj;
     };
     
+#line 64
+    template < class _1 >
+    inline _1 *One < _1 >::operator-> ()
+    {
+        {
+#line 64
+            if (!(obj))
+            {
+#line 64
+                Lang::SysBreak("Assertion failed: obj");
+            }
+        }
+#line 64
+        ;
+#line 64
+        return obj;
+    };
+    
+#line 65
+    template < class _1 >
+    inline const _1 *One < _1 >::operator-> () const
+    {
+        {
+#line 65
+            if (!(obj))
+            {
+#line 65
+                Lang::SysBreak("Assertion failed: obj");
+            }
+        }
+#line 65
+        ;
+#line 65
+        return obj;
+    };
+    
 #line 61
     template < class _1 >
     inline void One < _1 >::operator= (_1 *obj)
@@ -1838,6 +1874,42 @@ namespace Container
         Clear();
 #line 61
         this -> obj = obj;
+    };
+    
+#line 75
+    template < class _1 >
+    inline One < _1 >::operator ConstT & () const
+    {
+        {
+#line 75
+            if (!(obj))
+            {
+#line 75
+                Lang::SysBreak("Assertion failed: obj");
+            }
+        }
+#line 75
+        ;
+#line 75
+        return *obj;
+    };
+    
+#line 74
+    template < class _1 >
+    inline One < _1 >::operator _1 & ()
+    {
+        {
+#line 74
+            if (!(obj))
+            {
+#line 74
+                Lang::SysBreak("Assertion failed: obj");
+            }
+        }
+#line 74
+        ;
+#line 74
+        return *obj;
     };
     
 #line 72
@@ -1881,6 +1953,28 @@ namespace Container
         Clear();
 #line 77
         obj = new _2;
+    };
+    
+#line 71
+    template < class _1 >
+    inline _1 *One < _1 >::Detach()
+    {
+        {
+#line 71
+            if (!(obj))
+            {
+#line 71
+                Lang::SysBreak("Assertion failed: obj");
+            }
+        }
+#line 71
+        ;
+#line 71
+        _1 * tmp = obj;
+#line 71
+        obj = 0;
+#line 71
+        return tmp;
     };
     
 #line 68
@@ -2094,6 +2188,67 @@ namespace Container
         return out;
     };
     
+#line 163
+    template < class _1 >
+    inline void Vector < _1 >::Serialize(Abstract::StreamBase& s)
+    {
+#line 164
+        static const Lang::byte correct_pre = 0xA;
+        static const Lang::byte correct_post = 0xB;
+        Lang::byte pre_magic;
+        Lang::byte post_magic;
+        Lang::uint32 len = 0;
+        if (s.IsLoading())
+        {
+#line 170
+            s.Get(&pre_magic, 1);
+            if (pre_magic != correct_pre)
+            {
+#line 172
+                s.SetCorrupted();
+                return;
+            }
+#line 176
+            s.Get(&len, sizeof (len));
+            if (len > 2000000000)
+            {
+#line 178
+                s.SetCorrupted();
+                return;
+            }
+            Base::SetCount(len);
+            Iterator it = Base::Begin();
+            Iterator end = Base::End();
+            for (; it != end; ++ it)
+                Abstract::Serialize(*it, s);
+#line 187
+            s.Get(&post_magic, 1);
+            if (post_magic != correct_post)
+            {
+#line 189
+                s.SetCorrupted();
+                return;
+            }
+        }
+        else 
+#line 193
+        if (s.IsStoring())
+        {
+#line 194
+            s.Put(&correct_pre, 1);
+#line 196
+            len = Base::GetCount();
+            s.Put(&len, sizeof (len));
+            Iterator it = Base::Begin();
+            Iterator end = Base::End();
+            for (; it != end; ++ it)
+                Abstract::Serialize(*it, s);
+#line 203
+            s.Put(&correct_post, 1);
+        }
+    };
+    
+#line 222
     template < class _1 >
     inline void Vector < _1 >::Split(Text::String to_split, Text::String split_str, bool ignore_empty)
     {

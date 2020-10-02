@@ -1,8 +1,11 @@
 
-auto string PLATFORM = "UNKNOWN";
-auto number CPU_32 = 0;
-auto number CPU_64 = 0;
-auto number PTRSIZE = 0;
+//auto number M_PI		= 3.141592654;
+//auto number M_2PI		= 6.283185307;
+
+auto string PLATFORM	= "UNKNOWN";
+auto number CPU_32		= 0;
+auto number CPU_64		= 0;
+auto number PTRSIZE		= 0;
 
 
 auto bool IsDefined(identifier id) {$std::defined(id);}
@@ -115,7 +118,7 @@ auto statement MainClass(token AppClass) {
 	
 	
 	extern "C" !inline int main(int argc, const char** argv) {
-		Com::Env& e = Com::Env::Local();
+		Util::Env& e = Util::Env::Local();
 		e.Init(argc, argv);
 		Main::${AppClass}().Run();
 		return e.Deinit();

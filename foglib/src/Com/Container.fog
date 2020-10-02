@@ -56,26 +56,26 @@ public:
 	inline One(T* obj) : obj(obj) {}
 	inline ~One() { Clear(); }
 
-	void Create() { Clear(); obj = new T(); }
-	void Clear() { if (obj) { delete obj; obj = NULL; } }
-	void operator=(T* obj) { Clear(); this->obj = obj; }
-	bool Is() const { return obj != NULL; }
-	bool IsEmpty() const { return obj == NULL; }
-	T* operator->() {ASSERT(obj); return obj;}
-	const T* operator->() const {ASSERT(obj); return obj;}
+	inline void Create() { Clear(); obj = new T(); }
+	inline void Clear() { if (obj) { delete obj; obj = NULL; } }
+	inline void operator=(T* obj) { Clear(); this->obj = obj; }
+	inline bool Is() const { return obj != NULL; }
+	inline bool IsEmpty() const { return obj == NULL; }
+	inline T* operator->() {ASSERT(obj); return obj;}
+	inline const T* operator->() const {ASSERT(obj); return obj;}
 	inline T& operator*() {ASSERT(obj); return *obj;}
 	inline const T& operator*() const {ASSERT(obj); return *obj;}
-	T* Get() {return obj;}
-	const T* Get() const {return obj;}
-	T& Value() {return *obj;}
-	T* Detach() {ASSERT(obj); T* tmp = obj; obj = NULL; return tmp;}
-	operator bool() const {return !IsEmpty();}
-	bool operator!=(void* ptr) {return ptr != obj;}
-	operator T&() {ASSERT(obj); return *obj;}
-	operator ConstT&() const {ASSERT(obj); return *obj;}
+	inline T* Get() {return obj;}
+	inline const T* Get() const {return obj;}
+	inline T& Value() {return *obj;}
+	inline T* Detach() {ASSERT(obj); T* tmp = obj; obj = NULL; return tmp;}
+	inline operator bool() const {return !IsEmpty();}
+	inline bool operator!=(void* ptr) {return ptr != obj;}
+	inline operator T&() {ASSERT(obj); return *obj;}
+	inline operator ConstT&() const {ASSERT(obj); return *obj;}
 	
-	template <class K> void CreateDerived() {Clear(); obj = new K();}
-	template <class K> K* GetDerived() {return dynamic_cast<K*>(obj);}
+	template <class K> inline void CreateDerived() {Clear(); obj = new K();}
+	template <class K> inline K* GetDerived() {return dynamic_cast<K*>(obj);}
 };
 
 template <class T> inline class FutureOne {
@@ -160,7 +160,7 @@ public:
 	inline Vector() {}
 	inline Vector(const Vector& v) : Base(v) {}
 	
-	void Serialize(StreamBase& s) {
+	inline void Serialize(StreamBase& s) {
 		static const byte correct_pre = 0xA;
 		static const byte correct_post = 0xB;
 		byte pre_magic;
@@ -182,7 +182,7 @@ public:
 			Iterator it = Base::Begin();
 			Iterator end = Base::End();
 			for(; it != end; ++it)
-				Abstract::Serialize(*it, *this);
+				Abstract::Serialize(*it, s);
 			
 			s.Get(&post_magic, 1);
 			if (post_magic != correct_post) {
@@ -198,7 +198,7 @@ public:
 			Iterator it = Base::Begin();
 			Iterator end = Base::End();
 			for(; it != end; ++it)
-				Abstract::Serialize(*it, *this);
+				Abstract::Serialize(*it, s);
 			
 			s.Put(&correct_post, 1);
 		}

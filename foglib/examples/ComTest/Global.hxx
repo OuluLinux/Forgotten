@@ -9,10 +9,10 @@
 
 extern "C"
 {
-#line 117 "../../src/Com/Meta.fog"
+#line 120 "../../src/Com/Meta.fog"
     int main(int argc, const char **argv);
 };
-#line 114
+#line 117
 NamespaceInterfaceLinker loader;
 
 #endif

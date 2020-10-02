@@ -1,13 +1,82 @@
+
 namespace Util {
 using/interface Container;
 using/interface Stream;
 
 
-inline String& ExeFilePath() {static String s; return s;}
-void SetExeFilePath(String s) {ExeFilePath() = s;}
-String GetExeFilePath() {return ExeFilePath();}
+class Env {
+	Vector<String> cmd;
+	String exe_path;
+	int exit_code = 0;
+	
+public:
+	
+	!inline void Init(int argc, const char** argv) {
+		SetExeFilePath(argv[0]);
+		ParseCommandLine(argc, argv);
+		ReadComCmdlineArgs();
+		RunInitBlocks();
+	}
+	
+	!inline int Deinit() {
+		ShutdownThreads();
+		RunExitBlocks();
+		return GetExitCode();
+	}
+	
+	void ShutdownThreads() {}
+	
+	static Env& Local() {static Env e; return e;}
+	
+	
+	void SetExitCode(int i) {exit_code = i;}
+	
+	int GetExitCode() const {return 0;}
+	String GetExeFilePath() const {return exe_path;}
+	const Vector<String>& CommandLine() const {return cmd;}
+	
+protected:
+	void SetExeFilePath(const char* path) {exe_path = path;}
+	void SeedRandom() {Random::Generator::Local().Seed();}
+	void ParseCommandLine(int argc, const char** argv) {
+		for(int i = 1; i < argc; i++)
+			cmd.Add(argv[i]);
+	}
+	void ReadComCmdlineArgs() {
+		for(int i = 0; i < cmd.GetCount(); i++) {
+			String arg = cmd[i];
+			int j = arg.Find("=");
+			if (j >= 0) {
+				String key = arg.Left(j);
+				String value = arg.Mid(j+1);
+				if (key.Left(2) == "-E") {
+					key = key.Mid(2);
+					SetCoreArg(key, value);
+				}
+			}
+		}
+	}
+	void RunInitBlocks() {}
+	void RunExitBlocks() {}
+		
+	void SetCoreArg(String key, String value) {
+		if (key.IsEmpty())
+			return;
+		
+		LOG("core-arg: \"" << key << "\" -> \"" << value << "\"");
+		if (key == "datapath") {
+			ASSERT(DirectoryExists(value));
+			__DataPath() = value;
+		}
+		else if (key == "config") {
+			ASSERT(DirectoryExists(value));
+			__ConfigPath() = value;
+		}
+	}
+};
+
 String GetHomeDir() {return Native::GetHomeDir();}
-String& ConfigPath() {static String s; return s;}
+inline String& ConfigPath() {static String s; return s;}
 String AppendFileName(String a, String b);
 String GetExeDirFile(String filename);
 String ConfigFile(String file_name);
@@ -25,13 +94,6 @@ CharStream& Cout();
 CharStream& Errout();
 CharStream& Cin();
 String ReadStdIn();
-void ParseCommandLine(int argc, const char** argv);
-void ParseCommandLine(const char* cmdline);
-const Vector<String>& CommandLine();
-int GetExitCode();
-void SetExitCode(int i);
-void SetCoreArg(String key, String value);
-String GetExeDirFile(String filename);
 String GetEnv(String id);
 void ReadCoreCmdlineArgs();
 void SetDataPath(String path);
@@ -182,10 +244,6 @@ String AppendFileName(String a, String b) {
 	}
 }
 
-String GetExeDirFile(String filename) {
-	return AppendFileName(GetFileDirectory(GetExeFilePath()), filename);
-}
-
 String ConfigFile(String file_name) {
 	if (ConfigPath().GetCount())
 		return AppendFileName(ConfigPath(), file_name);
@@ -293,7 +351,7 @@ void RenameFile(String oldpath, String newpath) {
 	static FileOut fout;
 	static StringStream ss; // for early logging
 	if (!fout.IsOpen()) {
-		String exepath = GetExeFilePath();
+		String exepath = Env::Local().GetExeFilePath();
 		if (exepath.IsEmpty()) {
 			return ss;
 		}
@@ -306,7 +364,7 @@ void RenameFile(String oldpath, String newpath) {
 			fout.Open(path);
 			//fout << " *** " << GetSysTime().ToString() << " ***" << ENDL
 			//	 << " *** " << GetExeFilePath() << " ***" << ENDL;
-			fout << " *** " << GetExeFilePath() << " ***" << $ENDL;
+			fout << " *** " << Env::Local().GetExeFilePath() << " ***" << $ENDL;
 			
 			if (ss.GetSize())
 				fout << ss.GetResult();
@@ -339,65 +397,19 @@ void RenameFile(String oldpath, String newpath) {
 
 !inline String ReadStdIn() {return Cin().GetLine();}
 
-Vector<String>& __CommandLine() {static Vector<String> v; return v;}
 
-void ParseCommandLine(const char* cmdline) {
-	__CommandLine().Split((String)cmdline, " ");
-}
-
-void ParseCommandLine(int argc, const char** argv) {
-	__CommandLine().Clear();
-	for(int i = 1; i < argc; i++)
-		__CommandLine().Add(argv[i]);
-}
-
-const Vector<String>& CommandLine() {return __CommandLine();}
-
-int& __ExitCode() {static int i; return i;}
-int GetExitCode() {return __ExitCode();}
-void SetExitCode(int i) {__ExitCode() = i;}
 
 String& __DataPath() {static String s; return s;}
 String& __ConfigPath() {static String s; return s;}
 
-!inline void SetCoreArg(String key, String value) {
-	if (key.IsEmpty())
-		return;
-	
-	LOG("core-arg: \"" << key << "\" -> \"" << value << "\"");
-	if (key == "datapath") {
-		ASSERT(DirectoryExists(value));
-		__DataPath() = value;
-	}
-	else if (key == "config") {
-		ASSERT(DirectoryExists(value));
-		__ConfigPath() = value;
-	}
-}
-
 String GetExeDirFile(String filename) {
-	return AppendFileName(GetFileDirectory(GetExeFilePath()), filename);
+	return AppendFileName(GetFileDirectory(Env::Local().GetExeFilePath()), filename);
 }
 
 String GetEnv(String id) {
 	if (id.IsEmpty())
 		return String();
 	return Native::GetEnv(id.Begin());
-}
-
-void ReadCoreCmdlineArgs() {
-	for(int i = 0; i < __CommandLine().GetCount(); i++) {
-		String arg = __CommandLine()[i];
-		int j = arg.Find("=");
-		if (j >= 0) {
-			String key = arg.Left(j);
-			String value = arg.Mid(j+1);
-			if (key.Left(2) == "-E") {
-				key = key.Mid(2);
-				SetCoreArg(key, value);
-			}
-		}
-	}
 }
 
 void SetDataPath(String path) {
@@ -447,9 +459,9 @@ void AddLocalFileDirectory(String dir) {
 	__LocalFileDirs().Add(dir);
 }
 
-bool& __Verbose() {static bool b; return b;}
-bool IsVerbose() {return __Verbose();}
-void SetVerbose(bool b) {__Verbose() = b;}
+!inline bool& __Verbose() {static bool b; return b;}
+!inline bool IsVerbose() {return __Verbose();}
+!inline void SetVerbose(bool b) {__Verbose() = b;}
 
 !inline void __FileAdder(const char* str, void* files_idx) {
 	typedef Index<String> Idx;
@@ -783,7 +795,7 @@ void CommandLineArguments::AddArg(char key, const char* desc, bool has_value) {
 }
 
 bool CommandLineArguments::Parse() {
-	const Vector<String>& args = CommandLine();
+	const Vector<String>& args = Env::Local().CommandLine();
 	
 	for(int i = 0; i < args.GetCount(); i++) {
 		String arg = args[i];
@@ -822,7 +834,7 @@ bool CommandLineArguments::Parse() {
 }
 
 void CommandLineArguments::PrintHelp() {
-	String exe = GetExeFilePath();
+	String exe = Env::Local().GetExeFilePath();
 	int i = exe.ReverseFind($DIR_SEPS);
 	if (i >= 0)
 		exe = exe.Mid(i+1);
@@ -921,10 +933,52 @@ bool StreamCopy(StreamBase& dest, StreamBase& src) {
 
 }
 
-#define Log					Util::Log
+#define Env							Util::Env
+#define GetHomeDir					Util::GetHomeDir
+#define ConfigPath					Util::ConfigPath
+#define AppendFileName				Util::AppendFileName
+#define ConfigFile					Util::ConfigFile
+#define GetFileName					Util::GetFileName
+#define GetFileTitle				Util::GetFileTitle
+#define GetFileDirectory			Util::GetFileDirectory
+#define GetParentDirectory			Util::GetParentDirectory
+#define GetFileExt					Util::GetFileExt
+#define RealizeDirectory			Util::RealizeDirectory
+#define DeleteFile					Util::DeleteFile
+#define RenameFile					Util::RenameFile
+#define Panic						Util::Panic
+#define Log							Util::Log
+#define Cout						Util::Cout
+#define Errout						Util::Errout
+#define Cin							Util::Cin
+#define ReadStdIn					Util::ReadStdIn
+#define ParseCommandLine			Util::ParseCommandLine
+#define GetExeDirFile				Util::GetExeDirFile
+#define GetEnv						Util::GetEnv
+#define SetDataPath					Util::SetDataPath
+#define GetDataDirectory			Util::GetDataDirectory
+#define GetDataFile					Util::GetDataFile
+#define GetDataDirectoryFile		Util::GetDataDirectoryFile
+#define FileExists					Util::FileExists
+#define DirectoryExists				Util::DirectoryExists
+#define FindLocalFile				Util::FindLocalFile
+#define AddLocalFileDirectory		Util::AddLocalFileDirectory
+#define IsVerbose					Util::IsVerbose
+#define SetVerbose					Util::SetVerbose
+#define IsDotString					Util::IsDotString
+#define GetDirectoryFiles			Util::GetDirectoryFiles
+#define IsClose						Util::IsClose
+#define Single						Util::Single
+#define PtrRef						Util::PtrRef
+#define StringParser				Util::StringParser
+#define StringCache					Util::StringCache
+#define FindFile					Util::FindFile
+#define StdLess						Util::StdLess
+#define StdGreater					Util::StdGreater
+#define CmdArg						Util::CmdArg
+#define CmdInput					Util::CmdInput
+#define CommandLineArguments		Util::CommandLineArguments
+#define StreamCopy					Util::StreamCopy
+#define DtorValueSetter				Util::DtorValueSetter
+#define FlagDisabler				Util::FlagDisabler
 
-#define CommandLine			Util::CommandLine
-
-#define StringCache			Util::StringCache
-
-#define GetDirectoryFiles	Util::GetDirectoryFiles

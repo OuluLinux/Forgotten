@@ -118,6 +118,8 @@ using namespace std::chrono;
 #define NAMESPACE_LANG_END		}
 #define NAMESPACE_COM_BEGIN		namespace  Com {
 #define NAMESPACE_COM_END		}
+#define NAMESPACE_MATH_BEGIN	namespace  Math {
+#define NAMESPACE_MATH_END		}
 
 
 namespace Lang {
@@ -168,6 +170,13 @@ public:
 }
 
 #include "Defs.h"
+
+namespace Native {
+
+Com::uint64 NanoSeconds();
+Com::uint64 MilliSeconds();
+
+}
 
 NAMESPACE_COM_BEGIN
 

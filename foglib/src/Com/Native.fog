@@ -88,3 +88,4 @@ struct Trans8x16 {
 #define NativeDblStr				Native::DblStr
 #define NativeUtf8To16				Native::Utf8To16
 #define NativeUtf16To8				Native::Utf16To8
+#define StdRandomGaussian			Native::StdRandomGaussian

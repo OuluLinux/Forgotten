@@ -7,6 +7,7 @@ using/interface Com;
 using/interface Shared;
 using/interface Stream;
 using/interface Util;
+using/interface Math;
 using/implementation Com;
 
 
@@ -179,8 +180,9 @@ class App {
 		FileOut fout;
 		fout % r % f % d;
 		
-		for(int i = 0; i < CommandLine().GetCount(); i++) {
-			String arg = CommandLine()[i];
+		const Vector<String>& cmd = Env::Local().CommandLine();
+		for(int i = 0; i < cmd.GetCount(); i++) {
+			String arg = cmd[i];
 		}
 		
 		Index<String> files;
@@ -190,6 +192,19 @@ class App {
 			String s = files[i];
 			const char* c = s.Begin();
 			int len = StringLength(c);
+		}
+		
+		{
+			double d = FastSin(M_PI);
+			d = FastCos(M_PI);
+		}
+		
+		{
+			RandomGaussian& gaus = GetRandomGaussian(13);
+			double d = gaus;
+			d = gaus;
+			d = gaus;
+			d = gaus;
 		}
 		
 		/* TODO

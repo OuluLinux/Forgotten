@@ -16,10 +16,10 @@ namespace Shared
         DetachAll();
     };
     
-#line 156 "../../src/Com/Meta.fog"
+#line 159 "../../src/Com/Meta.fog"
     void Attachable::AddSlot(Slot *ptr)
     {
-#line 156
+#line 159
         slots.Add(ptr);
     };
     
@@ -78,17 +78,17 @@ namespace Shared
             }
     };
     
-#line 153 "../../src/Com/Meta.fog"
+#line 156 "../../src/Com/Meta.fog"
     Slot& Attachable::GetSlot(int i)
     {
-#line 153
+#line 156
         return *(Slot * ) slots[i];
     };
     
-#line 155
+#line 158
     int Attachable::GetSlotCount()
     {
-#line 155
+#line 158
         return slots.GetCount();
     };
     
@@ -105,10 +105,10 @@ namespace Shared
         return false;
     };
     
-#line 154 "../../src/Com/Meta.fog"
+#line 157 "../../src/Com/Meta.fog"
     void Attachable::RemoveSlot(int i)
     {
-#line 154
+#line 157
         slots.Remove(i);
     };
     
@@ -124,10 +124,10 @@ namespace Shared
 #line 127
     RefBase::~RefBase() {};
     
-#line 156 "../../src/Com/Meta.fog"
+#line 159 "../../src/Com/Meta.fog"
     void RefBase::AddWeak(WeakBase *ptr)
     {
-#line 156
+#line 159
         weaks.Add(ptr);
     };
     
@@ -153,17 +153,17 @@ namespace Shared
                 RemoveWeak(i -- );
     };
     
-#line 153 "../../src/Com/Meta.fog"
+#line 156 "../../src/Com/Meta.fog"
     WeakBase& RefBase::GetWeak(int i)
     {
-#line 153
+#line 156
         return *(WeakBase * ) weaks[i];
     };
     
-#line 155
+#line 158
     int RefBase::GetWeakCount()
     {
-#line 155
+#line 158
         return weaks.GetCount();
     };
     
@@ -181,10 +181,10 @@ namespace Shared
         AddWeak(w);
     };
     
-#line 154 "../../src/Com/Meta.fog"
+#line 157 "../../src/Com/Meta.fog"
     void RefBase::RemoveWeak(int i)
     {
-#line 154
+#line 157
         weaks.Remove(i);
     };
     

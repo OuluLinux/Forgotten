@@ -14,8 +14,8 @@ file
 	Abstract.cxx,
 	Algorithm.cxx,
 	Algorithm.hxx,
-	Com.cxx,
 	Com.hxx,
+	Com.cxx,
 	Container.cxx,
 	Container.hxx,
 	Global.cxx,
@@ -40,6 +40,8 @@ file
 	Stream.cxx,
 	Util.hxx,
 	Util.cxx,
+	Math.hxx,
+	Math.cxx,
 	Compiler.hxx,
 	Compiler.cxx,
 	_ readonly separator;
