@@ -2,8 +2,6 @@
 
 
 namespace Stream {
-using/interface Container;
-using/interface Abstract;
 
 
 /*struct Console {
@@ -14,7 +12,7 @@ using/interface Abstract;
 };*/
 
 
-!inline struct CharStream : public Abstract::Stream {
+!inline struct CharStream : public StreamBase {
 	
 	CharStream& operator << (String s) {s.Serialize(*this); return *this;}
 	CharStream& operator << (const char* s) {Serialize(s, *this); return *this;}
@@ -144,11 +142,11 @@ public:
 		if (s) { Native::FileFlush(s); Native::FileClose(s); s = NULL; }
 	}
 
-	/*virtual Stream& operator << (String str) {
+	/*virtual StreamBase& operator << (String str) {
 		Put(str.Begin(), str.GetCount());
 		return *this;
 	}
-	virtual Stream& operator << (int i) {
+	virtual StreamBase& operator << (int i) {
 		String str = IntStr(i);
 		Put(str.Begin(), str.GetCount());
 		return *this;
@@ -197,11 +195,11 @@ public:
 	void SetStoring()			{is_storing = true;}
 	void SetLoading()			{is_storing = false;}
 	
-	virtual Stream& operator << (String str) {
+	virtual StreamBase& operator << (String str) {
 		Put(str.Begin(), str.GetCount());
 		return *this;
 	}
-	virtual Stream& operator << (int i) {
+	virtual StreamBase& operator << (int i) {
 		String str = IntStr(i);
 		Put(str.Begin(), str.GetCount());
 		return *this;
@@ -312,6 +310,7 @@ public:
 
 }
 
+#define CharStream			Stream::CharStream
 #define FileIn				Stream::FileIn
 #define FileOut				Stream::FileOut
 #define StringStream		Stream::StringStream

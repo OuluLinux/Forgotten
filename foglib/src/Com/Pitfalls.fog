@@ -4,6 +4,25 @@
 
 FOG BUGS AND WORKAROUNDS:
 	
+	You need to very explicitly define used interfaced
+	Otherwise you get error like:
+		"Failed to resolve semantics of "typed-name: Container::Vector < Text::String > strings""
+		WRONG
+			namespace Some {
+				...
+				Vector<String> strvec;
+				...
+			}
+		RIGHT
+			namespace Some {
+				using/interface Container;
+				using/interface Text
+				...
+				Vector<String> strvec;
+				...
+			}
+		
+	
 	Having different variable name in virtual function params will give warning:
 		WRONG:
 			virtual void Base::Fn(int a);

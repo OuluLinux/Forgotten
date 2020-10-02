@@ -1,10 +1,4 @@
 namespace Shared {
-using/interface Prim;
-using/interface Lang;
-using/interface Native;
-using/interface Container;
-using/interface Com;
-using/implementation Com;
 
 class Attachable;
 

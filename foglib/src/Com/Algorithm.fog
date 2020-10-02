@@ -1,22 +1,29 @@
 
 namespace Algorithm {
 
-template <class T> const T& Minimum(const T& a, const T& b) {
+template <class T> inline const T& Minimum(const T& a, const T& b) {
 	if (a < b)
 		return a;
 	else
 		return b;
 }
 
-template <class T> const T& Maximum(const T& a, const T& b) {
+template <class T> inline const T& Maximum(const T& a, const T& b) {
 	if (a >= b)
 		return a;
 	else
 		return b;
 }
 
+template <class T> inline T Absolute(const T& a) {
+	if (a < 0)
+		return a * -1;
+	else
+		return a;
+}
 
 }
 
 #define Min		Algorithm::Minimum
 #define Max		Algorithm::Maximum
+#define Abs		Algorithm::Absolute

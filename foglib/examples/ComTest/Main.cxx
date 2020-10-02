@@ -1,28 +1,3 @@
-/*!$@FOG@$!
- *	Generated at Thu Oct  1 09:45:53 2020
- *
- *	by fog 0.1.a of 12:17:36 Sep 29 2020
- *
- *	from
- *		../../src/Com/Abstract.fog
- *		../../src/Com/Algorithm.fog
- *		../../src/Com/Com.fog
- *		../../src/Com/Container.fog
- *		../../src/Com/Environment.fog
- *		../../src/Com/Hash.fog
- *		../../src/Com/Lang.fog
- *		../../src/Com/Macros.fog
- *		../../src/Com/Meta.fog
- *		../../src/Com/Native.fog
- *		../../src/Com/Prim.fog
- *		../../src/Com/Random.fog
- *		../../src/Com/Shared.fog
- *		../../src/Com/Stream.fog
- *		../../src/Com/Text.fog
- *		../../src/Com/Util.fog
- *		/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog
- */
-
 #ifndef MAIN_CXX
 #define MAIN_CXX
 
@@ -34,37 +9,37 @@
 
 namespace Main
 {
-#line 208 "/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog"
+#line 227 "ComTest.mfog"
     void App::TestShared()
     {
-#line 218
+#line 237
         Shared::Ptr < Dumb > s0a;
-#line 220
+#line 239
         ;
         {
-#line 221
+#line 240
             Shared::Ptr < Dumber > s1a;
             Shared::Ptr < Dumb > s1b;
-#line 224
+#line 243
             ;
             ;
             s1b = Shared::Ptr < Dumb > ().WrapObject(new Dumb);
-#line 228
+#line 247
             ;
             s1a = s1b.As < Dumber > ();
-#line 231
+#line 250
             ;
             {
                 Shared::Ptr < Dumber > s2;
-#line 235
+#line 254
                 ;
-#line 235
+#line 254
                 s2 = s1a;
-#line 237
+#line 256
                 ;
-#line 237
+#line 256
                 s0a = s2.As < Dumb > ();
-#line 239
+#line 258
                 ;
             }
             ;
@@ -72,10 +47,10 @@ namespace Main
         ;
     };
     
-#line 201
+#line 220
     App::Dumber::~Dumber()
     {
-#line 201
+#line 220
         ;
     };
     
@@ -87,20 +62,20 @@ namespace Main
     {};
     
 #line 74
-    Text::String App::SomeRefTuple2::ToString() const
+    Text::String App::SomeRefTuple2::AsString() const
     {
 #line 74
         return Text::ToString(a) + ", " + Text::ToString(b);
     };
     
 #line 54
-    Text::String App::SomeTuple2::ToString() const
+    Text::String App::SomeTuple2::AsString() const
     {
 #line 54
         return Text::ToString(a) + ", " + Text::ToString(b);
     };
     
-#line 29 "/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog"
+#line 29 "ComTest.mfog"
     App::VirtualBase::~VirtualBase() {};
     
 };

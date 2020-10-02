@@ -50,11 +50,11 @@
 #define MACROSTR(x) #x
 #define COUT(x) {::UScript::String ____s; ____s << x; Cout() << ____s << "\n";}
 #define COUTLOG(x) {::UScript::String ____s; ____s << x; LOG(____s); Cout() << ____s << "\n";}
-#define TODO {Panic("TODO " __FILE__ ":" + UScript::IntStr(__LINE__)); throw UScript::Exc("TODO");}
+#define TODO {Panic("TODO"); throw Exc();}
 #define SYNON_UNION_2(type, name0, name1) union {type name0; type name1;};
 
 
-#define LOG(x) {UScript::Log() << x << ENDL; UScript::Log().Flush();}
+#define LOG(x) {Log() << x << $ENDL; Log().Flush();}
 
 #define DUMP(x) {LOG( #x  " = " << ToString(x));}
 

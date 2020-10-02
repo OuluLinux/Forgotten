@@ -1,70 +1,15 @@
-/*!$@FOG@$!
- *	Generated at Thu Oct  1 09:26:12 2020
- *
- *	by fog 0.1.a of 12:17:36 Sep 29 2020
- *
- *	from
- *		../../src/Com/Abstract.fog
- *		../../src/Com/Algorithm.fog
- *		../../src/Com/Com.fog
- *		../../src/Com/Container.fog
- *		../../src/Com/Environment.fog
- *		../../src/Com/Hash.fog
- *		../../src/Com/Lang.fog
- *		../../src/Com/Macros.fog
- *		../../src/Com/Meta.fog
- *		../../src/Com/Native.fog
- *		../../src/Com/Prim.fog
- *		../../src/Com/Random.fog
- *		../../src/Com/Shared.fog
- *		../../src/Com/Stream.fog
- *		../../src/Com/Text.fog
- *		../../src/Com/Util.fog
- *		ComTest.mfog
- */
-
 #ifndef TEXT_HXX
 #define TEXT_HXX
 
 #include <new>
 
+#ifndef PRIM_HXX
+#include <Prim.hxx>
+#endif
+
 #ifndef ABSTRACT_HXX
 #include <Abstract.hxx>
 #endif
-
-namespace Lang
-{
-#line 9 "../../src/Com/Lang.fog"
-    typedef Prim::CPtr < const char > CString;
-#line 9
-    typedef Prim::CPtr < const void > ConstVoidPtr;
-#line 9
-    typedef Prim::CPtr < void > VoidPtr;
-#line 142 "../../src/Com/Meta.fog"
-    typedef unsigned char byte;
-#line 142
-    typedef short int16;
-#line 142
-    typedef int int32;
-#line 142
-    typedef long long int64;
-#line 142
-    typedef char int8;
-#line 142
-    typedef unsigned short uint16;
-#line 142
-    typedef unsigned int uint32;
-#line 142
-    typedef uint32 dword;
-#line 142
-    typedef unsigned long long uint64;
-#line 142
-    typedef uint64 qword;
-#line 142
-    typedef unsigned char uint8;
-#line 142
-    typedef uint16 word;
-};
 
 namespace Text
 {
@@ -82,34 +27,34 @@ namespace Text
     String EscapeCharacter(String s);
 #line 805
     String EscapeString(String s);
-#line 830
+#line 845
     inline void FromString(const String& s, Lang::byte& o);
-#line 829
+#line 844
     inline void FromString(const String& s, Lang::int64& o);
-#line 828
+#line 843
     inline void FromString(const String& s, Lang::uint32& o);
-#line 834
+#line 849
     inline void FromString(const String& s, String& o);
-#line 825
+#line 840
     template < class _1 >
     inline void FromString(const String& s, _1& o);
-#line 826
+#line 841
     inline void FromString(const String& s, bool& o);
-#line 831
+#line 846
     inline void FromString(const String& s, char& o);
-#line 833
+#line 848
     inline void FromString(const String& s, double& o);
-#line 832
+#line 847
     inline void FromString(const String& s, float& o);
-#line 827
+#line 842
     inline void FromString(const String& s, int& o);
 #line 10
     inline int GetHexDigit(char c);
-#line 846
+#line 861
     inline int HexDigit(int c);
     inline int HexDigitLower(int c);
     inline String HexStr(Lang::uint64 p);
-#line 864
+#line 879
     inline String HexStr(void *p);
 #line 9
     inline bool IsAlpha(char c);
@@ -121,49 +66,49 @@ namespace Text
     inline bool IsOctDigit(char c);
 #line 8
     inline bool IsSpace(char c);
-#line 836
+#line 851
     template < class _1 >
     inline Lang::int64 ToInt(const _1& o);
-#line 840
+#line 855
     template <>
     inline Lang::int64 ToInt < Lang::byte > (const Lang::byte& o);
-#line 839
+#line 854
     template <>
     inline Lang::int64 ToInt < Lang::int64 > (const Lang::int64& o);
-#line 844
+#line 859
     template <>
     inline Lang::int64 ToInt < String > (const String& o);
-#line 837
+#line 852
     template <>
     inline Lang::int64 ToInt < bool > (const bool& o);
-#line 841
+#line 856
     template <>
     inline Lang::int64 ToInt < char > (const char& o);
     template <>
     inline Lang::int64 ToInt < double > (const double& o);
-#line 842
+#line 857
     template <>
     inline Lang::int64 ToInt < float > (const float& o);
-#line 838
+#line 853
     template <>
     inline Lang::int64 ToInt < int > (const int& o);
 #line 778
     String ToLower(const String& s);
 #line 758
     int ToLowerChar(int chr);
-#line 810
+#line 825
     template < class _1 >
     inline String ToString(const _1& o);
-#line 815
+#line 830
     template <>
     inline String ToString < Lang::byte > (const Lang::byte& o);
-#line 814
+#line 829
     template <>
     inline String ToString < Lang::int64 > (const Lang::int64& o);
-#line 813
+#line 828
     template <>
     inline String ToString < Lang::uint32 > (const Lang::uint32& o);
-#line 819
+#line 834
     template <>
     inline String ToString < String > (const String& o);
 };
@@ -174,33 +119,33 @@ class WString;
 
 namespace Text
 {
-#line 822
+#line 837
     template <>
     inline String ToString < WString > (const WString& o);
-#line 811
+#line 826
     template <>
     inline String ToString < bool > (const bool& o);
-#line 816
+#line 831
     template <>
     inline String ToString < char > (const char& o);
     template <>
     inline String ToString < double > (const double& o);
-#line 817
+#line 832
     template <>
     inline String ToString < float > (const float& o);
-#line 812
+#line 827
     template <>
     inline String ToString < int > (const int& o);
 #line 764
     String ToUpper(const String& s);
 #line 752
     int ToUpperChar(int chr);
-#line 821
+#line 836
     template < class _1 >
     inline WString ToWString(const _1& o);
     template <>
     inline WString ToWString < String > (const String& o);
-#line 807
+#line 808
     String TrimBoth(String s);
     
     class String
@@ -287,7 +232,7 @@ namespace Text
 #line 402
         inline String Right(int i) const;
 #line 111
-        void Serialize(Abstract::Stream& s);
+        void Serialize(Abstract::StreamBase& s);
 #line 145
         String& Set(const Char *c, int len, bool find_end = true);
         
@@ -476,7 +421,7 @@ namespace Text
 #line 402
         inline WString Right(int i) const;
 #line 111
-        void Serialize(Abstract::Stream& s);
+        void Serialize(Abstract::StreamBase& s);
 #line 145
         WString& Set(const Char *c, int len, bool find_end = true);
         
@@ -584,74 +529,74 @@ namespace Text
         return ToUpper(s.Left(1)) + s.Mid(1);
     };
     
-#line 830
+#line 845
     inline void FromString(const String& s, Lang::byte& o)
     {
-#line 830
+#line 845
         o = Text::String::StrInt(s);
     };
     
-#line 829
+#line 844
     inline void FromString(const String& s, Lang::int64& o)
     {
-#line 829
+#line 844
         o = Text::String::StrInt64(s);
     };
     
-#line 828
+#line 843
     inline void FromString(const String& s, Lang::uint32& o)
     {
-#line 828
+#line 843
         o = Text::String::StrInt64(s);
     };
     
-#line 834
+#line 849
     inline void FromString(const String& s, String& o)
     {
-#line 834
+#line 849
         o = s;
     };
     
-#line 825
+#line 840
     template < class _1 >
     inline void FromString(const String& s, _1& o)
     {
-#line 825
+#line 840
         o.FromString(s);
     };
     
-#line 826
+#line 841
     inline void FromString(const String& s, bool& o)
     {
-#line 826
+#line 841
         o = (ToLower(s) != "false" && s != "0" && s.GetCount());
     };
     
-#line 831
+#line 846
     inline void FromString(const String& s, char& o)
     {
-#line 831
+#line 846
         o = Text::String::StrInt(s);
     };
     
-#line 833
+#line 848
     inline void FromString(const String& s, double& o)
     {
-#line 833
+#line 848
         o = Text::String::StrDbl(s);
     };
     
-#line 832
+#line 847
     inline void FromString(const String& s, float& o)
     {
-#line 832
+#line 847
         o = Text::String::StrDbl(s);
     };
     
-#line 827
+#line 842
     inline void FromString(const String& s, int& o)
     {
-#line 827
+#line 842
         o = Text::String::StrInt(s);
     };
     
@@ -668,50 +613,50 @@ namespace Text
         return 0;
     };
     
-#line 846
+#line 861
     inline int HexDigit(int c)
     {
-#line 846
+#line 861
         return "0123456789ABCDEF"[c & 15];
     };
     
-#line 847
+#line 862
     inline int HexDigitLower(int c)
     {
-#line 847
+#line 862
         return "0123456789abcdef"[c & 15];
     };
     
-#line 848
+#line 863
     inline String HexStr(Lang::uint64 p)
     {
-#line 849
+#line 864
         String o("0x");
         bool zero = true;
         Lang::uint64 i = 64;
         do
             {
-#line 853
+#line 868
                 i -= 4;
                 Lang::byte b = (p >> i) & 15ULL;
                 if (b || !zero)
                 {
-#line 856
+#line 871
                     zero = false;
                     o.Cat(HexDigit(b));
                 }
             }while (i);
-#line 861
+#line 876
         if (zero)
-#line 861
+#line 876
             o.Cat('0');
         return o;
     };
     
-#line 864
+#line 879
     inline String HexStr(void *p)
     {
-#line 864
+#line 879
         return HexStr((Lang::uint64) p);
     };
     
@@ -749,187 +694,187 @@ namespace Text
         return c == ' ' || c == '\t' || c == '\n' || c == '\r';
     };
     
-#line 836
+#line 851
     template < class _1 >
     inline Lang::int64 ToInt(const _1& o)
     {
-#line 836
+#line 851
         return o.ToInt();
     };
     
-#line 840
+#line 855
     template <>
     inline Lang::int64 ToInt < Lang::byte > (const Lang::byte& o)
     {
-#line 840
+#line 855
         return(Lang::int64) o;
     };
     
-#line 839
+#line 854
     template <>
     inline Lang::int64 ToInt < Lang::int64 > (const Lang::int64& o)
     {
-#line 839
+#line 854
         return(Lang::int64) o;
     };
     
-#line 844
+#line 859
     template <>
     inline Lang::int64 ToInt < String > (const String& o)
     {
-#line 844
+#line 859
         return Text::String::StrInt(o);
     };
     
-#line 837
+#line 852
     template <>
     inline Lang::int64 ToInt < bool > (const bool& o)
     {
-#line 837
+#line 852
         return(Lang::int64) o;
     };
     
-#line 841
+#line 856
     template <>
     inline Lang::int64 ToInt < char > (const char& o)
     {
-#line 841
+#line 856
         return(Lang::int64) o;
     };
     
-#line 843
+#line 858
     template <>
     inline Lang::int64 ToInt < double > (const double& o)
     {
-#line 843
+#line 858
         return(Lang::int64) o;
     };
     
-#line 842
+#line 857
     template <>
     inline Lang::int64 ToInt < float > (const float& o)
     {
-#line 842
+#line 857
         return(Lang::int64) o;
     };
     
-#line 838
+#line 853
     template <>
     inline Lang::int64 ToInt < int > (const int& o)
     {
-#line 838
+#line 853
         return(Lang::int64) o;
     };
     
-#line 810
+#line 825
     template < class _1 >
     inline String ToString(const _1& o)
     {
-#line 810
-        return o.ToString();
+#line 825
+        return o.AsString();
     };
     
-#line 815
+#line 830
     template <>
     inline String ToString < Lang::byte > (const Lang::byte& o)
     {
-#line 815
+#line 830
         return Text::String::IntStr(o);
     };
     
-#line 814
+#line 829
     template <>
     inline String ToString < Lang::int64 > (const Lang::int64& o)
     {
-#line 814
+#line 829
         return Text::String::IntStr64(o);
     };
     
-#line 813
+#line 828
     template <>
     inline String ToString < Lang::uint32 > (const Lang::uint32& o)
     {
-#line 813
+#line 828
         return Text::String::IntStr64(o);
     };
     
-#line 819
+#line 834
     template <>
     inline String ToString < String > (const String& o)
     {
-#line 819
+#line 834
         return o;
     };
     
     template <>
     inline String ToString < WString > (const WString& o)
     {
-#line 822
+#line 837
         return Native::Utf16To8(o.Begin());
     };
     
-#line 811
+#line 826
     template <>
     inline String ToString < bool > (const bool& o)
     {
-#line 811
+#line 826
         if (o)
-#line 811
+#line 826
             return "true";
         else
-#line 811
+#line 826
             return "false";
     };
     
-#line 816
+#line 831
     template <>
     inline String ToString < char > (const char& o)
     {
-#line 816
+#line 831
         String s;
-#line 816
+#line 831
         s.Cat(o);
-#line 816
+#line 831
         return s;
     };
     
-#line 818
+#line 833
     template <>
     inline String ToString < double > (const double& o)
     {
-#line 818
+#line 833
         return Text::String::DblStr(o);
     };
     
-#line 817
+#line 832
     template <>
     inline String ToString < float > (const float& o)
     {
-#line 817
+#line 832
         return Text::String::DblStr(o);
     };
     
-#line 812
+#line 827
     template <>
     inline String ToString < int > (const int& o)
     {
-#line 812
+#line 827
         return Text::String::IntStr(o);
     };
     
-#line 821
+#line 836
     template < class _1 >
     inline WString ToWString(const _1& o)
     {
-#line 821
+#line 836
         return o.ToWString();
     };
     
-#line 823
+#line 838
     template <>
     inline WString ToWString < String > (const String& o)
     {
-#line 823
+#line 838
         return Native::Utf8To16(o.Begin());
     };
     

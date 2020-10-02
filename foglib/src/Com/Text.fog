@@ -1,5 +1,5 @@
 namespace Text {
-using/interface Abstract;
+using/interface Prim;
 
 
 inline bool IsOctDigit(char c) { return c >= '0' && c <= '7'; }
@@ -108,7 +108,7 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 			count = 0;
 		}
 		
-		void Serialize(Abstract::Stream& s) {
+		void Serialize(StreamBase& s) {
 			if (s.IsStoring()) {
 				s.Put(&count, sizeof(count));
 				if (count) {
@@ -804,10 +804,25 @@ inline String DblStr(double d) { return String::DblStr(d); }*/
 
 String EscapeString(String s);
 String EscapeCharacter(String s);
-String TrimBoth(String s);
+
+String TrimBoth(String s) {
+	if (s.IsEmpty())
+		return s;
+	String out;
+	int begin = s.FindFirstNotOf(" \t\n\r");
+	if (begin < 0)
+		return "";
+	int end = s.ReverseFindFirstNotOf(" \t\n\r");
+	if (end < 0)
+		return "";
+	end++;
+	if (end <= begin)
+		return "";
+	return s.Mid(begin, end - begin);
+}
 
 
-template <class T> inline String ToString(const T& o) {return o.ToString();}
+template <class T> inline String ToString(const T& o) {return o.AsString();}
 template<> inline String ToString(const bool& o) {if (o) return "true"; else return "false";}
 template<> inline String ToString(const int& o) {return Text::String::IntStr(o);}
 template<> inline String ToString(const uint32& o) {return Text::String::IntStr64(o);}
@@ -908,3 +923,11 @@ auto declaration HaveTextOperators() {
 #define HexDigit		Text::HexDigit
 #define HexDigitLower	Text::HexDigitLower
 #define HexStr			Text::HexStr
+
+#define IsOctDigit		Text::IsOctDigit
+#define IsHexDigit		Text::IsHexDigit
+#define IsDigit			Text::IsDigit
+#define IsSpace			Text::IsSpace
+#define IsAlpha			Text::IsAlpha
+#define GetHexDigit		Text::GetHexDigit
+

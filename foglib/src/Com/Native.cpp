@@ -3,6 +3,9 @@
 namespace Native {
 using namespace Com;
 
+FILE* GetStdOut()	{return stdout;}
+FILE* GetStdIn()	{return stdin;}
+FILE* GetStdErr()	{return stderr;}
 
 int SignificantBits(dword x) {
 	// basically log2(x) + 1 except that for 0 this is 0, number of significant bits of x
@@ -147,5 +150,189 @@ const char* Utf16To8(const short* in) {
 
 
 
+const char* GetHomeDir() {
+	#ifdef flagPOSIX
+	struct passwd *pw = getpwuid(getuid());
+	const char *homedir = pw->pw_dir;
+	return homedir;
+	#else
+	char homedir[2048];
+	getenv_s(0, homedir, 2048, "USERPROFILE");
+	return homedir;
+	#endif
+}
+
+
+bool DirExists(const char* path) {
+	DIR* d = opendir(path);
+	if (d) {
+	    closedir(d);
+	    return true;
+	}
+	return false;
+}
+
+bool PathExists(const char* path) {
+	#ifdef flagWIN32
+	#ifndef flagUWP
+	return PathFileExistsA(path);
+	#else
+	struct stat stat_info = {0};
+	if (stat(path, &stat_info) != 0)
+		return false;
+	return true;
+	#endif
+	#else
+	return access( path, F_OK ) != -1;
+	#endif
+}
+
+void CreateDirectory(const char* path) {
+	mkdir(path, 0700);
+}
+
+void DeleteFile(const char* path) {
+	unlink(path);
+}
+
+void RenameFile(const char* oldpath, const char* newpath) {
+	rename(oldpath, newpath);
+}
+
+
+const char* GetEnv(const char* id) {
+	#ifdef flagWIN32
+	size_t len = 0;
+	char homedir[2048];
+	getenv_s(&len, &homedir[0], 2048, id);
+	return String(homedir, len);
+	#else
+	return getenv(id);
+	#endif
+}
+
+bool is_dot_string(const char* s) {
+	int len = strlen(s);
+	if (!len) return false;
+	if (len == 1 && !memcmp(s, ".", 1)) return true;
+	if (len == 2 && !memcmp(s, "..", 2)) return true;
+	return false;
+}
+
+void GetDirFiles(const char* dir, void(*add_path)(const char*, void*), void* arg) {
+	#ifdef flagPOSIX
+	DIR* dirp = opendir(dir);
+    struct dirent * dp;
+    while ((dp = readdir(dirp)) != NULL) {
+        if (!is_dot_string(dp->d_name))
+            add_path(dp->d_name, arg);
+    }
+    closedir(dirp);
+    #endif
+    
+    #ifdef flagWIN32
+    std::string pattern = std::string(dir) + "\\*";
+    WIN32_FIND_DATA data;
+    HANDLE hFind;
+    if ((hFind = FindFirstFile(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE) {
+        do {
+            if (!IsDotString(data.cFileName))
+                add_path(data.cFileName, arg);
+        }
+        while (FindNextFile(hFind, &data) != 0);
+        FindClose(hFind);
+    }
+    #endif
+}
+
+
+
+
+
+
+int PopCount64(uint64 i) {
+	#ifdef flagMSC
+	#if CPU_64
+	return (int)__popcnt64(i);
+	#elif CPU_32
+	return __popcnt(i) + __popcnt(i >> 32);
+	#endif
+	#else
+	return (int)__builtin_popcountll(i);
+	#endif
+}
+
+int PopCount32(dword i) {
+	#ifdef flagMSC
+	return (int)__popcnt64(i);
+	#else
+	return (int)__builtin_popcountl(i);
+	#endif
+}
+
+int HammingDistance32(int count, const dword* a, const dword* b) {
+	if (count <= 0) return 0;
+	const dword* end = a + count;
+	int distance = 0;
+	while(a != end)
+		distance += PopCount32(*a++ ^ *b++);
+	return distance;
+}
+
+int HammingDistance64(int count, const uint64* a, const uint64* b) {
+	if (count <= 0) return 0;
+	const uint64* end = a + count;
+	int distance = 0;
+	while(a != end)
+		distance += PopCount64(*a++ ^ *b++);
+	return distance;
+}
+
+bool IsFinite(float f) {
+	return ::isfinite(f);
+}
+
+bool IsFinite(double f) {
+	return ::isfinite(f);
+}
+
+int64 GetCpuTicks() {
+	#ifdef flagWIN32
+    return __rdtsc();
+    #else
+    return clock();
+    #endif
+}
+
+int64 Delay(int64 cpu_ticks) {
+	int64 end = GetCpuTicks() + cpu_ticks;
+	int64 iters = 0;
+	while (GetCpuTicks() < end)
+		iters++;
+	return iters;
+}
+
+
+struct Trans8x16 {
+	union {
+		uint16 u16[8];
+		uint8 u8[16];
+		__m128i m;
+		uint64 u64[2];
+	};
+	
+	void TransFrom16x8();
+	void Zero();
+};
+
+void Trans8x16::TransFrom16x8() {
+	__m128i x = m;
+    for (int i = 0; i < 8; ++i) {
+        u16[7-i] = _mm_movemask_epi8(x);
+        x = _mm_slli_epi64(x,1);
+    }
+}
+
+void Trans8x16::Zero() {u64[0] = 0; u64[1] = 0;}
 
 }

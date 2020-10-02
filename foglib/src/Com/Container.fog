@@ -1,5 +1,5 @@
 namespace Container {
-using/interface Text;
+
 
 
 auto declaration MakeFiller(int size) {
@@ -160,7 +160,7 @@ public:
 	inline Vector() {}
 	inline Vector(const Vector& v) : Base(v) {}
 	
-	void Serialize(Abstract::Stream& s) {
+	void Serialize(StreamBase& s) {
 		static const byte correct_pre = 0xA;
 		static const byte correct_post = 0xB;
 		byte pre_magic;
@@ -281,7 +281,7 @@ public:
 	inline VectorPtr() {}
 	inline VectorPtr(const VectorPtr& v) : data(v) {}
 	
-	//void Serialize(Stream& s);
+	//void Serialize(StreamBase& s);
 	
 	
 	inline String Join(String join_str = "", bool ignore_empty = true) const {

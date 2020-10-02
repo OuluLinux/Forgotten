@@ -1,38 +1,13 @@
-/*!$@FOG@$!
- *	Generated at Thu Oct  1 09:26:12 2020
- *
- *	by fog 0.1.a of 12:17:36 Sep 29 2020
- *
- *	from
- *		../../src/Com/Abstract.fog
- *		../../src/Com/Algorithm.fog
- *		../../src/Com/Com.fog
- *		../../src/Com/Container.fog
- *		../../src/Com/Environment.fog
- *		../../src/Com/Hash.fog
- *		../../src/Com/Lang.fog
- *		../../src/Com/Macros.fog
- *		../../src/Com/Meta.fog
- *		../../src/Com/Native.fog
- *		../../src/Com/Prim.fog
- *		../../src/Com/Random.fog
- *		../../src/Com/Shared.fog
- *		../../src/Com/Stream.fog
- *		../../src/Com/Text.fog
- *		../../src/Com/Util.fog
- *		ComTest.mfog
- */
-
 #ifndef ABSTRACT_HXX
 #define ABSTRACT_HXX
 
 #include <new>
 
-#ifndef RANDOM_HXX
-#include <Random.hxx>
-#endif
 #ifndef ALGORITHM_HXX
 #include <Algorithm.hxx>
+#endif
+#ifndef NATIVE_HXX
+#include <Native.hxx>
 #endif
 
 namespace Abstract
@@ -40,132 +15,132 @@ namespace Abstract
 };
 
 namespace Abstract {
-class Stream;
+class StreamBase;
 }
 
 namespace Abstract
 {
-#line 21 "../../src/Com/Abstract.fog"
+#line 15 "../../src/Com/Abstract.fog"
     template < class _1 >
-    inline void Serialize(_1& o, Stream& s);
-#line 14
-    inline void Serialize(bool& o, Stream& s);
-#line 14
-    inline void Serialize(char& o, Stream& s);
-#line 33
-    inline void Serialize(const char *o, Stream& s);
-#line 14
-    inline void Serialize(double& o, Stream& s);
-#line 14
-    inline void Serialize(float& o, Stream& s);
-#line 14
-    inline void Serialize(int& o, Stream& s);
-#line 14
-    inline void Serialize(long long& o, Stream& s);
-#line 14
-    inline void Serialize(short& o, Stream& s);
-#line 14
-    inline void Serialize(unsigned char& o, Stream& s);
-#line 14
-    inline void Serialize(unsigned int& o, Stream& s);
-#line 14
-    inline void Serialize(unsigned long long& o, Stream& s);
-#line 14
-    inline void Serialize(unsigned short& o, Stream& s);
+    inline void Serialize(_1& o, StreamBase& s);
+#line 8
+    inline void Serialize(bool& o, StreamBase& s);
+#line 8
+    inline void Serialize(char& o, StreamBase& s);
+#line 27
+    inline void Serialize(const char *o, StreamBase& s);
+#line 8
+    inline void Serialize(double& o, StreamBase& s);
+#line 8
+    inline void Serialize(float& o, StreamBase& s);
+#line 8
+    inline void Serialize(int& o, StreamBase& s);
+#line 8
+    inline void Serialize(long long& o, StreamBase& s);
+#line 8
+    inline void Serialize(short& o, StreamBase& s);
+#line 8
+    inline void Serialize(unsigned char& o, StreamBase& s);
+#line 8
+    inline void Serialize(unsigned int& o, StreamBase& s);
+#line 8
+    inline void Serialize(unsigned long long& o, StreamBase& s);
+#line 8
+    inline void Serialize(unsigned short& o, StreamBase& s);
     
-    class Stream
+    class StreamBase
     {
     public:
-#line 46
+#line 40
         typedef Native::FILE FILE;
         
-#line 44
+#line 38
         bool corrupted;
         
     public:
-        inline Stream();
-#line 67
+        inline StreamBase();
+#line 61
         template < class _1 >
-        inline Stream& operator% (_1& o);
-#line 65
+        inline StreamBase& operator% (_1& o);
+#line 59
         virtual void Flush();
-#line 60
+#line 54
         virtual int Get(void *mem, int size);
         virtual Lang::int64 GetCursor();
-#line 63
+#line 57
         virtual Lang::int64 GetSize() const;
-#line 49
+#line 43
         inline bool IsCorrupted() const;
-#line 56
-        virtual bool IsEof();
-#line 54
-        virtual bool IsLoading();
-#line 52
-        virtual bool IsOpen() const;
-#line 55
-        virtual bool IsStoring();
-#line 59
-        virtual int Put(char c);
-#line 58
-        virtual int Put(const void *mem, int size);
-#line 62
-        virtual void Seek(Lang::int64 i);
 #line 50
+        virtual bool IsEof();
+#line 48
+        virtual bool IsLoading();
+#line 46
+        virtual bool IsOpen() const;
+#line 49
+        virtual bool IsStoring();
+#line 53
+        virtual int Put(char c);
+#line 52
+        virtual int Put(const void *mem, int size);
+#line 56
+        virtual void Seek(Lang::int64 i);
+#line 44
         inline void SetCorrupted(bool b = true);
     };
 };
 
 namespace Abstract
 {
-#line 21
+#line 15
     template < class _1 >
-    inline void Serialize(_1& o, Stream& s)
+    inline void Serialize(_1& o, StreamBase& s)
     {
-#line 21
+#line 15
         o.Serialize(s);
     };
     
-#line 14
-    inline void Serialize(bool& o, Stream& s)
+#line 8
+    inline void Serialize(bool& o, StreamBase& s)
     {
-#line 15
+#line 9
         if (s.IsLoading())
             s.Get(&o, sizeof (bool));
         else 
-#line 17
+#line 11
         if (s.IsStoring())
             s.Put(&o, sizeof (bool));
     };
     
-#line 14
-    inline void Serialize(char& o, Stream& s)
+#line 8
+    inline void Serialize(char& o, StreamBase& s)
     {
-#line 15
+#line 9
         if (s.IsLoading())
             s.Get(&o, sizeof (char));
         else 
-#line 17
+#line 11
         if (s.IsStoring())
             s.Put(&o, sizeof (char));
     };
     
-#line 33
-    inline void Serialize(const char *o, Stream& s)
+#line 27
+    inline void Serialize(const char *o, StreamBase& s)
     {
         {
-#line 34
+#line 28
             if (!(s.IsStoring()))
             {
-#line 34
+#line 28
                 Lang::SysBreak("Assertion failed: s.IsStoring()");
             }
         }
-#line 35
+#line 29
         ;
-#line 35
+#line 29
         if (s.IsStoring())
         {
-#line 36
+#line 30
             int len = Lang::StringLength(o);
             s.Put(&len, sizeof (len));
             if (len > 0)
@@ -173,141 +148,141 @@ namespace Abstract
         }
     };
     
-#line 14
-    inline void Serialize(double& o, Stream& s)
+#line 8
+    inline void Serialize(double& o, StreamBase& s)
     {
-#line 15
+#line 9
         if (s.IsLoading())
             s.Get(&o, sizeof (double));
         else 
-#line 17
+#line 11
         if (s.IsStoring())
             s.Put(&o, sizeof (double));
     };
     
-#line 14
-    inline void Serialize(float& o, Stream& s)
+#line 8
+    inline void Serialize(float& o, StreamBase& s)
     {
-#line 15
+#line 9
         if (s.IsLoading())
             s.Get(&o, sizeof (float));
         else 
-#line 17
+#line 11
         if (s.IsStoring())
             s.Put(&o, sizeof (float));
     };
     
-#line 14
-    inline void Serialize(int& o, Stream& s)
+#line 8
+    inline void Serialize(int& o, StreamBase& s)
     {
-#line 15
+#line 9
         if (s.IsLoading())
             s.Get(&o, sizeof (int));
         else 
-#line 17
+#line 11
         if (s.IsStoring())
             s.Put(&o, sizeof (int));
     };
     
-#line 14
-    inline void Serialize(long long& o, Stream& s)
+#line 8
+    inline void Serialize(long long& o, StreamBase& s)
     {
-#line 15
+#line 9
         if (s.IsLoading())
             s.Get(&o, sizeof (long long));
         else 
-#line 17
+#line 11
         if (s.IsStoring())
             s.Put(&o, sizeof (long long));
     };
     
-#line 14
-    inline void Serialize(short& o, Stream& s)
+#line 8
+    inline void Serialize(short& o, StreamBase& s)
     {
-#line 15
+#line 9
         if (s.IsLoading())
             s.Get(&o, sizeof (short));
         else 
-#line 17
+#line 11
         if (s.IsStoring())
             s.Put(&o, sizeof (short));
     };
     
-#line 14
-    inline void Serialize(unsigned char& o, Stream& s)
+#line 8
+    inline void Serialize(unsigned char& o, StreamBase& s)
     {
-#line 15
+#line 9
         if (s.IsLoading())
             s.Get(&o, sizeof (unsigned char));
         else 
-#line 17
+#line 11
         if (s.IsStoring())
             s.Put(&o, sizeof (unsigned char));
     };
     
-#line 14
-    inline void Serialize(unsigned int& o, Stream& s)
+#line 8
+    inline void Serialize(unsigned int& o, StreamBase& s)
     {
-#line 15
+#line 9
         if (s.IsLoading())
             s.Get(&o, sizeof (unsigned int));
         else 
-#line 17
+#line 11
         if (s.IsStoring())
             s.Put(&o, sizeof (unsigned int));
     };
     
-#line 14
-    inline void Serialize(unsigned long long& o, Stream& s)
+#line 8
+    inline void Serialize(unsigned long long& o, StreamBase& s)
     {
-#line 15
+#line 9
         if (s.IsLoading())
             s.Get(&o, sizeof (unsigned long long));
         else 
-#line 17
+#line 11
         if (s.IsStoring())
             s.Put(&o, sizeof (unsigned long long));
     };
     
-#line 14
-    inline void Serialize(unsigned short& o, Stream& s)
+#line 8
+    inline void Serialize(unsigned short& o, StreamBase& s)
     {
-#line 15
+#line 9
         if (s.IsLoading())
             s.Get(&o, sizeof (unsigned short));
         else 
-#line 17
+#line 11
         if (s.IsStoring())
             s.Put(&o, sizeof (unsigned short));
     };
     
-#line 47
-    inline Stream::Stream()
+#line 41
+    inline StreamBase::StreamBase()
     :
         corrupted(false)
     {};
     
-#line 67
+#line 61
     template < class _1 >
-    inline Stream& Stream::operator% (_1& o)
+    inline StreamBase& StreamBase::operator% (_1& o)
     {
-#line 68
+#line 62
         Serialize(o, *this);
-#line 68
+#line 62
         return *this;
     };
     
-#line 49
-    inline bool Stream::IsCorrupted() const
+#line 43
+    inline bool StreamBase::IsCorrupted() const
     {
-#line 49
+#line 43
         return corrupted;
     };
     
-#line 50
-    inline void Stream::SetCorrupted(bool b)
+#line 44
+    inline void StreamBase::SetCorrupted(bool b)
     {
-#line 50
+#line 44
         corrupted = b;
     };
     

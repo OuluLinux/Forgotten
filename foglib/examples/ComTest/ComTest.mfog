@@ -6,9 +6,9 @@ using/interface Container;
 using/interface Com;
 using/interface Shared;
 using/interface Stream;
+using/interface Util;
 using/implementation Com;
 
-$HaveTextOperators();
 
 class App {
 	//typedef Vector<String> StrVec;
@@ -70,7 +70,7 @@ class App {
 		
 		ASSERT(String("test") == "test");
 		ASSERT(DblStr(1.2) == "1.2");
-		ASSERT("abc" + String("def") == "abcdef");
+		ASSERT((String)"abc" + String("def") == "abcdef");
 		ASSERT(String("abc") + "def" == "abcdef");
 		ASSERT(ToString(ToWString<String>("abc")) == "abc");
 		ASSERT(ToInt<String>("123") == 123);
@@ -174,8 +174,27 @@ class App {
 			int sz = s.GetCount();
 		}
 		
+		Log() << "Lol does this work?\n";
+		
 		FileOut fout;
 		fout % r % f % d;
+		
+		for(int i = 0; i < CommandLine().GetCount(); i++) {
+			String arg = CommandLine()[i];
+		}
+		
+		Index<String> files;
+		GetDirectoryFiles("/", files);
+		ASSERT(files.Find("home") >= 0);
+		for(int i = 0; i < files.GetCount(); i++) {
+			String s = files[i];
+			const char* c = s.Begin();
+			int len = StringLength(c);
+		}
+		
+		/* TODO
+			- log init GetSysTime
+		*/
 		
 		//for (char& c: strvec) c += 1;
 		//for (char& c: strarr) c += 1;

@@ -1,10 +1,22 @@
 
-namespace Com {};
+namespace Prim			{};
+namespace Lang			{using/interface Prim;};
+namespace Native		{using/interface Lang;};
+namespace Hash			{using/interface Native;};
+namespace Random		{using/interface Hash;};
+namespace Algorithm		{using/interface Random;};
+namespace Abstract		{using/interface Algorithm;};
+namespace Text			{using/interface Abstract;};
+namespace Container		{using/interface Text;};
+namespace Shared		{using/interface Container;};
+namespace Stream		{using/interface Shared;};
+namespace Util			{using/interface Stream;};
+namespace Com			{using/interface Util;};
 
 #define NULL 0
 
-using "Com/Macros.fog";
 using "Com/Meta.fog";
+using "Com/Macros.fog";
 using "Com/Prim.fog";
 using "Com/Lang.fog";
 using "Com/Native.fog";
@@ -17,6 +29,9 @@ using "Com/Container.fog";
 using "Com/Shared.fog";
 using "Com/Stream.fog";
 using "Com/Util.fog";
+
+
+using "Com/CompilerBase.fog";
 
 /*using "Com/Math.fog";
 using "Com/Concurrency.fog";

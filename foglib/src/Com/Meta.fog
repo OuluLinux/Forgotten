@@ -37,7 +37,7 @@ else if ($IsDefined("WIN32")) {
 	auto string DIR_SEPS = "\\";
 	auto char DIR_SEP = '\\';
 	auto string ENDL = "\r\n";
-	auto PLATFORM = "POSIX";
+	auto PLATFORM = "WIN32";
 }
 else
 	$std::error("No OS defined. Define POSIX or WIN32");
@@ -51,7 +51,7 @@ auto declaration Tuple2(identifier cls, identifier a, identifier b) {
 		$a a;
 		$b b;
 		
-		Text::String ToString() const {return Text::ToString(a) + ", " + Text::ToString(b);}
+		Text::String AsString() const {return Text::ToString(a) + ", " + Text::ToString(b);}
 	};
 }
 
@@ -61,7 +61,7 @@ auto declaration Tuple3(identifier cls, identifier a, identifier b, identifier c
 		$b b;
 		$c c;
 		
-		Text::String ToString() const {return Text::ToString(a) + ", " + Text::ToString(b) + ", " + Text::ToString(c);}
+		Text::String AsString() const {return Text::ToString(a) + ", " + Text::ToString(b) + ", " + Text::ToString(c);}
 	};
 }
 
@@ -71,7 +71,7 @@ auto declaration RefTuple2(identifier cls, identifier a, identifier b) {
 		$b& b;
 		
 		${cls}($a& a, $b& b) : a(a), b(b) {}
-		Text::String ToString() const {return Text::ToString(a) + ", " + Text::ToString(b);}
+		Text::String AsString() const {return Text::ToString(a) + ", " + Text::ToString(b);}
 	};
 }
 
@@ -82,7 +82,7 @@ auto declaration RefTuple3(identifier cls, identifier a, identifier b, identifie
 		$c& c;
 		
 		${cls}($a& a, $b& b, $c& c) : a(a), b(b), c(c) {}
-		String ToString() const {return Text::ToString(a) + ", " + Text::ToString(b) + ", " + Text::ToString(c);}
+		String AsString() const {return Text::ToString(a) + ", " + Text::ToString(b) + ", " + Text::ToString(c);}
 	};
 }
 

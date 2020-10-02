@@ -1,12 +1,58 @@
 namespace Util {
-using/interface Lang;
+using/interface Container;
+using/interface Stream;
 
-#if 0
 
-!inline void Panic(String s) {
-	Lang::SysBreak(s.Begin());
+inline String& ExeFilePath() {static String s; return s;}
+void SetExeFilePath(String s) {ExeFilePath() = s;}
+String GetExeFilePath() {return ExeFilePath();}
+String GetHomeDir() {return Native::GetHomeDir();}
+String& ConfigPath() {static String s; return s;}
+String AppendFileName(String a, String b);
+String GetExeDirFile(String filename);
+String ConfigFile(String file_name);
+String GetFileName(String path);
+String GetFileTitle(String path);
+String GetFileDirectory(String path);
+String GetParentDirectory(String path, int steps=1);
+String GetFileExt(String path);
+void RealizeDirectory(String dir);
+void DeleteFile(String path);
+void RenameFile(String oldpath, String newpath);
+void Panic(String s);
+CharStream& Log();
+CharStream& Cout();
+CharStream& Errout();
+CharStream& Cin();
+String ReadStdIn();
+void ParseCommandLine(int argc, const char** argv);
+void ParseCommandLine(const char* cmdline);
+const Vector<String>& CommandLine();
+int GetExitCode();
+void SetExitCode(int i);
+void SetCoreArg(String key, String value);
+String GetExeDirFile(String filename);
+String GetEnv(String id);
+void ReadCoreCmdlineArgs();
+void SetDataPath(String path);
+String GetDataDirectory();
+String GetDataFile(String filename);
+String GetDataDirectoryFile(String file);
+bool FileExists(String path);
+bool DirectoryExists(String path);
+String FindLocalFile(String filename);
+void AddLocalFileDirectory(String dir);
+bool IsVerbose();
+void SetVerbose(bool b=true);
+bool IsDotString(String s) {return s == "." || s == "..";}
+void GetDirectoryFiles(String dir, Index<String>& files);
+bool IsClose(double a, double b);
+
+template <class T>
+inline T& Single() {
+	static T o;
+	return o;
 }
-
 
 template <class T>
 T& PtrRef(T* o, String throw_msg) {
@@ -14,7 +60,236 @@ T& PtrRef(T* o, String throw_msg) {
 	return *o;
 }
 
-Abstract:Stream& Log() {
+struct StringParser {
+	String s;
+	int cursor = 0;
+
+	StringParser(String s) : s(s) {}
+
+	void PassChar(int chr, bool do_pass_white = true);
+	bool Char(int chr);
+	int ReadInt();
+	String ReadId();
+	int GetChar();
+	int PeekChar();
+	bool IsChar(int chr);
+	void PassWhite();
+};
+
+class StringCache {
+	$MakeMoveable();
+	
+	Vector<unsigned int> hashes;
+	Vector<String> strings;
+	Vector<int> free_slots;
+	int str_counter = 0;
+	SpinLock lock;
+	
+public:
+	StringCache();
+	int GetAdd(const String& s);
+	void Remove(int i);
+	String Get(int i) const;
+	int GetCount() const;
+	
+};
+
+struct FindFile {
+	typedef FindFile CLASSNAME;
+	FindFile();
+	
+	bool Search(String path);
+	bool Next();
+	
+	bool IsDirectory() const;
+	String GetPath() const;
+	String GetName() const;
+};
+
+template <class T> struct StdLess;
+template <class T> struct StdGreater;
+
+struct CmdArg {
+	char key;
+	String desc;
+	bool has_value;
+};
+
+struct CmdInput {
+	char key;
+	String value;
+};
+
+class CommandLineArguments {
+	static const int max_inputs = 300;
+	static const int max_args = 100;
+	
+	Array<CmdArg> args;
+	Array<CmdInput> inputs;
+	
+	
+public:
+	CommandLineArguments() {}
+	void AddArg(char key, const char* desc, bool has_value);
+	bool Parse();
+	void PrintHelp();
+	int GetInputCount() const {return inputs.GetCount();}
+	const Array<CmdInput>& GetInputs() const {return inputs;}
+	
+};
+
+bool StreamCopy(StreamBase& dest, StreamBase& src);
+
+template <class T>
+struct DtorValueSetter {
+	T& obj;
+	int value = 0;
+	DtorValueSetter(T& obj) : obj(obj) {}
+	~DtorValueSetter() {obj = value;}
+};
+
+typedef DtorValueSetter<bool> FlagDisabler;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+String AppendFileName(String a, String b) {
+	if (b.IsEmpty()) return a;
+	if (a.IsEmpty()) return b;
+	bool a_sep = a.ReverseFind($DIR_SEPS) == a.GetCount()-1;
+	bool b_sep = b.Find($DIR_SEPS) == 0;
+	if (!a_sep) {
+		if (!b_sep)
+			return a + $DIR_SEPS + b;
+		else
+			return a + b;
+	}
+	else {
+		if (!b_sep)
+			return a + b;
+		else
+			return a + b.Mid(1);
+	}
+}
+
+String GetExeDirFile(String filename) {
+	return AppendFileName(GetFileDirectory(GetExeFilePath()), filename);
+}
+
+String ConfigFile(String file_name) {
+	if (ConfigPath().GetCount())
+		return AppendFileName(ConfigPath(), file_name);
+	auto if ($IsDefined("WIN32")) {
+		String dir = GetExeDirFile("");
+	}
+	else if ($IsDefined("POSIX")) {
+		String home_dir = GetHomeDir();
+		String upp = AppendFileName(home_dir, ".config");
+		upp = AppendFileName(upp, "u++");
+		String dir = AppendFileName(upp, GetFileTitle(GetExeFilePath()));
+	}
+	else $std::error("Not implemented");
+	return AppendFileName(dir, file_name);
+}
+
+String GetFileName(String path) {
+	int i = path.ReverseFind($DIR_SEPS);
+	if (i >= 0)
+		return path.Mid(i + 1);
+	return path;
+}
+
+String GetFileTitle(String path) {
+	String fname = GetFileName(path);
+	int i = fname.ReverseFind(".");
+	if (i >= 0)
+		return fname.Left(i);
+	return fname;
+}
+
+String GetFileDirectory(String path) {
+	int i = path.ReverseFind("\\");
+	int j = path.ReverseFind("/");
+	if (i >= 0 && j >= 0)
+		return path.Left(Max(i, j));
+	if (i >= 0)
+		return path.Left(i);
+	if (j >= 0)
+		return path.Left(j);
+	return "";
+}
+
+String GetParentDirectory(String path, int steps) {
+	path = TrimBoth(path);
+	String last_known_dir = path;
+	for(int i = 0; i < steps; i++) {
+		if (path.IsEmpty())
+			return last_known_dir;
+		
+		while (path.Right(1) == $DIR_SEPS)
+			path = path.Left(path.GetCount()-1);
+		
+		int j = path.ReverseFind($DIR_SEPS);
+		auto if ($IsDefined("POSIX")) {
+			if (!j)
+				return $DIR_SEPS;
+		}
+		if (j <= 0)
+			return path;
+		
+		path = path.Left(j);
+		last_known_dir = path;
+	}
+	return path;
+}
+
+String GetFileExt(String path) {
+	static const char* path_str = $DIR_SEPS;
+	for(int i = path.GetCount()-1; i >= 0; i--) {
+		int chr = path[i];
+		if (chr == path_str[0])
+			return "";
+		if (chr == '.')
+			return path.Mid(i);
+	}
+	return "";
+}
+
+void RealizeDirectory(String dir) {
+	if (dir.IsEmpty())
+		return;
+	if (!Native::DirExists(dir.Begin())) {
+		RealizeDirectory(GetFileDirectory(dir));
+		
+		if (!Native::PathExists(dir.Begin()))
+			Native::CreateDirectory(dir.Begin());
+	}
+}
+
+void DeleteFile(String path) {
+	Native::DeleteFile(path.Begin());
+}
+
+void RenameFile(String oldpath, String newpath) {
+	Native::RenameFile(oldpath.Begin(), newpath.Begin());
+}
+
+!inline void Panic(String s) {
+	SysBreak(s.Begin());
+}
+
+
+!inline CharStream& Log() {
 	static FileOut fout;
 	static StringStream ss; // for early logging
 	if (!fout.IsOpen()) {
@@ -25,45 +300,631 @@ Abstract:Stream& Log() {
 		else {
 			String exe_title = GetFileTitle(exepath);
 			String path = ConfigFile(exe_title + ".log");
-			int r0 = (path.GetString0()->GetRefs());
 			const char* p = path.Begin();
-			int r1 = (path.GetString0()->GetRefs());
 			RealizeDirectory(GetFileDirectory(path));
-			int r2 = (path.GetString0()->GetRefs());
 			//cout << path << ENDL;
 			fout.Open(path);
-			int r3 = (path.GetString0()->GetRefs());
-			fout << " *** " << GetSysTime().ToString() << " ***" << ENDL
-				 << " *** " << GetExeFilePath() << " ***" << ENDL;
+			//fout << " *** " << GetSysTime().ToString() << " ***" << ENDL
+			//	 << " *** " << GetExeFilePath() << " ***" << ENDL;
+			fout << " *** " << GetExeFilePath() << " ***" << $ENDL;
 			
 			if (ss.GetSize())
 				fout << ss.GetResult();
 			
 			fout.Flush();
-			
-			int r4 = (path.GetString0()->GetRefs());
-			
-			int s = r0 + r1 + r2 + r3 + r4;
 		}
 	}
 	return fout;
 }
 
-Abstract:Stream& Cout() {
-	static FileOut fout(stdout);
+!inline CharStream& Cout() {
+	static FileOut fout(Native::GetStdOut());
 	return fout;
 }
 
-Abstract:Stream& Cin() {
-	static FileOut fout(stderr);
+!inline CharStream& Errout() {
+	static FileOut fout(Native::GetStdErr());
 	return fout;
 }
 
-Abstract:Stream& Cerr() {
-	static FileOut fout(stdin);
+!inline CharStream& Cin() {
+	static FileOut fout(Native::GetStdIn());
 	return fout;
 }
 
-#endif
+!inline CharStream& Cerr() {
+	static FileOut fout(Native::GetStdErr());
+	return fout;
+}
+
+!inline String ReadStdIn() {return Cin().GetLine();}
+
+Vector<String>& __CommandLine() {static Vector<String> v; return v;}
+
+void ParseCommandLine(const char* cmdline) {
+	__CommandLine().Split((String)cmdline, " ");
+}
+
+void ParseCommandLine(int argc, const char** argv) {
+	__CommandLine().Clear();
+	for(int i = 1; i < argc; i++)
+		__CommandLine().Add(argv[i]);
+}
+
+const Vector<String>& CommandLine() {return __CommandLine();}
+
+int& __ExitCode() {static int i; return i;}
+int GetExitCode() {return __ExitCode();}
+void SetExitCode(int i) {__ExitCode() = i;}
+
+String& __DataPath() {static String s; return s;}
+String& __ConfigPath() {static String s; return s;}
+
+!inline void SetCoreArg(String key, String value) {
+	if (key.IsEmpty())
+		return;
+	
+	LOG("core-arg: \"" << key << "\" -> \"" << value << "\"");
+	if (key == "datapath") {
+		ASSERT(DirectoryExists(value));
+		__DataPath() = value;
+	}
+	else if (key == "config") {
+		ASSERT(DirectoryExists(value));
+		__ConfigPath() = value;
+	}
+}
+
+String GetExeDirFile(String filename) {
+	return AppendFileName(GetFileDirectory(GetExeFilePath()), filename);
+}
+
+String GetEnv(String id) {
+	if (id.IsEmpty())
+		return String();
+	return Native::GetEnv(id.Begin());
+}
+
+void ReadCoreCmdlineArgs() {
+	for(int i = 0; i < __CommandLine().GetCount(); i++) {
+		String arg = __CommandLine()[i];
+		int j = arg.Find("=");
+		if (j >= 0) {
+			String key = arg.Left(j);
+			String value = arg.Mid(j+1);
+			if (key.Left(2) == "-E") {
+				key = key.Mid(2);
+				SetCoreArg(key, value);
+			}
+		}
+	}
+}
+
+void SetDataPath(String path) {
+	__DataPath() = path;
+}
+
+String GetDataDirectory() {
+	if(__DataPath().GetCount())
+		return __DataPath();
+	return Native::GetEnv("UPP_MAIN__");
+}
+
+String GetDataFile(String filename) {
+	if(__DataPath().GetCount())
+		return AppendFileName(__DataPath(), filename);
+	String s = Native::GetEnv("UPP_MAIN__");
+	if (s.GetCount())
+		return AppendFileName(s, filename);
+	else
+		return GetExeDirFile(filename);
+}
+
+String GetDataDirectoryFile(String file) {
+	return AppendFileName(GetDataDirectory(), file);
+}
+
+bool FileExists(String path) {return Native::PathExists(path.Begin());}
+bool DirectoryExists(String path) {return Native::DirExists(path.Begin());}
+
+Vector<String>& __LocalFileDirs() {static Vector<String> v; return v;}
+
+String FindLocalFile(String filename) {
+	String exe_dir_file = GetExeDirFile(filename);
+	if (FileExists(exe_dir_file))
+		return exe_dir_file;
+	
+	for(int i = 0; i < __LocalFileDirs().GetCount(); i++) {
+		String dir_file = AppendFileName(__LocalFileDirs()[i], filename);
+		if (Native::PathExists(dir_file.Begin()) || Native::DirExists(dir_file.Begin()))
+			return dir_file;
+	}
+	
+	return ConfigFile(filename);
+}
+
+void AddLocalFileDirectory(String dir) {
+	__LocalFileDirs().Add(dir);
+}
+
+bool& __Verbose() {static bool b; return b;}
+bool IsVerbose() {return __Verbose();}
+void SetVerbose(bool b) {__Verbose() = b;}
+
+!inline void __FileAdder(const char* str, void* files_idx) {
+	typedef Index<String> Idx;
+	Idx* p = (Idx*)files_idx;
+	p->Add(str);
+}
+
+void GetDirectoryFiles(String dir, Index<String>& files) {
+	files.Clear();
+	Native::GetDirFiles(dir.Begin(), &__FileAdder, (void*)&files);
+}
+
+bool IsClose(double a, double b) {
+	if (Native::IsFinite(a) && Native::IsFinite(b)) {
+		double diff = Abs(a - b);
+		return diff < 0.0001;
+	}
+	else return a == b;
+}
+
+
+
+
+
+
+
+void StringParser::PassChar(int chr, bool do_pass_white) {
+	if (!IsChar(chr))
+		throw Exc("unexpected char");
+	cursor++;
+	if (do_pass_white)
+		PassWhite();
+}
+
+bool StringParser::Char(int chr) {
+	int curchr = s[cursor];
+	if (curchr == chr) {
+		cursor++;
+		PassWhite();
+		return true;
+	}
+	return false;
+}
+
+int StringParser::ReadInt() {
+	String i;
+	while (IsDigit(s[cursor])) {
+		i.Cat(s[cursor++]);
+	}
+	PassWhite();
+	return StrInt(i);
+}
+
+String StringParser::ReadId() {
+	String id;
+	while (cursor < s.GetCount()) {
+		int chr = s[cursor];
+		if (IsSpace(chr))
+			break;
+		
+		if (chr == '\\') {
+			cursor++;
+			chr = s[cursor];
+		}
+		if (IsAlpha(chr) || chr == '_' || IsDigit(chr)) {
+			id.Cat(chr);
+			cursor++;
+		}
+		else
+			break;
+	}
+	PassWhite();
+	return id;
+}
+
+int StringParser::GetChar() {
+	return s[cursor++];
+}
+
+int StringParser::PeekChar() {
+	return s[cursor];
+}
+
+bool StringParser::IsChar(int chr) {
+	return s[cursor] == chr;
+}
+
+void StringParser::PassWhite() {
+	while (cursor < s.GetCount()) {
+		int chr = s[cursor];
+		if (IsSpace(chr))
+			cursor++;
+		else
+			break;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+StringCache::StringCache() {}
+
+int StringCache::GetAdd(const String& s) {
+	uint32 hash = s.GetHashValue();
+	FwdIterator<uint32> it = hashes.Begin();
+	FwdIterator<uint32> end = hashes.End();
+	int i = 0;
+	while (it != end) {
+		if (*it == hash)
+			return i;
+		++i; ++it;
+	}
+	
+	lock.Enter();
+	if (free_slots.GetCount())
+		i = free_slots.Pop();
+	else {
+		i = hashes.GetCount();
+		hashes.Add();
+		strings.Add();
+	}
+	lock.Leave();
+	
+	hashes[i]	= hash;
+	strings[i]	= s;
+	return i;
+}
+
+void StringCache::Remove(int i) {
+	hashes[i] = 0xFFFFFFFF;
+	strings[i] = 0;
+	
+	lock.Enter();
+	free_slots.Add(i);
+	lock.Leave();
+}
+
+String StringCache::Get(int i) const {
+	return strings[i];
+}
+
+int StringCache::GetCount() const {
+	return strings.GetCount();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+FindFile::FindFile() {
+	
+}
+
+bool FindFile::Search(String path) {
+	TODO
+}
+
+bool FindFile::Next() {
+	TODO
+}
+
+bool FindFile::IsDirectory() const {
+	TODO
+}
+
+String FindFile::GetPath() const {
+	TODO
+}
+
+String FindFile::GetName() const {
+	TODO
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+template <class I>
+inline void __IterSwap(I a, I b) {
+	if(a != b)
+		Swap(*a, *b);
+}
+
+template <class I, class Less>
+inline void __OrderIter2(I a, I b, const Less& less) {
+	if(less(*b, *a))
+		__IterSwap(a, b);
+}
+
+template <class I, class Less>
+inline void __FinalSort(I begin, I end, const Less& less) {
+	if(begin == end)
+		return;
+	I last = end;
+	--last;
+	while(!(begin == last)) {
+		I best = last;
+		I next = last;
+		I ptr = last;
+		for(;;) {
+			if(less(*best, *--ptr)) {  // best holds, scan for better candidate
+				do
+					if(ptr == begin) { // best is the final minimum
+						__IterSwap(begin, best);
+						++begin;
+						goto NEXT_ITEM;
+					}
+				while(less(*best, *--ptr));
+				if(ptr == begin) { // begin is the final minimum, best is 2nd least
+					__IterSwap(++begin, best);
+					++begin;
+					break;
+				}
+				next = ptr; // mark position after new best as the new end of sorted array
+				++next;     // it will hold only if all subseqent iterations define new best (descending order)
+			}
+			else
+			if(ptr == begin) { // begin is the final minimum
+				begin = next;  // and everything is sorted up to next
+				break;
+			}
+			best = ptr;
+		}
+	NEXT_ITEM:
+		;
+	}
+}
+
+
+template <class I, class Less>
+void __Sort(I l, I h, const Less& less)
+{
+	for(;;) {
+		int count = int(h - l);
+		if(count < 2)
+			return;
+		if(count < 8) {                         // Final optimized SelectSort
+			__FinalSort(l, h, less);
+			return;
+		}
+		int pass = 4;
+		for(;;) {
+			I middle = l + (count >> 1);        // get the middle element
+			__OrderIter2(l, middle, less);      // sort l, middle, h-1 to find median of 3
+			__OrderIter2(middle, h - 1, less);
+			__OrderIter2(l, middle, less);      // median is now in middle
+			__IterSwap(l + 1, middle);            // move median pivot to l + 1
+			I ii = l + 1;
+			for(I i = l + 2; i != h - 1; ++i)   // do partitioning; already l <= pivot <= h - 1
+				if(less(*i, *(l + 1)))
+					__IterSwap(++ii, i);
+			__IterSwap(ii, l + 1);                // put pivot back in between partitions
+			I iih = ii;
+			while(iih + 1 != h && !less(*ii, *(iih + 1))) // Find middle range of elements equal to pivot
+				++iih;
+			if(pass > 5 || min(ii - l, h - iih) > (max(ii - l, h - iih) >> pass)) { // partition sizes ok or we have done max attempts
+				if(ii - l < h - iih - 1) {       // recurse on smaller partition, tail on larger
+					__Sort(l, ii, less);
+					l = iih + 1;
+				}
+				else {
+					__Sort(iih + 1, h, less);
+					h = ii;
+				}
+				break;
+			}
+			__IterSwap(l,		l + Random::Range(count));     // try some other random elements for median pivot
+			__IterSwap(middle,	l + Random::Range(count));
+			__IterSwap(h - 1,	l + Random::Range(count));
+			pass++;
+		}
+	}
+}
+
+template <class V, class S>
+void Sort(V& vector, const S& sorter) {
+	if (vector.GetCount() < 2)
+		return;
+	//__Sort<V::Iterator, S>(vector.Begin().Get(), vector.End().Get(), sorter);
+	__Sort(vector.Begin().Get(), vector.End().Get(), sorter);
+}
+
+template <class T> struct StdLess {bool operator()(const T& a, const T& b) const {return a < b;}};
+template <class T> struct StdGreater {bool operator()(const T& a, const T& b) const {return a > b;}};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void CommandLineArguments::AddArg(char key, const char* desc, bool has_value) {
+	CmdArg& a = args.Add();
+	a.key = key;
+	a.desc = desc;
+	a.has_value = has_value;
+}
+
+bool CommandLineArguments::Parse() {
+	const Vector<String>& args = CommandLine();
+	
+	for(int i = 0; i < args.GetCount(); i++) {
+		String arg = args[i];
+		
+		if (arg.GetCount() < 2) return false;
+		
+		bool found = false;
+		
+		if (arg[0] == '-') {
+			char key = arg[1];
+			if (key) {
+				for(int j = 0; j < this->args.GetCount(); j++) {
+					CmdArg& a = this->args[j];
+					if (a.key == key) {
+						found = true;
+						CmdInput& in = inputs.Add();
+						in.key = key;
+						if (a.has_value) {
+							if (i+1 >= args.GetCount()) {
+								Errout() << "No value provided: " << arg << $ENDL;
+								return false;
+							}
+							in.value = args[i+1];
+							i++;
+						}
+						break;
+					}
+				}
+			}
+		}
+		
+		if (!found) {Errout() << "Invalid argument: " << arg << $ENDL; return false;}
+	}
+	
+	return true;
+}
+
+void CommandLineArguments::PrintHelp() {
+	String exe = GetExeFilePath();
+	int i = exe.ReverseFind($DIR_SEPS);
+	if (i >= 0)
+		exe = exe.Mid(i+1);
+	
+	CharStream& cout = Cout();
+	cout << exe << " [-";
+	for(int i = 0; i < args.GetCount(); i++)
+		if (args[i].has_value)
+			cout << args[i].key;
+	cout << " value]";
+	
+	cout << " [-";
+	for(int i = 0; i < args.GetCount(); i++)
+		if (!args[i].has_value)
+			cout << args[i].key;
+	cout << "]" << $ENDL;
+	
+	for(int i = 0; i < args.GetCount(); i++) {
+		CmdArg& a = args[i];
+		cout << "\t-" << a.key;
+		if (a.has_value)
+			cout << " value";
+		cout << ": " << a.desc << $ENDL;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+template <class T, class V>
+inline void CopyHeapless(const T& from, T& to) {
+	FwdIterator<V> src = from.Begin();
+	FwdIterator<V> end = from.End();
+	FwdIterator<V> dst = to.Begin();
+	to.SetCount(from.GetCount());
+	while (src != end) {
+		*dst = *src;
+		src++;
+		dst++;
+	}
+}
+
+template <class T, class V>
+inline void CopyHeaplessMat(const T& from, T& to) {
+	to.SetCount(from.GetCount());
+	for(int i = 0; i < to.GetCount(); i++) {
+		const V&	from0	= from[i];
+		V&			to0		= to[i];
+		to0.SetCount(from0.GetCount());
+		for(int i = 0; i < to0.GetCount(); i++)
+			to0[i] = from0[i];
+	}
+}
+
+inline void VectorAdd(const Vector<double>& from, Vector<double>& to) {
+	ASSERT(from.GetCount() == to.GetCount());
+	ConstFwdIterator<double> src	= from.Begin();
+	FwdIterator<double> dst			= to.Begin();
+	FwdIterator<double> end			= to.End();
+	while (dst != end) {
+		*dst = *src;
+		++dst;
+		++src;
+	}
+}
+
+
+
+bool StreamCopy(StreamBase& dest, StreamBase& src) {
+	dest.Seek(0);
+	src.Seek(0);
+	byte buf[1024];
+	int64 size_left = src.GetSize();
+	while (size_left > 0) {
+		int block;
+		if (size_left < 1024)	block = (int)size_left;
+		else					block = 1024;
+		int got = src.Get(buf, block);
+		if (got != block)
+			return false;
+		dest.Put(buf, block);
+		size_left -= block;
+	}
+	return true;
+}
+
+
+
+
 
 }
+
+#define Log					Util::Log
+
+#define CommandLine			Util::CommandLine
+
+#define StringCache			Util::StringCache
+
+#define GetDirectoryFiles	Util::GetDirectoryFiles

@@ -1,7 +1,5 @@
-
-
 namespace Lang {
-using/interface Prim;
+
 
 //template <class T> struct LangPtr : public CPtr<T> {};
 
@@ -27,7 +25,8 @@ $GlobalTypedefPtr(void,				VoidPtr);
 $GlobalTypedefPtr(const void,		ConstVoidPtr);
 
 //template<class T> inline void Destruct(T*& o) {o = 0;}
-template<class T> inline void Destruct(T& o) {o.~T();}
+//template<class T> inline void Destruct(T& o) {o. ~  T ();}
+template<class T> inline void Destruct(T& o) {o. ~ _1 ();}
 inline void Destruct(uint8& o) {}
 inline void Destruct(int8& o) {}
 inline void Destruct(uint16& o) {}
@@ -248,6 +247,8 @@ inline class DynArray {
 	
 public:
 	
+	typedef K Unit;
+	typedef const K ConstUnit;
 	typedef K IndirectK;
 	typedef const K ConstK;
 	typedef DynArray<K> DynArrayK;
@@ -265,7 +266,7 @@ public:
 		$AssertMoveable(K);  // T must be moveable
 	}
 	
-	//void Serialize(Stream& s);
+	//void Serialize(StreamBase& s);
 	//void operator=(const Pick<DynArray>& pick) {Clear(); DynArray& v = pick.Get(); Swap(data, v.data); Swap(reserved, v.reserved); Swap(count, v.count);}
 	//void operator=(DynArray&& v) {Pick0(v);}
 	
@@ -469,7 +470,7 @@ public:
 		ASSERT(GetCount() > 0);
 		int i = count - 1;
 		K ret(data[i]);
-		data[i].~K();
+		Destruct(data[i]);
 		count--;
 		return ret;
 	}
@@ -520,7 +521,7 @@ public:
 #define SysBreak		Lang::SysBreak
 #define StringLength	Lang::StringLength
 #define AtomicFlag		Lang::AtomicFlag
-#define SpinLock		Lang::AtomicFlag
+#define SpinLock		AtomicFlag
 #define AtomicBool		Lang::AtomicBool
 #define AtomicInt		Lang::AtomicInt
 #define ConditionalVar	Lang::ConditionalVar

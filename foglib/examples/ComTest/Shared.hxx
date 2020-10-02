@@ -1,76 +1,11 @@
-/*!$@FOG@$!
- *	Generated at Thu Oct  1 09:26:12 2020
- *
- *	by fog 0.1.a of 12:17:36 Sep 29 2020
- *
- *	from
- *		../../src/Com/Abstract.fog
- *		../../src/Com/Algorithm.fog
- *		../../src/Com/Com.fog
- *		../../src/Com/Container.fog
- *		../../src/Com/Environment.fog
- *		../../src/Com/Hash.fog
- *		../../src/Com/Lang.fog
- *		../../src/Com/Macros.fog
- *		../../src/Com/Meta.fog
- *		../../src/Com/Native.fog
- *		../../src/Com/Prim.fog
- *		../../src/Com/Random.fog
- *		../../src/Com/Shared.fog
- *		../../src/Com/Stream.fog
- *		../../src/Com/Text.fog
- *		../../src/Com/Util.fog
- *		ComTest.mfog
- */
-
 #ifndef SHARED_HXX
 #define SHARED_HXX
 
 #include <new>
 
-#ifndef COM_HXX
-#include <Com.hxx>
+#ifndef CONTAINER_HXX
+#include <Container.hxx>
 #endif
-#ifndef NATIVE_HXX
-#include <Native.hxx>
-#endif
-#ifndef PRIM_HXX
-#include <Prim.hxx>
-#endif
-
-namespace Lang
-{
-#line 9 "../../src/Com/Lang.fog"
-    typedef Prim::CPtr < const char > CString;
-#line 9
-    typedef Prim::CPtr < const void > ConstVoidPtr;
-#line 9
-    typedef Prim::CPtr < void > VoidPtr;
-#line 142 "../../src/Com/Meta.fog"
-    typedef unsigned char byte;
-#line 142
-    typedef short int16;
-#line 142
-    typedef int int32;
-#line 142
-    typedef long long int64;
-#line 142
-    typedef char int8;
-#line 142
-    typedef unsigned short uint16;
-#line 142
-    typedef unsigned int uint32;
-#line 142
-    typedef uint32 dword;
-#line 142
-    typedef unsigned long long uint64;
-#line 142
-    typedef uint64 qword;
-#line 142
-    typedef unsigned char uint8;
-#line 142
-    typedef uint16 word;
-};
 
 namespace Shared
 {
@@ -82,31 +17,31 @@ template < class _1 > class Ptr;
 
 namespace Shared
 {
-#line 221 "../../src/Com/Shared.fog"
+#line 215 "../../src/Com/Shared.fog"
     template < class _1 >
     inline Ptr < _1 > MakePtr();
-#line 222
+#line 216
     template < class _1, class _2 >
     inline Ptr < _1 > MakePtr1(_2 a0);
-#line 223
+#line 217
     template < class _1, class _2, class _3 >
     inline Ptr < _1 > MakePtr2(_2 a0, _3 a1);
-#line 224
+#line 218
     template < class _1, class _2, class _3, class _4 >
     inline Ptr < _1 > MakePtr3(_2 a0, _3 a1, _4 a2);
-#line 225
+#line 219
     template < class _1, class _2, class _3, class _4, class _5 >
     inline Ptr < _1 > MakePtr4(_2 a0, _3 a1, _4 a2, _5 a3);
-#line 226
+#line 220
     template < class _1, class _2, class _3, class _4, class _5, class _6 >
     inline Ptr < _1 > MakePtr5(_2 a0, _3 a1, _4 a2, _5 a3, _6 a4);
-#line 227
+#line 221
     template < class _1, class _2, class _3, class _4, class _5, class _6, class _7 >
     inline Ptr < _1 > MakePtr6(_2 a0, _3 a1, _4 a2, _5 a3, _6 a4, _7 a5);
-#line 228
+#line 222
     template < class _1, class _2, class _3, class _4, class _5, class _6, class _7, class _8 >
     inline Ptr < _1 > MakePtr7(_2 a0, _3 a1, _4 a2, _5 a3, _6 a4, _7 a5, _8 a6);
-#line 271
+#line 265
     template < class _1, class _2 >
     inline Ptr < _1 > StaticPointerCast(_2 it);
 };
@@ -119,33 +54,33 @@ namespace Shared
 {
     class Attachable
     {
-#line 56
+#line 50
         typedef Lang::FwdIterator < void * > Iter;
         
-#line 54
+#line 48
         Lang::DynArray < void * > slots;
         
     public:
-#line 76
+#line 70
         virtual ~Attachable();
-#line 78
+#line 72
         inline void Attach(Slot& s);
-#line 91
+#line 85
         void Detach(Slot *ptr);
-#line 79
+#line 73
         void DetachAll();
-#line 96
+#line 90
         inline Slot& Get(int i) const;
-#line 95
+#line 89
         inline int GetCount() const;
-#line 84
+#line 78
         bool IsAttached(Slot *ptr);
         
 #line 156 "../../src/Com/Meta.fog"
         void AddSlot(Slot *ptr);
-#line 58 "../../src/Com/Shared.fog"
+#line 52 "../../src/Com/Shared.fog"
         void DoAttach(Slot *s);
-#line 63
+#line 57
         void DoDetach(Slot *s);
 #line 153 "../../src/Com/Meta.fog"
         Slot& GetSlot(int i);
@@ -169,46 +104,46 @@ namespace Shared
     class Ptr
     {
     protected:
-#line 163 "../../src/Com/Shared.fog"
+#line 157 "../../src/Com/Shared.fog"
         RefBase *r;
         _1 *o;
         
     public:
         inline Ptr();
         inline Ptr(const Ptr& o);
-#line 171
+#line 165
         inline ~Ptr();
-#line 182
+#line 176
         inline _1& operator*() const;
-#line 178
+#line 172
         inline _1 *operator-> ();
         inline _1 *operator-> () const;
-#line 176
+#line 170
         inline void operator= (const Ptr < _1 > & s);
-#line 184
+#line 178
         inline bool operator== (const Ptr& s) const;
-#line 183
+#line 177
         inline bool operator== (const _1 *ptr) const;
-#line 181
+#line 175
         inline operator bool() const;
-#line 185
+#line 179
         template < class _2 >
         inline Ptr < _2 > As();
-#line 175
+#line 169
         inline void Clear();
-#line 173
+#line 167
         inline void Create();
         template < class _2 >
         inline void CreateAbstract();
-#line 180
+#line 174
         inline _1 *Get() const;
-#line 213
+#line 207
         inline const RefBase *GetBase() const;
-#line 177
+#line 171
         inline bool IsEmpty() const;
-#line 198
+#line 192
         inline void SetPtr(_1 *o, RefBase *r);
-#line 204
+#line 198
         inline Ptr < _1 > & WrapObject(_1 *obj);
     };
 };
@@ -222,9 +157,9 @@ namespace Shared
     class RefBase
     {
     public:
-#line 116
+#line 110
         void *obj;
-#line 128
+#line 122
         Lang::DynArray < void * > weaks;
         Lang::AtomicInt refs;
         
@@ -233,17 +168,17 @@ namespace Shared
         virtual ~RefBase();
 #line 156 "../../src/Com/Meta.fog"
         void AddWeak(WeakBase *ptr);
-#line 135 "../../src/Com/Shared.fog"
+#line 129 "../../src/Com/Shared.fog"
         void Dec();
-#line 144
+#line 138
         void DecWeak(WeakBase *w);
 #line 153 "../../src/Com/Meta.fog"
         WeakBase& GetWeak(int i);
 #line 155
         int GetWeakCount();
-#line 134 "../../src/Com/Shared.fog"
+#line 128 "../../src/Com/Shared.fog"
         void Inc();
-#line 143
+#line 137
         void IncWeak(WeakBase *w);
 #line 154 "../../src/Com/Meta.fog"
         void RemoveWeak(int i);
@@ -252,94 +187,94 @@ namespace Shared
     template < class _1 >
     struct RefTemplate : public Shared::RefBase
     {
-#line 155 "../../src/Com/Shared.fog"
+#line 149 "../../src/Com/Shared.fog"
         inline ~RefTemplate();
     };
     
     class Slot
     {
-#line 13
+#line 7
         Attachable *ptr;
         
     public:
         inline Slot();
         virtual ~Slot();
-#line 48
+#line 42
         inline Attachable& operator*() const;
-#line 43
+#line 37
         inline Attachable *operator-> () const;
         inline operator bool() const;
-#line 19
+#line 13
         virtual bool CanAttach(Attachable& a);
-#line 35
+#line 29
         void Clear();
-#line 45
+#line 39
         inline Attachable& Get() const;
         inline Attachable *GetPtr() const;
-#line 22
+#line 16
         inline bool IsEmpty() const;
         void Set(Attachable& a);
-#line 21
+#line 15
         inline void SetPtr(Attachable *p);
-#line 29
+#line 23
         void TestSet(Attachable& a);
     };
     
     struct WeakBase
     {
-#line 106
+#line 100
         /*pure*/virtual void SetDeleted() = 0;
     };
     
     template < class _1 >
     class Weak : public Shared::WeakBase
     {
-#line 234
+#line 228
         struct RefBase *r;
         _1 *o;
         
     public:
         inline Weak();
-#line 240
+#line 234
         inline Weak(const Ptr < _1 > & s);
-#line 239
+#line 233
         inline Weak(const Weak& w);
-#line 241
+#line 235
         inline ~Weak();
-#line 249
-        inline _1 *operator-> ();
-#line 245
-        inline void operator= (const Ptr < _1 > & s);
-#line 247
-        inline void operator= (const Weak < _1 > & p);
-#line 251
-        inline operator bool();
-#line 244
-        inline void Clear();
-#line 252
-        inline Ptr < _1 > Enter() const;
-#line 250
-        inline _1 *Get();
-#line 248
-        inline bool IsEmpty() const;
 #line 243
+        inline _1 *operator-> ();
+#line 239
+        inline void operator= (const Ptr < _1 > & s);
+#line 241
+        inline void operator= (const Weak < _1 > & p);
+#line 245
+        inline operator bool();
+#line 238
+        inline void Clear();
+#line 246
+        inline Ptr < _1 > Enter() const;
+#line 244
+        inline _1 *Get();
+#line 242
+        inline bool IsEmpty() const;
+#line 237
         inline virtual void SetDeleted();
     };
     
     template < class _1 >
     class EnablePtrFromThis
     {
-#line 258
+#line 252
         Weak < _1 > weak;
         
     public:
         inline virtual ~EnablePtrFromThis();
-#line 267
+#line 261
         template < class _2 >
         inline Ptr < _2 > AsPtr();
-#line 265
+#line 259
         inline bool HasWeak() const;
-#line 263
+#line 257
         inline void InitWeak(const Ptr < _1 > & s);
     };
     
@@ -350,145 +285,145 @@ namespace Shared
 
 namespace Shared
 {
-#line 221
+#line 215
     template < class _1 >
     inline Ptr < _1 > MakePtr()
     {
-#line 221
+#line 215
         return Ptr < _1 > (new _1);
     };
     
-#line 222
+#line 216
     template < class _1, class _2 >
     inline Ptr < _1 > MakePtr1(_2 a0)
     {
-#line 222
+#line 216
         return Ptr < _1 > (new _1(a0));
     };
     
-#line 223
+#line 217
     template < class _1, class _2, class _3 >
     inline Ptr < _1 > MakePtr2(_2 a0, _3 a1)
     {
-#line 223
+#line 217
         return Ptr < _1 > (new _1(a0, a1));
     };
     
-#line 224
+#line 218
     template < class _1, class _2, class _3, class _4 >
     inline Ptr < _1 > MakePtr3(_2 a0, _3 a1, _4 a2)
     {
-#line 224
+#line 218
         return Ptr < _1 > (new _1(a0, a1, a2));
     };
     
-#line 225
+#line 219
     template < class _1, class _2, class _3, class _4, class _5 >
     inline Ptr < _1 > MakePtr4(_2 a0, _3 a1, _4 a2, _5 a3)
     {
-#line 225
+#line 219
         return Ptr < _1 > (new _1(a0, a1, a2, a3));
     };
     
-#line 226
+#line 220
     template < class _1, class _2, class _3, class _4, class _5, class _6 >
     inline Ptr < _1 > MakePtr5(_2 a0, _3 a1, _4 a2, _5 a3, _6 a4)
     {
-#line 226
+#line 220
         return Ptr < _1 > (new _1(a0, a1, a2, a3, a4));
     };
     
-#line 227
+#line 221
     template < class _1, class _2, class _3, class _4, class _5, class _6, class _7 >
     inline Ptr < _1 > MakePtr6(_2 a0, _3 a1, _4 a2, _5 a3, _6 a4, _7 a5)
     {
-#line 227
+#line 221
         return Ptr < _1 > (new _1(a0, a1, a2, a3, a4, a5));
     };
     
-#line 228
+#line 222
     template < class _1, class _2, class _3, class _4, class _5, class _6, class _7, class _8 >
     inline Ptr < _1 > MakePtr7(_2 a0, _3 a1, _4 a2, _5 a3, _6 a4, _7 a5, _8 a6)
     {
-#line 228
+#line 222
         return Ptr < _1 > (new _1(a0, a1, a2, a3, a4, a5, a6));
     };
     
-#line 271
+#line 265
     template < class _1, class _2 >
     inline Ptr < _1 > StaticPointerCast(_2 it) {};
     
-#line 78
+#line 72
     inline void Attachable::Attach(Slot& s)
     {
-#line 78
+#line 72
         s.Set(*this);
     };
     
-#line 96
+#line 90
     inline Slot& Attachable::Get(int i) const
     {
-#line 96
+#line 90
         return *(Slot * ) slots[i];
     };
     
-#line 95
+#line 89
     inline int Attachable::GetCount() const
     {
-#line 95
+#line 89
         return slots.GetCount();
     };
     
-#line 261
+#line 255
     template < class _1 >
     inline EnablePtrFromThis < _1 >::~EnablePtrFromThis() {};
     
-#line 267
+#line 261
     template < class _1 >
     template < class _2 >
     inline Ptr < _2 > EnablePtrFromThis < _1 >::AsPtr()
     {
         {
-#line 268
+#line 262
             if (!(!weak.IsEmpty()))
             {
-#line 268
+#line 262
                 Lang::SysBreak("Assertion failed: !weak.IsEmpty()");
             }
         }
-#line 268
+#line 262
         ;
-#line 268
+#line 262
         return weak.Enter();
     };
     
-#line 265
+#line 259
     template < class _1 >
     inline bool EnablePtrFromThis < _1 >::HasWeak() const
     {
-#line 265
+#line 259
         return !weak.IsEmpty();
     };
     
-#line 263
+#line 257
     template < class _1 >
     inline void EnablePtrFromThis < _1 >::InitWeak(const Ptr < _1 > & s)
     {
         {
-#line 263
+#line 257
             if (!(weak.IsEmpty()))
             {
-#line 263
+#line 257
                 Lang::SysBreak("Assertion failed: weak.IsEmpty()");
             }
         }
-#line 263
+#line 257
         ;
-#line 263
+#line 257
         weak = s;
     };
     
-#line 167
+#line 161
     template < class _1 >
     inline Ptr < _1 >::Ptr()
     :
@@ -496,115 +431,115 @@ namespace Shared
         o(0)
     {};
     
-#line 168
+#line 162
     template < class _1 >
     inline Ptr < _1 >::Ptr(const Ptr& o)
     :
         r(0),
         o(0)
     {
-#line 168
+#line 162
         *this = o;
     };
     
     template < class _1 >
     inline Ptr < _1 >::~Ptr()
     {
-#line 171
+#line 165
         Clear();
     };
     
-#line 182
+#line 176
     template < class _1 >
     inline _1& Ptr < _1 >::operator*() const
     {
-#line 182
+#line 176
         return *Get();
     };
     
-#line 178
+#line 172
     template < class _1 >
     inline _1 *Ptr < _1 >::operator-> ()
     {
-#line 178
+#line 172
         if (r)
-#line 178
+#line 172
             return o;
-#line 178
+#line 172
         return 0;
     };
     
-#line 179
+#line 173
     template < class _1 >
     inline _1 *Ptr < _1 >::operator-> () const
     {
-#line 179
+#line 173
         if (r)
-#line 179
+#line 173
             return o;
-#line 179
+#line 173
         return 0;
     };
     
-#line 176
+#line 170
     template < class _1 >
     inline void Ptr < _1 >::operator= (const Ptr < _1 > & s)
     {
-#line 176
+#line 170
         if (r == s.r)
-#line 176
+#line 170
             return;
-#line 176
+#line 170
         SetPtr(s.o, s.r);
     };
     
-#line 184
+#line 178
     template < class _1 >
     inline bool Ptr < _1 >::operator== (const Ptr& s) const
     {
-#line 184
+#line 178
         if (r && s.r)
-#line 184
+#line 178
             return o == s.o;
-#line 184
+#line 178
         return false;
     };
     
-#line 183
+#line 177
     template < class _1 >
     inline bool Ptr < _1 >::operator== (const _1 *ptr) const
     {
-#line 183
+#line 177
         if (r)
-#line 183
+#line 177
             return o == ptr;
-#line 183
+#line 177
         return false;
     };
     
-#line 181
+#line 175
     template < class _1 >
     inline Ptr < _1 >::operator bool() const
     {
-#line 181
+#line 175
         return !IsEmpty();
     };
     
-#line 185
+#line 179
     template < class _1 >
     template < class _2 >
     inline Ptr < _2 > Ptr < _1 >::As()
     {
-#line 186
+#line 180
         static_assert(std::is_base_of < _1, _2 > () || std::is_base_of < _2, _1 > (), "K -> T or T -> K inheritance is required");
-#line 188
+#line 182
         if (o)
         {
-#line 189
+#line 183
             _2 * ptr = dynamic_cast< _2 * >(o);
             if (ptr)
             {
-#line 191
+#line 185
                 Ptr < _2 > s;
                 s.SetPtr(ptr, r);
                 return s;
@@ -613,103 +548,103 @@ namespace Shared
         return Ptr < _2 > ();
     };
     
-#line 175
+#line 169
     template < class _1 >
     inline void Ptr < _1 >::Clear()
     {
-#line 175
+#line 169
         if (r)
         {
-#line 175
+#line 169
             r -> Dec();
-#line 175
+#line 169
             r = 0;
-#line 175
+#line 169
             o = 0;
         }
     };
     
-#line 173
+#line 167
     template < class _1 >
     inline void Ptr < _1 >::Create()
     {
-#line 173
+#line 167
         Clear();
-#line 173
+#line 167
         r = new RefTemplate < _1 > ;
-#line 173
+#line 167
         o = new _1;
-#line 173
+#line 167
         r -> obj = o;
     };
     
-#line 174
+#line 168
     template < class _1 >
     template < class _2 >
     inline void Ptr < _1 >::CreateAbstract()
     {
-#line 174
+#line 168
         Clear();
-#line 174
+#line 168
         r = new RefTemplate < _1 > ;
-#line 174
+#line 168
         o = new _2;
-#line 174
+#line 168
         r -> obj = o;
     };
     
-#line 180
+#line 174
     template < class _1 >
     inline _1 *Ptr < _1 >::Get() const
     {
-#line 180
+#line 174
         if (r)
-#line 180
+#line 174
             return o;
-#line 180
+#line 174
         return 0;
     };
     
-#line 213
+#line 207
     template < class _1 >
     inline const RefBase *Ptr < _1 >::GetBase() const
     {
-#line 213
+#line 207
         return r;
     };
     
-#line 177
+#line 171
     template < class _1 >
     inline bool Ptr < _1 >::IsEmpty() const
     {
-#line 177
+#line 171
         return r == 0;
     };
     
-#line 198
+#line 192
     template < class _1 >
     inline void Ptr < _1 >::SetPtr(_1 *o, RefBase *r)
     {
-#line 199
+#line 193
         Ptr < _1 > tmp;
-#line 199
+#line 193
         Container::Swap(*this, tmp);
         this -> o = o;
         this -> r = r;
         if (r)
-#line 202
+#line 196
             r -> Inc();
     };
     
-#line 204
+#line 198
     template < class _1 >
     inline Ptr < _1 > & Ptr < _1 >::WrapObject(_1 *obj)
     {
-#line 205
+#line 199
         Clear();
         if (obj)
         {
-#line 207
+#line 201
             r = new RefTemplate < _1 > ;
             r -> obj = obj;
             o = obj;
@@ -717,74 +652,74 @@ namespace Shared
         return *this;
     };
     
-#line 155
+#line 149
     template < class _1 >
     inline RefTemplate < _1 >::~RefTemplate()
     {
-#line 155
+#line 149
         if (obj)
-#line 155
+#line 149
             delete ((_1 * ) obj);
-#line 155
+#line 149
         obj = 0;
     };
     
-#line 16
+#line 10
     inline Slot::Slot()
     :
         ptr(0)
     {};
     
-#line 48
+#line 42
     inline Attachable& Slot::operator*() const
     {
-#line 48
+#line 42
         return *ptr;
     };
     
-#line 43
+#line 37
     inline Attachable *Slot::operator-> () const
     {
-#line 43
+#line 37
         return ptr;
     };
     
-#line 44
+#line 38
     inline Slot::operator bool() const
     {
-#line 44
+#line 38
         return ptr != 0;
     };
     
-#line 45
+#line 39
     inline Attachable& Slot::Get() const
     {
-#line 45
+#line 39
         return *ptr;
     };
     
-#line 46
+#line 40
     inline Attachable *Slot::GetPtr() const
     {
-#line 46
+#line 40
         return ptr;
     };
     
-#line 22
+#line 16
     inline bool Slot::IsEmpty() const
     {
-#line 22
+#line 16
         return ptr == 0;
     };
     
-#line 21
+#line 15
     inline void Slot::SetPtr(Attachable *p)
     {
-#line 21
+#line 15
         ptr = p;
     };
     
-#line 238
+#line 232
     template < class _1 >
     inline Weak < _1 >::Weak()
     :
@@ -792,141 +727,141 @@ namespace Shared
         o(0)
     {};
     
-#line 240
+#line 234
     template < class _1 >
     inline Weak < _1 >::Weak(const Ptr < _1 > & s)
     :
         r(s.r),
         o(s.o)
     {
-#line 240
+#line 234
         if (r)
-#line 240
+#line 234
             r -> IncWeak(this);
     };
     
-#line 239
+#line 233
     template < class _1 >
     inline Weak < _1 >::Weak(const Weak& w)
     :
         r(w.r),
         o(w.o)
     {
-#line 239
+#line 233
         if (r)
-#line 239
+#line 233
             r -> IncWeak(this);
     };
     
-#line 241
+#line 235
     template < class _1 >
     inline Weak < _1 >::~Weak()
     {
-#line 241
+#line 235
         Clear();
     };
     
-#line 249
+#line 243
     template < class _1 >
     inline _1 *Weak < _1 >::operator-> ()
     {
-#line 249
+#line 243
         return o;
     };
     
-#line 245
+#line 239
     template < class _1 >
     inline void Weak < _1 >::operator= (const Ptr < _1 > & s)
     {
-#line 245
+#line 239
         Clear();
-#line 245
+#line 239
         r = s.r;
-#line 245
+#line 239
         o = s.o;
-#line 245
+#line 239
         if (r)
-#line 245
+#line 239
             r -> IncWeak(this);
     };
     
-#line 247
+#line 241
     template < class _1 >
     inline void Weak < _1 >::operator= (const Weak < _1 > & p)
     {
-#line 247
+#line 241
         Clear();
-#line 247
+#line 241
         r = p.r;
-#line 247
+#line 241
         o = p.o;
-#line 247
+#line 241
         if (r)
-#line 247
+#line 241
             r -> IncWeak(this);
     };
     
-#line 251
+#line 245
     template < class _1 >
     inline Weak < _1 >::operator bool()
     {
-#line 251
+#line 245
         return !IsEmpty();
     };
     
-#line 244
+#line 238
     template < class _1 >
     inline void Weak < _1 >::Clear()
     {
-#line 244
+#line 238
         if (r)
-#line 244
+#line 238
             r -> DecWeak(this);
-#line 244
+#line 238
         r = 0;
-#line 244
+#line 238
         o = 0;
     };
     
-#line 252
+#line 246
     template < class _1 >
     inline Ptr < _1 > Weak < _1 >::Enter() const
     {
-#line 252
+#line 246
         Ptr < _1 > s;
-#line 252
+#line 246
         s.r = r;
-#line 252
+#line 246
         s.o = o;
-#line 252
+#line 246
         if (s.r)
-#line 252
+#line 246
             s.r -> Inc();
-#line 252
+#line 246
         return s;
     };
     
-#line 250
+#line 244
     template < class _1 >
     inline _1 *Weak < _1 >::Get()
     {
-#line 250
+#line 244
         return o;
     };
     
-#line 248
+#line 242
     template < class _1 >
     inline bool Weak < _1 >::IsEmpty() const
     {
-#line 248
+#line 242
         return r == 0;
     };
     
-#line 243
+#line 237
     template < class _1 >
     inline void Weak < _1 >::SetDeleted()
     {
-#line 243
+#line 237
         r = 0;
     };
     

@@ -1,6 +1,9 @@
 #ifndef _Com_Com_h_
 #define _Com_Com_h_
 
+#if defined flagWIN32 && defined flagMSC
+#include <corecrt_io.h>
+#endif
 
 #ifdef WINSOCK_HACK_FIX
 	#define _WS2DEF_
@@ -27,6 +30,18 @@
 	#endif
 #endif
 
+
+#ifdef flagPOSIX
+
+#include <sys/types.h>
+#include <dirent.h>
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <sys/stat.h>
+
+#endif
 
 
 

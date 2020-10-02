@@ -1,0 +1,115 @@
+namespace Compiler {;
+using/interface Util;
+
+
+
+auto declaration MakeImmediateTypesEqual(token T) {
+	bool operator==(const $T& t) const {
+		return MemoryCompare(this, &t, sizeof($T)) == 0;
+	}
+}
+
+
+struct FileLocation {
+	$MakeMoveable();
+	
+	int file = -1;
+	int line = -1, col = -1;
+	
+	void SetFileLocation(const FileLocation& loc) {*this = loc;}
+	$MakeImmediateTypesEqual(FileLocation);
+};
+
+
+enum { PROCMSG_UNKNOWN, PROCMSG_SKIP, PROCMSG_INFO, PROCMSG_WARNING, PROCMSG_ERROR };
+
+
+struct ProcMsg : public FileLocation {
+	$MakeMoveable();
+	
+	!inline static StringCache cache;
+	
+	int severity = 0;
+	int src = -1;
+	int msg = -1;
+
+	ProcMsg() {}
+	ProcMsg(const ProcMsg& e) { *this = e; }
+	ProcMsg(String source, FileLocation loc, int severity, String msg) {
+		this->src = cache.GetAdd(source);
+		SetFileLocation(loc);
+		this->severity = severity;
+		this->msg = cache.GetAdd(msg);
+	}
+	
+	$MakeImmediateTypesEqual(ProcMsg);
+	
+	void operator=(const ProcMsg& e) {
+		msg = e.msg;
+		file = e.file;
+		src = e.src;
+		line = e.line;
+		col = e.col;
+		severity = e.severity;
+	}
+	
+	void Set(String source, FileLocation loc, int severity, String msg) {
+		this->src = cache.GetAdd(source);
+		SetFileLocation(loc);
+		this->severity = severity;
+		this->msg = cache.GetAdd(msg);
+	}
+	
+	String AsString() const {
+		String s;
+		s	<< IntStr(src)
+			<< InlineIf<String>(src >= 0, (String)": " + cache.Get(src), "")
+			<< ": " << cache.Get(file)
+			<< ":" << line
+			<< ":" << col
+			<< ": " << GetSeverityString()
+			<< ": " << cache.Get(msg);
+		return s;
+	}
+	
+	String GetSeverityString() const {
+		switch (severity) {
+		case PROCMSG_SKIP: return "skip";
+		case PROCMSG_INFO: return "info";
+		case PROCMSG_WARNING: return "warning";
+		case PROCMSG_ERROR: return "error";
+		default: return "<invalid severity>";
+		}
+	}
+};
+
+
+
+class ErrorSource {
+	String error_path, src;
+	bool fail = false;
+
+protected:
+	void PrintHeader(String file = "", int line = -1, int col = -1);
+	void Internal(String msg);
+	void InternalWarning(String msg);
+	void Error(String msg, int line, int col);
+	void Error(String msg, String file, int line, int col);
+	void Error(String msg);
+	void Warning(String msg, int line, int col);
+	void Warning(String msg, String file, int line, int col);
+	void Warning(String msg);
+	void Info(String msg);
+
+
+public:
+	ErrorSource() {}
+
+	void SetErrorPath(String path) { error_path = path; }
+	void SetSource(String s) { src = s; }
+
+	//Callback1<struct Error> WhenError;
+};
+
+
+}

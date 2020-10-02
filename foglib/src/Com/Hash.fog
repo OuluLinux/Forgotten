@@ -1,5 +1,5 @@
 namespace Hash {
-using/interface Lang;
+using/interface Prim;
 
 class Combine {
 	$MakeMoveable();

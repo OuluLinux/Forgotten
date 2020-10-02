@@ -4,5 +4,15 @@ namespace Com {
 
 
 
+/*
+double Multiply(double prev_norm, int64 count, double multiplier) {
+	if (count <= 0)
+		return multiplier;
+	if (prev_norm == 0.0 || multiplier == 0.0)
+		return 0.0;
+	ASSERT(count < 300);
+	return FastPow(FastPow(prev_norm, (double)count) * multiplier, 1.0 / (count + 1));
+}
+*/
 
 }

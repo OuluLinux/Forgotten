@@ -572,21 +572,6 @@ String EscapeCharacter(String s) {
 
 
 
-String TrimBoth(String s) {
-	if (s.IsEmpty())
-		return s;
-	String out;
-	int begin = s.FindFirstNotOf(" \t\n\r");
-	if (begin < 0)
-		return "";
-	int end = s.ReverseFindFirstNotOf(" \t\n\r");
-	if (end < 0)
-		return "";
-	end++;
-	if (end <= begin)
-		return "";
-	return s.Mid(begin, end - begin);
-}
 
 
 

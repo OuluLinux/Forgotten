@@ -12,9 +12,12 @@ template <class T> struct initializer_list {
 }*/
 
 namespace Native {
-using/interface Lang;
 
 struct FILE;
+
+FILE* GetStdOut();
+FILE* GetStdIn();
+FILE* GetStdErr();
 
 int SignificantBits(uint32 x) :{ export/noimplementation; };
 int SignificantBits64(uint64 x) :{ export/noimplementation; };
@@ -41,7 +44,38 @@ void FileSeekEnd(FILE* s, int offset=0);
 bool IsFileEnd(FILE* s);
 void FileFlush(FILE* s);
 
+const char* GetHomeDir();
+const char* GetEnv(const char* id);
+
+bool DirExists(const char* path);
+bool PathExists(const char* path);
+void CreateDirectory(const char* path);
+void DeleteFile(const char* path);
+void RenameFile(const char* oldpath, const char* newpath);
+void GetDirFiles(const char* dir, void(*add_path)(const char*,void*), void* arg);
+
+int PopCount64(uint64 i);
+int PopCount32(dword i);
+int HammingDistance32(int count, const dword* a, const dword* b);
+int HammingDistance64(int count, const uint64* a, const uint64* b);
+
+bool IsFinite(float f);
+bool IsFinite(double f);
+int64 GetCpuTicks();
+int64 Delay(int64 cpu_ticks);
+
+struct Trans8x16 {
+	union {
+		uint16 u16[8];
+		uint8 u8[16];
+		uint64 u64[2];
+	};
+	
+	void TransFrom16x8();
+	void Zero();
 };
+
+}
 
 
 #define SignificantBits				Native::SignificantBits

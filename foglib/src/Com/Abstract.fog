@@ -1,24 +1,18 @@
 namespace Abstract {
-using/interface Prim;
-using/interface Lang;
-using/interface Lang;
-using/interface Native;
-using/interface Hash;
-using/interface Random;
-using/interface Algorithm;
 
 
-struct Stream;
+class StreamBase;
+
 
 auto declaration PrimSerialize(token type_id) {
-	inline void Serialize(${type_id}& o, Stream& s) {
+	inline void Serialize(${type_id}& o, StreamBase& s) {
 		if (s.IsLoading())
 			s.Get(&o, sizeof(${type_id}));
 		else if (s.IsStoring())
 			s.Put(&o, sizeof(${type_id}));
 	};
 };
-template <class T> inline void Serialize(T& o, Stream& s) {o.Serialize(s);}
+template <class T> inline void Serialize(T& o, StreamBase& s) {o.Serialize(s);}
 $PrimSerialize(bool);
 $PrimSerialize(char);
 $PrimSerialize(unsigned char);
@@ -30,7 +24,7 @@ $PrimSerialize(long long);
 $PrimSerialize(unsigned long long);
 $PrimSerialize(float);
 $PrimSerialize(double);
-inline void Serialize(const char* o, Stream& s) {
+inline void Serialize(const char* o, StreamBase& s) {
 	ASSERT(s.IsStoring());
 	if (s.IsStoring()) {
 		int len = StringLength(o);
@@ -40,11 +34,11 @@ inline void Serialize(const char* o, Stream& s) {
 	}
 }
 
-class Stream {
+class StreamBase {
 	bool corrupted = false;
 public:
 	typedef Native::FILE FILE;
-	Stream() {}
+	StreamBase() {}
 	
 	bool IsCorrupted() const {return corrupted;}
 	void SetCorrupted(bool b=true) {corrupted = b;}
@@ -65,7 +59,7 @@ public:
 	virtual void Flush() {};
 	
 	template <class T>
-	Stream& operator%(T& o) {Serialize(o, *this); return *this;}
+	StreamBase& operator%(T& o) {Serialize(o, *this); return *this;}
 	
 	
 	
@@ -74,3 +68,4 @@ public:
 
 }
 
+#define StreamBase			Abstract::StreamBase

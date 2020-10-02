@@ -38,6 +38,10 @@ file
 	Shared.cxx,
 	Stream.hxx,
 	Stream.cxx,
+	Util.hxx,
+	Util.cxx,
+	Compiler.hxx,
+	Compiler.cxx,
 	_ readonly separator;
 
 mainconfig
@@ -45,13 +49,15 @@ mainconfig
 
 custom() "fog",
 	"",
-	"$(DIR)/dummy.hxx";
+	"$(DIR)/Main.hxx";
 
 custom(POSIX) "mfog",
-	"fog -cd$(DIR) -t4 -I../../src -DPOSIX -DCPU64 -global Global $(PATH)\n",
-	"$(DIR)/CoreTest.hxx";
+	"fog -cd$(DIR) -t4 -I../../src -DPOSIX -DCPU64 -global Global -nobanner"
+	" -f $(PATH)\n",
+	"$(DIR)/Main.hxx";
 
 custom(WIN32) "",
-	"fog -cd$(DIR) -t4 -I../../src -DWIN32 -DCPU64 -global Global $(PATH)\n",
-	"$(DIR)/CoreTest.hxx";
+	"fog -cd$(DIR) -t4 -I../../src -DWIN32 -DCPU64 -global Global -nobanner"
+	" -nobanner -f $(PATH)\n",
+	"$(DIR)/Main.hxx";
 

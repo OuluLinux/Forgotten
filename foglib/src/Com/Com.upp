@@ -10,8 +10,8 @@ file
 	Pitfalls.fog,
 	LangNotes.fog,
 	"FOG code" readonly separator,
-	Macros.fog,
 	Meta.fog,
+	Macros.fog,
 	Prim.fog,
 	Lang.fog,
 	Native.fog,
@@ -28,6 +28,8 @@ file
 	Concurrency.fog,
 	Environment.fog,
 	StringUtil.fog,
+	"Basic Compiler" readonly separator,
+	CompilerBase.fog,
 	"C++ Support" readonly separator,
 	Com.h,
 	Com.cpp,
@@ -37,4 +39,8 @@ file
 	Defs.h,
 	Math.cpp,
 	_ readonly separator;
+
+custom() "fog",
+	"",
+	"$(DIR)/Com.h";
 

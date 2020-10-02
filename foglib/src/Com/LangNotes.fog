@@ -464,15 +464,15 @@ auto class Serializer {};
 
 // Basic serializer
 auto declaration unsigned long ::Serialize(expression name) {
-	public virtual void Serialize(Stream& s) {s % $name;}
-	public ${Scope}(Stream& s) {s % $name;}
+	public virtual void Serialize(StreamBase& s) {s % $name;}
+	public ${Scope}(StreamBase& s) {s % $name;}
 }
 
 // Custom serializer.
 // You can have different initializer than "= 0" and you can call some post-loading function.
 auto declaration short ::Serialize(expression name) {
-	public virtual void Serialize(Stream& s) {s % $name;}
-	public ${Scope}(Stream& s) {s % $name; if (s.IsLoading()) PostLoad($name);}
+	public virtual void Serialize(StreamBase& s) {s % $name;}
+	public ${Scope}(StreamBase& s) {s % $name; if (s.IsLoading()) PostLoad($name);}
 }
 
 auto declaration Serializer::Install() {
@@ -480,7 +480,7 @@ auto declaration Serializer::Install() {
 	auto static statement switch_body = {default: return 0;}
 	protected enum DerivedObjectTypes {};
 
-	public virtual void Serialize(Stream& s) :{
+	public virtual void Serialize(StreamBase& s) :{
 		derived(true) entry {
 			if (s.IsLoading()) {
 				int scope_i; int magic;
@@ -505,11 +505,11 @@ auto declaration Serializer::Install() {
 		}
 	};
 
-	public static !inline $Scope* LoadAnyStream(Stream& s) {
+	public static !inline $Scope* LoadAnyStream(StreamBase& s) {
 		switch (s.Peek()) @switch_body;
 	};
 	
-	protected static @Scope* LoadStream(Stream& s) :{
+	protected static @Scope* LoadStream(StreamBase& s) :{
 		derived(true) {
 			if (s.Peek() == MESSAGE_@Scope)
 				return new @{Scope}(s);
@@ -523,7 +523,7 @@ auto declaration Serializer::Install() {
 		auto switch_body +=
 			case MESSAGE_$Dynamic:
 				return ${Dynamic}::LoadStream(s);
-		public inline/implementation ${Dynamic}(Stream& s) {
+		public inline/implementation ${Dynamic}(StreamBase& s) {
 			Clear();
 			if (s.IsStoring()) return;
 		}

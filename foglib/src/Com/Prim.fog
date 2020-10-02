@@ -1,9 +1,10 @@
 
 namespace Prim {
 
-template<class T> struct CPtr {
-	
+
+template<class T> inline struct CPtr {
 	T* value;
+	
 	
 	CPtr() : value(0) {}
 	CPtr(T* p) : value(p) {}
@@ -18,6 +19,16 @@ template<class T> struct CPtr {
 		unsigned long Int() const {return (unsigned long)value;}
 };
 
+
+template<class T> T InlineIf(bool cond, T a, T b) {
+	if (cond)
+		return a;
+	else
+		return b;
+};
+
+
 }
 
+#define InlineIf		Prim::InlineIf
 #define CPtr			Prim::CPtr

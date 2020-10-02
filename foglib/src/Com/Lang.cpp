@@ -32,19 +32,22 @@ int StringLength(const short* c, int max_len) {
 struct AtomicFlag {
     std::atomic_flag locked = ATOMIC_FLAG_INIT;
     
-	void Enter() {
-		while (locked.test_and_set(std::memory_order_acquire)) { ; }
-	}
-	
-	void Leave() {
-		locked.clear(std::memory_order_release);
-	}
-	
-	bool TryEnter() {
-		return !locked.test_and_set(std::memory_order_acquire);
-	}
+	void Enter();
+	void Leave();
+	bool TryEnter();
 };
 
+void AtomicFlag::Enter() {
+	while (locked.test_and_set(std::memory_order_acquire)) { ; }
+}
+
+void AtomicFlag::Leave() {
+	locked.clear(std::memory_order_release);
+}
+
+bool AtomicFlag::TryEnter() {
+	return !locked.test_and_set(std::memory_order_acquire);
+}
 
 
 

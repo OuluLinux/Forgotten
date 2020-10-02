@@ -1,75 +1,44 @@
-/*!$@FOG@$!
- *	Generated at Thu Oct  1 09:45:53 2020
- *
- *	by fog 0.1.a of 12:17:36 Sep 29 2020
- *
- *	from
- *		../../src/Com/Abstract.fog
- *		../../src/Com/Algorithm.fog
- *		../../src/Com/Com.fog
- *		../../src/Com/Container.fog
- *		../../src/Com/Environment.fog
- *		../../src/Com/Hash.fog
- *		../../src/Com/Lang.fog
- *		../../src/Com/Macros.fog
- *		../../src/Com/Meta.fog
- *		../../src/Com/Native.fog
- *		../../src/Com/Prim.fog
- *		../../src/Com/Random.fog
- *		../../src/Com/Shared.fog
- *		../../src/Com/Stream.fog
- *		../../src/Com/Text.fog
- *		../../src/Com/Util.fog
- *		/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog
- */
-
 #ifndef MAIN_HXX
 #define MAIN_HXX
 
 #include <new>
 
-#ifndef CONTAINER_HXX
-#include <Container.hxx>
+#ifndef UTIL_HXX
+#include <Util.hxx>
 #endif
 
 struct NamespaceInterfaceLinker
 {
 };
 
-#ifndef STREAM_HXX
-#include <Stream.hxx>
-#endif
-#ifndef SHARED_HXX
-#include <Shared.hxx>
+#ifndef COM_HXX
+#include <Com.hxx>
 #endif
 
 namespace Main
 {
-#line 11 "/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog"
-    inline Text::String operator+ (const char *c, const Text::String& l);
-    
     class App
     {
-#line 18
+#line 18 "ComTest.mfog"
         Container::VectorMap < int, int > arr;
         
     public:
 #line 42
         inline void Run();
         
-#line 208
+#line 227
         void TestShared();
         
         struct Dumber
         {
-#line 200
+#line 219
             inline Dumber();
             virtual ~Dumber();
         };
         
         struct Dumb : public Main::App::Dumber
         {
-#line 204
+#line 223
             inline Dumb();
             inline ~Dumb();
         };
@@ -81,7 +50,7 @@ namespace Main
             double& b;
             
             SomeRefTuple2(int& a, double& b);
-            Text::String ToString() const;
+            Text::String AsString() const;
         };
         
         struct SomeTuple2
@@ -90,12 +59,12 @@ namespace Main
             int a;
             double b;
             
-            Text::String ToString() const;
+            Text::String AsString() const;
         };
         
         struct TestCmp
         {
-#line 22 "/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog"
+#line 22 "ComTest.mfog"
             inline bool operator()(const char& c);
         };
         
@@ -122,16 +91,7 @@ namespace Main
 
 namespace Main
 {
-#line 11
-    inline Text::String operator+ (const char *c, const Text::String& l)
-    {
-#line 873 "../../src/Com/Text.fog"
-        Text::String s(c);
-        s.Cat(l);
-        return s;
-    };
-    
-#line 42 "/home/sblo/Forgotten/foglib/examples/ComTest/ComTest.mfog"
+#line 42
     inline void App::Run()
     {
 #line 43
@@ -241,10 +201,10 @@ namespace Main
         ;
         {
 #line 73
-            if (!("abc" + Text::String("def") == "abcdef"))
+            if (!((Text::String)"abc" + Text::String("def") == "abcdef"))
             {
 #line 73
-                Lang::SysBreak("Assertion failed: \"abc\" + String(\"def\") == \"abcdef\"");
+                Lang::SysBreak("Assertion failed: (String)\"abc\" + String(\"def\") == \"abcdef\"");
             }
         }
 #line 74
@@ -621,8 +581,37 @@ namespace Main
             int sz = s.GetCount();
         }
 #line 177
+        Util::Log() << "Lol does this work\?\n";
+#line 179
         Stream::FileOut fout;
         fout % r % f % d;
+#line 182
+        for (int i = 0; i < Util::CommandLine().GetCount(); i ++ )
+            {
+#line 183
+                Text::String arg = Util::CommandLine()[i];
+            }
+#line 186
+        Container::Index < Text::String > files;
+        Util::GetDirectoryFiles("/", files);
+        {
+#line 188
+            if (!(files.Find("home") >= 0))
+            {
+#line 188
+                Lang::SysBreak("Assertion failed: files.Find(\"home\") >= 0");
+            }
+        }
+#line 189
+        ;
+#line 189
+        for (int i = 0; i < files.GetCount(); i ++ )
+            {
+#line 190
+                Text::String s = files[i];
+                const char * c = s.Begin();
+                int len = Lang::StringLength(c);
+            }
     };
     
 #line 34
@@ -631,24 +620,24 @@ namespace Main
         a(8)
     {};
     
-#line 204
+#line 223
     inline App::Dumb::Dumb()
     {
-#line 204
+#line 223
         ;
     };
     
-#line 205
+#line 224
     inline App::Dumb::~Dumb()
     {
-#line 205
+#line 224
         ;
     };
     
-#line 200
+#line 219
     inline App::Dumber::Dumber()
     {
-#line 200
+#line 219
         ;
     };
     

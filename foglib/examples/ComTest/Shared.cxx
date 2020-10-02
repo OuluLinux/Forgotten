@@ -1,28 +1,3 @@
-/*!$@FOG@$!
- *	Generated at Thu Oct  1 09:26:12 2020
- *
- *	by fog 0.1.a of 12:17:36 Sep 29 2020
- *
- *	from
- *		../../src/Com/Abstract.fog
- *		../../src/Com/Algorithm.fog
- *		../../src/Com/Com.fog
- *		../../src/Com/Container.fog
- *		../../src/Com/Environment.fog
- *		../../src/Com/Hash.fog
- *		../../src/Com/Lang.fog
- *		../../src/Com/Macros.fog
- *		../../src/Com/Meta.fog
- *		../../src/Com/Native.fog
- *		../../src/Com/Prim.fog
- *		../../src/Com/Random.fog
- *		../../src/Com/Shared.fog
- *		../../src/Com/Stream.fog
- *		../../src/Com/Text.fog
- *		../../src/Com/Util.fog
- *		ComTest.mfog
- */
-
 #ifndef SHARED_CXX
 #define SHARED_CXX
 
@@ -34,10 +9,10 @@
 
 namespace Shared
 {
-#line 76 "../../src/Com/Shared.fog"
+#line 70 "../../src/Com/Shared.fog"
     Attachable::~Attachable()
     {
-#line 76
+#line 70
         DetachAll();
     };
     
@@ -48,57 +23,57 @@ namespace Shared
         slots.Add(ptr);
     };
     
-#line 91 "../../src/Com/Shared.fog"
+#line 85 "../../src/Com/Shared.fog"
     void Attachable::Detach(Slot *ptr)
     {
-#line 92
+#line 86
         DoDetach(ptr);
         ptr -> SetPtr(0);
     };
     
-#line 79
+#line 73
     void Attachable::DetachAll()
     {
-#line 80
+#line 74
         for (Iter it = slots.Begin(), end = slots.End(); it != end; ++ it)
             ((Slot * ) * it)-> SetPtr(0);
         slots.Clear();
     };
     
-#line 58
+#line 52
     void Attachable::DoAttach(Slot *s)
     {
         {
-#line 59
+#line 53
             if (!(s && s -> GetPtr() == 0 && !IsAttached(s)))
             {
-#line 59
+#line 53
                 Lang::SysBreak("Assertion failed: s && s->GetPtr() == 0 && !IsAttached(s)");
             }
         }
-#line 60
+#line 54
         ;
-#line 60
+#line 54
         AddSlot(s);
         s -> SetPtr(this);
     };
     
-#line 63
+#line 57
     void Attachable::DoDetach(Slot *s)
     {
-#line 64
+#line 58
         int i = 0;
         for (Iter it = slots.Begin(), end = slots.End(); it != end; ++ it)
             {
-#line 66
+#line 60
                 if ((Slot * ) * it == s)
                 {
-#line 67
+#line 61
                     slots.Remove(i);
                     break;
                 
                 }
-#line 70
+#line 64
                 i ++ ;
             }
     };
@@ -117,13 +92,13 @@ namespace Shared
         return slots.GetCount();
     };
     
-#line 84 "../../src/Com/Shared.fog"
+#line 78 "../../src/Com/Shared.fog"
     bool Attachable::IsAttached(Slot *ptr)
     {
-#line 85
+#line 79
         for (Iter it = slots.Begin(), end = slots.End(); it != end; ++ it)
             {
-#line 86
+#line 80
                 if ((Slot * ) * it == ptr)
                     return true;
             }
@@ -137,16 +112,16 @@ namespace Shared
         slots.Remove(i);
     };
     
-#line 132 "../../src/Com/Shared.fog"
+#line 126 "../../src/Com/Shared.fog"
     RefBase::RefBase()
     :
         obj(0)
     {
-#line 132
+#line 126
         refs = 1;
     };
     
-#line 133
+#line 127
     RefBase::~RefBase() {};
     
 #line 156 "../../src/Com/Meta.fog"
@@ -156,14 +131,14 @@ namespace Shared
         weaks.Add(ptr);
     };
     
-#line 135 "../../src/Com/Shared.fog"
+#line 129 "../../src/Com/Shared.fog"
     void RefBase::Dec()
     {
-#line 136
+#line 130
         refs -- ;
         if (refs <= 0)
         {
-#line 138
+#line 132
             for (int i = 0; i < GetWeakCount(); i ++ )
                 GetWeak(i).SetDeleted();
             delete this;
@@ -172,7 +147,7 @@ namespace Shared
     
     void RefBase::DecWeak(WeakBase *w)
     {
-#line 145
+#line 139
         for (int i = 0; i < GetWeakCount(); i ++ )
             if (&GetWeak(i) == w)
                 RemoveWeak(i -- );
@@ -192,17 +167,17 @@ namespace Shared
         return weaks.GetCount();
     };
     
-#line 134 "../../src/Com/Shared.fog"
+#line 128 "../../src/Com/Shared.fog"
     void RefBase::Inc()
     {
-#line 134
+#line 128
         refs ++ ;
     };
     
-#line 143
+#line 137
     void RefBase::IncWeak(WeakBase *w)
     {
-#line 143
+#line 137
         AddWeak(w);
     };
     
@@ -213,62 +188,62 @@ namespace Shared
         weaks.Remove(i);
     };
     
-#line 17 "../../src/Com/Shared.fog"
+#line 11 "../../src/Com/Shared.fog"
     Slot::~Slot()
     {
-#line 17
+#line 11
         Clear();
     };
     
-#line 19
+#line 13
     bool Slot::CanAttach(Attachable& a)
     {
-#line 19
+#line 13
         return true;
     };
     
-#line 35
+#line 29
     void Slot::Clear()
     {
-#line 36
+#line 30
         if (ptr)
         {
-#line 37
+#line 31
             Attachable * a = ptr;
             ptr = 0;
             a -> DoDetach(this);
         }
     };
     
-#line 23
+#line 17
     void Slot::Set(Attachable& a)
     {
-#line 24
+#line 18
         Clear();
         bool b = CanAttach(a);
         {
-#line 26
+#line 20
             if (!(b))
             {
-#line 26
+#line 20
                 Lang::SysBreak("Assertion failed: b");
             }
         }
-#line 27
+#line 21
         ;
-#line 27
+#line 21
         if (b)
-#line 27
+#line 21
             a.DoAttach(this);
     };
     
-#line 29
+#line 23
     void Slot::TestSet(Attachable& a)
     {
-#line 30
+#line 24
         if (CanAttach(a))
         {
-#line 31
+#line 25
             Clear();
             a.DoAttach(this);
         }

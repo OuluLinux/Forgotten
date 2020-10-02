@@ -1,7 +1,4 @@
 namespace Random {
-using/interface Lang;
-using/interface Hash;
-using/interface Native;
 
 
 
