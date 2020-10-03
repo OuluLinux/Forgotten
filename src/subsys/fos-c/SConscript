@@ -1,0 +1,85 @@
+####################################
+# SCons build system for Forgotten
+## Tyler Kennedy (AKA Linuxhq AKA TkTech)
+####################################
+
+import os
+import shutil
+import tempfile
+Import(['env'])
+
+tmp = env.Clone()
+
+# Build directories
+builddir = "#" + env["FORGOTTEN_BUILD_BASE"]
+kerneldir = "#" + env["FORGOTTEN_BUILD_KERNEL"]
+moduledir = "#" + env["FORGOTTEN_BUILD_MODULES"]
+subsysdir = "#" + env["FORGOTTEN_BUILD_SUBSYS"]
+
+# Change to then of this module
+fos_c_objname = subsysdir + '/fos-c.o'
+libfos_c_objname = builddir + '/libfos-c.a'
+
+env.Alias("subsys", fos_c_objname)
+env.Alias("subsys", libfos_c_objname)
+
+# To include a new subdirectory just add to the list.
+subdirs = [
+    
+]
+
+# To include new files just add to the list, or Glob("*.cpp")
+fos_c_files = [
+    Glob("*.cc")
+]
+
+libfos_c_files = [
+    Glob("*.c")
+]
+
+# To include a new directory for includes, just add it to the list
+include = [
+    './include',
+    '#/src/modules',
+    '#/src/system/include',
+    '#/src/modules/system',
+	'#/src/subsys/posix/include',
+    '.'
+]
+
+# To add a library add to the list below
+if 'STATIC_DRIVERS' in env['CPPDEFINES']:
+    libraries = []
+else:
+    libraries = ['gcc']
+
+# To add a library path add to the list below
+libpaths = [
+    env['LIBGCC']
+]
+
+####################################
+SConscript([os.path.join(i, 'SConscript') for i in subdirs],exports = ['tmp'])
+tmp['CPPPATH'] = include
+tmp['LIBS'] = libraries
+tmp['LIBPATH'] = libpaths
+
+if "STATIC_DRIVERS" in env['CPPDEFINES']:
+    build = tmp.Program(fos_c_objname, fos_c_files,LINKFLAGS='-nostdlib -Wl,-r -T $LSCRIPT',LSCRIPT=File("#src/modules/link_static.ld"))
+else:
+    build = tmp.Program(fos_c_objname, fos_c_files,LINKFLAGS='-nostdlib -Wl,-r -T $LSCRIPT',LSCRIPT=File("#src/modules/link.ld"))
+    
+tmp_lib = tmp.Clone()
+
+# -fPIC for libfos-c
+glueFlags = " -fno-exceptions "
+if env['ARCH_TARGET'] in ['X64', 'ARM']:
+    glueFlags += " -fPIC "
+
+tmp_lib['CFLAGS'] = tmp_lib['CFLAGS'].replace("mcmodel=kernel", "mcmodel=small")
+tmp_lib['CXXFLAGS'] = tmp_lib['CXXFLAGS'].replace("mcmodel=kernel", "mcmodel=small")
+tmp_lib['CFLAGS'] += glueFlags
+tmp_lib['CXXFLAGS'] += glueFlags
+tmp_lib['LD'] = tmp_lib['LINK'] = tmp_lib['LD'].replace('gcc', 'ld')
+
+tmp_lib.Library(libfos_c_objname, libfos_c_files)

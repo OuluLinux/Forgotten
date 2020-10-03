@@ -1,0 +1,7 @@
+[paths]
+installroot=$installRoot
+localdb=$localDb
+
+[remotes]
+server0=http://127.0.0.1/fu
+

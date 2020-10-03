@@ -1,0 +1,17 @@
+Welcome to Forgotten OS.
+This is Forgotten OS (Unstable 2020-10-3) -- 0.1.2
+
+-------------------------------------------------------------------------------
+NOTE: This is an *unstable* build of Forgotten. There may still be significant
+bugs which are being worked on, and the quality of this build may not directly
+reflect the quality of a stable release.
+
+Again, _expect bugs_.
+-------------------------------------------------------------------------------
+
+Please report any issues on https://github.com/UltimateScript/Forgotten/issues.
+We prefer getting a backtrace with all reports that show the debugger screen
+(blue text) - just hit a key and type "backtrace" at the prompt.
+
+Login with user "james", "matt" or "root", with a password equal to the username.
+

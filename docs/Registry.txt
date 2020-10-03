@@ -1,0 +1,123 @@
+The Forgotten OS "Registry"
+==============================
+
+Introduction
+------------
+
+In order to keep configuration as simple as possible, a "Registry"
+will be built into Forgotten OS. While having the same name as the Windows
+concept, internally it is totally unique.
+
+Configuration is managed by a central manager, which provides a consistent
+interface that can be used without requiring knowledge of the configuration
+method. Backends can be plugged in quickly by subclassing the backend class,
+and ensuring the backend is added to the configuration manager before it is
+used.
+
+API
+---
+
+All configuration backends must subclass `class ConfigurationBackend`.
+
+### ConfigurationManager
+
+    class ConfigurationManager {
+    public:
+        ConfigurationManager &Instance();
+    
+        size_t Write(String config_store, String table, String key_name, String key_value, String value_name, uintptr_t buffer, size_t n_bytes);
+        size_t Read(String config_store, String table, String key_name, String key_value, String value_name, uintptr_t buffer, size_t max_bytes);
+    
+        bool InstallBackend(ConfigurationBackend *p_backend, String config_store = "");
+        void RemoveBackend(String config_store);
+    
+        bool BackendExists(String config_store);
+    };
+
+This class interface is designed to hide as much of the internal configuration methods
+from the programmer. The most important concept to grasp is that of the `config_store`
+parameters. Each backend, when installed, specifies a `config_store` which is used
+from then on to uniquely identify the backend. Should `config_store` not be passed to
+InstallBackend, the name of the store will be obtained from the `ConfigurationBackend::GetConfigStore` method.
+
+### ConfigurationBackend
+
+    class ConfigurationBackend {
+    public:
+        ConfigurationBackend(String config_store);
+        virtual ~ConfiguratonBackend();
+    
+        virtual size_t write(String table, String key_name, String key_value, String value_name, uintptr_t buffer, size_t n_bytes);
+        virtual size_t read(String table, String key_name, String key_value, String value_name, uintptr_t buffer, size_t max_bytes) = 0;
+    
+        virtual String GetConfigStore();
+    
+        virtual String GetTypeName();
+    };
+
+The interface for a `ConfigurationBackend` is relatively simple, as it is merely
+a layer of abstraction between the ConfigurationManager and different methods of storing configuration
+data. It is <b>not</b> compulsory to override `write`, as the store may be read-only.
+It is however compulsory to override `read`. It is not compulsory, but highly
+recommended for ease of implementation, to override `GetConfigStore`.
+
+The destructor for `ConfigurationBackend` automatically removes the backend from the
+`ConfigurationManager`. The constructor will not add the backend automatically.
+
+Example Implementation
+----------------------
+
+To make the concept easier to understand, the following code shows an example of the use of this
+design. Note that this is more like psuedocode, it will not compile on Forgotten OS (casting and lack of
+String constructor calls, mainly).
+
+    /** SqlConfigBackend: implementation of a configuration backend for an SQL database */
+    class SqlConfigBackend : public ConfigurationBackend
+    {
+    public:
+        /** Default constructor, should not be called */
+        SqlConfigBackend();
+        
+        /** Constructor - defines the database file (uses the name of the database file for config_store) */
+        SqlConfigBackend(String file_name);
+    
+        /** Destructor */
+        virtual ~SqlConfigBackend();
+            
+        /** This will run a query of the form "SELECT valueName FROM Table WHERE keyName=keyValue;"
+         * For instance, to obtain the IP address for an interface managed with this backend:
+         * read("net-interfaces", "iface", "interface0", "ip_addr", myBuffer, maxSize);
+         */
+        size_t read(String table, String key_name, String key_value, String value_name, uintptr_t buffer, size_t max_bytes);
+        
+        /** Updates the database (will execute an SQL SELECT, then an UPDATE or INSERT query) */
+        size_t write(String table, String key_name, String key_value, String value_name, uintptr_t buffer, size_t n_bytes);
+        
+        /** Will return "SqlBackend" */
+        String GetTypeName();
+    };
+    
+    /** NetworkStack initialisation */
+    void NetworkStack::Initialise() {
+        ...
+    
+        SqlConfigBackend *sql_config = new SqlConfigBackend("root:/config/net-data");
+        if(sql_config)
+            ConfigurationManager::Instance().InstallBackend(sql_config); // config_store = "net-data"
+    
+        ...
+    }
+    
+    /** Some network card */
+    int NetworkCard::SetStationInfo() {
+        ...
+    
+        String ipv4; // set above
+    
+        uint8_t *ip_addr = new uint8_t[ipv4.GetLength() + 1];
+        strcpy(ip_addr, static_cast<const char*>(ipv4));
+    
+        ConfigurationManager::Instance().write("net-data", "interfaces", "interface", "interface0" /* Probably created by getting the NIC ID */, "ipv4", ip_addr, ipv4.GetLength());
+    
+        ...
+    }
