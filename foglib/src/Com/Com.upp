@@ -25,6 +25,7 @@ file
 	Stream.fog highlight cpp,
 	Util.fog,
 	Math.fog,
+	Chrono.fog,
 	Concurrency.fog,
 	StringUtil.fog,
 	"Basic Compiler" readonly separator,

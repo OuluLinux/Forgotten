@@ -1,0 +1,66 @@
+namespace Chrono {
+	
+class Date {
+	byte year, month, day;
+	
+public:
+	Date() {}
+	
+	void Set(int y, int m, int d) {
+		year = y;
+		month = m;
+		day = d;
+	}
+};
+
+class Time : public Date {
+	byte hour, min, sec;
+
+public:
+	Time() {}
+	Time(const Time& t) { MemoryCopy(this, &t, sizeof(Time)); }
+	Time(int y, int m, int d) {Set(y,m,d,0,0,0);}
+	Time(int y, int m, int d, int h, int min, int s) {Set(y,m,d,h,min,s);}
+	String ToString() const;
+
+	void Set(int y, int m, int d, int h, int min, int s) {
+		Date::Set(y, m, d);
+		hour = h;
+		this->min = min;
+		sec = s;
+	}
+	
+	int64 Get() const {return Native::TimeSeconds(year, month, day, hour, min, sec);}
+	void Set(int64 t);
+	uint32 GetHashValue() {return sec + 32 * (min + 32 * (hour + 16 * (day + 32 * (month + 8 * year))));}
+	
+};
+
+inline Time operator+(const Time& t, int64 seconds) {
+	Time o;
+	o.Set(t.Get() + seconds);
+	return o;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+void Time::Set(int64 scalar) {
+	int q = (int)(scalar / (24 * 3600));
+	Date::Set(q);
+	int n = int(scalar - (int64)q * 24 * 3600);
+	hour = n / 3600;
+	n %= 3600;
+	minute = n / 60;
+	second = n % 60;
+}
+
+}
