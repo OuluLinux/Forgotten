@@ -21,7 +21,7 @@ public:
 	Time(const Time& t) { MemoryCopy(this, &t, sizeof(Time)); }
 	Time(int y, int m, int d) {Set(y,m,d,0,0,0);}
 	Time(int y, int m, int d, int h, int min, int s) {Set(y,m,d,h,min,s);}
-	String ToString() const;
+	String AsString() const;
 
 	void Set(int y, int m, int d, int h, int min, int s) {
 		Date::Set(y, m, d);
