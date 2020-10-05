@@ -282,7 +282,12 @@ public:
 	inline VectorPtr(const VectorPtr& v) : data(v) {}
 	
 	//void Serialize(StreamBase& s);
-	
+	inline K& Add(K* o) {data.Add(o); return *o;}
+	inline int GetCount() const {return data.GetCount();}
+	inline void Append(const VectorPtr& v) {data.Append(v.data);}
+	inline K& operator[](int i) {return *data[i];}
+	inline const K& operator[](int i) const {return *data[i];}
+	inline void Clear() {data.Clear();}
 	
 	inline String Join(String join_str = "", bool ignore_empty = true) const {
 		String out;

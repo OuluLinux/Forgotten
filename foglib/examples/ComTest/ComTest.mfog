@@ -8,6 +8,7 @@ using/interface Shared;
 using/interface Stream;
 using/interface Util;
 using/interface Math;
+using/interface Chrono;
 using/implementation Com;
 
 
@@ -206,6 +207,15 @@ class App {
 			d = gaus;
 			d = gaus;
 		}
+		
+		{
+			Time t1(2020,10,5,3,28,0);
+			int64 i64 = t1.Get();
+			Time t2;
+			t2.Set(i64);
+			ASSERT(t1 == t2);
+		}
+		
 		
 		/* TODO
 			- log init GetSysTime

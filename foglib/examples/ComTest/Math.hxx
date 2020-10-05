@@ -203,7 +203,7 @@ namespace Math
     namespace Native
     {
 #line 54
-        Native::StdRandomGaussian *CreateStdRandomGaussian(int length);
+        StdRandomGaussian *CreateStdRandomGaussian(int length);
 #line 8
         double Floor(double a);
         double Round(double a);
@@ -552,6 +552,14 @@ namespace Math
 #line 283
         static RandomGaussianCache cache;
         return cache.Get(length);
+    };
+    
+#line 65
+    template < class _1 >
+    inline _1 PowFastT(_1 v, _1 e)
+    {
+#line 65
+        Lang::SysBreak("Unimplemented");
     };
     
 #line 66

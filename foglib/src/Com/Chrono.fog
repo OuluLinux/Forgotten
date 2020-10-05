@@ -1,16 +1,26 @@
 namespace Chrono {
-	
+using/interface Text;
+using/interface Native;
+
 class Date {
-	byte year, month, day;
+	
+protected:
+	short year;
+	byte month, day;
 	
 public:
 	Date() {}
 	
-	void Set(int y, int m, int d) {
-		year = y;
-		month = m;
-		day = d;
-	}
+	void Set(int y, int m, int d);
+	void Set(int64 scalar);
+	int64 Get() const;
+	bool operator==(const Date& d) const {return year == d.year && month == d.month && day == d.day;}
+	
+	static const int* DaysInMonth();
+	static const int* MonthDayOffset();
+	static bool IsLeapYear(int year);
+	static int GetDaysOfMonth(int m, int y);
+	
 };
 
 class Time : public Date {
@@ -23,18 +33,21 @@ public:
 	Time(int y, int m, int d, int h, int min, int s) {Set(y,m,d,h,min,s);}
 	String AsString() const;
 
-	void Set(int y, int m, int d, int h, int min, int s) {
-		Date::Set(y, m, d);
-		hour = h;
-		this->min = min;
-		sec = s;
-	}
-	
-	int64 Get() const {return Native::TimeSeconds(year, month, day, hour, min, sec);}
-	void Set(int64 t);
+	void Set(int y, int mon, int d, int h, int m, int s);
+	void Set(int64 scalar);
+	void SetFromStamp(int seconds);
+	int64 Get() const {return Date::Get() * (int64)24 * 3600 + hour * 3600 + min * 60 + sec;}
 	uint32 GetHashValue() {return sec + 32 * (min + 32 * (hour + 16 * (day + 32 * (month + 8 * year))));}
+	int GetStamp() const;
 	
+	bool operator==(const Time& t) const {return hour == t.hour && min == t.min && sec == t.sec;}
+	
+	String AsString() const;
+	String AsDiffString() const;
+	static Time GetSys();
 };
+
+String GetTimeDurationString(Time begin, Time end);
 
 inline Time operator+(const Time& t, int64 seconds) {
 	Time o;
@@ -42,6 +55,48 @@ inline Time operator+(const Time& t, int64 seconds) {
 	return o;
 }
 
+class TimeStop {
+	Native::HighResTimePoint* tp = 0;
+	
+public:
+	TimeStop() {tp = Native::HighResTimePoint::Create();}
+	~TimeStop() {delete tp; tp = 0;}
+	
+	void Reset() {tp->Reset();}
+	int Elapsed() const {return tp->Elapsed();}
+	double ElapsedSeconds() const {return tp->ElapsedSeconds();}
+	int ResetElapsed() {return tp->ResetElapsed();}
+	double ResetElapsedSeconds() {return tp->ResetElapsedSeconds();}
+};
+
+
+struct OnlineFrequency {
+	TimeStop timer;
+	int ticks = 0;
+	
+	OnlineFrequency() {}
+	void Reset() {timer.Reset(); ticks = 0;}
+	double Get() const {return (double)ticks / timer.Elapsed() * 1000;}
+	void Tick() {ticks++;}
+	
+	operator double() const {return Get();}
+	double operator++() {Tick(); return Get();}
+};
+
+struct OnlineFrequencyWindow {
+	OnlineFrequency freq0, freq1;
+	bool which = 0;
+	double interval = 0.5;
+	
+	OnlineFrequencyWindow() {}
+	OnlineFrequency& GetActive();
+	OnlineFrequency& GetInactive();
+	void SwitchActive() {which = !which;}
+	void Tick();
+	double Get() const;
+	operator double() const {return Get();}
+	double operator++() {Tick(); return Get();}
+};
 
 
 
@@ -52,6 +107,96 @@ inline Time operator+(const Time& t, int64 seconds) {
 
 
 
+
+
+
+static const int* Date::DaysInMonth() {
+	static int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	return month_days;
+}
+
+static const int* Date::MonthDayOffset() {
+	static int month_off[] = {0,  31,  59,  90, 120, 151, 181, 212, 243, 273, 304, 334};
+	return month_off;
+}
+
+static bool Date::IsLeapYear(int year) {
+	return ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0);
+}
+
+static int Date::GetDaysOfMonth(int m, int y) {
+	ASSERT(m >= 1 && m <= 12);
+	return DaysInMonth()[m - 1] + (m == 2) * IsLeapYear(y);
+}
+
+int64 Date::Get() const {
+	int64 y400 = (year / 400 ) - 2;
+	int64 ym = year - y400 * 400;
+	return y400 * (400 * 365 + 100 - 3) +
+	        ym * 365 + MonthDayOffset()[month - 1] + (day - 1) +
+	       (ym - 1) / 4 - (ym - 1) / 100 + (ym - 1) / 400 + 1 +
+	       (month > 2) * IsLeapYear(ym);
+}
+
+void Date::Set(int y, int m, int d) {
+	year = y;
+	month = m;
+	day = d;
+}
+
+void Date::Set(int d) {
+	if(d == 0) {
+		day = 0; month = 0; year = 0;
+		return;
+	}
+	int q;
+	int leap;
+	year = 0;
+	q = d / (400 * 365 + 100 - 3);
+	year += 400 * q;
+	d -= q * (400 * 365 + 100 - 3);
+	if(d < 0) {
+		year -= 400;
+		d += 400 * 365 + 100 - 3;
+	}
+	leap = 1;
+	if(d >= 100 * 365 + 24 + 1) {
+		d--;
+		q = d / (100 * 365 + 24);
+		year += 100 * q;
+		d -= q * (100 * 365 + 24);
+		leap = 0;
+	}
+	if(d >= 365 * 4 + leap) {
+		q = (d + 1 - leap) / (365 * 4 + 1);
+		year += 4 * q;
+		d -= q * (365 * 4 + 1) - 1 + leap;
+		leap = 1;
+	}
+	if(d >= 365 + leap) {
+		q = (d - leap) / 365;
+		year += q;
+		d -= q * 365 + leap;
+		leap = 0;
+	}
+	int i;
+	const int* s_month = DaysInMonth();
+	for(i = 0; i < 12; i++) {
+		int q = s_month[i] + (i == 1) * leap;
+		if(q > d) break;
+		d -= q;
+	}
+	month = i + 1;
+	day = d + 1;
+}
+
+
+void Time::Set(int y, int mon, int d, int h, int m, int s) {
+	Date::Set(y, mon, d);
+	hour = h;
+	min = m;
+	sec = s;
+}
 
 void Time::Set(int64 scalar) {
 	int q = (int)(scalar / (24 * 3600));
@@ -59,8 +204,112 @@ void Time::Set(int64 scalar) {
 	int n = int(scalar - (int64)q * 24 * 3600);
 	hour = n / 3600;
 	n %= 3600;
-	minute = n / 60;
-	second = n % 60;
+	min = n / 60;
+	sec = n % 60;
 }
 
+String Time::AsString() const {
+	char m[3];
+	m[0] = '0' + min / 10;
+	m[1] = '0' + min / 10;
+	m[2] = 0;
+	char s[3];
+	s[0] = '0' + sec / 10;
+	s[1] = '0' + sec / 10;
+	s[2] = 0;
+	return	IntStr(day) + "." + IntStr(month) + "." + IntStr(day) +
+			" " + IntStr(hour) + ":" + String(m) + ":" + String(s);
+	//return Format("%v.%v.%v %v:%v", (int)t.day(), (int)t.month(), (int)t.year(), (int)t.hour(), min);
 }
+
+auto statement DIV(token x, expression y) {$x = seconds / ($y); seconds = seconds % ($y);};
+auto statement PRINT(token x) {if ($x) {out.Cat(' '); out += IntStr64($x) + " " + $to_string($x);};}
+
+String Time::AsDiffString() const {
+	String out;
+	int64 seconds = Get();
+	
+	if (seconds > -60 && seconds < 60) return "Now";
+	
+	if (seconds < 0)		{out += "-"; seconds *= -1;}
+	else if (seconds > 0)	out += "+";
+	
+	int64 years;
+	int64 months;
+	int64 days;
+	int64 hours;
+	int64 minutes;
+	
+	$DIV(years, 365*24*60*60);
+	$DIV(months, 30*24*60*60);
+	$DIV(days,    24*60*60);
+	$DIV(hours,      60*60);
+	$DIV(minutes,       60);
+	$PRINT(years);
+	$PRINT(months);
+	$PRINT(days);
+	$PRINT(hours);
+	$PRINT(minutes);
+	return out;
+}
+
+static Time Time::GetSys() {
+	Time t;
+	t.Set(Native::CurrentTime());
+	return t;
+}
+
+void Time::SetFromStamp(int seconds) {
+	static int64 begin = Time(1970,1,1).Get();
+	Set(begin + (int64)seconds);
+}
+
+int Time::GetStamp() const {
+	static int64 begin = Time(1970,1,1).Get();
+	return Get() - begin;
+}
+
+String GetTimeDurationString(Time begin, Time end) {
+	int64 diff = end.Get() - begin.Get();
+	Time t;
+	t.Set(diff);
+	return t.AsDiffString();
+}
+
+
+
+
+
+
+
+
+
+OnlineFrequency& OnlineFrequencyWindow::GetActive() {
+	if (which)	return freq1;
+	else		return freq0;
+}
+
+OnlineFrequency& OnlineFrequencyWindow::GetInactive() {
+	if (which)	return freq0;
+	else		return freq1;
+}
+
+void OnlineFrequencyWindow::Tick() {
+	freq0.Tick();
+	freq1.Tick();
+	if (GetInactive().timer.Elapsed() >= interval) {
+		SwitchActive();
+		GetActive().Reset();
+	}
+}
+
+double OnlineFrequencyWindow::Get() const {
+	if (which)	return freq1.Get();
+	else		return freq0.Get();
+}
+
+
+}
+
+#define Data		Chrono::Data
+#define Time		Chrono::Time

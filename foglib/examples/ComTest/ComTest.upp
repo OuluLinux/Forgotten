@@ -44,6 +44,10 @@ file
 	Math.cxx,
 	Compiler.hxx,
 	Compiler.cxx,
+	Chrono.hxx,
+	Chrono.cxx,
+	Indirect.hxx,
+	Indirect.cxx,
 	_ readonly separator;
 
 mainconfig

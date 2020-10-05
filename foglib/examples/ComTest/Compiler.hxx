@@ -9,7 +9,7 @@
 
 namespace Compiler
 {
-    enum _anon_5
+    enum _anon_17
     {
         PROCMSG_UNKNOWN,
         PROCMSG_SKIP,

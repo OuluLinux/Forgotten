@@ -104,6 +104,48 @@ uint64 MilliSeconds() {
 	return (int)std::chrono::duration_cast<std::chrono::milliseconds>(p2.time_since_epoch()).count();
 }
 
+struct HighResTimePoint {
+	high_resolution_clock::time_point start;
+	
+	void Reset();
+	int Elapsed() const;
+	double ElapsedSeconds() const;
+	int ResetElapsed();
+	double ResetElapsedSeconds();
+	static HighResTimePoint* Create();
+};
+
+void HighResTimePoint::Reset() {
+	start = high_resolution_clock::now();
+}
+
+int HighResTimePoint::Elapsed() const {
+	return (int)(ElapsedSeconds() * 1000);
+}
+
+double HighResTimePoint::ElapsedSeconds() const {
+	std::chrono::high_resolution_clock::time_point stop = high_resolution_clock::now();
+	duration<double> time_span = duration_cast<duration<double> >(stop - start);
+	return time_span.count();
+}
+
+int HighResTimePoint::ResetElapsed() {
+	return (int)(ResetElapsedSeconds() * 1000);
+}
+
+double HighResTimePoint::ResetElapsedSeconds() {
+		std::chrono::high_resolution_clock::time_point stop = high_resolution_clock::now();
+		duration<double> time_span = duration_cast<duration<double> >(stop - start);
+		start = stop;
+		return time_span.count();
+}
+
+HighResTimePoint* HighResTimePoint::Create() {
+	return new HighResTimePoint();
+}
+
+
+
 
 
 

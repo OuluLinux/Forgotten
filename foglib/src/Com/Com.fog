@@ -11,6 +11,9 @@ namespace Container		{using/interface Text;};
 namespace Shared		{using/interface Container;};
 namespace Stream		{using/interface Shared;};
 namespace Util			{using/interface Stream;};
+namespace Math			{using/interface Util;};
+namespace Chrono		{using/interface Math;};
+namespace Indirect		{using/interface Chrono;};
 namespace Com			{using/interface Util;};
 
 #define NULL 0
@@ -31,6 +34,7 @@ using "Com/Stream.fog";
 using "Com/Util.fog";
 using "Com/Math.fog";
 using "Com/Chrono.fog";
+using "Com/Indirect.fog";
 
 using "Com/CompilerBase.fog";
 

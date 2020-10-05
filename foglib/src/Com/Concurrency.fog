@@ -1,3 +1,49 @@
 
 
-#define ONCELOCK static AtomicInt __once; if (__once++ == 0)
+/*
+
+void  SetTimeCallback(int delay_ms, Callback cb, void *id = NULL); // delay_ms < 0 -> periodic
+void  KillTimeCallback(void *id);
+bool  ExistsTimeCallback(void *id);
+dword GetTimeClick();
+void AddGlobalTicks(uint32 ticks);
+uint32 GetGlobalTicks();
+
+inline void  PostCallback(Callback cb, void *id = NULL)  { SetTimeCallback(1, cb, id); }
+
+
+class TimeCallback
+{
+public:
+	~TimeCallback()                               { Kill(); (void)dummy; }
+
+	void Set(int delay, Callback cb)     { SetTimeCallback(delay, cb, this); }
+	void Post(Callback cb)               { PostCallback(cb, this); }
+	void Kill()                                   { KillTimeCallback(this); }
+	void KillSet(int delay, Callback cb) { Kill(); Set(delay, cb); }
+	void KillPost(Callback cb)           { Kill(); Post(cb); }
+
+private:
+	byte dummy;
+};
+
+
+
+
+
+
+uint32 __global_ticks;
+
+struct __TimeCallbackItem {
+	void* id;
+	Callback cb;
+	uint32 ticks;
+	uint32 delay;
+	bool is_periodical;
+	byte epoch;
+};
+
+Array<__TimeCallbackItem>& __TimeCb() {static Array<__TimeCallbackItem> v; return v;}
+Mutex& __TimeCbLock() {static Mutex m; return m;}
+
+*/

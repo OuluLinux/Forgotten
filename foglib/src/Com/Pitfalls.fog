@@ -4,6 +4,17 @@
 
 FOG BUGS AND WORKAROUNDS:
 	
+	Template params are not used properly everywhere yet:
+		WRONG
+			template<class T> struct S {
+				void ( T ::* fn)();
+			};
+		RIGHT
+			template<class T> struct S {
+				typedef T Cls;
+				void (Cls::* fn)(); // because T is renamed internally to _1
+			};
+	
 	You need to very explicitly define used interfaced
 	Otherwise you get error like:
 		"Failed to resolve semantics of "typed-name: Container::Vector < Text::String > strings""

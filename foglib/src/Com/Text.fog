@@ -853,7 +853,7 @@ inline void FromString(const String& s, float& o) {o = Text::String::StrDbl(s);}
 inline void FromString(const String& s, double& o) {o = Text::String::StrDbl(s);}
 inline void FromString(const String& s, String& o) {o = s;}
 
-template <class T> inline int64 ToInt(const T& o) {return o.ToInt();}
+template <class T> inline int64 ToInt(const T& o) {return o.AsInt();}
 template<> inline int64 ToInt(const bool& o) {return (int64)o;}
 template<> inline int64 ToInt(const int& o) {return (int64)o;}
 template<> inline int64 ToInt(const int64& o) {return (int64)o;}

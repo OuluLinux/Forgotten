@@ -15,9 +15,9 @@ namespace Native {
 
 struct FILE;
 
-FILE* GetStdOut();
-FILE* GetStdIn();
-FILE* GetStdErr();
+FILE* GetStdOut() :{ export/noimplementation; };
+FILE* GetStdIn() :{ export/noimplementation; };
+FILE* GetStdErr() :{ export/noimplementation; };
 
 int SignificantBits(uint32 x) :{ export/noimplementation; };
 int SignificantBits64(uint64 x) :{ export/noimplementation; };
@@ -28,41 +28,50 @@ uint64 CurrentTime() :{ export/noimplementation; };
 uint64 NanoSeconds() :{ export/noimplementation; };
 uint64 MilliSeconds() :{ export/noimplementation; };
 
-void DblStr(double d, char* buf, int buf_size);
-void DblStr(double d, short* buf, int buf_size);
+struct HighResTimePoint {
+	void Reset() :{ export/noimplementation; };
+	int Elapsed() const :{ export/noimplementation; };
+	double ElapsedSeconds() const :{ export/noimplementation; };
+	int ResetElapsed() :{ export/noimplementation; };
+	double ResetElapsedSeconds() :{ export/noimplementation; };
+	static HighResTimePoint* Create() :{ export/noimplementation; };
+};
 
-const short* Utf8To16(const char* in);
-const char*  Utf16To8(const short* in);
+void DblStr(double d, char* buf, int buf_size) :{ export/noimplementation; };
+void DblStr(double d, short* buf, int buf_size) :{ export/noimplementation; };
 
-void FileClose(FILE* s);
-void FileOpen(FILE** s, const char* path, bool rw, bool append);
-int  FileTell(FILE* s);
-int  FileWrite(const void* buf, int size, int nmemb, FILE* s);
-int  FileRead(void* buf, int size, int nmemb, FILE* s);
-void FileSeekSet(FILE* s, int offset);
-void FileSeekEnd(FILE* s, int offset=0);
-bool IsFileEnd(FILE* s);
-void FileFlush(FILE* s);
+const short* Utf8To16(const char* in) :{ export/noimplementation; };
+const char*  Utf16To8(const short* in) :{ export/noimplementation; };
 
-const char* GetHomeDir();
-const char* GetEnv(const char* id);
+void FileClose(FILE* s) :{ export/noimplementation; };
+void FileOpen(FILE** s, const char* path, bool rw, bool append) :{ export/noimplementation; };
+int  FileTell(FILE* s) :{ export/noimplementation; };
+int  FileWrite(const void* buf, int size, int nmemb, FILE* s) :{ export/noimplementation; };
+int  FileRead(void* buf, int size, int nmemb, FILE* s) :{ export/noimplementation; };
+void FileSeekSet(FILE* s, int offset) :{ export/noimplementation; };
+void FileSeekEnd(FILE* s, int offset=0) :{ export/noimplementation; };
+bool IsFileEnd(FILE* s) :{ export/noimplementation; };
+void FileFlush(FILE* s) :{ export/noimplementation; };
 
-bool DirExists(const char* path);
-bool PathExists(const char* path);
-void CreateDirectory(const char* path);
-void DeleteFile(const char* path);
-void RenameFile(const char* oldpath, const char* newpath);
-void GetDirFiles(const char* dir, void(*add_path)(const char*,void*), void* arg);
+const char* GetHomeDir() :{ export/noimplementation; };
+const char* GetEnv(const char* id) :{ export/noimplementation; };
 
-int PopCount64(uint64 i);
-int PopCount32(dword i);
-int HammingDistance32(int count, const dword* a, const dword* b);
-int HammingDistance64(int count, const uint64* a, const uint64* b);
+bool DirExists(const char* path) :{ export/noimplementation; };
+bool PathExists(const char* path) :{ export/noimplementation; };
+void CreateDirectory(const char* path) :{ export/noimplementation; };
+void DeleteFile(const char* path) :{ export/noimplementation; };
+void RenameFile(const char* oldpath, const char* newpath) :{ export/noimplementation; };
+void GetDirFiles(const char* dir, void(*add_path)(const char*,void*), void* arg) :{ export/noimplementation; };
 
-bool IsFinite(float f);
-bool IsFinite(double f);
-int64 GetCpuTicks();
-int64 Delay(int64 cpu_ticks);
+int PopCount64(uint64 i) :{ export/noimplementation; };
+int PopCount32(dword i) :{ export/noimplementation; };
+int HammingDistance32(int count, const dword* a, const dword* b) :{ export/noimplementation; };
+int HammingDistance64(int count, const uint64* a, const uint64* b) :{ export/noimplementation; };
+
+bool IsFinite(float f) :{ export/noimplementation; };
+bool IsFinite(double f) :{ export/noimplementation; };
+int64 GetCpuTicks() :{ export/noimplementation; };
+int64 Delay(int64 cpu_ticks) :{ export/noimplementation; };
 
 struct Trans8x16 {
 	union {
@@ -71,8 +80,8 @@ struct Trans8x16 {
 		uint64 u64[2];
 	};
 	
-	void TransFrom16x8();
-	void Zero();
+	void TransFrom16x8() :{ export/noimplementation; };
+	void Zero() :{ export/noimplementation; };
 };
 
 }
@@ -88,4 +97,3 @@ struct Trans8x16 {
 #define NativeDblStr				Native::DblStr
 #define NativeUtf8To16				Native::Utf8To16
 #define NativeUtf16To8				Native::Utf16To8
-#define StdRandomGaussian			Native::StdRandomGaussian

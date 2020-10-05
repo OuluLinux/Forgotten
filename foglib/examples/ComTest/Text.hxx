@@ -7,6 +7,10 @@
 #include <Prim.hxx>
 #endif
 
+#ifndef LANG_HXX
+#include <Lang.hxx>
+#endif
+
 #ifndef ABSTRACT_HXX
 #include <Abstract.hxx>
 #endif
@@ -699,7 +703,7 @@ namespace Text
     inline Lang::int64 ToInt(const _1& o)
     {
 #line 856
-        return o.ToInt();
+        return o.AsInt();
     };
     
 #line 860

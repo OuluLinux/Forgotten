@@ -7,6 +7,7 @@ library(POSIX) pthread;
 file
 	Com.fog highlight cpp,
 	"Notes for programmer" readonly separator,
+	Todo.txt,
 	Pitfalls.fog,
 	LangNotes.fog,
 	"FOG code" readonly separator,
@@ -26,6 +27,7 @@ file
 	Util.fog,
 	Math.fog,
 	Chrono.fog,
+	Indirect.fog,
 	Concurrency.fog,
 	StringUtil.fog,
 	"Basic Compiler" readonly separator,

@@ -5,45 +5,45 @@ using/interface Container;
 
 namespace Native {
 
-double Floor(double a);
-double Round(double a);
-double Sin(double a);
-double Cos(double a);
-double Tan(double a);
-double ASin(double a);
-double ACos(double a);
-double ATan(double a);
+double Floor(double a) :{ export/noimplementation; };
+double Round(double a) :{ export/noimplementation; };
+double Sin(double a) :{ export/noimplementation; };
+double Cos(double a) :{ export/noimplementation; };
+double Tan(double a) :{ export/noimplementation; };
+double ASin(double a) :{ export/noimplementation; };
+double ACos(double a) :{ export/noimplementation; };
+double ATan(double a) :{ export/noimplementation; };
 
-double exp_fast_lb(double a);
-double exp_fast_ub(double a);
-double exp_fast(double a);
-double better_exp_fast(double a);
-double exp_fast_schraudolph(double a);
-float expf_fast_ub(float a);
-float expf_fast(float a);
-double better_expf_fast(float a);
-float expf_fast_lb(float a);
-double log_fast_ankerl(double a);
-double log_fast_ub(double a);
-double log_fast(double a);
-double log_fast_lb(double a);
-float logf_fast_ub(float a);
-float logf_fast(float a);
-float logf_fast_lb(float a);
-double pow_fast_ankerl(double a, double b);
-float powf_fast(float a, float b);
-float powf_fast_lb(float a, float b);
-float powf_fast_ub(float a, float b);
-double pow_fast_ub(double a, double b);
-double pow_fast(double a, double b);
-double pow_fast_lb(double a, double b);
-double pow_fast_precise_ankerl(double a, double b);
-double pow_fast_precise(double a, double b);
-double better_pow_fast_precise(double a, double b);
-float powf_fast_precise(float a, float b);
-float better_powf_fast_precise(float a, float b);
+double exp_fast_lb(double a) :{ export/noimplementation; };
+double exp_fast_ub(double a) :{ export/noimplementation; };
+double exp_fast(double a) :{ export/noimplementation; };
+double better_exp_fast(double a) :{ export/noimplementation; };
+double exp_fast_schraudolph(double a) :{ export/noimplementation; };
+float expf_fast_ub(float a) :{ export/noimplementation; };
+float expf_fast(float a) :{ export/noimplementation; };
+double better_expf_fast(float a) :{ export/noimplementation; };
+float expf_fast_lb(float a) :{ export/noimplementation; };
+double log_fast_ankerl(double a) :{ export/noimplementation; };
+double log_fast_ub(double a) :{ export/noimplementation; };
+double log_fast(double a) :{ export/noimplementation; };
+double log_fast_lb(double a) :{ export/noimplementation; };
+float logf_fast_ub(float a) :{ export/noimplementation; };
+float logf_fast(float a) :{ export/noimplementation; };
+float logf_fast_lb(float a) :{ export/noimplementation; };
+double pow_fast_ankerl(double a, double b) :{ export/noimplementation; };
+float powf_fast(float a, float b) :{ export/noimplementation; };
+float powf_fast_lb(float a, float b) :{ export/noimplementation; };
+float powf_fast_ub(float a, float b) :{ export/noimplementation; };
+double pow_fast_ub(double a, double b) :{ export/noimplementation; };
+double pow_fast(double a, double b) :{ export/noimplementation; };
+double pow_fast_lb(double a, double b) :{ export/noimplementation; };
+double pow_fast_precise_ankerl(double a, double b) :{ export/noimplementation; };
+double pow_fast_precise(double a, double b) :{ export/noimplementation; };
+double better_pow_fast_precise(double a, double b) :{ export/noimplementation; };
+float powf_fast_precise(float a, float b) :{ export/noimplementation; };
+float better_powf_fast_precise(float a, float b) :{ export/noimplementation; };
 
-float fast_atan2(float y, float x);
+float fast_atan2(float y, float x) :{ export/noimplementation; };
 
 class StdRandomGaussian {
 public:
@@ -51,7 +51,7 @@ public:
 	void Seed() :{ export/noimplementation; };
 };
 
-StdRandomGaussian* CreateStdRandomGaussian(int length);
+StdRandomGaussian* CreateStdRandomGaussian(int length) :{ export/noimplementation; };
 
 }
 
@@ -62,7 +62,7 @@ inline double FastExp(double a) {return Native::exp_fast(a);}
 inline double FastPow(double a, double b) {return Native::pow_fast(a, b);}
 inline double FastSqrt(double a) {return Native::pow_fast(a, 0.5);}
 
-template <class T> inline T PowFastT(T v, T e);
+template <class T> inline T PowFastT(T v, T e) {SysBreak("Unimplemented");}
 template <> inline double PowFastT(double v, double e) {return Native::pow_fast_precise(v, e);}
 template <> inline float PowFastT(float v, float e) {return Native::powf_fast_precise(v, e);}
 
@@ -255,7 +255,7 @@ public:
 };
 
 inline class RandomGaussian {
-	One<StdRandomGaussian> n;
+	One<Native::StdRandomGaussian> n;
 	
 public:
 	RandomGaussian(int length) {n = Native::CreateStdRandomGaussian(length);}
