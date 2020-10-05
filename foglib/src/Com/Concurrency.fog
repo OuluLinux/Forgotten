@@ -1,30 +1,143 @@
+namespace Concurrency {
+using/interface Container;
+using/interface Indirect;
 
 
-/*
+namespace Native {
 
-void  SetTimeCallback(int delay_ms, Callback cb, void *id = NULL); // delay_ms < 0 -> periodic
-void  KillTimeCallback(void *id);
-bool  ExistsTimeCallback(void *id);
-dword GetTimeClick();
-void AddGlobalTicks(uint32 ticks);
-uint32 GetGlobalTicks();
+int CPU_Cores() :{ export/noimplementation; };
+void Sleep(int ms) :{ export/noimplementation; };
 
-inline void  PostCallback(Callback cb, void *id = NULL)  { SetTimeCallback(1, cb, id); }
+struct StdThread {
+	typedef void(*Fn)(void*);
+	!inline StdThread() :{ export/noimplementation; };
+	!inline ~StdThread() :{ export/noimplementation; };
+	void Clear() :{ export/noimplementation; };
+	void Run(Fn fn, void* arg) :{ export/noimplementation; };
+	void Wait() :{ export/noimplementation; };
+	void Detach() :{ export/noimplementation; };
+	static StdThread* Create() :{ export/noimplementation; };
+	static void Start(Fn fn, void* arg) :{ export/noimplementation; };
+};
+
+struct StdMutex {
+	typedef void(*Fn)(void*);
+	!inline StdMutex() :{ export/noimplementation; };
+	!inline ~StdMutex() :{ export/noimplementation; };
+	void Enter() :{ export/noimplementation; };
+	void Leave() :{ export/noimplementation; };
+	bool TryEnter() :{ export/noimplementation; };
+	static StdMutex* Create() :{ export/noimplementation; };
+};
+
+struct StdSharedMutex {
+	!inline StdSharedMutex() :{ export/noimplementation; };
+	!inline ~StdSharedMutex() :{ export/noimplementation; };
+	void EnterWrite() :{ export/noimplementation; };
+	void LeaveWrite() :{ export/noimplementation; };
+	void EnterRead() :{ export/noimplementation; };
+	void LeaveRead() :{ export/noimplementation; };
+	static StdSharedMutex* Create() :{ export/noimplementation; };
+};
+
+}
 
 
-class TimeCallback
-{
+
+
+class Thread {
+	typedef Native::StdThread Std;
+	One<Std> t;
+	Callback cb;
+	
+	static bool& shutdown() {static bool b; return b;}
+	static AtomicInt& thrd_count() {static AtomicInt a; return a;}
+	
 public:
-	~TimeCallback()                               { Kill(); (void)dummy; }
+	Thread() {thrd_count()++;}
+	~Thread() {thrd_count()--;}
 
-	void Set(int delay, Callback cb)     { SetTimeCallback(delay, cb, this); }
-	void Post(Callback cb)               { PostCallback(cb, this); }
-	void Kill()                                   { KillTimeCallback(this); }
-	void KillSet(int delay, Callback cb) { Kill(); Set(delay, cb); }
-	void KillPost(Callback cb)           { Kill(); Post(cb); }
+	void ExecuteCallbackOnly() {cb.Execute();}
+	
+	static void NativeCallback(void* arg) {((Thread*)arg)->ExecuteCallbackOnly();}
+	
+	static void Start(Callback cb) {
+		Thread* t = new Thread();
+		t->cb = cb;
+		t->t.Clear();
+		t->t = Native::StdThread::Create();
+		t->t->Run(&Thread::NativeCallback, t);
+	}
+	
+	void Run(Callback cb) {
+		ASSERT(t.IsEmpty());
+		this->cb = cb;
+		t.Clear();
+		t = Native::StdThread::Create();
+		t->Run(&Thread::NativeCallback, this);
+	}
+	
+	void Wait() {if (t) t->Wait();}
+	void Detach() {if (t) t->Detach();}
+	
+	static bool IsShutdownThreads() {return shutdown();}
+	static void ShutdownThreads(bool b=true) {shutdown() = b;}
+	static void ShutdownAndWaitThreads() {
+		shutdown() = true;
+		while (thrd_count() != 0) Native::Sleep(100);
+	}
+};
 
-private:
-	byte dummy;
+
+class Mutex {
+	typedef Native::StdMutex Std;
+	One<Std> m;
+	
+public:
+	Mutex() {Create();}
+	~Mutex() {}
+	void Create() {m.Clear(); m = Native::StdMutex::Create();}
+	void Enter() {m->Enter();}
+	void Leave() {m->Leave();}
+	bool TryEnter() {return m->TryEnter();}
+};
+
+
+
+class Mutex_Locker {
+	Mutex& m;
+public:
+	Mutex_Locker(Mutex& m) : m(m) {m.Enter();}
+	~Mutex_Locker() {m.Leave();}
+};
+
+
+class RWMutex {
+	typedef Native::StdSharedMutex Std;
+	One<Std> m;
+	
+public:
+	RWMutex() {Create();}
+	void Create() {m.Clear(); m = Native::StdSharedMutex::Create();}
+	void EnterWrite() {m->EnterWrite();}
+	void LeaveWrite() {m->LeaveWrite();}
+	void EnterRead() {m->EnterRead();}
+	void LeaveRead() {m->LeaveRead();}
+};
+
+
+class RWMutex_ReadLocker {
+	RWMutex& m;
+public:
+	RWMutex_ReadLocker(RWMutex& m) : m(m) {m.EnterRead();}
+	~RWMutex_ReadLocker() {m.LeaveRead();}
+};
+
+class RWMutex_WriteLocker {
+	RWMutex& m;
+public:
+	RWMutex_WriteLocker(RWMutex& m) : m(m) {m.EnterWrite();}
+	~RWMutex_WriteLocker() {m.LeaveWrite();}
 };
 
 
@@ -32,9 +145,13 @@ private:
 
 
 
-uint32 __global_ticks;
 
-struct __TimeCallbackItem {
+
+
+
+
+
+struct TimeCallbackItem {
 	void* id;
 	Callback cb;
 	uint32 ticks;
@@ -43,7 +160,183 @@ struct __TimeCallbackItem {
 	byte epoch;
 };
 
-Array<__TimeCallbackItem>& __TimeCb() {static Array<__TimeCallbackItem> v; return v;}
-Mutex& __TimeCbLock() {static Mutex m; return m;}
+class TimelineEnv {
+	Array<TimeCallbackItem> cb;
+	Vector<int> remlist;
+	uint32 global_ticks = 0;
+	Mutex m;
+	
+	void ExecuteTimeCallback();
+	void DecreaseTimeCallbackEpoch();
+public:
+	TimelineEnv() {}
+	
+	void SetTimeCallback(int delay_ms, Callback cb, void *id=0);
+	void KillTimeCallback(void *id);
+	bool ExistsTimeCallback(void *id);
+	dword GetTimeClick();
+	void AddGlobalTicks(uint32 ticks);
+	uint32 GetGlobalTicks() {return global_ticks;}
+};
 
-*/
+inline TimelineEnv& GetTimelineEnv() {static TimelineEnv e; return e;}
+inline TimelineEnv& TLEnv() {return GetTimelineEnv();}
+
+
+inline void PostCallback(Callback cb, void *id = NULL) {
+	TLEnv().SetTimeCallback(1, cb, id);
+}
+
+
+void TimelineEnv::SetTimeCallback(int delay_ms, Callback cb, void *id) {
+	bool is_periodical = false;
+	if (delay_ms < 0) {
+		delay_ms *= -1;
+		is_periodical = true;
+	}
+	
+	for(int i = 0; i < this->cb.GetCount(); i++) {
+		TimeCallbackItem& it = this->cb[i];
+		if (it.id == id) {
+			it.cb = cb;
+			it.ticks = global_ticks + delay_ms;
+			it.delay = delay_ms;
+			it.is_periodical = is_periodical;
+			if (it.ticks < global_ticks)
+				it.epoch = 1;
+			else
+				it.epoch = 0;
+			return;
+		}
+	}
+	
+	
+	m.Enter();
+	
+	TimeCallbackItem& it = this->cb.Add();
+	it.id = id;
+	it.cb = cb;
+	it.ticks = global_ticks + delay_ms;
+	it.delay = delay_ms;
+	it.is_periodical = is_periodical;
+	if (it.ticks < global_ticks)
+		it.epoch = 1;
+	else
+		it.epoch = 0;
+	
+	m.Leave();
+}
+
+void TimelineEnv::KillTimeCallback(void *id) {
+	FwdPtrIterator<TimeCallbackItem> it = cb.Begin();
+	FwdPtrIterator<TimeCallbackItem> end = cb.End();
+	int i = 0;
+	while (it != end) {
+		if (it->id == id) {
+			m.Enter();
+			cb.Remove(i);
+			m.Leave();
+			break;
+		}
+		++it;
+		++i;
+	}
+}
+
+bool TimelineEnv::ExistsTimeCallback(void *id) {
+	FwdPtrIterator<TimeCallbackItem> it = cb.Begin();
+	FwdPtrIterator<TimeCallbackItem> end = cb.End();
+	while (it != end) {
+		if (it->id == id)
+			return true;
+		++it;
+	}
+	return false;
+}
+
+private void TimelineEnv::ExecuteTimeCallback() {
+	remlist.SetCount(0);
+	
+	FwdPtrIterator<TimeCallbackItem> it = cb.Begin();
+	FwdPtrIterator<TimeCallbackItem> end = cb.End();
+	int i = 0;
+	while (it != end) {
+		if (it->epoch == 0 && it->ticks <= global_ticks) {
+			it->cb.Execute();
+			if (it->is_periodical) {
+				it->ticks = global_ticks + it->delay;
+				if (it->ticks < global_ticks)
+					it->epoch = 1;
+				else
+					it->epoch = 0;
+			}
+			else
+				remlist.Add(i);
+		}
+		++it;
+		++i;
+	}
+	
+	if (remlist.GetCount()) {
+		m.Enter();
+		cb.Remove(remlist.Begin(), remlist.GetCount());
+		m.Leave();
+	}
+}
+
+private void TimelineEnv::DecreaseTimeCallbackEpoch() {
+	m.Enter();
+	
+	for(int i = 0; i < cb.GetCount(); i++) {
+		TimeCallbackItem& it = cb[i];
+		if (it.epoch > 0)
+			it.epoch--;
+		else
+			cb.Remove(i--);
+	}
+	
+	m.Leave();
+}
+
+void TimelineEnv::AddGlobalTicks(uint32 ticks) {
+	uint32 prev_global_ticks = global_ticks;
+	global_ticks += ticks;
+	
+	// overflow
+	if (global_ticks < prev_global_ticks)
+		DecreaseTimeCallbackEpoch();
+	
+	ExecuteTimeCallback();
+}
+
+
+
+
+
+
+
+
+
+
+
+class TimeCallback {
+public:
+	~TimeCallback()                      { Kill(); (void)dummy; }
+
+	void Set(int delay, Callback cb)     { TLEnv().SetTimeCallback(delay, cb, this); }
+	void Post(Callback cb)               { PostCallback(cb, this); }
+	void Kill()                          { TLEnv().KillTimeCallback(this); }
+	void KillSet(int delay, Callback cb) { Kill(); Set(delay, cb); }
+	void KillPost(Callback cb)           { Kill(); Post(cb); }
+
+private:
+	byte dummy;
+};
+
+}
+
+#define Thread			Concurrency::Thread
+#define Mutex			Concurrency::Mutex
+
+
+

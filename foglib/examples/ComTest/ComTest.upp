@@ -48,6 +48,8 @@ file
 	Chrono.cxx,
 	Indirect.hxx,
 	Indirect.cxx,
+	Concurrency.hxx,
+	Concurrency.cxx,
 	_ readonly separator;
 
 mainconfig

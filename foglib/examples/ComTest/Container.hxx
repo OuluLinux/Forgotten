@@ -875,7 +875,7 @@ namespace Container
         const int * end = sorted_list + n;
         _1 * *vector = l.Get();
         while (it != end)
-            (*(vector + *it ++ ))-> ~K();
+            Lang::Destruct(**(vector + *it ++ ));
         l.Remove(sorted_list, n);
     };
     

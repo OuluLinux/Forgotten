@@ -403,7 +403,7 @@ public:
 		const int* end = sorted_list + n;
 		K** vector = l.Get();
 		while (it != end)
-			(*(vector + *it++))->~K();
+			Destruct(**(vector + *it++));
 		l.Remove(sorted_list, n);
 	}
 	inline void RemoveLast() {ASSERT(GetCount()); Remove(GetCount()-1);}

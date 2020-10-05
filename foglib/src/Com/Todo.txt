@@ -1,0 +1,8 @@
+
+Use meta functions for wrapping native classes like:
+ - TimeStop
+
+These classes were copy-pasted from old c++ source.
+Use meta for new version of these classes:
+ - Callback, etc.
+

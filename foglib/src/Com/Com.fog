@@ -14,6 +14,7 @@ namespace Util			{using/interface Stream;};
 namespace Math			{using/interface Util;};
 namespace Chrono		{using/interface Math;};
 namespace Indirect		{using/interface Chrono;};
+namespace Concurrency	{using/interface Indirect;};
 namespace Com			{using/interface Util;};
 
 #define NULL 0
@@ -35,6 +36,7 @@ using "Com/Util.fog";
 using "Com/Math.fog";
 using "Com/Chrono.fog";
 using "Com/Indirect.fog";
+using "Com/Concurrency.fog";
 
 using "Com/CompilerBase.fog";
 

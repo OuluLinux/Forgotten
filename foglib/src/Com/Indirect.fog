@@ -1,0 +1,383 @@
+namespace Indirect {
+
+
+class CallBaseObject {
+	int refs = 1;
+
+public:
+	CallBaseObject() {}
+	virtual ~CallBaseObject() {}
+
+	void Inc() { refs++; }
+	void Dec() { if ((void*)this == NULL) return; refs--; if (refs <= 0) { delete this; } }
+};
+
+
+class CallBase : public CallBaseObject {
+public:
+	virtual void Execute() const = 0;
+};
+
+template <class A0>
+class CallBase1 : public CallBaseObject {
+public:
+	virtual void Execute(const A0& a0) const = 0;
+};
+
+template <class A0, class A1>
+class CallBase2 : public CallBaseObject {
+public:
+	virtual void Execute(const A0& a0, const A1& a1) const = 0;
+};
+
+
+class StaticCaller : public CallBase {
+	void (*fn)();
+
+public:
+	StaticCaller(void (*fn)()) : fn(fn) {}
+	virtual void Execute() const { fn(); }
+};
+
+
+
+template <class T>
+class Caller : public CallBase {
+	typedef T Cls;
+	typedef void (Cls:: *Fn)();
+	Fn fn;
+	Cls* obj;
+
+public:
+	Caller(Fn fn, Cls* obj) : fn(fn), obj(obj) {}
+	virtual void Execute() const { (*obj.*fn)(); }
+};
+
+template <class A0, class T>
+class Caller1 : public CallBase1<A0> {
+	typedef T Cls;
+	typedef void (Cls:: *Fn)(A0);
+	Fn fn;
+	Cls* obj;
+
+public:
+	Caller1(Fn fn, Cls* obj) : fn(fn), obj(obj) {}
+	virtual void Execute(const A0& a0) const { (*obj.*fn)(a0); }
+};
+
+template <class T, class A0>
+class Caller_1 : public CallBase {
+	typedef T Cls;
+	typedef void (Cls:: *Fn)(A0);
+	Fn fn;
+	T* obj;
+	A0 a0;
+
+public:
+	Caller_1(Fn fn, T* obj, A0 a0) : fn(fn), obj(obj), a0(a0) {}
+	virtual void Execute() const { (*obj.*fn)(a0); }
+};
+
+template <class A0, class T, class A1>
+class Caller1_1 : public CallBase1<A0> {
+	typedef T Cls;
+	typedef void (Cls:: *Fn)(A0, A1);
+	Fn fn;
+	T* obj;
+	A1 a1;
+
+public:
+	Caller1_1(Fn fn, T* obj, A1 a1) : fn(fn), obj(obj), a1(a1) {}
+	virtual void Execute(const A0& a0) const { (*obj.*fn)(a0, a1); }
+};
+
+template <class A0, class A1, class T>
+class Caller2 : public CallBase2<A0, A1> {
+	typedef T Cls;
+	typedef void (Cls:: *Fn)(A0, A1);
+	Fn fn;
+	T* obj;
+
+public:
+	Caller2(Fn fn, T* obj) : fn(fn), obj(obj) {}
+	virtual void Execute(const A0& a0, const A1& a1) const { (*obj.*fn)(a0, a1); }
+};
+
+
+
+
+
+
+
+
+
+class Callback {
+	$MakeMoveable();
+	
+	VectorPtr<CallBase> calls;
+
+
+public:
+	typedef void (*Fn)();
+	
+	Callback() {}
+	Callback(const Callback& cb) { *this = cb; }
+	Callback(CallBase* cb) { ASSERT(cb); calls.Add(cb); }
+	Callback(Fn fn) {calls.Add(new StaticCaller(fn));}
+	~Callback() { Clear(); }
+	void operator=(const Callback& cb) {
+		Clear();
+		*this << cb;
+	}
+	void operator<<(const Callback& cb) {
+		int begin = calls.GetCount();
+		calls.Append(cb.calls);
+		for (int i = begin; i < calls.GetCount(); i++)
+			calls[i].Inc();
+	}
+	void Clear() {
+		for (int i = 0; i < calls.GetCount(); i++)
+			calls[i].Dec();
+		calls.Clear();
+	}
+	void Execute() const {
+		for (int i = 0; i < calls.GetCount(); i++)
+			calls[i].Execute();
+	}
+
+	void operator()() const { Execute(); }
+	operator bool() {return calls.GetCount();}
+	String AsString() const {return "Callback";}
+	int64 AsInt() const {return calls.GetCount();}
+};
+
+
+template <class A0>
+class Callback1 {
+	$MakeMoveable();
+	
+	typedef Indirect::CallBase1<A0> Base;
+	VectorPtr<Base> calls;
+
+public:
+	Callback1() {}
+	Callback1(const Callback1& cb) { *this = cb; }
+	Callback1(Base* cb) { ASSERT(cb); calls.Add(cb); }
+	~Callback1() { Clear(); }
+	void operator=(const Callback1& cb) {
+		Clear();
+		*this << cb;
+	}
+	void operator<<(const Callback1& cb) {
+		int begin = calls.GetCount();
+		calls.Append(cb.calls);
+		for (int i = begin; i < calls.GetCount(); i++)
+			calls[i]->Inc();
+	}
+	void Clear() {
+		for (int i = 0; i < calls.GetCount(); i++)
+			calls[i]->Dec();
+		calls.Clear();
+	}
+	void Execute(const A0& a0) const {
+		for (int i = 0; i < calls.GetCount(); i++)
+			calls[i]->Execute(a0);
+	}
+
+	void operator()(const A0& a0) const { Execute(a0); }
+	operator bool() {return calls.GetCount();}
+	String AsString() const {return "Callback1";}
+	int64 AsInt() const {return calls.GetCount();}
+};
+
+
+template <class A0, class A1>
+class Callback2 {
+	$MakeMoveable();
+	typedef CallBase2<A0, A1> Base;
+	VectorPtr<Base> calls;
+
+public:
+	Callback2() {}
+	Callback2(const Callback2& cb) { *this = cb; }
+	Callback2(Base* cb) { ASSERT(cb); calls.Add(cb); }
+	~Callback2() { Clear(); }
+	void operator=(const Callback2& cb) {
+		Clear();
+		*this << cb;
+	}
+	void operator<<(const Callback2& cb) {
+		int begin = calls.GetCount();
+		calls.Append(cb.calls);
+		for (int i = begin; i < calls.GetCount(); i++)
+			calls[i]->Inc();
+	}
+	void Clear() {
+		for (int i = 0; i < calls.GetCount(); i++)
+			calls[i]->Dec();
+		calls.Clear();
+	}
+	void Execute(const A0& a0, const A1& a1) const {
+		for (int i = 0; i < calls.GetCount(); i++)
+			calls[i]->Execute(a0, a1);
+	}
+
+	void operator()(const A0& a0, const A1& a1) const { Execute(a0, a1); }
+	operator bool() {return calls.GetCount();}
+	String AsString() const {return "Callback2";}
+	int64 AsInt() const {return calls.GetCount();}
+};
+
+
+
+
+
+
+
+
+
+class ProxyCaller : public CallBase {
+	const Callback* cb;
+public:
+	ProxyCaller(const Callback& cb) : cb(&cb) {}
+	virtual void Execute() const { cb->Execute(); }
+};
+
+template <class A0>
+class ProxyCaller1 : public CallBase1<A0> {
+	typedef Callback1<A0> Cb;
+	const Cb* cb;
+public:
+	ProxyCaller1(const Cb& cb) : cb(&cb) {}
+	virtual void Execute(const A0& a0) const { cb->Execute(a0); }
+};
+
+
+
+
+
+
+
+
+
+// TODO fix fog _1 <---> T bug
+template <class T>
+struct callback {
+	typedef T Cls;
+	typedef void (Cls::*Fn)();
+	Callback cb;
+	
+	inline callback(Fn fn, Cls* obj) {cb = Callback(new Caller<Cls>(fn, obj));}
+	inline operator Callback() const {return cb;}
+};
+
+template <class A0, class T>
+struct callback_1 {
+	typedef T Cls;
+	typedef void (Cls::*Fn)(A0);
+	Callback1<A0> cb;
+	
+	inline callback_1(Fn fn, Cls* obj) {cb = Callback1<A0>(new Caller1<A0, Cls>(fn, obj));}
+	inline operator Callback1<A0>() const {return cb;}
+};
+
+template <class A0, class T>
+struct callback1 {
+	typedef T Cls;
+	typedef void (Cls::*Fn)(A0);
+	Callback cb;
+	
+	inline callback1(Fn fn, Cls* obj, A0 a0) {cb = Callback(new Caller_1<A0, Cls>(fn, obj, a0));}
+	inline operator Callback() const {return cb;}
+};
+
+template <class A0, class T, class A1>
+struct callback1_1 {
+	typedef T Cls;
+	typedef void (Cls::*Fn)(A0, A1);
+	Callback1<A0> cb;
+	
+	inline callback1_1(Fn fn, Cls* obj, A1 a1) {cb = Callback1<A0>(new Caller1_1<A0, Cls, A1>(fn, obj, a1));}
+	inline operator Callback1<A0>() const {return cb;}
+};
+
+template <class A0, class A1, class T>
+struct callback_2 {
+	typedef T Cls;
+	typedef void (Cls::*Fn)(A0, A1);
+	Callback2<A0, A1> cb;
+	
+	inline callback_2(Fn fn, Cls* obj) {cb = Callback2<A0, A1>(new Caller2<A0, A1, Cls>(fn, obj));}
+	inline operator Callback2<A0, A1>() const {return cb;}
+};
+
+
+// TODO use meta
+#define THISBACK(x) callback<CLASSNAME>(&CLASSNAME::x, this)
+#define THISBACK1(x, a0) callback1<CLASSNAME, decltype(a0)>(&CLASSNAME::x, this, a0)
+
+
+
+
+inline Callback Proxy(Callback cb) {
+	return Callback(new ProxyCaller(cb));
+}
+
+template <class A0>
+inline Callback1<A0> Proxy_1(Callback1<A0> cb) {
+	return Callback1<A0>(new ProxyCaller1<A0>(cb));
+}
+
+
+
+
+Vector<Callback>& __InitBlocks() {static Vector<Callback> v; return v;}
+Vector<Callback>& __ExitBlocks() {static Vector<Callback> v; return v;}
+
+void AddInitBlock(Callback cb) {__InitBlocks() << cb;}
+void AddExitBlock(Callback cb) {__ExitBlocks() << cb;}
+void RunInitBlocks() {
+	FwdIterator<Callback> it = __InitBlocks().Begin();
+	FwdIterator<Callback> end = __InitBlocks().End();
+	for(; it != end; ++it) it->Execute();
+}
+
+void RunExitBlocks() {
+	FwdIterator<Callback> it = __ExitBlocks().Begin();
+	FwdIterator<Callback> end = __ExitBlocks().End();
+	for(; it != end; ++it) it->Execute();
+}
+
+struct Callinit {
+	typedef void (*Fn)();
+	Callinit(Fn fn) {AddInitBlock(Callback(fn));}
+};
+
+struct Callexit {
+	typedef void (*Fn)();
+	Callexit(Fn fn) {AddExitBlock(Callback(fn));}
+};
+
+
+#define INITBLOCK(x) void LINEID(Init,x) (); static Callinit LINEID(initcb,x) (LINEID(Init,x)); void LINEID(Init,x) ()
+#define EXITBLOCK(x) void LINEID(Exit,x) (); static Callexit LINEID(exitcb,x) (LINEID(Exit,x)); void LINEID(Exit,x) ()
+#define ONCELOCK static AtomicInt __once; if (__once++ == 0)
+
+
+
+
+
+}
+
+
+#define	Callback		Indirect::Callback
+#define	Callback1		Indirect::Callback1
+#define	Callback2		Indirect::Callback2
+#define	ProxyCaller		Indirect::ProxyCaller
+#define	ProxyCaller1	Indirect::ProxyCaller1
+#define	callback		Indirect::callback
+#define	callback_1		Indirect::callback_1
+#define	callback1		Indirect::callback1
+#define	callback1_1		Indirect::callback1_1
+#define	callback_2		Indirect::callback_2
+

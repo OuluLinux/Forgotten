@@ -428,7 +428,7 @@ public:
 		for(;;) {
 			ASSERT(pos < count);
 			if(pos == *sorted_list) {
-				(data + pos)->~K();
+				Destruct(*(data + pos));
 				pos++;
 				sorted_list++;
 				if(--n == 0) break;

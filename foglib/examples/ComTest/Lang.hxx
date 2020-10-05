@@ -2509,7 +2509,7 @@ namespace Lang
                 if (pos == *sorted_list)
                 {
 #line 431
-                    (data + pos)-> ~K();
+                    Destruct(*(data + pos));
                     pos ++ ;
                     sorted_list ++ ;
                     if (-- n == 0)

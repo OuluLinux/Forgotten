@@ -9,6 +9,7 @@ using/interface Stream;
 using/interface Util;
 using/interface Math;
 using/interface Chrono;
+using/interface Concurrency;
 using/implementation Com;
 
 
@@ -217,6 +218,10 @@ class App {
 		}
 		
 		
+		{
+			Thread t;
+			Mutex m;
+		}
 		/* TODO
 			- log init GetSysTime
 		*/
