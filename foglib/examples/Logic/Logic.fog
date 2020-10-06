@@ -1,0 +1,15 @@
+using "Math/Math.fog";
+
+namespace Logic {
+using/interface Com;
+};
+
+
+
+
+/*
+TODO:
+Core
+	Neural.h
+/*
+

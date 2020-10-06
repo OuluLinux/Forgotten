@@ -329,6 +329,8 @@ public:
 	typedef const K ConstK;
 	typedef FwdPtrIterator<K> Iterator;
 	typedef BwdPtrIterator<K> RIterator;
+	typedef ConstFwdPtrIterator<K> CIterator;
+	typedef ConstBwdPtrIterator<K> CRIterator;
 
 
 	inline Array() {}
@@ -338,21 +340,23 @@ public:
 	
 	K** Get() const {return l.Get();}
 	K** GetEnd() const {return l.GetEnd();}
+	const K** GetConst() const {return l.Get();}
+	const K** GetConstEnd() const {return l.GetEnd();}
 	
-	inline FwdPtrIterator<K>			Begin()			{return Iterator(l.Begin());}
-	inline FwdPtrIterator<K>			End()			{return Iterator(l.End());}
-	inline ConstFwdPtrIterator<K>	Begin() const	{return Iterator(l.Begin());}
-	inline ConstFwdPtrIterator<K>	End() const		{return Iterator(l.End());}
-	inline FwdPtrIterator<K>			begin()			{return Begin();}
-	inline FwdPtrIterator<K>			end()			{return End();}
+	inline FwdPtrIterator<K>		Begin()			{return Iterator(l.Get());}
+	inline FwdPtrIterator<K>		End()			{return Iterator(l.GetEnd());}
+	inline ConstFwdPtrIterator<K>	Begin() const	{return CIterator((const K**)l.Get());}
+	inline ConstFwdPtrIterator<K>	End() const		{return CIterator((const K**)l.GetEnd());}
+	inline FwdPtrIterator<K>		begin()			{return Begin();}
+	inline FwdPtrIterator<K>		end()			{return End();}
 	inline ConstFwdPtrIterator<K>	begin() const	{return Begin();}
 	inline ConstFwdPtrIterator<K>	end() const		{return End();}
-	inline BwdPtrIterator<K>			RBegin()		{return RIterator(l.End() - 1);}
-	inline BwdPtrIterator<K>			REnd()			{return RIterator(l.Begin() - 1);}
-	inline ConstBwdPtrIterator<K>	RBegin() const	{return RIterator(l.End() - 1);}
-	inline ConstBwdPtrIterator<K>	REnd() const	{return RIterator(l.Begin() - 1);}
-	inline BwdPtrIterator<K>			rbegin()		{return RBegin();}
-	inline BwdPtrIterator<K>			rend()			{return REnd();}
+	inline BwdPtrIterator<K>		RBegin()		{return RIterator(l.GetEnd() - 1);}
+	inline BwdPtrIterator<K>		REnd()			{return RIterator(l.Get() - 1);}
+	inline ConstBwdPtrIterator<K>	RBegin() const	{return CRIterator(l.GetConstEnd() - 1);}
+	inline ConstBwdPtrIterator<K>	REnd() const	{return CRIterator(l.GetConst() - 1);}
+	inline BwdPtrIterator<K>		rbegin()		{return RBegin();}
+	inline BwdPtrIterator<K>		rend()			{return REnd();}
 	inline ConstBwdPtrIterator<K>	rbegin() const	{return RBegin();}
 	inline ConstBwdPtrIterator<K>	rend() const	{return REnd();}
 	

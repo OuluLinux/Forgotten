@@ -22,22 +22,22 @@ public:
 
 
 template <class K> inline uint32 GetValue(const K& k) { return k.GetHashValue(); }
-template <> inline uint32 GetValue(const char& k) { return k; }
-template <> inline uint32 GetValue(const int& k) { return k; }
-template <> inline uint32 GetValue(const uint32& k) { return k; }
-template <> inline uint32 GetValue(const uint64& k) {
+inline uint32 GetValue(const char& k) { return k; }
+inline uint32 GetValue(const int& k) { return k; }
+inline uint32 GetValue(const uint32& k) { return k; }
+inline uint32 GetValue(const uint64& k) {
 	uint32 a = k & 0xFFFFFFFFULL;
 	uint32 b = k >> 32ULL;
 	uint32 hash = a ^ b;
 	return hash;
 }
-template <> inline uint32 GetValue(const float& k) { return static_cast<uint32>(k); }
-template <> inline uint32 GetValue(const double& k) {return GetValue(*(uint64*)&k);}
-template <> inline uint32 GetValue(const VoidPtr& k) {
+inline uint32 GetValue(const float& k) { return static_cast<uint32>(k); }
+inline uint32 GetValue(const double& k) {return GetValue(*(uint64*)&k);}
+inline uint32 GetValue(void* const& k) {
 	auto if ($IsDefined("CPU64"))
-		return GetValue(k.Int());
+		return GetValue(k);
 	else
-		return GetValue(k.Int());
+		return GetValue(k);
 }
 
 

@@ -1,0 +1,363 @@
+namespace Interface {
+
+
+class Value;
+class ValueMap;
+class ValueArray;
+
+
+int RegisterTypeNo(const char *type) {
+	static Index<String> idx;
+	return idx.FindAdd(type);
+}
+
+
+
+template <class K>
+inline int StaticTypeNo(K* p) {
+	static int typeno = RegisterTypeNo(typeid(K).name());
+	return typeno;
+}
+
+enum {
+	VOID_V					= 0,
+	INT_V					= 1,
+	DOUBLE_V				= 2,
+	STRING_V				= 3,
+	DATE_V					= 4,
+	TIME_V					= 5,
+	ERROR_V					= 6,
+	VALUE_V					= 7,
+	WSTRING_V				= 8,
+	VALUEARRAY_V			= 9,
+	INT64_V					= 10,
+	BOOL_V					= 11,
+	VALUEMAP_V				= 12,
+	VALUE_ARRAY_AND_MAP_V	= 13,
+	UNKNOWN_V				= 0Xffffffff,
+};
+
+
+
+template <class T>
+inline dword ValueTypeNo(const T*)       { return StaticTypeNo((T*)0) + 0x8000000; }
+
+inline dword ValueTypeNo(const void*)    { return VOID_V; }
+inline dword ValueTypeNo(const int*)     { return INT_V; }
+inline dword ValueTypeNo(const int64*)   { return INT64_V; }
+inline dword ValueTypeNo(const double*)  { return DOUBLE_V; }
+inline dword ValueTypeNo(const bool*)    { return BOOL_V; }
+inline dword ValueTypeNo(const String*)  { return STRING_V; }
+inline dword ValueTypeNo(const WString*) { return WSTRING_V; }
+inline dword ValueTypeNo(const Date*)    { return DATE_V; }
+inline dword ValueTypeNo(const Time*)    { return TIME_V; }
+inline dword ValueTypeNo(const Value*)   { return VALUE_V; }
+
+class ValueObject {
+protected:
+	dword type = VOID_V;
+	
+public:
+	virtual ~ValueObject() {}
+	virtual void* Get() {return 0;}
+	virtual String AsString() const {return "VOID";}
+	virtual int64 AsInt() const {return 0;}
+	dword GetType() const {return type;}
+};
+
+template <class T>
+class ValueTemplate : public ValueObject {
+	bool is_owned = false;
+	T* ptr = NULL;
+	
+public:
+	ValueTemplate() {ptr = new T(); is_owned = true; type = ValueTypeNo<T>(0);}
+	ValueTemplate(T* ptr) : ptr(ptr) {type = ValueTypeNo<T>(0);}
+	ValueTemplate(const T& obj) {ptr = new T(obj); is_owned = true; type = ValueTypeNo<T>(0);}
+	~ValueTemplate() {if (is_owned && ptr) {delete ptr; ptr = 0; is_owned = false; type = VOID_V;}}
+	virtual void* Get() {return ptr;}
+	virtual String AsString() const {if (ptr) return ToString(*ptr); return "NULL";}
+	virtual int64 AsInt() const {if (ptr) return ToInt(*ptr); return 0;}
+};
+
+
+class Value {
+	$MakeMoveable();
+	
+	SharedPtr<ValueObject> obj;
+	
+public:
+	
+	Value() {}
+	Value(const Value& v) {*this = v;}
+	Value(const char* str) {String& s = Create<String>(); s = str;}
+	//template <class T> Value(const T& o) {obj.WrapObject(new ValueTemplate<T>(o));}
+	
+	void Clear() {obj.Clear();}
+	template <class T> T& Create() {ValueTemplate<T>* o = new ValueTemplate<T>(); T* t = (T*)o->Get(); obj.WrapObject(o); return *t;}
+	template <class T> T& Create1(const T& arg) {ValueTemplate<T>* o = new ValueTemplate<T>(arg); T* t = (T*)o->Get(); obj.WrapObject(o); return *t;}
+	void DeepCopyArrayMap(Value v);
+	ValueMap&   CreateMap();
+	ValueArray& CreateArray();
+	
+	bool operator==(const Value& v) const {return obj == v.obj;}
+	
+	dword GetType() const {if (obj) return obj->GetType(); return VOID_V;}
+	template <class T> Value&	operator=(const Value& v) {obj = v.obj; return *this;}
+	//template <class T> Value&	operator=(T* o) {Set<T>(o); return *this;}
+	//template <class T> Value&	operator=(const T& o) {Set<T>(o); return *this;}
+	
+	template <class T> void     Attach(T* o) {obj = new ValueTemplate<T>(o);}
+	template <class T> void     Set(const T& o) {obj.WrapObject(new ValueTemplate<T>(o));}
+	template <class T> bool		Is() const {if (obj) return obj->GetType() == ValueTypeNo<T>(0); return false;}
+	template <class T> T* Try() const {
+		if (obj && obj->GetType() == ValueTypeNo<T>(0))
+			return (T*)obj->Get();
+		return NULL;
+	}
+
+		
+	template <class T> operator T&() const {
+		if (obj && obj->GetType() == ValueTypeNo<T>(0))
+			return *(T*)obj->Get();
+		throw Exc("Unexpected value type");
+	}
+	template <class T> T& Get() const {
+		if (obj && obj->GetType() == ValueTypeNo<T>(0))
+			return *(T*)obj->Get();
+		throw Exc("Unexpected value type");
+	}
+	const ValueMap* TryGetMap() const;
+	const ValueArray* TryGetArray() const;
+	ValueMap* TryGetMap();
+	ValueArray* TryGetArray();
+	const ValueMap& GetMap() const;
+	const ValueArray& GetArray() const;
+	ValueMap& GetMap();
+	ValueArray& GetArray();
+	Value* GetMapSub(String key, Value* def=NULL);
+	Value* AddMapSub(String key, Value* def=NULL);
+	Value* GetAddMapSub(String key, Value* def=NULL);
+	ValueObject* GetObject() const {return obj.Get();}
+	
+	bool IsVoid() const {if (obj) return obj->GetType() == VOID_V; return true;}
+	bool IsArray() const;
+	bool IsMap() const;
+	bool IsArrayMapComb() const;
+	bool IsString() const {return !obj.IsEmpty() && obj->GetType() == STRING_V;}
+	bool IsInt() const {return !obj.IsEmpty() && obj->GetType() == INT_V;}
+	bool IsInt64() const {return !obj.IsEmpty() && obj->GetType() == INT64_V;}
+	
+	String AsString() const {if (obj) return obj->AsString(); return "NULL";}
+	int64 AsInt() const {if (obj) return obj->AsInt(); return 0;}
+};
+
+class ValueArray {
+	typedef Array<Value> A;
+	A values;
+	
+public:
+	
+	ValueArray() {}
+	ValueArray(const ValueArray& m) {*this = m;}
+	void operator=(const ValueArray& m) {values <<= m.values;}
+	
+	void Clear() {values.Clear();}
+	Value& Add() {return values.Add();}
+	Value& Add(const Value& v) {return values.Add(v);}
+	Value& Insert(int i) {return values.Insert(i);}
+	Value& Insert(int i, const Value& v) {return values.Insert(i, v);}
+	int GetCount() const {return values.GetCount();}
+	Value& operator[](int i) {return values[i];}
+	Value& At(int i) {return values[i];}
+	const Value& operator[](int i) const {return values[i];}
+	const Value& At(int i) const {return values[i];}
+	bool IsEmpty() const {return values.IsEmpty();}
+	void SetCount(int i) {values.SetCount(i);}
+	void DeepCopyArrayMap(ValueArray& arr);
+	
+	String AsString() const {String s; s << "ValueArray(" << values.GetCount() << ")"; return s;}
+	int64 AsInt() const {return values.GetCount();}
+	
+	FwdPtrIterator<Value> begin() {return values.begin();}
+	FwdPtrIterator<Value> end() {return values.end();}
+	ConstFwdPtrIterator<Value> begin() const {return values.begin();}
+	ConstFwdPtrIterator<Value> end() const {return values.end();}
+};
+
+
+
+
+class ValueMap {
+	Vector<String> keys;
+	Array<Value> values;
+	
+public:
+	
+	ValueMap() {}
+	ValueMap(const ValueMap& m) {*this = m;}
+	void operator=(const ValueMap& m) {keys <<= m.keys; values <<= m.values;}
+	
+	Value& Add(String key, Value v) {keys.Add(key); return values.Add(v);}
+	Value& Add(String key) {keys.Add(key); return values.Add();}
+	Value& GetAdd(String key) {int i = Find(key); if (i >= 0) return values[i]; return Add(key);}
+	Value& GetAdd(String key, const Value& def) {int i = Find(key); if (i >= 0) return values[i]; return Add(key, def);}
+	Value TryGet(String key, Value def=Value()) {int i = Find(key); if (i >= 0) return At(i); else return def;}
+	Value* TryFind(String key) {int i = Find(key); if (i >= 0) return &At(i); return NULL;}
+	int Find(String key) const {for(int i = 0; i < keys.GetCount(); i++) if (keys[i] == key) return i; return -1;}
+	Value& Get(String key) {int i = Find(key); if (i == -1) throw Exc("Unexpected key"); return values[i];}
+	int GetPos(Value* v) const {for(int i = 0; i < values.GetCount(); i++) if (&values[i] == v) return i; return -1;}
+	
+	void Clear() {keys.Clear(); values.Clear();}
+	int GetCount() const {return values.GetCount();}
+	Value& operator[](int i) {return values[i];}
+	Value& At(int i) {return values[i];}
+	const Value& operator[](int i) const {return values[i];}
+	const Value& At(int i) const {return values[i];}
+	String GetKey(int i) const {return keys[i];}
+	void DeepCopyArrayMap(ValueMap& map);
+	
+	String AsString() const {String s; s << "ValueMap(" << keys.GetCount() << ")"; return s;}
+	int64 AsInt() const {return keys.GetCount();}
+};
+
+
+struct ValueArrayMapComb {
+	ValueArray arr;
+	ValueMap   map;
+	
+	
+	ValueArrayMapComb() {}
+	ValueArrayMapComb(const ValueArrayMapComb& v) {*this = v;}
+	void operator=(const ValueArrayMapComb& v) {arr = v.arr; map = v.map;}
+	void DeepCopyArrayMap(ValueArrayMapComb& am);
+	
+	void Clear() {arr.Clear(); map.Clear();}
+	int GetTotal() const {return arr.GetCount() + map.GetCount();}
+	String AsString() const {String s; s << "ValueArrayMapComb(" << arr.GetCount() << ", " << map.GetCount() << ")"; return s;}
+	int64 AsInt() const {return GetTotal();}
+};
+
+
+template<> inline dword ValueTypeNo(const ValueArray*)          { return VALUEARRAY_V; }
+template<> inline dword ValueTypeNo(const ValueMap*)            { return VALUEMAP_V; }
+template<> inline dword ValueTypeNo(const ValueArrayMapComb*)   { return VALUE_ARRAY_AND_MAP_V; }
+
+
+
+String GetValueTreeString(const Value& v, String key, int indent) {
+	thread_local static Index<void*> visited;
+	if (!indent)
+		visited.Clear();
+	
+	String s;
+	for(int i = 0; i < indent; i++)
+		s.Cat('\t');
+	s << key;
+	
+	void* obj = v.GetObject();
+	if (obj) {
+		if (visited.Find(obj) >= 0)
+			return s + ": <recursive>\n";
+		visited.Add(obj);
+	}
+	
+	if (v.IsMap()) {
+		s.Cat('\n');
+		const ValueMap& map = v.Get<ValueMap>();
+		for(int i = 0; i < map.GetCount(); i++) {
+			String key = map.GetKey(i);
+			const Value& v0 = map[i];
+			s << GetValueTreeString(v0, key, indent+1);
+		}
+	}
+	else if (v.IsArray()) {
+		s.Cat('\n');
+		const ValueArray& arr = v.Get<ValueArray>();
+		for(int i = 0; i < arr.GetCount(); i++) {
+			String key = IntStr(i);
+			const Value& v0 = arr[i];
+			s << GetValueTreeString(v0, key, indent+1);
+		}
+	}
+	else if (v.IsArrayMapComb()) {
+		s.Cat('\n');
+		const ValueArrayMapComb& comb = v.Get<ValueArrayMapComb>();
+		for(int i = 0; i < comb.map.GetCount(); i++) {
+			String key = comb.map.GetKey(i);
+			const Value& v0 = comb.map[i];
+			s << GetValueTreeString(v0, key, indent+1);
+		}
+		for(int i = 0; i < comb.arr.GetCount(); i++) {
+			String key = IntStr(i);
+			const Value& v0 = comb.arr[i];
+			s << GetValueTreeString(v0, key, indent+1);
+		}
+	}
+	else {
+		s << ": " << v.AsString() << "\n";
+	}
+	
+	if (obj)
+		visited.RemoveLast();
+	
+	return s;
+}
+
+enum {
+	FMT_MAIN_SWITCH = 0,
+
+	FMT_TYPE_INVALID = 0,
+	FMT_TYPE_VALUE,
+};
+
+String Format(String pattern, Value v0, Value v1, Value v2, Value v3, Value v4, Value v5, Value v6, Value v7) {
+	static const int MAX_ARGS = 8;
+	Value* v[MAX_ARGS] = {&v0, &v1, &v2, &v3, &v4, &v5, &v6, &v7};
+	
+	if (pattern.IsEmpty()) return "";
+	
+	int arg = 0;
+	String out;
+	const char* it  = pattern.Begin();
+	const char* end = pattern.End();
+	while (it != end) {
+		int chr = *it++;
+		
+		// \ or %
+		if (chr == 92 && *it == 37) {
+			chr = *it++;
+			out.Cat(chr);
+		}
+		// %
+		else if (chr == 37) {
+			int state = FMT_MAIN_SWITCH;
+			int type = FMT_TYPE_INVALID;
+			while (it != end) {
+				chr = *it++;
+				if (state == FMT_MAIN_SWITCH) {
+					if (chr == 'v') {
+						type = FMT_TYPE_VALUE;
+						break;
+					}
+					else break;
+				}
+				else break;
+			}
+			if (type == FMT_TYPE_INVALID)
+				out << "<invalid>";
+			else if (type == FMT_TYPE_VALUE) {
+				if (arg < MAX_ARGS)
+					out << v[arg++]->AsString();
+				else
+					out << "<arg overflow " << arg++ << ">";
+			}
+		}
+		else {
+			out.Cat(chr);
+		}
+	}
+	return out;
+}
+
+}

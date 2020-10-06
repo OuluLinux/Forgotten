@@ -3,6 +3,10 @@
 
 #include <new>
 
+#ifndef CONTAINER_HXX
+#include <Container.hxx>
+#endif
+
 #ifndef CONCURRENCY_HXX
 #include <Concurrency.hxx>
 #endif

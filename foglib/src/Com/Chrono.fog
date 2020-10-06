@@ -311,5 +311,5 @@ double OnlineFrequencyWindow::Get() const {
 
 }
 
-#define Data		Chrono::Data
+#define Date		Chrono::Date
 #define Time		Chrono::Time

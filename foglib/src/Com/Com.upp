@@ -30,6 +30,7 @@ file
 	Indirect.fog,
 	Concurrency.fog,
 	Network.fog,
+	Interface.fog,
 	"Basic Compiler" readonly separator,
 	CompilerBase.fog,
 	"C++ Support" readonly separator,

@@ -1,0 +1,6 @@
+uses
+	Logic;
+
+mainconfig
+	"" = "";
+

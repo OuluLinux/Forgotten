@@ -1,1 +1,10 @@
 using "Com/Com.fog";
+
+/*
+TODO:
+Core
+	Geom.h
+	DCT.h
+	GeneticOptimizer.h
+	Coordinate.h
+/*

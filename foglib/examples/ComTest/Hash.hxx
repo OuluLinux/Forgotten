@@ -9,30 +9,22 @@
 
 namespace Hash
 {
-#line 24 "../../src/Com/Hash.fog"
+#line 27 "../../src/Com/Hash.fog"
+    inline Lang::uint32 GetValue(const Lang::uint32& k);
+    inline Lang::uint32 GetValue(const Lang::uint64& k);
+#line 24
     template < class _1 >
     inline Lang::uint32 GetValue(const _1& k);
-#line 36
-    template <>
-    inline Lang::uint32 GetValue < Lang::VoidPtr > (const Lang::VoidPtr& k);
-#line 27
-    template <>
-    inline Lang::uint32 GetValue < Lang::uint32 > (const Lang::uint32& k);
-#line 28
-    template <>
-    inline Lang::uint32 GetValue < Lang::uint64 > (const Lang::uint64& k);
 #line 25
-    template <>
-    inline Lang::uint32 GetValue < char > (const char& k);
+    inline Lang::uint32 GetValue(const char& k);
 #line 35
-    template <>
-    inline Lang::uint32 GetValue < double > (const double& k);
+    inline Lang::uint32 GetValue(const double& k);
 #line 34
-    template <>
-    inline Lang::uint32 GetValue < float > (const float& k);
+    inline Lang::uint32 GetValue(const float& k);
 #line 26
-    template <>
-    inline Lang::uint32 GetValue < int > (const int& k);
+    inline Lang::uint32 GetValue(const int& k);
+#line 36
+    inline Lang::uint32 GetValue(void *const& k);
     
     class Combine
     {
@@ -56,32 +48,15 @@ namespace Hash
 
 namespace Hash
 {
-    template < class _1 >
-    inline Lang::uint32 GetValue(const _1& k)
-    {
-#line 24
-        return k.GetHashValue();
-    };
-    
-#line 36
-    template <>
-    inline Lang::uint32 GetValue < Lang::VoidPtr > (const Lang::VoidPtr& k)
-    {
-#line 38
-        return GetValue(k.Int());
-    };
-    
 #line 27
-    template <>
-    inline Lang::uint32 GetValue < Lang::uint32 > (const Lang::uint32& k)
+    inline Lang::uint32 GetValue(const Lang::uint32& k)
     {
 #line 27
         return k;
     };
     
 #line 28
-    template <>
-    inline Lang::uint32 GetValue < Lang::uint64 > (const Lang::uint64& k)
+    inline Lang::uint32 GetValue(const Lang::uint64& k)
     {
 #line 29
         Lang::uint32 a = k & 0xFFFFFFFFULL;
@@ -90,36 +65,46 @@ namespace Hash
         return hash;
     };
     
+#line 24
+    template < class _1 >
+    inline Lang::uint32 GetValue(const _1& k)
+    {
+#line 24
+        return k.GetHashValue();
+    };
+    
 #line 25
-    template <>
-    inline Lang::uint32 GetValue < char > (const char& k)
+    inline Lang::uint32 GetValue(const char& k)
     {
 #line 25
         return k;
     };
     
 #line 35
-    template <>
-    inline Lang::uint32 GetValue < double > (const double& k)
+    inline Lang::uint32 GetValue(const double& k)
     {
 #line 35
         return GetValue(*(Lang::uint64 * ) & k);
     };
     
 #line 34
-    template <>
-    inline Lang::uint32 GetValue < float > (const float& k)
+    inline Lang::uint32 GetValue(const float& k)
     {
 #line 34
         return static_cast< Lang::uint32 >(k);
     };
     
 #line 26
-    template <>
-    inline Lang::uint32 GetValue < int > (const int& k)
+    inline Lang::uint32 GetValue(const int& k)
     {
 #line 26
         return k;
+    };
+    
+#line 36
+    inline Lang::uint32 GetValue(void *const& k)
+    {
+        return GetValue(k);
     };
     
 #line 10

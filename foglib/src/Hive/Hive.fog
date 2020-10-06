@@ -1,4 +1,4 @@
-using "Math/Math.fog";
+using "Logic/Logic.fog";
 
 namespace Hive {
 using/interface Com;
@@ -7,4 +7,10 @@ using/interface Com;
 
 using "Hive/Program.fog";
 
+
+/*
+TODO:
+Core
+	Graph.h
+/*
 
