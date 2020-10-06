@@ -21,7 +21,6 @@ struct StdThread {
 };
 
 struct StdMutex {
-	typedef void(*Fn)(void*);
 	!inline StdMutex() :{ export/noimplementation; };
 	!inline ~StdMutex() :{ export/noimplementation; };
 	void Enter() :{ export/noimplementation; };

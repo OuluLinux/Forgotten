@@ -41,6 +41,9 @@
 #include <pwd.h>
 #include <sys/stat.h>
 
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #endif
 
 

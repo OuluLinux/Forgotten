@@ -1,0 +1,77 @@
+namespace Network {
+
+namespace Native {
+	
+
+struct StdTcpSocket {
+	!inline StdTcpSocket()						:{ export/noimplementation; };
+	!inline ~StdTcpSocket()						:{ export/noimplementation; };
+	bool Listen(int port, int max_conn,
+		bool ip6, const char* addr)				:{ export/noimplementation; };
+	bool Accept(StdTcpSocket& sock)				:{ export/noimplementation; };
+	bool IsOpen()								:{ export/noimplementation; };
+	void Close()								:{ export/noimplementation; };
+	int Put(const void* data, int size)			:{ export/noimplementation; };
+	int Get(void* data, int size)				:{ export/noimplementation; };
+	bool Connect(const char* addr, int port)	:{ export/noimplementation; };
+	void Timeout(int ms)						:{ export/noimplementation; };
+	void GetPeerAddr(char* buf, int bufsize)	:{ export/noimplementation; };
+	const char* GetLastError()					:{ export/noimplementation; };
+	static StdTcpSocket* Create()				:{ export/noimplementation; };
+};
+
+}
+
+
+class TcpSocket {
+	typedef Native::StdTcpSocket Std;
+	One<Std> s;
+	
+public:
+	TcpSocket() {s.Create();}
+	~TcpSocket() {}
+	
+	bool Listen(int port, int max_conn, bool ip6=false, const char* addr="127.0.0.1") {return s->Listen(port, max_conn, ip6, addr);}
+	bool Accept(TcpSocket& sock) {return s->Accept(*sock.s);}
+	bool IsOpen() {return s->IsOpen();}
+	void Close() {s->Close();}
+	String GetLine(int max_len = UINT16_MAX);
+	String GetPeerAddr() {char b[1024]; s->GetPeerAddr(b, 1024); return b;}
+	int Put(String str) {return Put((void*)str.Begin(), str.GetCount());}
+	int Put(const void* data, int size) {return s->Put(data, size);}
+	int Get(void* data, int size) {return s->Get(data, size);}
+	String Get(int size);
+	bool Connect(String addr, int port) {return s->Connect(addr.Begin(), port);}
+	void Timeout(int ms) {s->Timeout(ms);}
+};
+
+String TcpSocket::Get(int size) {
+	Vector<char> buf;
+	buf.SetCount(size);
+	int got = Get(buf.Begin(), size);
+	buf.SetCount(got);
+	return String(buf.Begin(), got);
+}
+
+String TcpSocket::GetLine(int max_len) {
+	if (!IsOpen())
+		return "";
+	
+	String out;
+	while (out.GetCount() < max_len) {
+		char chr;
+		int received = Get(&chr, 1);
+		if (!received) {
+			Close();
+			break;
+		}
+		if (chr == '\n')
+			break;
+		out.Cat(chr);
+	}
+	return out;
+}
+
+}
+
+#define TcpSocket			Network::TcpSocket

@@ -3,14 +3,14 @@ using "Com/Com.fog";
 namespace Main {
 using/interface Native;
 using/interface Container;
-using/interface Com;
 using/interface Shared;
 using/interface Stream;
 using/interface Util;
 using/interface Math;
 using/interface Chrono;
+using/interface Indirect;
 using/interface Concurrency;
-using/implementation Com;
+using/interface Network;
 
 
 class App {
@@ -221,6 +221,11 @@ class App {
 		{
 			Thread t;
 			Mutex m;
+		}
+		
+		{
+			TcpSocket s;
+			ASSERT(s.Listen(8005, 5));
 		}
 		/* TODO
 			- log init GetSysTime

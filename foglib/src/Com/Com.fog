@@ -15,7 +15,7 @@ namespace Math			{using/interface Util;};
 namespace Chrono		{using/interface Math;};
 namespace Indirect		{using/interface Chrono;};
 namespace Concurrency	{using/interface Indirect;};
-namespace Com			{using/interface Util;};
+namespace Network		{using/interface Concurrency;};
 
 #define NULL 0
 
@@ -37,13 +37,12 @@ using "Com/Math.fog";
 using "Com/Chrono.fog";
 using "Com/Indirect.fog";
 using "Com/Concurrency.fog";
+using "Com/Network.fog";
 
 using "Com/CompilerBase.fog";
 
 /*
 TODO:
-	Types.h
-	TypeTraits.h
 	Socket.h
 	Graph.h
 	Geom.h
@@ -62,6 +61,13 @@ TODO:
 	GeneticOptimizer.h
 	Coordinate.h
 	ECS.h
+	
+	Transformer
+	Text-to-speech
+	Speech-to-text
+	
+	TypeTraits.h
+	Scripting
 	
 	ActionPlanner
 		PipelinePlanner

@@ -29,6 +29,7 @@ file
 	Chrono.fog,
 	Indirect.fog,
 	Concurrency.fog,
+	Network.fog,
 	"Basic Compiler" readonly separator,
 	CompilerBase.fog,
 	"C++ Support" readonly separator,
@@ -40,6 +41,7 @@ file
 	Defs.h,
 	Math.cpp,
 	Concurrency.cpp,
+	Network.cpp,
 	_ readonly separator;
 
 custom() "fog",

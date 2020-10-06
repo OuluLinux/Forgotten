@@ -9,146 +9,146 @@
 
 namespace Concurrency
 {
-#line 99 "../../src/Com/Concurrency.fog"
+#line 98 "../../src/Com/Concurrency.fog"
     void Mutex::Create()
     {
-#line 99
+#line 98
         m.Clear();
-#line 99
+#line 98
         m = Native::StdMutex::Create();
     };
     
-#line 110
+#line 109
     MutexLocker::MutexLocker(Mutex& m)
     :
         m(m)
     {
-#line 110
+#line 109
         m.Enter();
     };
     
-#line 121
+#line 120
     void RWMutex::Create()
     {
-#line 121
+#line 120
         m.Clear();
-#line 121
+#line 120
         m = Native::StdSharedMutex::Create();
     };
     
-#line 132
+#line 131
     RWMutexReadLocker::RWMutexReadLocker(RWMutex& m)
     :
         m(m)
     {
-#line 132
+#line 131
         m.EnterRead();
     };
     
-#line 139
+#line 138
     RWMutexWriteLocker::RWMutexWriteLocker(RWMutex& m)
     :
         m(m)
     {
-#line 139
+#line 138
         m.EnterWrite();
     };
     
-#line 363
+#line 362
     RunningFlag::RunningFlag()
     :
         sleep_time(100),
         running(false)
     {
-#line 363
+#line 362
         workers_running = 0;
     };
     
-#line 368
+#line 367
     void RunningFlag::DecreaseRunning()
     {
-#line 368
+#line 367
         workers_running -- ;
-#line 368
+#line 367
         if (workers_running == 0)
-#line 368
+#line 367
             running = false;
     };
     
-#line 364
+#line 363
     void RunningFlag::Start(int count)
     {
-#line 364
+#line 363
         Stop();
-#line 364
+#line 363
         running = true;
-#line 364
+#line 363
         workers_running = count;
     };
     
-#line 365
+#line 364
     void RunningFlag::Stop()
     {
-#line 365
+#line 364
         running = false;
-#line 365
+#line 364
         while (workers_running > 0)
-#line 365
+#line 364
             Native::Sleep(sleep_time);
     };
     
-#line 349
+#line 348
     RunningFlagSingle::RunningFlagSingle()
     :
         running(false),
         stopped(true)
     {};
     
-#line 354
+#line 353
     void RunningFlagSingle::Stop()
     {
-#line 354
+#line 353
         running = false;
-#line 354
+#line 353
         while (!stopped)
-#line 354
+#line 353
             Native::Sleep(100);
     };
     
-#line 72
+#line 71
     void Thread::Run(Indirect::Callback cb)
     {
         {
-#line 73
+#line 72
             if (!(t.IsEmpty()))
             {
-#line 73
+#line 72
                 Lang::SysBreak("Assertion failed: t.IsEmpty()");
             }
         }
-#line 74
+#line 73
         ;
-#line 74
+#line 73
         this -> cb = cb;
         t.Clear();
         t = Native::StdThread::Create();
         t -> Run(&Thread::NativeCallback, this);
     };
     
-#line 85
+#line 84
     void Thread::ShutdownAndWaitThreads()
     {
-#line 86
+#line 85
         shutdown() = true;
         while (thrd_count() != 0)
-#line 87
+#line 86
             Native::Sleep(100);
     };
     
-#line 64
+#line 63
     void Thread::Start(Indirect::Callback cb)
     {
-#line 65
+#line 64
         Thread * t = new Thread;
         t -> cb = cb;
         t -> t.Clear();
@@ -156,57 +156,57 @@ namespace Concurrency
         t -> t -> Run(&Thread::NativeCallback, t);
     };
     
-#line 301
+#line 300
     void TimelineEnv::AddGlobalTicks(Lang::uint32 ticks)
     {
-#line 302
+#line 301
         Lang::uint32 prev_global_ticks = global_ticks;
         global_ticks += ticks;
-#line 306
+#line 305
         if (global_ticks < prev_global_ticks)
             DecreaseTimeCallbackEpoch();
-#line 309
+#line 308
         ExecuteTimeCallback();
     };
     
-#line 287
+#line 286
     void TimelineEnv::DecreaseTimeCallbackEpoch()
     {
-#line 288
+#line 287
         m.Enter();
-#line 290
+#line 289
         for (int i = 0; i < cb.GetCount(); i ++ )
             {
-#line 291
+#line 290
                 TimeCallbackItem & it = cb[i];
                 if (it.epoch > 0)
                     it.epoch -- ;
                 else
                     cb.Remove(i -- );
             }
-#line 298
+#line 297
         m.Leave();
     };
     
-#line 257
+#line 256
     void TimelineEnv::ExecuteTimeCallback()
     {
-#line 258
+#line 257
         remlist.SetCount(0);
-#line 260
+#line 259
         Lang::FwdPtrIterator < TimeCallbackItem > it = cb.Begin();
         Lang::FwdPtrIterator < TimeCallbackItem > end = cb.End();
         int i = 0;
         while (it != end)
             {
-#line 264
+#line 263
                 if (it -> epoch == 0 && it -> ticks <= global_ticks)
                 {
-#line 265
+#line 264
                     it -> cb.Execute();
                     if (it -> is_periodical)
                     {
-#line 267
+#line 266
                         it -> ticks = global_ticks + it -> delay;
                         if (it -> ticks < global_ticks)
                             it -> epoch = 1;
@@ -219,25 +219,25 @@ namespace Concurrency
                 ++ it;
                 ++ i;
             }
-#line 280
+#line 279
         if (remlist.GetCount())
         {
-#line 281
+#line 280
             m.Enter();
             cb.Remove(remlist.Begin(), remlist.GetCount());
             m.Leave();
         }
     };
     
-#line 246
+#line 245
     bool TimelineEnv::ExistsTimeCallback(void *id)
     {
-#line 247
+#line 246
         Lang::FwdPtrIterator < TimeCallbackItem > it = cb.Begin();
         Lang::FwdPtrIterator < TimeCallbackItem > end = cb.End();
         while (it != end)
             {
-#line 250
+#line 249
                 if (it -> id == id)
                     return true;
                 ++ it;
@@ -245,50 +245,50 @@ namespace Concurrency
         return false;
     };
     
-#line 230
+#line 229
     void TimelineEnv::KillTimeCallback(void *id)
     {
-#line 231
+#line 230
         Lang::FwdPtrIterator < TimeCallbackItem > it = cb.Begin();
         Lang::FwdPtrIterator < TimeCallbackItem > end = cb.End();
         int i = 0;
         while (it != end)
             {
-#line 235
+#line 234
                 if (it -> id == id)
                 {
-#line 236
+#line 235
                     m.Enter();
                     cb.Remove(i);
                     m.Leave();
                     break;
                 
                 }
-#line 241
+#line 240
                 ++ it;
                 ++ i;
             }
     };
     
-#line 174
+#line 173
     void TimelineEnv::SetTimeCallback(int delay_ms, Indirect::Callback cb, void *id)
     {
-#line 192
+#line 191
         bool is_periodical = false;
         if (delay_ms < 0)
         {
-#line 194
+#line 193
             delay_ms *= - 1;
             is_periodical = true;
         }
-#line 198
+#line 197
         for (int i = 0; i < this -> cb.GetCount(); i ++ )
             {
-#line 199
+#line 198
                 TimeCallbackItem & it = this -> cb[i];
                 if (it.id == id)
                 {
-#line 201
+#line 200
                     it.cb = cb;
                     it.ticks = global_ticks + delay_ms;
                     it.delay = delay_ms;
@@ -300,9 +300,9 @@ namespace Concurrency
                     return;
                 }
             }
-#line 214
+#line 213
         m.Enter();
-#line 216
+#line 215
         TimeCallbackItem & it = this -> cb.Add();
         it.id = id;
         it.cb = cb;
@@ -313,7 +313,7 @@ namespace Concurrency
             it.epoch = 1;
         else
             it.epoch = 0;
-#line 227
+#line 226
         m.Leave();
     };
     

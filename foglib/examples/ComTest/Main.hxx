@@ -11,14 +11,8 @@ struct NamespaceInterfaceLinker
 {
 };
 
-#ifndef CONCURRENCY_HXX
-#include <Concurrency.hxx>
-#endif
-#ifndef MATH_HXX
-#include <Math.hxx>
-#endif
-#ifndef COM_HXX
-#include <Com.hxx>
+#ifndef NETWORK_HXX
+#include <Network.hxx>
 #endif
 
 namespace Main
@@ -32,19 +26,19 @@ namespace Main
 #line 45
         inline void Run();
         
-#line 257
+#line 262
         void TestShared();
         
         struct Dumber
         {
-#line 249
+#line 254
             inline Dumber();
             virtual ~Dumber();
         };
         
         struct Dumb : public Main::App::Dumber
         {
-#line 253
+#line 258
             inline Dumb();
             inline ~Dumb();
         };
@@ -654,6 +648,20 @@ namespace Main
             Concurrency::Thread t;
             Concurrency::Mutex m;
         }
+        {
+#line 227
+            Network::TcpSocket s;
+            {
+#line 228
+                if (!(s.Listen(8005, 5)))
+                {
+#line 228
+                    Lang::SysBreak("Assertion failed: s.Listen(8005, 5)");
+                }
+            }
+#line 229
+            ;
+        }
     };
     
 #line 37
@@ -662,24 +670,24 @@ namespace Main
         a(8)
     {};
     
-#line 253
+#line 258
     inline App::Dumb::Dumb()
     {
-#line 253
+#line 258
         ;
     };
     
-#line 254
+#line 259
     inline App::Dumb::~Dumb()
     {
-#line 254
+#line 259
         ;
     };
     
-#line 249
+#line 254
     inline App::Dumber::Dumber()
     {
-#line 249
+#line 254
         ;
     };
     
