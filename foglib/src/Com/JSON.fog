@@ -1,0 +1,146 @@
+namespace TextProc {
+using/interface Interface;
+
+
+struct JSON {
+	
+	
+	static Value ParseArray(Tokenizer& tk) {
+		Value ret;
+		ValueArray& arr = ret.CreateArray();
+		
+		tk.PassToken('[');
+		
+		while (!tk.IsToken(']')) {
+			
+			if (tk.IsToken(TextProc::TK_BRACKET_BEGIN)) {
+				arr.Add(ParseMap(tk));
+			}
+			else if (tk.IsToken(TextProc::TK_SQUARE_BEGIN)) {
+				arr.Add(ParseArray(tk));
+			}
+			else if (tk.IsToken(TextProc::TK_ID)) {
+				String value = tk.ReadId();
+				if (value == "true")
+					arr.AddAsValue(true);
+				else if (value == "false")
+					arr.AddAsValue(false);
+				else
+					arr.AddAsValue(value);
+			}
+			else if (tk.IsToken(TextProc::TK_INTEGER)) {
+				int64 value = tk.ReadInt();
+				arr.AddAsValue(value);
+			}
+			else if (tk.IsToken(TextProc::TK_FLOAT) || tk.IsToken(TextProc::TK_DOUBLE)) {
+				double value = tk.ReadDouble();
+				arr.AddAsValue(value);
+			}
+			else if (tk.IsToken(TextProc::TK_STRING)) {
+				String value = tk.ReadString();
+				arr.AddAsValue(value);
+			}
+			else {
+				throw Exc("Unexpected token");
+			}
+			
+			tk.TryPassToken(TextProc::TK_COMMA);
+		}
+		
+		tk.PassToken(']');
+		
+		return ret;
+	}
+	
+	static Value ParseMap(Tokenizer& tk) {
+		Value ret;
+		ValueMap& vm = ret.CreateMap();
+		
+		tk.PassToken(TextProc::TK_BRACKET_BEGIN);
+		
+		while (!tk.IsToken(TextProc::TK_BRACKET_END)) {
+			String key;
+			if (tk.IsToken(TextProc::TK_ID))
+				key = tk.ReadId();
+			else
+				key = tk.ReadString();
+			
+			if (tk.IsToken(TextProc::TK_COMMA) || tk.IsToken(TextProc::TK_BRACKET_END)) {
+				tk.TryPassToken(TextProc::TK_COMMA);
+				vm.Add(key);
+				continue;
+			}
+			
+			tk.PassToken(TextProc::TK_COLON);
+			
+			if (tk.IsToken(TextProc::TK_BRACKET_BEGIN)) {
+				vm.Add(key, ParseMap(tk));
+			}
+			else if (tk.IsToken(TextProc::TK_SQUARE_BEGIN)) {
+				vm.Add(key, ParseArray(tk));
+			}
+			else if (tk.IsToken(TextProc::TK_ID)) {
+				String value = tk.ReadId();
+				if (value == "true")
+					vm.AddAsValue(key, true);
+				else if (value == "false")
+					vm.AddAsValue(key, false);
+				else
+					vm.AddAsValue(key, value);
+			}
+			else if (tk.IsToken(TextProc::TK_INTEGER)) {
+				int64 value = tk.ReadInt();
+				vm.AddAsValue(key, value);
+			}
+			else if (tk.IsToken(TextProc::TK_FLOAT) || tk.IsToken(TextProc::TK_DOUBLE)) {
+				double value = tk.ReadDouble();
+				vm.AddAsValue(key, value);
+			}
+			else if (tk.IsToken(TextProc::TK_STRING)) {
+				String value = tk.ReadString();
+				vm.AddAsValue(key, value);
+			}
+			else {
+				throw Exc("Unexpected token");
+			}
+			
+			tk.TryPassToken(TextProc::TK_COMMA);
+		}
+		
+		tk.PassToken(TextProc::TK_BRACKET_END);
+		
+		return ret;
+	}
+	
+	static Value ParseJSON(String json) {
+		Value v;
+		
+		Tokenizer tk;
+		tk.SkipComments();
+		tk.SkipNewLines();
+		tk.SkipSeparateUnary();
+		
+		if (!tk.Load(json, "json")) {
+			LOG("Warning: Json tokenization failed");
+			for(int i = 0; i < tk.messages.GetCount(); i++) {
+				ProcMsg& e = tk.messages[i];
+				LOG("\t" << i << ": " << e.line << ":" << e.col << ": " << e.msg);
+			}
+		}
+		
+		try {
+			v = ParseMap(tk);
+		}
+		catch (Exc e) {
+			tk.Dump();
+			LOG("Error: Json parsing failed at " << tk.GetPassCursor() << ": " << e);
+		}
+		
+		return v;
+	}
+
+};
+
+}
+
+#define JSON		TextProc::JSON

@@ -151,10 +151,27 @@ namespace TextProc
 #line 19
         inline void SetFileLocation(const FileLocation& loc);
     };
+};
+
+namespace TextProc {
+class Tokenizer;
+}
+
+namespace TextProc
+{
+    struct JSON
+    {
+#line 8 "../../src/Com/JSON.fog"
+        static Interface::Value ParseArray(TextProc::Tokenizer& tk);
+#line 115
+        static Interface::Value ParseJSON(Text::String json);
+#line 55
+        static Interface::Value ParseMap(TextProc::Tokenizer& tk);
+    };
     
     struct ProcMsg : public TextProc::FileLocation
     {
-#line 30
+#line 30 "../../src/Com/CompilerBase.fog"
         int severity;
         Text::String src;
         Text::String msg;

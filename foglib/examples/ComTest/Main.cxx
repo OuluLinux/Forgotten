@@ -9,37 +9,37 @@
 
 namespace Main
 {
-#line 269 "ComTest.mfog"
+#line 273 "ComTest.mfog"
     void App::TestShared()
     {
-#line 279
+#line 283
         Shared::Ptr < Dumb > s0a;
-#line 281
+#line 285
         ;
         {
-#line 282
+#line 286
             Shared::Ptr < Dumber > s1a;
             Shared::Ptr < Dumb > s1b;
-#line 285
+#line 289
             ;
             ;
             s1b = Shared::Ptr < Dumb > ().WrapObject(new Dumb);
-#line 289
+#line 293
             ;
             s1a = s1b.As < Dumber > ();
-#line 292
+#line 296
             ;
             {
                 Shared::Ptr < Dumber > s2;
-#line 296
-                ;
-#line 296
-                s2 = s1a;
-#line 298
-                ;
-#line 298
-                s0a = s2.As < Dumb > ();
 #line 300
+                ;
+#line 300
+                s2 = s1a;
+#line 302
+                ;
+#line 302
+                s0a = s2.As < Dumb > ();
+#line 304
                 ;
             }
             ;
@@ -47,10 +47,10 @@ namespace Main
         ;
     };
     
-#line 262
+#line 266
     App::Dumber::~Dumber()
     {
-#line 262
+#line 266
         ;
     };
     

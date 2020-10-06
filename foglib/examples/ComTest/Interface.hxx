@@ -44,9 +44,12 @@ class Value;
 
 namespace Interface
 {
-#line 314 "../../src/Com/Interface.fog"
+#line 155 "../../src/Com/Interface.fog"
+    template < class _1 >
+    inline Value AsValue(const _1& o);
+#line 318
     Text::String Format(Text::String pattern, Value v0, Value v1, Value v2, Value v3, Value v4, Value v5, Value v6, Value v7);
-#line 248
+#line 252
     Text::String GetValueTreeString(const Value& v, Text::String key, int indent);
 #line 9
     inline int RegisterTypeNo(const char *type);
@@ -81,7 +84,7 @@ class ValueArray;
 
 namespace Interface
 {
-#line 242
+#line 246
     template <>
     inline Lang::dword ValueTypeNo < ValueArray > (const ValueArray *);
 };
@@ -92,7 +95,7 @@ struct ValueArrayMapComb;
 
 namespace Interface
 {
-#line 244
+#line 248
     template <>
     inline Lang::dword ValueTypeNo < ValueArrayMapComb > (const ValueArrayMapComb *);
 };
@@ -103,7 +106,7 @@ class ValueMap;
 
 namespace Interface
 {
-#line 243
+#line 247
     template <>
     inline Lang::dword ValueTypeNo < ValueMap > (const ValueMap *);
 };
@@ -131,7 +134,7 @@ namespace Interface
         inline bool operator== (const Value& v) const;
 #line 120
         template < class _1 >
-        operator _1 & () const;
+        inline operator _1 & () const;
 #line 139
         Value *AddMapSub(Text::String key, Value *def = 0);
 #line 152
@@ -144,27 +147,28 @@ namespace Interface
 #line 96
         inline void Clear();
         template < class _1 >
-        _1& Create();
+        inline _1& Create();
 #line 98
         template < class _1 >
-        _1& Create1(const _1& arg);
-#line 101
+        inline _1& Create1(const _1& arg);
+#line 388
         ValueArray& CreateArray();
-#line 100
+#line 383
         ValueMap& CreateMap();
-#line 99
+#line 511
         void DeepCopyArrayMap(Value v);
 #line 125
         template < class _1 >
-        _1& Get() const;
+        inline _1& Get() const;
 #line 140
         Value *GetAddMapSub(Text::String key, Value *def = 0);
-#line 137
+#line 459
         ValueArray& GetArray();
-#line 135
+#line 447
         const ValueArray& GetArray() const;
+#line 453
         ValueMap& GetMap();
-#line 134
+#line 441
         const ValueMap& GetMap() const;
 #line 138
         Value *GetMapSub(Text::String key, Value *def = 0);
@@ -174,15 +178,15 @@ namespace Interface
         inline Lang::dword GetType() const;
 #line 112
         template < class _1 >
-        bool Is() const;
-#line 144
+        inline bool Is() const;
+#line 393
         bool IsArray() const;
-#line 146
+#line 401
         bool IsArrayMapComb() const;
 #line 148
         bool IsInt() const;
         bool IsInt64() const;
-#line 145
+#line 397
         bool IsMap() const;
 #line 147
         bool IsString() const;
@@ -192,134 +196,140 @@ namespace Interface
         template < class _1 >
         inline void Set(const _1& o);
         template < class _1 >
-        _1 *Try() const;
-#line 133
+        inline _1 *Try() const;
+#line 423
         ValueArray *TryGetArray();
-#line 131
+#line 405
         const ValueArray *TryGetArray() const;
+#line 432
         ValueMap *TryGetMap();
-#line 130
+#line 414
         const ValueMap *TryGetMap() const;
     };
     
     class ValueArray
     {
-#line 156
+#line 158
         typedef Container::Array < Value > A;
         
-#line 157
+#line 159
         A values;
         
     public:
-#line 161
+#line 163
         inline ValueArray();
         inline ValueArray(const ValueArray& m);
         inline void operator= (const ValueArray& m);
-#line 171
+#line 174
         inline Value& operator[](int i);
-#line 173
+#line 176
         inline const Value& operator[](int i) const;
-#line 166
+#line 168
         inline Value& Add();
         inline Value& Add(const Value& v);
-#line 180
+        template < class _1 >
+        inline Value& AddAsValue(const _1& o);
+#line 183
         inline Lang::int64 AsInt() const;
-#line 179
+#line 182
         Text::String AsString() const;
-#line 172
+#line 175
         inline Value& At(int i);
-#line 174
-        inline const Value& At(int i) const;
-#line 165
-        inline void Clear();
 #line 177
+        inline const Value& At(int i) const;
+#line 167
+        inline void Clear();
+#line 528
         void DeepCopyArrayMap(ValueArray& arr);
-#line 170
+#line 173
         inline int GetCount() const;
-#line 168
+#line 171
         inline Value& Insert(int i);
         inline Value& Insert(int i, const Value& v);
-#line 175
+#line 178
         inline bool IsEmpty() const;
         inline void SetCount(int i);
-#line 184
+#line 187
         inline Lang::ConstFwdPtrIterator < Value > begin() const;
-#line 182
-        inline Lang::FwdPtrIterator < Value > begin();
 #line 185
+        inline Lang::FwdPtrIterator < Value > begin();
+#line 188
         inline Lang::ConstFwdPtrIterator < Value > end() const;
-#line 183
+#line 186
         inline Lang::FwdPtrIterator < Value > end();
     };
     
     class ValueMap
     {
-#line 192
+#line 195
         Container::Vector < Text::String > keys;
         Container::Array < Value > values;
         
     public:
-#line 197
+#line 200
         inline ValueMap();
         inline ValueMap(const ValueMap& m);
         void operator= (const ValueMap& m);
-#line 213
+#line 217
         inline Value& operator[](int i);
-#line 215
+#line 219
         inline const Value& operator[](int i) const;
-#line 202
+#line 205
         Value& Add(Text::String key);
-#line 201
+#line 204
         Value& Add(Text::String key, Value v);
-#line 221
+#line 206
+        template < class _1 >
+        inline Value& AddAsValue(Text::String key, const _1& o);
+#line 225
         inline Lang::int64 AsInt() const;
-#line 220
+#line 224
         Text::String AsString() const;
-#line 214
-        inline Value& At(int i);
-#line 216
-        inline const Value& At(int i) const;
-#line 211
-        void Clear();
 #line 218
+        inline Value& At(int i);
+#line 220
+        inline const Value& At(int i) const;
+#line 215
+        void Clear();
+#line 541
         void DeepCopyArrayMap(ValueMap& map);
-#line 207
+#line 211
         int Find(Text::String key) const;
         Value& Get(Text::String key);
-#line 203
+#line 207
         Value& GetAdd(Text::String key);
         Value& GetAdd(Text::String key, const Value& def);
-#line 212
+#line 216
         inline int GetCount() const;
-#line 217
+#line 221
         inline Text::String GetKey(int i) const;
-#line 209
+#line 213
         int GetPos(Value *v) const;
-#line 206
+#line 210
         Value *TryFind(Text::String key);
-#line 205
+#line 209
         Value TryGet(Text::String key, Value def = Value());
     };
     
     struct ValueArrayMapComb
     {
-#line 226
+#line 230
         ValueArray arr;
         ValueMap map;
         
-#line 230
+#line 234
         inline ValueArrayMapComb();
         inline ValueArrayMapComb(const ValueArrayMapComb& v);
         void operator= (const ValueArrayMapComb& v);
-#line 238
+#line 242
         inline Lang::int64 AsInt() const;
-#line 237
+#line 241
         Text::String AsString() const;
-#line 235
+#line 239
         void Clear();
-#line 233
+#line 554
         void DeepCopyArrayMap(ValueArrayMapComb& am);
-#line 236
+#line 240
         int GetTotal() const;
     };
     
@@ -349,21 +359,33 @@ namespace Interface
         _1 *ptr;
         
     public:
-        ValueTemplate();
-        ValueTemplate(_1 *ptr);
-        ValueTemplate(const _1& obj);
-        ~ValueTemplate();
+        inline ValueTemplate();
+        inline ValueTemplate(_1 *ptr);
+        inline ValueTemplate(const _1& obj);
+        inline ~ValueTemplate();
 #line 80
-        virtual Lang::int64 AsInt() const;
+        inline virtual Lang::int64 AsInt() const;
 #line 79
-        virtual Text::String AsString() const;
+        inline virtual Text::String AsString() const;
 #line 78
-        virtual void *Get();
+        inline virtual void *Get();
     };
 };
 
 namespace Interface
 {
+#line 155
+    template < class _1 >
+    inline Value AsValue(const _1& o)
+    {
+#line 155
+        Value v;
+#line 155
+        v.Create1 < _1 > (o);
+#line 155
+        return v;
+    };
+    
 #line 9
     inline int RegisterTypeNo(const char *type)
     {
@@ -458,27 +480,27 @@ namespace Interface
         return VOID_V;
     };
     
-#line 242
+#line 246
     template <>
     inline Lang::dword ValueTypeNo < ValueArray > (const ValueArray *)
     {
-#line 242
+#line 246
         return VALUEARRAY_V;
     };
     
-#line 244
+#line 248
     template <>
     inline Lang::dword ValueTypeNo < ValueArrayMapComb > (const ValueArrayMapComb *)
     {
-#line 244
+#line 248
         return VALUE_ARRAY_AND_MAP_V;
     };
     
-#line 243
+#line 247
     template <>
     inline Lang::dword ValueTypeNo < ValueMap > (const ValueMap *)
     {
-#line 243
+#line 247
         return VALUEMAP_V;
     };
     
@@ -507,6 +529,16 @@ namespace Interface
     {
 #line 103
         return obj == v.obj;
+    };
+    
+#line 120
+    template < class _1 >
+    inline Value::operator _1 & () const
+    {
+#line 121
+        if (obj && obj -> GetType() == ValueTypeNo < _1 > (0))
+            return *(_1 * ) obj -> Get();
+        throw Text::Exc("Unexpected value type");
     };
     
 #line 152
@@ -546,6 +578,44 @@ namespace Interface
         obj.Clear();
     };
     
+#line 97
+    template < class _1 >
+    inline _1& Value::Create()
+    {
+#line 97
+        ValueTemplate < _1 > * o = new ValueTemplate < _1 > ;
+#line 97
+        _1 * t = (_1 * ) o -> Get();
+#line 97
+        obj.WrapObject(o);
+#line 97
+        return *t;
+    };
+    
+#line 98
+    template < class _1 >
+    inline _1& Value::Create1(const _1& arg)
+    {
+#line 98
+        ValueTemplate < _1 > * o = new ValueTemplate < _1 > (arg);
+#line 98
+        _1 * t = (_1 * ) o -> Get();
+#line 98
+        obj.WrapObject(o);
+#line 98
+        return *t;
+    };
+    
+#line 125
+    template < class _1 >
+    inline _1& Value::Get() const
+    {
+#line 126
+        if (obj && obj -> GetType() == ValueTypeNo < _1 > (0))
+            return *(_1 * ) obj -> Get();
+        throw Text::Exc("Unexpected value type");
+    };
+    
 #line 141
     inline ValueObject *Value::GetObject() const
     {
@@ -564,6 +634,18 @@ namespace Interface
         return VOID_V;
     };
     
+#line 112
+    template < class _1 >
+    inline bool Value::Is() const
+    {
+#line 112
+        if (obj)
+#line 112
+            return obj -> GetType() == ValueTypeNo < _1 > (0);
+#line 112
+        return false;
+    };
+    
 #line 111
     template < class _1 >
     inline void Value::Set(const _1& o)
@@ -572,214 +654,242 @@ namespace Interface
         obj.WrapObject(new ValueTemplate < _1 > (o));
     };
     
-#line 161
+#line 113
+    template < class _1 >
+    inline _1 *Value::Try() const
+    {
+#line 114
+        if (obj && obj -> GetType() == ValueTypeNo < _1 > (0))
+            return(_1 * ) obj -> Get();
+        return 0;
+    };
+    
+#line 163
     inline ValueArray::ValueArray() {};
     
-#line 162
+#line 164
     inline ValueArray::ValueArray(const ValueArray& m)
     {
-#line 162
+#line 164
         *this = m;
     };
     
-#line 163
+#line 165
     inline void ValueArray::operator= (const ValueArray& m)
     {
-#line 163
+#line 165
         values <<= m.values;
     };
     
-#line 171
+#line 174
     inline Value& ValueArray::operator[](int i)
     {
-#line 171
+#line 174
         return values[i];
     };
     
-#line 173
+#line 176
     inline const Value& ValueArray::operator[](int i) const
     {
-#line 173
+#line 176
         return values[i];
     };
     
-#line 166
+#line 168
     inline Value& ValueArray::Add()
     {
-#line 166
+#line 168
         return values.Add();
     };
     
-#line 167
+#line 169
     inline Value& ValueArray::Add(const Value& v)
     {
-#line 167
+#line 169
         return values.Add(v);
     };
     
-#line 180
+#line 170
+    template < class _1 >
+    inline Value& ValueArray::AddAsValue(const _1& o)
+    {
+#line 170
+        return values.Add(AsValue(o));
+    };
+    
+#line 183
     inline Lang::int64 ValueArray::AsInt() const
     {
-#line 180
+#line 183
         return values.GetCount();
     };
     
-#line 172
+#line 175
     inline Value& ValueArray::At(int i)
     {
-#line 172
+#line 175
         return values[i];
     };
     
-#line 174
+#line 177
     inline const Value& ValueArray::At(int i) const
     {
-#line 174
+#line 177
         return values[i];
     };
     
-#line 165
+#line 167
     inline void ValueArray::Clear()
     {
-#line 165
+#line 167
         values.Clear();
     };
     
-#line 170
+#line 173
     inline int ValueArray::GetCount() const
     {
-#line 170
+#line 173
         return values.GetCount();
     };
     
-#line 168
+#line 171
     inline Value& ValueArray::Insert(int i)
     {
-#line 168
+#line 171
         return values.Insert(i);
     };
     
-#line 169
+#line 172
     inline Value& ValueArray::Insert(int i, const Value& v)
     {
-#line 169
+#line 172
         return values.Insert(i, v);
     };
     
-#line 175
+#line 178
     inline bool ValueArray::IsEmpty() const
     {
-#line 175
+#line 178
         return values.IsEmpty();
     };
     
-#line 176
+#line 179
     inline void ValueArray::SetCount(int i)
     {
-#line 176
+#line 179
         values.SetCount(i);
     };
     
-#line 184
+#line 187
     inline Lang::ConstFwdPtrIterator < Value > ValueArray::begin() const
     {
-#line 184
+#line 187
         return values.begin();
     };
     
-#line 182
+#line 185
     inline Lang::FwdPtrIterator < Value > ValueArray::begin()
     {
-#line 182
+#line 185
         return values.begin();
     };
     
     inline Lang::ConstFwdPtrIterator < Value > ValueArray::end() const
     {
-#line 185
+#line 188
         return values.end();
     };
     
-#line 183
+#line 186
     inline Lang::FwdPtrIterator < Value > ValueArray::end()
     {
-#line 183
+#line 186
         return values.end();
     };
     
-#line 230
+#line 234
     inline ValueArrayMapComb::ValueArrayMapComb() {};
     
-#line 231
+#line 235
     inline ValueArrayMapComb::ValueArrayMapComb(const ValueArrayMapComb& v)
     {
-#line 231
+#line 235
         *this = v;
     };
     
-#line 238
+#line 242
     inline Lang::int64 ValueArrayMapComb::AsInt() const
     {
-#line 238
+#line 242
         return GetTotal();
     };
     
-#line 197
+#line 200
     inline ValueMap::ValueMap() {};
     
-#line 198
+#line 201
     inline ValueMap::ValueMap(const ValueMap& m)
     {
-#line 198
+#line 201
         *this = m;
     };
     
-#line 213
+#line 217
     inline Value& ValueMap::operator[](int i)
     {
-#line 213
+#line 217
         return values[i];
     };
     
-#line 215
+#line 219
     inline const Value& ValueMap::operator[](int i) const
     {
-#line 215
+#line 219
         return values[i];
     };
     
-#line 221
+#line 206
+    template < class _1 >
+    inline Value& ValueMap::AddAsValue(Text::String key, const _1& o)
+    {
+#line 206
+        keys.Add(key);
+#line 206
+        return values.Add(AsValue(o));
+    };
+    
+#line 225
     inline Lang::int64 ValueMap::AsInt() const
     {
-#line 221
+#line 225
         return keys.GetCount();
     };
     
-#line 214
+#line 218
     inline Value& ValueMap::At(int i)
     {
-#line 214
+#line 218
         return values[i];
     };
     
-#line 216
+#line 220
     inline const Value& ValueMap::At(int i) const
     {
-#line 216
+#line 220
         return values[i];
     };
     
-#line 212
+#line 216
     inline int ValueMap::GetCount() const
     {
-#line 212
+#line 216
         return values.GetCount();
     };
     
-#line 217
+#line 221
     inline Text::String ValueMap::GetKey(int i) const
     {
-#line 217
+#line 221
         return keys[i];
     };
     
@@ -788,6 +898,97 @@ namespace Interface
     {
 #line 65
         return type;
+    };
+    
+#line 74
+    template < class _1 >
+    inline ValueTemplate < _1 >::ValueTemplate()
+    :
+        is_owned(false),
+        ptr(0)
+    {
+#line 74
+        ptr = new _1;
+#line 74
+        is_owned = true;
+#line 74
+        type = ValueTypeNo < _1 > (0);
+    };
+    
+#line 75
+    template < class _1 >
+    inline ValueTemplate < _1 >::ValueTemplate(_1 *ptr)
+    :
+        is_owned(false),
+        ptr(ptr)
+    {
+#line 75
+        type = ValueTypeNo < _1 > (0);
+    };
+    
+#line 76
+    template < class _1 >
+    inline ValueTemplate < _1 >::ValueTemplate(const _1& obj)
+    :
+        is_owned(false),
+        ptr(0)
+    {
+#line 76
+        ptr = new _1(obj);
+#line 76
+        is_owned = true;
+#line 76
+        type = ValueTypeNo < _1 > (0);
+    };
+    
+#line 77
+    template < class _1 >
+    inline ValueTemplate < _1 >::~ValueTemplate()
+    {
+#line 77
+        if (is_owned && ptr)
+        {
+#line 77
+            delete ptr;
+#line 77
+            ptr = 0;
+#line 77
+            is_owned = false;
+#line 77
+            type = VOID_V;
+        }
+    };
+    
+#line 80
+    template < class _1 >
+    inline Lang::int64 ValueTemplate < _1 >::AsInt() const
+    {
+#line 80
+        if (ptr)
+#line 80
+            return Text::ToInt(*ptr);
+#line 80
+        return 0;
+    };
+    
+#line 79
+    template < class _1 >
+    inline Text::String ValueTemplate < _1 >::AsString() const
+    {
+#line 79
+        if (ptr)
+#line 79
+            return Text::ToString(*ptr);
+#line 79
+        return "NULL";
+    };
+    
+#line 78
+    template < class _1 >
+    inline void *ValueTemplate < _1 >::Get()
+    {
+#line 78
+        return ptr;
     };
     
 };

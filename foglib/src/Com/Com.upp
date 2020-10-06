@@ -33,6 +33,7 @@ file
 	Interface.fog,
 	CompilerBase.fog,
 	Tokenizer.fog,
+	JSON.fog,
 	"C++ Support" readonly separator,
 	Com.h,
 	Com.cpp,

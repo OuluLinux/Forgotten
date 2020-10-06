@@ -267,10 +267,10 @@ namespace Lang
 #line 177
         inline void operator= (const BwdPairIterator& it);
 #line 211
-        inline _2& Value() const;
+        inline _2& GetValue() const;
         
 #line 201
-        inline const _1& Key() const;
+        inline const _1& GetKey() const;
     };
     
     template < class _1, class _2 >
@@ -298,10 +298,10 @@ namespace Lang
 #line 177
         inline void operator= (const BwdPairPtrIterator& it);
 #line 206
-        inline _2& Value() const;
+        inline _2& GetValue() const;
         
 #line 201
-        inline const _1& Key() const;
+        inline const _1& GetKey() const;
     };
     
     template < class _1 >
@@ -418,9 +418,9 @@ namespace Lang
 #line 177
         inline void operator= (const ConstBwdPairIterator& it);
 #line 186
-        inline const _1& Key() const;
+        inline const _1& GetKey() const;
 #line 196
-        inline const _2& Value() const;
+        inline const _2& GetValue() const;
     };
     
     template < class _1, class _2 >
@@ -452,9 +452,9 @@ namespace Lang
 #line 177
         inline void operator= (const ConstBwdPairPtrIterator& it);
 #line 186
-        inline const _1& Key() const;
+        inline const _1& GetKey() const;
 #line 191
-        inline const _2& Value() const;
+        inline const _2& GetValue() const;
     };
     
     template < class _1 >
@@ -561,9 +561,9 @@ namespace Lang
 #line 177
         inline void operator= (const ConstFwdPairIterator& it);
 #line 186
-        inline const _1& Key() const;
+        inline const _1& GetKey() const;
 #line 196
-        inline const _2& Value() const;
+        inline const _2& GetValue() const;
     };
     
     template < class _1, class _2 >
@@ -595,9 +595,9 @@ namespace Lang
 #line 177
         inline void operator= (const ConstFwdPairPtrIterator& it);
 #line 186
-        inline const _1& Key() const;
+        inline const _1& GetKey() const;
 #line 191
-        inline const _2& Value() const;
+        inline const _2& GetValue() const;
     };
     
     template < class _1 >
@@ -829,10 +829,10 @@ namespace Lang
 #line 177
         inline void operator= (const FwdPairIterator& it);
 #line 211
-        inline _2& Value() const;
+        inline _2& GetValue() const;
         
 #line 201
-        inline const _1& Key() const;
+        inline const _1& GetKey() const;
     };
     
     template < class _1, class _2 >
@@ -860,10 +860,10 @@ namespace Lang
 #line 177
         inline void operator= (const FwdPairPtrIterator& it);
 #line 206
-        inline _2& Value() const;
+        inline _2& GetValue() const;
         
 #line 201
-        inline const _1& Key() const;
+        inline const _1& GetKey() const;
     };
     
     template < class _1 >
@@ -1137,7 +1137,7 @@ namespace Lang
     
 #line 201
     template < class _1, class _2 >
-    inline const _1& BwdPairIterator < _1, _2 >::Key() const
+    inline const _1& BwdPairIterator < _1, _2 >::GetKey() const
     {
 #line 201
         return *kit;
@@ -1145,7 +1145,7 @@ namespace Lang
     
 #line 211
     template < class _1, class _2 >
-    inline _2& BwdPairIterator < _1, _2 >::Value() const
+    inline _2& BwdPairIterator < _1, _2 >::GetValue() const
     {
 #line 211
         return *vit;
@@ -1223,7 +1223,7 @@ namespace Lang
     
 #line 201
     template < class _1, class _2 >
-    inline const _1& BwdPairPtrIterator < _1, _2 >::Key() const
+    inline const _1& BwdPairPtrIterator < _1, _2 >::GetKey() const
     {
 #line 201
         return *kit;
@@ -1231,7 +1231,7 @@ namespace Lang
     
 #line 206
     template < class _1, class _2 >
-    inline _2& BwdPairPtrIterator < _1, _2 >::Value() const
+    inline _2& BwdPairPtrIterator < _1, _2 >::GetValue() const
     {
 #line 206
         return **vit;
@@ -1511,7 +1511,7 @@ namespace Lang
     
 #line 186
     template < class _1, class _2 >
-    inline const _1& ConstBwdPairIterator < _1, _2 >::Key() const
+    inline const _1& ConstBwdPairIterator < _1, _2 >::GetKey() const
     {
 #line 186
         return *kit;
@@ -1519,7 +1519,7 @@ namespace Lang
     
 #line 196
     template < class _1, class _2 >
-    inline const _2& ConstBwdPairIterator < _1, _2 >::Value() const
+    inline const _2& ConstBwdPairIterator < _1, _2 >::GetValue() const
     {
 #line 196
         return **vit;
@@ -1597,7 +1597,7 @@ namespace Lang
     
 #line 186
     template < class _1, class _2 >
-    inline const _1& ConstBwdPairPtrIterator < _1, _2 >::Key() const
+    inline const _1& ConstBwdPairPtrIterator < _1, _2 >::GetKey() const
     {
 #line 186
         return *kit;
@@ -1605,7 +1605,7 @@ namespace Lang
     
 #line 191
     template < class _1, class _2 >
-    inline const _2& ConstBwdPairPtrIterator < _1, _2 >::Value() const
+    inline const _2& ConstBwdPairPtrIterator < _1, _2 >::GetValue() const
     {
 #line 191
         return *vit;
@@ -1885,7 +1885,7 @@ namespace Lang
     
 #line 186
     template < class _1, class _2 >
-    inline const _1& ConstFwdPairIterator < _1, _2 >::Key() const
+    inline const _1& ConstFwdPairIterator < _1, _2 >::GetKey() const
     {
 #line 186
         return *kit;
@@ -1893,7 +1893,7 @@ namespace Lang
     
 #line 196
     template < class _1, class _2 >
-    inline const _2& ConstFwdPairIterator < _1, _2 >::Value() const
+    inline const _2& ConstFwdPairIterator < _1, _2 >::GetValue() const
     {
 #line 196
         return **vit;
@@ -1971,7 +1971,7 @@ namespace Lang
     
 #line 186
     template < class _1, class _2 >
-    inline const _1& ConstFwdPairPtrIterator < _1, _2 >::Key() const
+    inline const _1& ConstFwdPairPtrIterator < _1, _2 >::GetKey() const
     {
 #line 186
         return *kit;
@@ -1979,7 +1979,7 @@ namespace Lang
     
 #line 191
     template < class _1, class _2 >
-    inline const _2& ConstFwdPairPtrIterator < _1, _2 >::Value() const
+    inline const _2& ConstFwdPairPtrIterator < _1, _2 >::GetValue() const
     {
 #line 191
         return *vit;
@@ -2958,7 +2958,7 @@ namespace Lang
     
 #line 201
     template < class _1, class _2 >
-    inline const _1& FwdPairIterator < _1, _2 >::Key() const
+    inline const _1& FwdPairIterator < _1, _2 >::GetKey() const
     {
 #line 201
         return *kit;
@@ -2966,7 +2966,7 @@ namespace Lang
     
 #line 211
     template < class _1, class _2 >
-    inline _2& FwdPairIterator < _1, _2 >::Value() const
+    inline _2& FwdPairIterator < _1, _2 >::GetValue() const
     {
 #line 211
         return *vit;
@@ -3044,7 +3044,7 @@ namespace Lang
     
 #line 201
     template < class _1, class _2 >
-    inline const _1& FwdPairPtrIterator < _1, _2 >::Key() const
+    inline const _1& FwdPairPtrIterator < _1, _2 >::GetKey() const
     {
 #line 201
         return *kit;
@@ -3052,7 +3052,7 @@ namespace Lang
     
 #line 206
     template < class _1, class _2 >
-    inline _2& FwdPairPtrIterator < _1, _2 >::Value() const
+    inline _2& FwdPairPtrIterator < _1, _2 >::GetValue() const
     {
 #line 206
         return **vit;

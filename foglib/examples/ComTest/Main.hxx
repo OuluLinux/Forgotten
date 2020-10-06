@@ -32,19 +32,19 @@ namespace Main
 #line 46
         inline void Run();
         
-#line 269
+#line 273
         void TestShared();
         
         struct Dumber
         {
-#line 261
+#line 265
             inline Dumber();
             virtual ~Dumber();
         };
         
         struct Dumb : public Main::App::Dumber
         {
-#line 265
+#line 269
             inline Dumb();
             inline ~Dumb();
         };
@@ -507,20 +507,20 @@ namespace Main
                 {
                     {
 #line 147
-                        if (!(it.Key() == "abc"))
+                        if (!(it.GetKey() == "abc"))
                         {
 #line 147
-                            Lang::SysBreak("Assertion failed: it.Key() == \"abc\"");
+                            Lang::SysBreak("Assertion failed: it.GetKey() == \"abc\"");
                         }
                     }
 #line 148
                     ;
                     {
 #line 148
-                        if (!(it.Value() == 123))
+                        if (!(it.GetValue() == 123))
                         {
 #line 148
-                            Lang::SysBreak("Assertion failed: it.Value() == 123");
+                            Lang::SysBreak("Assertion failed: it.GetValue() == 123");
                         }
                     }
 #line 149
@@ -532,20 +532,20 @@ namespace Main
                 {
                     {
 #line 151
-                        if (!(it.Key() == "def"))
+                        if (!(it.GetKey() == "def"))
                         {
 #line 151
-                            Lang::SysBreak("Assertion failed: it.Key() == \"def\"");
+                            Lang::SysBreak("Assertion failed: it.GetKey() == \"def\"");
                         }
                     }
 #line 152
                     ;
                     {
 #line 152
-                        if (!(it.Value() == 456))
+                        if (!(it.GetValue() == 456))
                         {
 #line 152
-                            Lang::SysBreak("Assertion failed: it.Value() == 456");
+                            Lang::SysBreak("Assertion failed: it.GetValue() == 456");
                         }
                     }
 #line 153
@@ -671,6 +671,10 @@ namespace Main
         {
             TextProc::Tokenizer t;
         }
+        {
+#line 238
+            TextProc::JSON j;
+        }
     };
     
 #line 38
@@ -679,24 +683,24 @@ namespace Main
         a(8)
     {};
     
-#line 265
+#line 269
     inline App::Dumb::Dumb()
     {
-#line 265
+#line 269
         ;
     };
     
-#line 266
+#line 270
     inline App::Dumb::~Dumb()
     {
-#line 266
+#line 270
         ;
     };
     
-#line 261
+#line 265
     inline App::Dumber::Dumber()
     {
-#line 261
+#line 265
         ;
     };
     

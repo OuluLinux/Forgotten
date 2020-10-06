@@ -9,10 +9,10 @@
 
 namespace Interface
 {
-#line 314 "../../src/Com/Interface.fog"
+#line 318 "../../src/Com/Interface.fog"
     Text::String Format(Text::String pattern, Value v0, Value v1, Value v2, Value v3, Value v4, Value v5, Value v6, Value v7)
     {
-#line 315
+#line 319
         static const int MAX_ARGS = 8;
         Value * v[MAX_ARGS] = 
         {
@@ -25,64 +25,64 @@ namespace Interface
             &v6,
             &v7
         };
-#line 318
+#line 322
         if (pattern.IsEmpty())
-#line 318
+#line 322
             return "";
-#line 320
+#line 324
         int arg = 0;
         Text::String out;
         const char * it = pattern.Begin();
         const char * end = pattern.End();
         while (it != end)
             {
-#line 325
+#line 329
                 int chr = *it ++ ;
-#line 328
+#line 332
                 if (chr == 92 && *it == 37)
                 {
-#line 329
+#line 333
                     chr = *it ++ ;
                     out.Cat(chr);
                 }
                 else 
                 if (chr == 37)
                 {
-#line 334
+#line 338
                     int state = FMT_MAIN_SWITCH;
                     int type = FMT_TYPE_INVALID;
                     while (it != end)
                         {
-#line 337
+#line 341
                             chr = *it ++ ;
                             if (state == FMT_MAIN_SWITCH)
                             {
-#line 339
+#line 343
                                 if (chr == 'v')
                                 {
-#line 340
+#line 344
                                     type = FMT_TYPE_VALUE;
                                     break;
                                 
                                 }
                                 else
-#line 343
+#line 347
                                     break;
                             
                             }
                             else
-#line 345
+#line 349
                                 break;
                         
                         }
-#line 347
+#line 351
                     if (type == FMT_TYPE_INVALID)
                         out << "<invalid>";
                     else 
-#line 349
+#line 353
                     if (type == FMT_TYPE_VALUE)
                     {
-#line 350
+#line 354
                         if (arg < MAX_ARGS)
                             out << v[arg ++ ] -> AsString();
                         else
@@ -91,80 +91,80 @@ namespace Interface
                 }
                 else
                 {
-#line 357
+#line 361
                     out.Cat(chr);
                 }
             }
         return out;
     };
     
-#line 248
+#line 252
     Text::String GetValueTreeString(const Value& v, Text::String key, int indent)
     {
-#line 249
+#line 253
         static thread_local Container::Index < void * > visited;
         if (!indent)
             visited.Clear();
-#line 253
+#line 257
         Text::String s;
         for (int i = 0; i < indent; i ++ )
             s.Cat('\t');
         s << key;
-#line 258
+#line 262
         void * obj = v.GetObject();
         if (obj)
         {
-#line 260
+#line 264
             if (visited.Find(obj) >= 0)
                 return s + ": <recursive>\n";
             visited.Add(obj);
         }
-#line 265
+#line 269
         if (v.IsMap())
         {
-#line 266
+#line 270
             s.Cat('\n');
             const ValueMap & map = v.Get < ValueMap > ();
             for (int i = 0; i < map.GetCount(); i ++ )
                 {
-#line 269
+#line 273
                     Text::String key = map.GetKey(i);
                     const Value & v0 = map[i];
                     s << GetValueTreeString(v0, key, indent + 1);
                 }
         }
         else 
-#line 274
+#line 278
         if (v.IsArray())
         {
-#line 275
+#line 279
             s.Cat('\n');
             const ValueArray & arr = v.Get < ValueArray > ();
             for (int i = 0; i < arr.GetCount(); i ++ )
                 {
-#line 278
+#line 282
                     Text::String key = Text::String::IntStr(i);
                     const Value & v0 = arr[i];
                     s << GetValueTreeString(v0, key, indent + 1);
                 }
         }
         else 
-#line 283
+#line 287
         if (v.IsArrayMapComb())
         {
-#line 284
+#line 288
             s.Cat('\n');
             const ValueArrayMapComb & comb = v.Get < ValueArrayMapComb > ();
             for (int i = 0; i < comb.map.GetCount(); i ++ )
                 {
-#line 287
+#line 291
                     Text::String key = comb.map.GetKey(i);
                     const Value & v0 = comb.map[i];
                     s << GetValueTreeString(v0, key, indent + 1);
                 }
             for (int i = 0; i < comb.arr.GetCount(); i ++ )
                 {
-#line 292
+#line 296
                     Text::String key = Text::String::IntStr(i);
                     const Value & v0 = comb.arr[i];
                     s << GetValueTreeString(v0, key, indent + 1);
@@ -172,13 +172,13 @@ namespace Interface
         }
         else
         {
-#line 298
+#line 302
             s << ": " << v.AsString() << "\n";
         }
-#line 301
+#line 305
         if (obj)
             visited.RemoveLast();
-#line 304
+#line 308
         return s;
     };
     
@@ -191,64 +191,167 @@ namespace Interface
         s = str;
     };
     
-#line 120
-    template < class _1 >
-    Value::operator _1 & () const
+#line 139
+    Value *Value::AddMapSub(Text::String key, Value *def)
     {
-#line 121
-        if (obj && obj -> GetType() == ValueTypeNo < _1 > (0))
-            return *(_1 * ) obj -> Get();
-        throw Text::Exc("Unexpected value type");
+#line 480
+        if (IsMap() || IsArrayMapComb())
+        {
+#line 481
+            ValueMap * map;
+            if (IsMap())
+#line 482
+                map = &Get < ValueMap > ();
+            else
+#line 483
+                map = &Get < ValueArrayMapComb > ().map;
+            int i = map -> Find(key);
+            if (i >= 0)
+                return 0;
+            else 
+#line 487
+            if (def)
+                return&map -> Add(key, *def);
+            else
+                return&map -> Add(key);
+        }
+        else
+#line 492
+            return 0;
     };
     
-#line 97
-    template < class _1 >
-    _1& Value::Create()
+#line 388
+    ValueArray& Value::CreateArray()
     {
-#line 97
-        ValueTemplate < _1 > * o = new ValueTemplate < _1 > ;
-#line 97
-        _1 * t = (_1 * ) o -> Get();
-#line 97
-        obj.WrapObject(o);
-#line 97
-        return *t;
+#line 389
+        Create < ValueArray > ();
+        return GetArray();
     };
     
-#line 98
-    template < class _1 >
-    _1& Value::Create1(const _1& arg)
+#line 383
+    ValueMap& Value::CreateMap()
     {
-#line 98
-        ValueTemplate < _1 > * o = new ValueTemplate < _1 > (arg);
-#line 98
-        _1 * t = (_1 * ) o -> Get();
-#line 98
-        obj.WrapObject(o);
-#line 98
-        return *t;
+#line 384
+        Create < ValueMap > ();
+        return GetMap();
     };
     
-#line 125
-    template < class _1 >
-    _1& Value::Get() const
+#line 511
+    void Value::DeepCopyArrayMap(Value v)
     {
-#line 126
-        if (obj && obj -> GetType() == ValueTypeNo < _1 > (0))
-            return *(_1 * ) obj -> Get();
-        throw Text::Exc("Unexpected value type");
+#line 512
+        if (v.IsArray())
+            CreateArray().DeepCopyArrayMap(v.GetArray());
+        else 
+#line 514
+        if (v.IsMap())
+            CreateMap().DeepCopyArrayMap(v.GetMap());
+        else
+#line 516
+            *this = v;
     };
     
-#line 112
-    template < class _1 >
-    bool Value::Is() const
+#line 140
+    Value *Value::GetAddMapSub(Text::String key, Value *def)
     {
-#line 112
-        if (obj)
-#line 112
-            return obj -> GetType() == ValueTypeNo < _1 > (0);
-#line 112
-        return false;
+#line 496
+        if (IsMap() || IsArrayMapComb())
+        {
+#line 497
+            ValueMap * map;
+            if (IsMap())
+#line 498
+                map = &Get < ValueMap > ();
+            else
+#line 499
+                map = &Get < ValueArrayMapComb > ().map;
+            int i = map -> Find(key);
+            if (i >= 0)
+                return&map -> At(i);
+            else 
+#line 503
+            if (def)
+                return&map -> Add(key, *def);
+            else
+                return&map -> Add(key);
+        }
+        else
+#line 508
+            return 0;
+    };
+    
+#line 459
+    ValueArray& Value::GetArray()
+    {
+#line 460
+        if (!Is < ValueArray > ())
+            throw Text::Exc("Not a ValueArray");
+        return Get < ValueArray > ();
+    };
+    
+#line 447
+    const ValueArray& Value::GetArray() const
+    {
+#line 448
+        if (!Is < ValueArray > ())
+            throw Text::Exc("Not a ValueArray");
+        return Get < ValueArray > ();
+    };
+    
+    ValueMap& Value::GetMap()
+    {
+#line 454
+        if (!Is < ValueMap > ())
+            throw Text::Exc("Not a ValueMap");
+        return Get < ValueMap > ();
+    };
+    
+#line 441
+    const ValueMap& Value::GetMap() const
+    {
+#line 442
+        if (!Is < ValueMap > ())
+            throw Text::Exc("Not a ValueMap");
+        return Get < ValueMap > ();
+    };
+    
+#line 138
+    Value *Value::GetMapSub(Text::String key, Value *def)
+    {
+#line 466
+        if (IsMap() || IsArrayMapComb())
+        {
+#line 467
+            ValueMap * map;
+            if (IsMap())
+#line 468
+                map = &Get < ValueMap > ();
+            else
+#line 469
+                map = &Get < ValueArrayMapComb > ().map;
+            int i = map -> Find(key);
+            if (i >= 0)
+                return&map -> At(i);
+            else
+                return 0;
+        }
+        else
+#line 476
+            return 0;
+    };
+    
+#line 393
+    bool Value::IsArray() const
+    {
+#line 394
+        return Is < ValueArray > ();
+    };
+    
+#line 401
+    bool Value::IsArrayMapComb() const
+    {
+#line 402
+        return Is < ValueArrayMapComb > ();
     };
     
 #line 148
@@ -263,6 +366,13 @@ namespace Interface
     {
 #line 149
         return !obj.IsEmpty() && obj -> GetType() == INT64_V;
+    };
+    
+#line 397
+    bool Value::IsMap() const
+    {
+#line 398
+        return Is < ValueMap > ();
     };
     
 #line 147
@@ -283,198 +393,297 @@ namespace Interface
         return true;
     };
     
-#line 113
-    template < class _1 >
-    _1 *Value::Try() const
+#line 423
+    ValueArray *Value::TryGetArray()
     {
-#line 114
-        if (obj && obj -> GetType() == ValueTypeNo < _1 > (0))
-            return(_1 * ) obj -> Get();
-        return 0;
+#line 424
+        if (IsArray())
+            return&Get < ValueArray > ();
+        else 
+#line 426
+        if (IsArrayMapComb())
+            return&Get < ValueArrayMapComb > ().arr;
+        else
+            return 0;
     };
     
-#line 179
+#line 405
+    const ValueArray *Value::TryGetArray() const
+    {
+#line 406
+        if (IsArray())
+            return&Get < ValueArray > ();
+        else 
+#line 408
+        if (IsArrayMapComb())
+            return&Get < ValueArrayMapComb > ().arr;
+        else
+            return 0;
+    };
+    
+#line 432
+    ValueMap *Value::TryGetMap()
+    {
+#line 433
+        if (IsMap())
+            return&Get < ValueMap > ();
+        else 
+#line 435
+        if (IsArrayMapComb())
+            return&Get < ValueArrayMapComb > ().map;
+        else
+            return 0;
+    };
+    
+#line 414
+    const ValueMap *Value::TryGetMap() const
+    {
+#line 415
+        if (IsMap())
+            return&Get < ValueMap > ();
+        else 
+#line 417
+        if (IsArrayMapComb())
+            return&Get < ValueArrayMapComb > ().map;
+        else
+            return 0;
+    };
+    
+#line 182
     Text::String ValueArray::AsString() const
     {
-#line 179
+#line 182
         Text::String s;
-#line 179
+#line 182
         s << "ValueArray(" << values.GetCount() << ")";
-#line 179
+#line 182
         return s;
     };
     
-#line 232
+#line 528
+    void ValueArray::DeepCopyArrayMap(ValueArray& arr)
+    {
+#line 529
+        Clear();
+        SetCount(arr.GetCount());
+        for (int i = 0; i < GetCount(); i ++ )
+            {
+#line 532
+                Value & from = arr.At(i);
+                Value & dst = At(i);
+                dst.DeepCopyArrayMap(from);
+            }
+    };
+    
+#line 236
     void ValueArrayMapComb::operator= (const ValueArrayMapComb& v)
     {
-#line 232
+#line 236
         arr = v.arr;
-#line 232
+#line 236
         map = v.map;
     };
     
-#line 237
+#line 241
     Text::String ValueArrayMapComb::AsString() const
     {
-#line 237
+#line 241
         Text::String s;
-#line 237
+#line 241
         s << "ValueArrayMapComb(" << arr.GetCount() << ", " << map.GetCount() << ")";
-#line 237
+#line 241
         return s;
     };
     
-#line 235
+#line 239
     void ValueArrayMapComb::Clear()
     {
-#line 235
+#line 239
         arr.Clear();
-#line 235
+#line 239
         map.Clear();
     };
     
-#line 236
+#line 554
+    void ValueArrayMapComb::DeepCopyArrayMap(ValueArrayMapComb& am)
+    {
+#line 555
+        Clear();
+        arr.SetCount(am.arr.GetCount());
+        for (int i = 0; i < arr.GetCount(); i ++ )
+            {
+#line 558
+                Value & from = am.arr.At(i);
+                Value & dst = arr.At(i);
+                dst.DeepCopyArrayMap(from);
+            }
+        for (int i = 0; i < am.map.GetCount(); i ++ )
+            {
+#line 563
+                Text::String key = am.map.GetKey(i);
+                Value & from = am.map.At(i);
+                Value & dst = map.Add(key);
+                dst.DeepCopyArrayMap(from);
+            }
+    };
+    
+#line 240
     int ValueArrayMapComb::GetTotal() const
     {
-#line 236
+#line 240
         return arr.GetCount() + map.GetCount();
     };
     
-#line 199
+#line 202
     void ValueMap::operator= (const ValueMap& m)
     {
-#line 199
+#line 202
         keys <<= m.keys;
-#line 199
+#line 202
         values <<= m.values;
     };
     
     Value& ValueMap::Add(Text::String key)
     {
-#line 202
+#line 205
         keys.Add(key);
-#line 202
+#line 205
         return values.Add();
     };
     
-#line 201
+#line 204
     Value& ValueMap::Add(Text::String key, Value v)
     {
-#line 201
+#line 204
         keys.Add(key);
-#line 201
+#line 204
         return values.Add(v);
     };
     
-#line 220
+#line 224
     Text::String ValueMap::AsString() const
     {
-#line 220
+#line 224
         Text::String s;
-#line 220
+#line 224
         s << "ValueMap(" << keys.GetCount() << ")";
-#line 220
+#line 224
         return s;
     };
     
-#line 211
+#line 215
     void ValueMap::Clear()
     {
-#line 211
+#line 215
         keys.Clear();
-#line 211
+#line 215
         values.Clear();
     };
     
-#line 207
+#line 541
+    void ValueMap::DeepCopyArrayMap(ValueMap& map)
+    {
+#line 542
+        Clear();
+        for (int i = 0; i < map.GetCount(); i ++ )
+            {
+#line 544
+                Text::String key = map.GetKey(i);
+                Value & from = map.At(i);
+                Value & dst = Add(key);
+                dst.DeepCopyArrayMap(from);
+            }
+    };
+    
+#line 211
     int ValueMap::Find(Text::String key) const
     {
-#line 207
+#line 211
         for (int i = 0; i < keys.GetCount(); i ++ )
-#line 207
+#line 211
             if (keys[i] == key)
-#line 207
+#line 211
                 return i;
-#line 207
+#line 211
         return - 1;
     };
     
-#line 208
+#line 212
     Value& ValueMap::Get(Text::String key)
     {
-#line 208
+#line 212
         int i = Find(key);
-#line 208
+#line 212
         if (i == - 1)
-#line 208
+#line 212
             throw Text::Exc("Unexpected key");
-#line 208
+#line 212
         return values[i];
     };
     
-#line 203
+#line 207
     Value& ValueMap::GetAdd(Text::String key)
     {
-#line 203
+#line 207
         int i = Find(key);
-#line 203
+#line 207
         if (i >= 0)
-#line 203
+#line 207
             return values[i];
-#line 203
+#line 207
         return Add(key);
     };
     
-#line 204
+#line 208
     Value& ValueMap::GetAdd(Text::String key, const Value& def)
     {
-#line 204
+#line 208
         int i = Find(key);
-#line 204
+#line 208
         if (i >= 0)
-#line 204
+#line 208
             return values[i];
-#line 204
+#line 208
         return Add(key, def);
     };
     
-#line 209
+#line 213
     int ValueMap::GetPos(Value *v) const
     {
-#line 209
+#line 213
         for (int i = 0; i < values.GetCount(); i ++ )
-#line 209
+#line 213
             if (&values[i] == v)
-#line 209
+#line 213
                 return i;
-#line 209
+#line 213
         return - 1;
     };
     
-#line 206
+#line 210
     Value *ValueMap::TryFind(Text::String key)
     {
-#line 206
+#line 210
         int i = Find(key);
-#line 206
+#line 210
         if (i >= 0)
-#line 206
+#line 210
             return&At(i);
-#line 206
+#line 210
         return 0;
     };
     
-#line 205
+#line 209
     Value ValueMap::TryGet(Text::String key, Value def)
     {
-#line 205
+#line 209
         int i = Find(key);
-#line 205
+#line 209
         if (i >= 0)
-#line 205
+#line 209
             return At(i);
         else
-#line 205
+#line 209
             return def;
     };
     
@@ -500,97 +709,6 @@ namespace Interface
     {
 #line 62
         return 0;
-    };
-    
-#line 74
-    template < class _1 >
-    ValueTemplate < _1 >::ValueTemplate()
-    :
-        is_owned(false),
-        ptr(0)
-    {
-#line 74
-        ptr = new _1;
-#line 74
-        is_owned = true;
-#line 74
-        type = ValueTypeNo < _1 > (0);
-    };
-    
-#line 75
-    template < class _1 >
-    ValueTemplate < _1 >::ValueTemplate(_1 *ptr)
-    :
-        is_owned(false),
-        ptr(ptr)
-    {
-#line 75
-        type = ValueTypeNo < _1 > (0);
-    };
-    
-#line 76
-    template < class _1 >
-    ValueTemplate < _1 >::ValueTemplate(const _1& obj)
-    :
-        is_owned(false),
-        ptr(0)
-    {
-#line 76
-        ptr = new _1(obj);
-#line 76
-        is_owned = true;
-#line 76
-        type = ValueTypeNo < _1 > (0);
-    };
-    
-#line 77
-    template < class _1 >
-    ValueTemplate < _1 >::~ValueTemplate()
-    {
-#line 77
-        if (is_owned && ptr)
-        {
-#line 77
-            delete ptr;
-#line 77
-            ptr = 0;
-#line 77
-            is_owned = false;
-#line 77
-            type = VOID_V;
-        }
-    };
-    
-#line 80
-    template < class _1 >
-    Lang::int64 ValueTemplate < _1 >::AsInt() const
-    {
-#line 80
-        if (ptr)
-#line 80
-            return Text::ToInt(*ptr);
-#line 80
-        return 0;
-    };
-    
-#line 79
-    template < class _1 >
-    Text::String ValueTemplate < _1 >::AsString() const
-    {
-#line 79
-        if (ptr)
-#line 79
-            return Text::ToString(*ptr);
-#line 79
-        return "NULL";
-    };
-    
-#line 78
-    template < class _1 >
-    void *ValueTemplate < _1 >::Get()
-    {
-#line 78
-        return ptr;
     };
     
 };

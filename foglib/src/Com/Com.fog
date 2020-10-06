@@ -43,6 +43,7 @@ using "Com/Network.fog";
 using "Com/Interface.fog";
 using "Com/CompilerBase.fog";
 using "Com/Tokenizer.fog";
+using "Com/JSON.fog";
 
 /*
 Core:
@@ -74,6 +75,7 @@ Core:
 					free legal movies, video, audio, news (youtube-dl? soundcloud? bookmarks?)
 					entertaining social media (twitter? instagram? tiktok? pinterest? etc.)
 	MediaPlayer / FFMpeg
+		Stream server
 	Simple sound fx & music (the simplest fm synth)
 	Game gfx drawer (draw something like in commander keen (+ topdown  & bike & skateboard))
 	

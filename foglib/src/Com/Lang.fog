@@ -183,32 +183,32 @@ auto declaration MakePairIterator(bool is_const, bool is_ptr, identifier name, n
 			typedef const K ConstK;
 			typedef const V ConstV;
 			const K* kit;
-			public inline const K& Key() const {return *kit;}
+			public inline const K& GetKey() const {return *kit;}
 			public inline bool operator!=(const ${name}& it) const {return it.kit != kit;}
 			auto if ($is_ptr) {
 				const V* vit;
 				public inline ${name}(const K* kit, const V* vit) : kit(kit), vit(vit) {}
-				public inline const V& Value() const {return *vit;}
+				public inline const V& GetValue() const {return *vit;}
 			}
 			else {
 				const V** vit;
 				public inline ${name}(const K* kit, const V** vit) : kit(kit), vit(vit) {}
-				public inline const V& Value() const {return **vit;}
+				public inline const V& GetValue() const {return **vit;}
 			}
 		}
 		else {
 			const K* kit;
-			const K& Key() const {return *kit;}
+			const K& GetKey() const {return *kit;}
 			public inline bool operator!=(const ${name}& it) const {return it.kit != kit;}
 			auto if ($is_ptr) {
 				V** vit;
 				public inline ${name}(const K* kit, V** vit) : kit(kit), vit(vit) {}
-				public inline V& Value() const {return **vit;}
+				public inline V& GetValue() const {return **vit;}
 			}
 			else {
 				V* vit;
 				public inline ${name}(const K* kit, V* vit) : kit(kit), vit(vit) {}
-				public inline V& Value() const {return *vit;}
+				public inline V& GetValue() const {return *vit;}
 			}
 		}
 	};

@@ -198,7 +198,233 @@ namespace TextProc
         return Lang::Memory::Compare(this, &t, sizeof (FileLocation)) == 0;
     };
     
+#line 8 "../../src/Com/JSON.fog"
+    Interface::Value JSON::ParseArray(TextProc::Tokenizer& tk)
+    {
+#line 9
+        Interface::Value ret;
+        Interface::ValueArray & arr = ret.CreateArray();
+#line 12
+        tk.PassToken('[');
+#line 14
+        while (!tk.IsToken(']'))
+            {
+                if (tk.IsToken(TextProc::TK_BRACKET_BEGIN))
+                {
+#line 17
+                    arr.Add(ParseMap(tk));
+                }
+                else 
+#line 19
+                if (tk.IsToken(TextProc::TK_SQUARE_BEGIN))
+                {
+#line 20
+                    arr.Add(ParseArray(tk));
+                }
+                else 
+#line 22
+                if (tk.IsToken(TextProc::TK_ID))
+                {
+#line 23
+                    Text::String value = tk.ReadId();
+                    if (value == "true")
+                        arr.AddAsValue(true);
+                    else 
+#line 26
+                    if (value == "false")
+                        arr.AddAsValue(false);
+                    else
+                        arr.AddAsValue(value);
+                }
+                else 
+#line 31
+                if (tk.IsToken(TextProc::TK_INTEGER))
+                {
+#line 32
+                    Lang::int64 value = tk.ReadInt();
+                    arr.AddAsValue(value);
+                }
+                else 
+#line 35
+                if (tk.IsToken(TextProc::TK_FLOAT) || tk.IsToken(TextProc::TK_DOUBLE))
+                {
 #line 36
+                    double value = tk.ReadDouble();
+                    arr.AddAsValue(value);
+                }
+                else 
+#line 39
+                if (tk.IsToken(TextProc::TK_STRING))
+                {
+#line 40
+                    Text::String value = tk.ReadString();
+                    arr.AddAsValue(value);
+                }
+                else
+                {
+#line 44
+                    throw Text::Exc("Unexpected token");
+                }
+#line 47
+                tk.TryPassToken(TextProc::TK_COMMA);
+            }
+#line 50
+        tk.PassToken(']');
+#line 52
+        return ret;
+    };
+    
+#line 115
+    Interface::Value JSON::ParseJSON(Text::String json)
+    {
+#line 116
+        Interface::Value v;
+#line 118
+        TextProc::Tokenizer tk;
+        tk.SkipComments();
+        tk.SkipNewLines();
+        tk.SkipSeparateUnary();
+#line 123
+        if (!tk.Load(json, "json"))
+        {
+            {
+#line 124
+                Util::Log() << "Warning: Json tokenization failed" << "\n";
+#line 124
+                Util::Log().Flush();
+            }
+#line 125
+            ;
+#line 125
+            for (int i = 0; i < tk.messages.GetCount(); i ++ )
+                {
+#line 126
+                    ProcMsg & e = tk.messages[i];
+                    {
+#line 127
+                        Util::Log() << "\t" << i << ": " << e.line << ":" << e.col << ": " << e.msg << "\n";
+#line 127
+                        Util::Log().Flush();
+                    }
+#line 128
+                    ;
+                }
+        }
+        try
+        {
+#line 132
+            v = ParseMap(tk);
+        }
+        catch (Text::Exc e)
+        {
+#line 135
+            tk.Dump();
+            {
+#line 136
+                Util::Log() << "Error: Json parsing failed at " << tk.GetPassCursor() << ": " << e << "\n";
+#line 136
+                Util::Log().Flush();
+            }
+#line 137
+            ;
+        }
+        return v;
+    };
+    
+#line 55
+    Interface::Value JSON::ParseMap(TextProc::Tokenizer& tk)
+    {
+#line 56
+        Interface::Value ret;
+        Interface::ValueMap & vm = ret.CreateMap();
+#line 59
+        tk.PassToken(TextProc::TK_BRACKET_BEGIN);
+#line 61
+        while (!tk.IsToken(TextProc::TK_BRACKET_END))
+            {
+#line 62
+                Text::String key;
+                if (tk.IsToken(TextProc::TK_ID))
+                    key = tk.ReadId();
+                else
+                    key = tk.ReadString();
+#line 68
+                if (tk.IsToken(TextProc::TK_COMMA) || tk.IsToken(TextProc::TK_BRACKET_END))
+                {
+#line 69
+                    tk.TryPassToken(TextProc::TK_COMMA);
+                    vm.Add(key);
+                    continue;
+                
+                }
+                tk.PassToken(TextProc::TK_COLON);
+#line 76
+                if (tk.IsToken(TextProc::TK_BRACKET_BEGIN))
+                {
+#line 77
+                    vm.Add(key, ParseMap(tk));
+                }
+                else 
+#line 79
+                if (tk.IsToken(TextProc::TK_SQUARE_BEGIN))
+                {
+#line 80
+                    vm.Add(key, ParseArray(tk));
+                }
+                else 
+#line 82
+                if (tk.IsToken(TextProc::TK_ID))
+                {
+#line 83
+                    Text::String value = tk.ReadId();
+                    if (value == "true")
+                        vm.AddAsValue(key, true);
+                    else 
+#line 86
+                    if (value == "false")
+                        vm.AddAsValue(key, false);
+                    else
+                        vm.AddAsValue(key, value);
+                }
+                else 
+#line 91
+                if (tk.IsToken(TextProc::TK_INTEGER))
+                {
+#line 92
+                    Lang::int64 value = tk.ReadInt();
+                    vm.AddAsValue(key, value);
+                }
+                else 
+#line 95
+                if (tk.IsToken(TextProc::TK_FLOAT) || tk.IsToken(TextProc::TK_DOUBLE))
+                {
+#line 96
+                    double value = tk.ReadDouble();
+                    vm.AddAsValue(key, value);
+                }
+                else 
+#line 99
+                if (tk.IsToken(TextProc::TK_STRING))
+                {
+#line 100
+                    Text::String value = tk.ReadString();
+                    vm.AddAsValue(key, value);
+                }
+                else
+                {
+#line 104
+                    throw Text::Exc("Unexpected token");
+                }
+#line 107
+                tk.TryPassToken(TextProc::TK_COMMA);
+            }
+#line 110
+        tk.PassToken(TextProc::TK_BRACKET_END);
+#line 112
+        return ret;
+    };
+    
+#line 36 "../../src/Com/CompilerBase.fog"
     ProcMsg::ProcMsg(Text::String source, FileLocation loc, int severity, Text::String msg)
     :
         severity(0)

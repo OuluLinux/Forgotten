@@ -144,12 +144,12 @@ class App {
 		FwdPairPtrIterator<String,int> it = amap.Begin();
 		for(int i = 0; i < 2; i++) {
 			if (i == 0) {
-				ASSERT(it.Key() == "abc");
-				ASSERT(it.Value() == 123);
+				ASSERT(it.GetKey() == "abc");
+				ASSERT(it.GetValue() == 123);
 			}
 			else if (i == 1) {
-				ASSERT(it.Key() == "def");
-				ASSERT(it.Value() == 456);
+				ASSERT(it.GetKey() == "def");
+				ASSERT(it.GetValue() == 456);
 			}
 			++it;
 		}
@@ -232,6 +232,10 @@ class App {
 		{
 			Tokenizer t;
 			
+		}
+		
+		{
+			JSON j;
 		}
 		
 		/* TODO
