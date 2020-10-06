@@ -104,6 +104,26 @@ uint64 MilliSeconds() {
 	return (int)std::chrono::duration_cast<std::chrono::milliseconds>(p2.time_since_epoch()).count();
 }
 
+void GetSysTime(short& year, byte& mon, byte& day, byte& hour, byte& min, byte& sec) {
+	time_t rawtime;
+	
+	time(&rawtime);
+	
+	struct tm tmp;
+	#ifdef flagWIN32
+	localtime_s(&tmp, &rawtime);
+	#else
+	tmp = *localtime(&rawtime);
+	#endif
+	
+	year	= 1900 + tmp.tm_year;
+	mon		= 1 + tmp.tm_mon;
+	day		= tmp.tm_mday;
+	hour	= tmp.tm_hour;
+	min		= tmp.tm_min;
+	sec		= tmp.tm_sec;
+}
+
 struct HighResTimePoint {
 	high_resolution_clock::time_point start;
 	

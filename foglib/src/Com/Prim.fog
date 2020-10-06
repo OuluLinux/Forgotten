@@ -13,7 +13,7 @@ template<class T> inline struct CPtr {
 	bool operator==(const CPtr& p) const {return value == p.value;}
 	bool operator==(void* p) const {return (void*)value == p;}
 	
-	auto if ($IsDefined("CPU64"))
+	auto if (flagCPU64)
 		unsigned long long Int() const {return (unsigned long long)value;}
 	else
 		unsigned long Int() const {return (unsigned long)value;}

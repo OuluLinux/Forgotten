@@ -9,10 +9,10 @@
 
 extern "C"
 {
-#line 120 "../../src/Com/Meta.fog"
+#line 148 "../../src/Com/Meta.fog"
     int main(int argc, const char **argv)
     {
-#line 121
+#line 149
         Util::Env & e = Util::Env::Local();
         e.Init(argc, argv);
         Main::App().Run();

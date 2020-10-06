@@ -9,7 +9,18 @@
 
 namespace Chrono
 {
-#line 282 "../../src/Com/Chrono.fog"
+#line 48 "../../src/Com/Chrono.fog"
+    Time GetSysTime()
+    {
+#line 48
+        Time t;
+#line 48
+        Native::GetSysTime(t.year, t.month, t.day, t.hour, t.min, t.sec);
+#line 48
+        return t;
+    };
+    
+#line 282
     Text::String GetTimeDurationString(Time begin, Time end)
     {
 #line 283
@@ -19,10 +30,10 @@ namespace Chrono
         return t.AsDiffString();
     };
     
-#line 17
+#line 15
     bool Date::operator== (const Date& d) const
     {
-#line 17
+#line 15
         return year == d.year && month == d.month && day == d.day;
     };
     
@@ -245,10 +256,10 @@ namespace Chrono
         }
     };
     
-#line 43
+#line 41
     bool Time::operator== (const Time& t) const
     {
-#line 43
+#line 41
         return hour == t.hour && min == t.min && sec == t.sec;
     };
     
@@ -380,17 +391,17 @@ namespace Chrono
         return Text::String::IntStr(day) + "." + Text::String::IntStr(month) + "." + Text::String::IntStr(day) + " " + Text::String::IntStr(hour) + ":" + Text::String(m) + ":" + Text::String(s);
     };
     
-#line 39
+#line 37
     Lang::int64 Time::Get() const
     {
-#line 39
+#line 37
         return Date::Get() * (Lang::int64)24 * 3600 + hour * 3600 + min * 60 + sec;
     };
     
-#line 40
+#line 38
     Lang::uint32 Time::GetHashValue()
     {
-#line 40
+#line 38
         return sec + 32 * (min + 32 * (hour + 16 * (day + 32 * (month + 8 * year))));
     };
     

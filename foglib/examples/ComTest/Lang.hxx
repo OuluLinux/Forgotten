@@ -40,99 +40,99 @@ namespace Lang
 
 namespace Lang
 {
-#line 145 "../../src/Com/Meta.fog"
+#line 173 "../../src/Com/Meta.fog"
     typedef unsigned char byte;
     
-#line 146
+#line 174
     extern byte ____unused_byte;
 };
 
 namespace Lang
 {
-#line 145
+#line 173
     typedef unsigned int uint32;
-#line 145
+#line 173
     typedef uint32 dword;
     
-#line 146
+#line 174
     extern dword ____unused_dword;
 };
 
 namespace Lang
 {
-#line 145
+#line 173
     typedef short int16;
     
-#line 146
+#line 174
     extern int16 ____unused_int16;
 };
 
 namespace Lang
 {
-#line 145
+#line 173
     typedef int int32;
     
-#line 146
+#line 174
     extern int32 ____unused_int32;
 };
 
 namespace Lang
 {
-#line 145
+#line 173
     typedef long long int64;
     
-#line 146
+#line 174
     extern int64 ____unused_int64;
 };
 
 namespace Lang
 {
-#line 145
+#line 173
     typedef char int8;
     
-#line 146
+#line 174
     extern int8 ____unused_int8;
 };
 
 namespace Lang
 {
-#line 145
+#line 173
     typedef unsigned long long uint64;
-#line 145
+#line 173
     typedef uint64 qword;
     
-#line 146
+#line 174
     extern qword ____unused_qword;
 };
 
 namespace Lang
 {
-#line 145
+#line 173
     typedef unsigned short uint16;
     
-#line 146
+#line 174
     extern uint16 ____unused_uint16;
-#line 146
+#line 174
     extern uint32 ____unused_uint32;
-#line 146
+#line 174
     extern uint64 ____unused_uint64;
 };
 
 namespace Lang
 {
-#line 145
+#line 173
     typedef unsigned char uint8;
     
-#line 146
+#line 174
     extern uint8 ____unused_uint8;
 };
 
 namespace Lang
 {
-#line 145
+#line 173
     typedef uint16 word;
     
-#line 146
+#line 174
     extern word ____unused_word;
     
 #line 33 "../../src/Com/Lang.fog"

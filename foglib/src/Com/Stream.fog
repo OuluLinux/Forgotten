@@ -14,7 +14,7 @@ namespace Stream {
 
 !inline struct CharStream : public StreamBase {
 	
-	CharStream& operator << (String s) {s.Serialize(*this); return *this;}
+	CharStream& operator << (String s) {Put(s.Begin(), s.GetCount()); return *this;}
 	CharStream& operator << (const char* s) {Serialize(s, *this); return *this;}
 	CharStream& operator << (int i) {IntStr(i).Serialize(*this); return *this;}
 	String GetString(int size) {
@@ -133,8 +133,9 @@ public:
 	virtual bool IsOpen() const { return s != NULL; }
 	virtual bool IsEof() { if (!s) return true; return Native::IsFileEnd(s); }
 
-	bool Open(String path) {
+	bool Open(String path, bool append=false) {
 		if (s) Native::FileClose(s);
+		Native::FileOpen(&s, path.Begin(), true, append);
 		return s != NULL;
 	}
 

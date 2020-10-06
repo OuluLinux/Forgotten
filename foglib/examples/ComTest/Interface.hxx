@@ -3,6 +3,9 @@
 
 #include <new>
 
+#ifndef CHRONO_HXX
+#include <Chrono.hxx>
+#endif
 #ifndef NETWORK_HXX
 #include <Network.hxx>
 #endif

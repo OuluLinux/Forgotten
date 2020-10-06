@@ -122,7 +122,7 @@ auto declaration auto_statements(identifier prefix) {
 	auto for (int i = 5; i < 16; i++)
 		auto if (i == 7)
 			auto continue;
-		else if (i == 9)
+		else auto if (i == 9)
 			auto break;
 		else
 			int ${prefix}
@@ -191,16 +191,6 @@ const char *strings2[] = { $to_string('9'), $to_string(a), $to_string(9), $to_st
 const char *strings3[] = { ""'9', ""a, ""9, """9" }; 
 
 
-/*
-
-	C preprocessor definitions
-	
-*/
-auto bool defined(identifier key) {
-	if ($std::defined(key))
-		return true;
-	TODO
-}
 
 /*
 
@@ -595,9 +585,9 @@ auto Monitor::~Monitor() {
 		auto for (iterator f = $functions(); f; ++f) {
 			auto if (f->is_static())
 				;
-			else if (f->is_volatile())
+			else auto if (f->is_volatile())
 				;
-			else if (f->is_const()) {
+			else auto if (f->is_const()) {
 				$f->specifier() : { entry { ReadOnlyLock aLock(_monitor); } };
 			} else {
 				$f->specifier() : { entry { ReadWriteLock aLock(_monitor); } };

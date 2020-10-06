@@ -2,23 +2,51 @@
 //auto number M_PI		= 3.141592654;
 //auto number M_2PI		= 6.283185307;
 
+auto character to_character(token t) { $t }
+auto identifier to_identifier(token t) { $t }
+auto identifier id_from_str(string t) { $t }
+auto number to_number(token t) { $t }
+auto string to_string(token t) { $t }
+auto type to_type(token t) { $t }
+
+
 auto string PLATFORM	= "UNKNOWN";
 auto number CPU_32		= 0;
 auto number CPU_64		= 0;
 auto number PTRSIZE		= 0;
 
+#define flagWIN32	0
+#define flagPOSIX	0
+#define flagCPU64	0
+#define flagCPU32	0
+#if WIN32
+	#undef flagWIN32
+	#define flagWIN32	1
+#else
+#if POSIX
+	#undef flagPOSIX
+	#define flagPOSIX	1
+#endif
+#if CPU32
+	#undef flagCPU32
+	#define flagCPU32	1
+#endif
+#if CPU64
+	#undef flagCPU64
+	#define flagCPU64	1
+#endif
 
-auto bool IsDefined(identifier id) {$std::defined(id);}
+
 auto statement DebugMetaLog(string s) {auto if (true) auto $std::diagnostic($s);};
 
 
-auto if ($IsDefined("CPU64")) {
+auto if (flagCPU64) {
 	$DebugMetaLog("Using 64bit cpu");
 	
 	auto CPU_64 = 1;
 	auto PTRSIZE = 8;
 }
-else if ($IsDefined("CPU32")) {
+else auto if (flagCPU32) {
 	$DebugMetaLog("Using 32bit cpu");
 	
 	auto CPU_64 = 1;
@@ -26,7 +54,7 @@ else if ($IsDefined("CPU32")) {
 }
 else $std::error("Define cpu bits: CPU32 or CPU64");
 
-auto if ($IsDefined("POSIX")) {
+auto if (flagPOSIX) {
 	$DebugMetaLog("Using Posix OS");
 	
 	auto string DIR_SEPS = "/";
@@ -34,7 +62,7 @@ auto if ($IsDefined("POSIX")) {
 	auto string ENDL = "\n";
 	auto PLATFORM = "POSIX";
 }
-else if ($IsDefined("WIN32")) {
+else auto if (flagWIN32) {
 	$DebugMetaLog("Using Windows OS");
 	
 	auto string DIR_SEPS = "\\";
@@ -145,12 +173,6 @@ auto declaration GlobalTypedef(token from, token to) {
 	typedef $from $to;
 	extern $to_identifier($to) $to_identifier("____unused_"$to);
 }
-
-auto character to_character(token t) { $t }
-auto identifier to_identifier(token t) { $t }
-auto number to_number(token t) { $t }
-auto string to_string(token t) { $t }
-auto type to_type(token t) { $t }
 
 auto declaration MakeVectorPtr(identifier Type, identifier postfix, identifier DynArrayVar) {
 	${Type}& Get${postfix}(int i) {return *(${Type}*)${DynArrayVar}[i];}

@@ -3,6 +3,9 @@
 // TODO translate
 #define t_(x) x
 
+#define COMBINE2(a, b) a##b
+#define COMBINE(a, b) COMBINE2(a, b)
+
 
 #define SCHAR_MIN		(-128)
 #define SCHAR_MAX		127

@@ -26,26 +26,26 @@ namespace Main
 #line 46
         inline void Run();
         
-#line 273
+#line 274
         void TestShared();
         
         struct Dumber
         {
-#line 265
+#line 266
             inline Dumber();
             virtual ~Dumber();
         };
         
         struct Dumb : public Main::App::Dumber
         {
-#line 269
+#line 270
             inline Dumb();
             inline ~Dumb();
         };
         
         struct SomeRefTuple2
         {
-#line 73 "../../src/Com/Meta.fog"
+#line 101 "../../src/Com/Meta.fog"
             int& a;
             double& b;
             
@@ -55,7 +55,7 @@ namespace Main
         
         struct SomeTuple2
         {
-#line 54
+#line 82
             int a;
             double b;
             
@@ -642,31 +642,33 @@ namespace Main
             }
 #line 219
             ;
+#line 219
+            Chrono::Time t3 = Chrono::GetSysTime();
         }
         {
-#line 223
+#line 224
             Concurrency::Thread t;
             Concurrency::Mutex m;
         }
         {
-#line 228
+#line 229
             Network::TcpSocket s;
             {
-#line 229
+#line 230
                 if (!(s.Listen(8005, 5)))
                 {
-#line 229
+#line 230
                     Lang::SysBreak("Assertion failed: s.Listen(8005, 5)");
                 }
             }
-#line 230
+#line 231
             ;
         }
         {
             TextProc::Tokenizer t;
         }
         {
-#line 238
+#line 239
             TextProc::JSON j;
         }
     };
@@ -677,24 +679,24 @@ namespace Main
         a(8)
     {};
     
-#line 269
+#line 270
     inline App::Dumb::Dumb()
     {
-#line 269
+#line 270
         ;
     };
     
-#line 270
+#line 271
     inline App::Dumb::~Dumb()
     {
-#line 270
+#line 271
         ;
     };
     
-#line 265
+#line 266
     inline App::Dumber::Dumber()
     {
-#line 265
+#line 266
         ;
     };
     

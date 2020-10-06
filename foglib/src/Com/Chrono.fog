@@ -2,13 +2,11 @@ namespace Chrono {
 using/interface Text;
 using/interface Native;
 
-class Date {
-	
-protected:
+struct Date {
 	short year;
 	byte month, day;
 	
-public:
+	
 	Date() {}
 	
 	void Set(int y, int m, int d);
@@ -23,10 +21,10 @@ public:
 	
 };
 
-class Time : public Date {
+struct Time : public Date {
 	byte hour, min, sec;
-
-public:
+	
+	
 	Time() {}
 	Time(const Time& t) { MemoryCopy(this, &t, sizeof(Time)); }
 	Time(int y, int m, int d) {Set(y,m,d,0,0,0);}
@@ -46,6 +44,8 @@ public:
 	String AsDiffString() const;
 	static Time GetSys();
 };
+
+Time GetSysTime() {Time t; Native::GetSysTime(t.year, t.month, t.day, t.hour, t.min, t.sec); return t;}
 
 String GetTimeDurationString(Time begin, Time end);
 
@@ -321,6 +321,7 @@ double OnlineFrequencyWindow::Get() const {
 
 }
 
-#define Date		Chrono::Date
-#define Time		Chrono::Time
+#define GetSysTime		Chrono::GetSysTime
+#define Date			Chrono::Date
+#define Time			Chrono::Time
 #define TimeStop		Chrono::TimeStop

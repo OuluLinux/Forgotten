@@ -76,17 +76,17 @@ namespace Shared
 #line 78
         bool IsAttached(Slot *ptr);
         
-#line 159 "../../src/Com/Meta.fog"
+#line 181 "../../src/Com/Meta.fog"
         void AddSlot(Slot *ptr);
 #line 52 "../../src/Com/Shared.fog"
         void DoAttach(Slot *s);
 #line 57
         void DoDetach(Slot *s);
-#line 156 "../../src/Com/Meta.fog"
+#line 178 "../../src/Com/Meta.fog"
         Slot& GetSlot(int i);
-#line 158
+#line 180
         int GetSlotCount();
-#line 157
+#line 179
         void RemoveSlot(int i);
     };
 };
@@ -166,21 +166,21 @@ namespace Shared
     public:
         RefBase();
         virtual ~RefBase();
-#line 159 "../../src/Com/Meta.fog"
+#line 181 "../../src/Com/Meta.fog"
         void AddWeak(WeakBase *ptr);
 #line 129 "../../src/Com/Shared.fog"
         void Dec();
 #line 138
         void DecWeak(WeakBase *w);
-#line 156 "../../src/Com/Meta.fog"
+#line 178 "../../src/Com/Meta.fog"
         WeakBase& GetWeak(int i);
-#line 158
+#line 180
         int GetWeakCount();
 #line 128 "../../src/Com/Shared.fog"
         void Inc();
 #line 137
         void IncWeak(WeakBase *w);
-#line 157 "../../src/Com/Meta.fog"
+#line 179 "../../src/Com/Meta.fog"
         void RemoveWeak(int i);
     };
     

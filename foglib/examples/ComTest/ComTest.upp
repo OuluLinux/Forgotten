@@ -66,12 +66,12 @@ custom() "fog",
 	"$(DIR)/Main.hxx";
 
 custom(POSIX) "mfog",
-	"fog -cd$(DIR) -t4 -I../../src -DPOSIX -DCPU64 -global Global -nobanner"
-	" -f $(PATH)\n",
+	"fog -cd$(DIR) -t4 -I../../src -DPOSIX=1 -DCPU64=1 -global Global -noba"
+	"nner -f $(PATH)\n",
 	"$(DIR)/Main.hxx";
 
 custom(WIN32) "",
-	"fog -cd$(DIR) -t4 -I../../src -DWIN32 -DCPU64 -global Global -nobanner"
-	" -nobanner -f $(PATH)\n",
+	"fog -cd$(DIR) -t4 -I../../src -DWIN32=1 -DCPU64=1 -global Global -noba"
+	"nner -nobanner -f $(PATH)\n",
 	"$(DIR)/Main.hxx";
 

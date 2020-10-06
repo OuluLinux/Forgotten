@@ -7,53 +7,57 @@
 #include <Container.hxx>
 #endif
 
-#ifndef STREAM_HXX
-#include <Stream.hxx>
+#ifndef CHRONO_HXX
+#include <Chrono.hxx>
+#endif
+
+#ifndef ABSTRACT_HXX
+#include <Abstract.hxx>
 #endif
 
 namespace Util
 {
-#line 458 "../../src/Com/Util.fog"
+#line 459 "../../src/Com/Util.fog"
     inline void AddLocalFileDirectory(Text::String dir);
 #line 228
     Text::String AppendFileName(Text::String a, Text::String b);
-#line 393
+#line 394
     Stream::CharStream& Cerr();
-#line 388
+#line 389
     Stream::CharStream& Cin();
 #line 247
     Text::String ConfigFile(Text::String file_name);
 #line 79
     inline Text::String& ConfigPath();
-#line 873
+#line 874
     template < class _1, class _2 >
     inline void CopyHeapless(const _1& from, _1& to);
-#line 886
+#line 887
     template < class _1, class _2 >
     inline void CopyHeaplessMat(const _1& from, _1& to);
-#line 378
+#line 379
     Stream::CharStream& Cout();
 #line 337
     inline void DeleteFile(Text::String path);
-#line 440
+#line 441
     inline bool DirectoryExists(Text::String path);
-#line 383
+#line 384
     Stream::CharStream& Errout();
-#line 439
+#line 440
     inline bool FileExists(Text::String path);
-#line 444
+#line 445
     Text::String FindLocalFile(Text::String filename);
-#line 419
+#line 420
     Text::String GetDataDirectory();
-#line 435
+#line 436
     inline Text::String GetDataDirectoryFile(Text::String file);
-#line 425
+#line 426
     Text::String GetDataFile(Text::String filename);
-#line 472
+#line 473
     void GetDirectoryFiles(Text::String dir, Container::Index < Text::String > & files);
-#line 409
+#line 410
     Text::String GetEnv(Text::String id);
-#line 405
+#line 406
     Text::String GetExeDirFile(Text::String filename);
 #line 278
     Text::String GetFileDirectory(Text::String path);
@@ -67,11 +71,11 @@ namespace Util
     inline Text::String GetHomeDir();
 #line 86
     Text::String GetParentDirectory(Text::String path, int steps = 1);
-#line 477
+#line 478
     bool IsClose(double a, double b);
 #line 109
     inline bool IsDotString(Text::String s);
-#line 463
+#line 464
     bool IsVerbose();
 #line 350
     Stream::CharStream& Log();
@@ -82,47 +86,47 @@ namespace Util
     inline _1& PtrRef(_1 *o, Text::String throw_msg);
 #line 98
     void ReadCoreCmdlineArgs();
-#line 398
+#line 399
     Text::String ReadStdIn();
 #line 326
     void RealizeDirectory(Text::String dir);
 #line 341
     void RenameFile(Text::String oldpath, Text::String newpath);
-#line 415
+#line 416
     inline void SetDataPath(Text::String path);
 #line 108
     void SetVerbose(bool b = true);
 #line 113
     template < class _1 >
     inline _1& Single();
-#line 762
+#line 763
     template < class _1, class _2 >
     void Sort(_1& vector, const _2& sorter);
-#line 912
+#line 913
     bool StreamCopy(Abstract::StreamBase& dest, Abstract::StreamBase& src);
-#line 898
+#line 899
     inline void VectorAdd(const Container::Vector < double > & from, Container::Vector < double > & to);
-#line 403
+#line 404
     inline Text::String& __ConfigPath();
-#line 402
+#line 403
     inline Text::String& __DataPath();
-#line 466
+#line 467
     void __FileAdder(const char *str, void *files_idx);
-#line 677
+#line 678
     template < class _1, class _2 >
     inline void __FinalSort(_1 begin, _1 end, const _2& less);
-#line 665
+#line 666
     template < class _1 >
     inline void __IterSwap(_1 a, _1 b);
-#line 442
+#line 443
     inline Container::Vector < Text::String > & __LocalFileDirs();
-#line 671
+#line 672
     template < class _1, class _2 >
     inline void __OrderIter2(_1 a, _1 b, const _2& less);
-#line 717
+#line 718
     template < class _1, class _2 >
     void __Sort(_1 l, _1 h, const _2& less);
-#line 462
+#line 463
     bool& __Verbose();
     
     struct CmdArg
@@ -149,14 +153,14 @@ namespace Util
     public:
 #line 194
         inline CommandLineArguments();
-#line 790
+#line 791
         void AddArg(char key, const char *desc, bool has_value);
 #line 198
         inline int GetInputCount() const;
         inline const Container::Array < CmdInput > & GetInputs() const;
-#line 797
+#line 798
         bool Parse();
-#line 836
+#line 837
         void PrintHelp();
         
 #line 187
@@ -226,31 +230,58 @@ namespace Util
 #line 160
         typedef FindFile CLASSNAME;
         
-#line 629
+#line 630
         FindFile();
-#line 649
+#line 650
         Text::String GetName() const;
-#line 645
+#line 646
         Text::String GetPath() const;
-#line 641
+#line 642
         bool IsDirectory() const;
-#line 637
+#line 638
         bool Next();
-#line 633
+#line 634
         bool Search(Text::String path);
+    };
+    
+    struct FloatTrans
+    {
+#line 943
+        double value;
+        
+        inline FloatTrans();
+        inline FloatTrans(double d);
+#line 964
+        inline bool operator!= (double d);
+#line 961
+        inline double operator*= (double d);
+#line 959
+        inline double operator+= (double d);
+        inline double operator-= (double d);
+#line 962
+        inline double operator/= (double d);
+#line 958
+        inline double operator= (double d);
+#line 963
+        inline bool operator== (double d);
+#line 965
+        inline operator double() const;
+        inline Text::String AsString() const;
+#line 947
+        void Serialize(Abstract::StreamBase& s);
     };
     
     template < class _1 >
     struct StdGreater
     {
-#line 771
+#line 772
         inline bool operator()(const _1& a, const _1& b) const;
     };
     
     template < class _1 >
     struct StdLess
     {
-#line 770
+#line 771
         inline bool operator()(const _1& a, const _1& b) const;
     };
     
@@ -264,15 +295,15 @@ namespace Util
         Lang::AtomicFlag lock;
         
     public:
-#line 573
+#line 574
         StringCache();
-#line 610
+#line 611
         Text::String Get(int i) const;
-#line 575
+#line 576
         int GetAdd(const Text::String& s);
-#line 614
+#line 615
         int GetCount() const;
-#line 601
+#line 602
         void Remove(int i);
     };
     
@@ -283,31 +314,44 @@ namespace Util
         int cursor;
         
         StringParser(Text::String s);
-#line 499
+#line 500
         bool Char(int chr);
-#line 540
+#line 541
         int GetChar();
-#line 548
+#line 549
         bool IsChar(int chr);
 #line 131
         void PassChar(int chr, bool do_pass_white = true);
-#line 552
+#line 553
         void PassWhite();
-#line 544
+#line 545
         int PeekChar();
-#line 518
+#line 519
         Text::String ReadId();
-#line 509
+#line 510
         int ReadInt();
+    };
+    
+    struct Version
+    {
+#line 977
+        Lang::byte write_v;
+#line 977
+        Lang::byte read_v;
+        Abstract::StreamBase& s;
+        
+        Version(Lang::byte write_v, Abstract::StreamBase& s);
+#line 987
+        bool Is(Lang::byte cmp_v);
     };
 };
 
 namespace Util
 {
-#line 458
+#line 459
     inline void AddLocalFileDirectory(Text::String dir)
     {
-#line 459
+#line 460
         __LocalFileDirs().Add(dir);
     };
     
@@ -320,18 +364,18 @@ namespace Util
         return s;
     };
     
-#line 873
+#line 874
     template < class _1, class _2 >
     inline void CopyHeapless(const _1& from, _1& to)
     {
-#line 875
+#line 876
         Lang::FwdIterator < _2 > src = from.Begin();
         Lang::FwdIterator < _2 > end = from.End();
         Lang::FwdIterator < _2 > dst = to.Begin();
         to.SetCount(from.GetCount());
         while (src != end)
             {
-#line 880
+#line 881
                 *dst = *src;
                 src ++ ;
                 dst ++ ;
@@ -341,11 +385,11 @@ namespace Util
     template < class _1, class _2 >
     inline void CopyHeaplessMat(const _1& from, _1& to)
     {
-#line 888
+#line 889
         to.SetCount(from.GetCount());
         for (int i = 0; i < to.GetCount(); i ++ )
             {
-#line 890
+#line 891
                 const _2 & from0 = from[i];
                 _2 & to0 = to[i];
                 to0.SetCount(from0.GetCount());
@@ -361,24 +405,24 @@ namespace Util
         Native::DeleteFile(path.Begin());
     };
     
-#line 440
+#line 441
     inline bool DirectoryExists(Text::String path)
     {
-#line 440
+#line 441
         return Native::DirExists(path.Begin());
     };
     
-#line 439
+#line 440
     inline bool FileExists(Text::String path)
     {
-#line 439
+#line 440
         return Native::PathExists(path.Begin());
     };
     
-#line 435
+#line 436
     inline Text::String GetDataDirectoryFile(Text::String file)
     {
-#line 436
+#line 437
         return AppendFileName(GetDataDirectory(), file);
     };
     
@@ -407,10 +451,10 @@ namespace Util
         return *o;
     };
     
-#line 415
+#line 416
     inline void SetDataPath(Text::String path)
     {
-#line 416
+#line 417
         __DataPath() = path;
     };
     
@@ -423,101 +467,101 @@ namespace Util
         return o;
     };
     
-#line 898
+#line 899
     inline void VectorAdd(const Container::Vector < double > & from, Container::Vector < double > & to)
     {
         {
-#line 899
+#line 900
             if (!(from.GetCount() == to.GetCount()))
             {
-#line 899
+#line 900
                 Lang::SysBreak("Assertion failed: from.GetCount() == to.GetCount()");
             }
         }
-#line 900
+#line 901
         ;
-#line 900
+#line 901
         Lang::ConstFwdIterator < double > src = from.Begin();
         Lang::FwdIterator < double > dst = to.Begin();
         Lang::FwdIterator < double > end = to.End();
         while (dst != end)
             {
-#line 904
+#line 905
                 *dst = *src;
                 ++ dst;
                 ++ src;
             }
     };
     
-#line 403
+#line 404
     inline Text::String& __ConfigPath()
     {
-#line 403
+#line 404
         static Text::String s;
-#line 403
+#line 404
         return s;
     };
     
-#line 402
+#line 403
     inline Text::String& __DataPath()
     {
-#line 402
+#line 403
         static Text::String s;
-#line 402
+#line 403
         return s;
     };
     
-#line 677
+#line 678
     template < class _1, class _2 >
     inline void __FinalSort(_1 begin, _1 end, const _2& less)
     {
-#line 679
+#line 680
         if (begin == end)
             return;
         _1 last = end;
         -- last;
         while (!(begin == last))
             {
-#line 684
+#line 685
                 _1 best = last;
                 _1 next = last;
                 _1 ptr = last;
                 for (;;)
                     {
-#line 688
+#line 689
                         if (less(*best, *-- ptr))
                         {
                             do
-#line 690
+#line 691
                                 if (ptr == begin)
                                 {
-#line 691
+#line 692
                                     __IterSwap(begin, best);
                                     ++ begin;
                                     goto NEXT_ITEM;
                                 }while (less(*best, *-- ptr));
-#line 696
+#line 697
                             if (ptr == begin)
                             {
-#line 697
+#line 698
                                 __IterSwap(++ begin, best);
                                 ++ begin;
                                 break;
                             
                             }
-#line 701
+#line 702
                             next = ptr;
                             ++ next;
                         }
                         else 
                         if (ptr == begin)
                         {
-#line 706
+#line 707
                             begin = next;
                             break;
                         
                         }
-#line 709
+#line 710
                         best = ptr;
                     }
                 NEXT_ITEM:
@@ -525,29 +569,29 @@ namespace Util
             }
     };
     
-#line 665
+#line 666
     template < class _1 >
     inline void __IterSwap(_1 a, _1 b)
     {
-#line 667
+#line 668
         if (a != b)
             Container::Swap(*a, *b);
     };
     
-#line 442
+#line 443
     inline Container::Vector < Text::String > & __LocalFileDirs()
     {
-#line 442
+#line 443
         static Container::Vector < Text::String > v;
-#line 442
+#line 443
         return v;
     };
     
-#line 671
+#line 672
     template < class _1, class _2 >
     inline void __OrderIter2(_1 a, _1 b, const _2& less)
     {
-#line 673
+#line 674
         if (less(*b, *a))
             __IterSwap(a, b);
     };
@@ -637,19 +681,106 @@ namespace Util
 #line 27
     inline void Env::ShutdownThreads() {};
     
-#line 771
+#line 945
+    inline FloatTrans::FloatTrans()
+    {
+#line 945
+        value = 0;
+    };
+    
+#line 946
+    inline FloatTrans::FloatTrans(double d)
+    {
+#line 946
+        value = d;
+    };
+    
+#line 964
+    inline bool FloatTrans::operator!= (double d)
+    {
+#line 964
+        return value != d;
+    };
+    
+#line 961
+    inline double FloatTrans::operator*= (double d)
+    {
+#line 961
+        value *= d;
+#line 961
+        return d;
+    };
+    
+#line 959
+    inline double FloatTrans::operator+= (double d)
+    {
+#line 959
+        value += d;
+#line 959
+        return d;
+    };
+    
+#line 960
+    inline double FloatTrans::operator-= (double d)
+    {
+#line 960
+        value -= d;
+#line 960
+        return d;
+    };
+    
+#line 962
+    inline double FloatTrans::operator/= (double d)
+    {
+#line 962
+        value /= d;
+#line 962
+        return d;
+    };
+    
+#line 958
+    inline double FloatTrans::operator= (double d)
+    {
+#line 958
+        value = d;
+#line 958
+        return d;
+    };
+    
+#line 963
+    inline bool FloatTrans::operator== (double d)
+    {
+#line 963
+        return value == d;
+    };
+    
+#line 965
+    inline FloatTrans::operator double() const
+    {
+#line 965
+        return value;
+    };
+    
+#line 966
+    inline Text::String FloatTrans::AsString() const
+    {
+#line 966
+        return Text::String::DblStr(value);
+    };
+    
+#line 772
     template < class _1 >
     inline bool StdGreater < _1 >::operator()(const _1& a, const _1& b) const
     {
-#line 771
+#line 772
         return a > b;
     };
     
-#line 770
+#line 771
     template < class _1 >
     inline bool StdLess < _1 >::operator()(const _1& a, const _1& b) const
     {
-#line 770
+#line 771
         return a < b;
     };
     

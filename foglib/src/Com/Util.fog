@@ -247,14 +247,14 @@ String AppendFileName(String a, String b) {
 String ConfigFile(String file_name) {
 	if (ConfigPath().GetCount())
 		return AppendFileName(ConfigPath(), file_name);
-	auto if ($IsDefined("WIN32")) {
+	auto if (flagWIN32) {
 		String dir = GetExeDirFile("");
 	}
-	else if ($IsDefined("POSIX")) {
+	else auto if (flagPOSIX) {
 		String home_dir = GetHomeDir();
 		String upp = AppendFileName(home_dir, ".config");
 		upp = AppendFileName(upp, "u++");
-		String dir = AppendFileName(upp, GetFileTitle(GetExeFilePath()));
+		String dir = AppendFileName(upp, GetFileTitle(Env::Local().GetExeFilePath()));
 	}
 	else $std::error("Not implemented");
 	return AppendFileName(dir, file_name);
@@ -298,7 +298,7 @@ String GetParentDirectory(String path, int steps) {
 			path = path.Left(path.GetCount()-1);
 		
 		int j = path.ReverseFind($DIR_SEPS);
-		auto if ($IsDefined("POSIX")) {
+		auto if (flagPOSIX) {
 			if (!j)
 				return $DIR_SEPS;
 		}
@@ -356,15 +356,15 @@ void RenameFile(String oldpath, String newpath) {
 			return ss;
 		}
 		else {
+			const char* e = exepath.Begin();
 			String exe_title = GetFileTitle(exepath);
 			String path = ConfigFile(exe_title + ".log");
 			const char* p = path.Begin();
 			RealizeDirectory(GetFileDirectory(path));
-			//cout << path << ENDL;
+			
 			fout.Open(path);
-			//fout << " *** " << GetSysTime().ToString() << " ***" << ENDL
-			//	 << " *** " << GetExeFilePath() << " ***" << ENDL;
-			fout << " *** " << Env::Local().GetExeFilePath() << " ***" << $ENDL;
+			fout << " *** " << GetSysTime().AsString() << " ***" << $ENDL;
+			fout << " *** " << exepath << " ***" << $ENDL;
 			
 			if (ss.GetSize())
 				fout << ss.GetResult();
@@ -930,6 +930,69 @@ bool StreamCopy(StreamBase& dest, StreamBase& src) {
 
 
 
+
+
+
+
+
+// Class for transforming already stored floats to doubles
+struct FloatTrans {
+	$MakeMoveable();
+	
+	double value;
+	
+	FloatTrans() {value = 0;}
+	FloatTrans(double d) {value = d;}
+	void Serialize(StreamBase& s) {
+		if (s.IsLoading()) {
+			float f;
+			s % f;
+			value = f;
+		}
+		else {
+			s % value;
+		}
+	}
+	
+	double operator=(double d) {value = d; return d;}
+	double operator+=(double d) {value += d; return d;}
+	double operator-=(double d) {value -= d; return d;}
+	double operator*=(double d) {value *= d; return d;}
+	double operator/=(double d) {value /= d; return d;}
+	bool operator==(double d) {return value == d;}
+	bool operator!=(double d) {return value != d;}
+	operator double() const {return value;}
+	String AsString() const {return DblStr(value);}
+};
+
+
+
+
+
+
+
+// Version control for persistent binary files
+struct Version {
+	byte write_v = 0, read_v = 0;
+	StreamBase& s;
+	
+	Version(byte write_v, StreamBase& s) : write_v(write_v), s(s) {
+		if (s.IsStoring())
+			s.Put(&write_v, sizeof(write_v));
+		else
+			s.Get(&read_v, sizeof(read_v));
+	}
+	
+	bool Is(byte cmp_v) {
+		if (s.IsStoring())
+			return cmp_v <= write_v;
+		else
+			return cmp_v <= read_v;
+	}
+};
+
+#define VER(x) Version v(x, s)
+#define FOR_VER(x) if (v.Is(x))
 
 }
 

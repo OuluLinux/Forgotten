@@ -54,17 +54,32 @@ FogStd_Defined::FogStd_Defined(FogToken& staticMetaScope)
 :
     Super(staticMetaScope, IS_STATIC, FogMetaType::bool_type(), IS_ENCAPSULATED, "defined")
 {
-    add(FogMetaType::expression_type(), IS_ENCAPSULATED, *PrimIdHandle("a_name"));  //   Formal name must be illegal
+    //add(FogMetaType::expression_type(), IS_ENCAPSULATED, *PrimIdHandle("a_name"));  //   Formal name must be illegal
+    add(FogMetaType::string_type(), IS_ENCAPSULATED, *PrimIdHandle("a_name"));  //   Formal name must be illegal
 }
 bool FogStd_Defined::resolve_function(FogTokenRef& returnValue, FogCallContext& callContext) const
 {
-    const FogName *aName = callContext.get_name_argument(0);
-    if (!aName)
-        return false;
-    FogMetaSlotFinding metaSlotFinding;
-    aName->find_slots_in(callContext.calling_context(), metaSlotFinding);
-    returnValue.assign(FogNumber::make_logical(metaSlotFinding.is_found()));
-    return true;
+	if (1) {
+	    const FogName *aName = callContext.get_name_argument(0);
+	    if (!aName)
+	        return false;
+	    FogMetaSlotFinding metaSlotFinding;
+	    aName->find_slots_in(callContext.calling_context(), metaSlotFinding);
+	    returnValue.assign(FogNumber::make_logical(metaSlotFinding.is_found()));
+	    return true;
+	}
+	else {
+		PrimIdHandle strhandle;
+	    if (!callContext.get_string_argument(strhandle, 0))
+			return false;
+	    const char* str = strhandle.str();
+	    const FogKeyword *aName = &FogIdentifier::make(*strhandle);
+	    FogMetaSlotFinding metaSlotFinding;
+	    aName->find_slots_in(callContext.calling_context(), metaSlotFinding);
+	    bool found = metaSlotFinding.is_found();
+	    returnValue.assign(FogNumber::make_logical(found));
+	    return true;
+	}
 }
  
 FOGMETAFUNCTION_CLASS(FogStd_Diagnostic)

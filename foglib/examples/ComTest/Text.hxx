@@ -293,7 +293,7 @@ namespace Text
 #line 32
             Char *data;
             int reserved;
-#line 94 "../../src/Com/Meta.fog"
+#line 122 "../../src/Com/Meta.fog"
             Lang::AtomicInt refs;
             
         public:
@@ -307,15 +307,15 @@ namespace Text
             Char *Begin();
 #line 40
             void Clear();
-#line 97 "../../src/Com/Meta.fog"
+#line 125 "../../src/Com/Meta.fog"
             void Dec();
 #line 73 "../../src/Com/Text.fog"
             ConstChar *Get() const;
-#line 95 "../../src/Com/Meta.fog"
+#line 123 "../../src/Com/Meta.fog"
             int GetRefs() const;
 #line 77 "../../src/Com/Text.fog"
             int GetReserved() const;
-#line 96 "../../src/Com/Meta.fog"
+#line 124 "../../src/Com/Meta.fog"
             void Inc();
 #line 42 "../../src/Com/Text.fog"
             void IncreaseReserved();
@@ -482,7 +482,7 @@ namespace Text
 #line 32
             Char *data;
             int reserved;
-#line 94 "../../src/Com/Meta.fog"
+#line 122 "../../src/Com/Meta.fog"
             Lang::AtomicInt refs;
             
         public:
@@ -496,15 +496,15 @@ namespace Text
             Char *Begin();
 #line 40
             void Clear();
-#line 97 "../../src/Com/Meta.fog"
+#line 125 "../../src/Com/Meta.fog"
             void Dec();
 #line 73 "../../src/Com/Text.fog"
             ConstChar *Get() const;
-#line 95 "../../src/Com/Meta.fog"
+#line 123 "../../src/Com/Meta.fog"
             int GetRefs() const;
 #line 77 "../../src/Com/Text.fog"
             int GetReserved() const;
-#line 96 "../../src/Com/Meta.fog"
+#line 124 "../../src/Com/Meta.fog"
             void Inc();
 #line 42 "../../src/Com/Text.fog"
             void IncreaseReserved();

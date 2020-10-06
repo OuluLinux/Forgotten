@@ -7,8 +7,8 @@
 #include <Container.hxx>
 #endif
 
-#ifndef CHRONO_HXX
-#include <Chrono.hxx>
+#ifndef MATH_HXX
+#include <Math.hxx>
 #endif
 
 namespace Indirect

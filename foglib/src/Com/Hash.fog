@@ -34,7 +34,7 @@ inline uint32 GetValue(const uint64& k) {
 inline uint32 GetValue(const float& k) { return static_cast<uint32>(k); }
 inline uint32 GetValue(const double& k) {return GetValue(*(uint64*)&k);}
 inline uint32 GetValue(void* const& k) {
-	auto if ($IsDefined("CPU64"))
+	auto if (flagCPU64)
 		return GetValue(k);
 	else
 		return GetValue(k);

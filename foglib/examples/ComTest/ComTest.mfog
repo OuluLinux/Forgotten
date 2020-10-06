@@ -216,6 +216,7 @@ class App {
 			Time t2;
 			t2.Set(i64);
 			ASSERT(t1 == t2);
+			Time t3 = GetSysTime();
 		}
 		
 		

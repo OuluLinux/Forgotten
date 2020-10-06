@@ -1252,7 +1252,7 @@ namespace Text
 #line 93
     void String::Zero()
     {
-#line 102 "../../src/Com/Meta.fog"
+#line 130 "../../src/Com/Meta.fog"
         Lang::Memory::Set(this, 0, sizeof (String));
     };
     
@@ -1308,14 +1308,14 @@ namespace Text
         }
     };
     
-#line 97 "../../src/Com/Meta.fog"
+#line 125 "../../src/Com/Meta.fog"
     void String::RefData::Dec()
     {
-#line 97
+#line 125
         refs -- ;
-#line 97
+#line 125
         if (refs <= 0)
-#line 97
+#line 125
             delete this;
     };
     
@@ -1326,10 +1326,10 @@ namespace Text
         return data;
     };
     
-#line 95 "../../src/Com/Meta.fog"
+#line 123 "../../src/Com/Meta.fog"
     int String::RefData::GetRefs() const
     {
-#line 95
+#line 123
         return refs;
     };
     
@@ -1340,10 +1340,10 @@ namespace Text
         return reserved;
     };
     
-#line 96 "../../src/Com/Meta.fog"
+#line 124 "../../src/Com/Meta.fog"
     void String::RefData::Inc()
     {
-#line 96
+#line 124
         refs ++ ;
     };
     
@@ -2531,7 +2531,7 @@ namespace Text
 #line 93
     void WString::Zero()
     {
-#line 102 "../../src/Com/Meta.fog"
+#line 130 "../../src/Com/Meta.fog"
         Lang::Memory::Set(this, 0, sizeof (WString));
     };
     
@@ -2587,14 +2587,14 @@ namespace Text
         }
     };
     
-#line 97 "../../src/Com/Meta.fog"
+#line 125 "../../src/Com/Meta.fog"
     void WString::RefData::Dec()
     {
-#line 97
+#line 125
         refs -- ;
-#line 97
+#line 125
         if (refs <= 0)
-#line 97
+#line 125
             delete this;
     };
     
@@ -2605,10 +2605,10 @@ namespace Text
         return data;
     };
     
-#line 95 "../../src/Com/Meta.fog"
+#line 123 "../../src/Com/Meta.fog"
     int WString::RefData::GetRefs() const
     {
-#line 95
+#line 123
         return refs;
     };
     
@@ -2619,10 +2619,10 @@ namespace Text
         return reserved;
     };
     
-#line 96 "../../src/Com/Meta.fog"
+#line 124 "../../src/Com/Meta.fog"
     void WString::RefData::Inc()
     {
-#line 96
+#line 124
         refs ++ ;
     };
     

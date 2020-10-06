@@ -27,6 +27,7 @@ int64 TimeSeconds(uint64 year, uint64 month, uint64 day, uint64 hour, uint64 min
 uint64 CurrentTime() :{ export/noimplementation; };
 uint64 NanoSeconds() :{ export/noimplementation; };
 uint64 MilliSeconds() :{ export/noimplementation; };
+void GetSysTime(short& year, byte& mon, byte& day, byte& hour, byte& min, byte& sec) :{ export/noimplementation; };
 
 struct HighResTimePoint {
 	void Reset() :{ export/noimplementation; };

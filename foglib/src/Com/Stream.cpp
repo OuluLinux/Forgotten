@@ -29,15 +29,15 @@ void FileOpen(FILE** s, const char* path, bool rw, bool append) {
 	
 	const char* flags;
 	if (!rw && !append)
-		flags = "rb";
+		flags = "r";
 	else if (!rw && append) {
 		ASSERT_(false, "Invalid args: can't do read-only and append at the same time");
-		flags = "a+b";
+		flags = "a+";
 	}
 	else if (rw && !append)
-		flags = "r+b";
+		flags = "w+";
 	else if (rw && append)
-		flags = "a+b";
+		flags = "a+";
 	
 	fopen_s(s, path, flags);
 }

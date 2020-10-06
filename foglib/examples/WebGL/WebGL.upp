@@ -26,7 +26,7 @@ mainconfig
 	"" = "";
 
 custom() "mfog",
-	"fog -cd$(DIR) -t4 -I../../src -DPOSIX -DCPU64 -global Global -nobanner"
-	" -f $(PATH)\n",
+	"fog -cd$(DIR) -t4 -I../../src -DPOSIX=1 -DCPU64=1 -global Global -noba"
+	"nner -f $(PATH)\n",
 	"$(DIR)/Main.hxx";
 
