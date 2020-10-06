@@ -44,13 +44,10 @@ using "Com/Interface.fog";
 using "Com/CompilerBase.fog";
 using "Com/Tokenizer.fog";
 using "Com/JSON.fog";
+using "Com/Make.fog";
 
 /*
 Core:
-	Value.h
-	Tokenizer.h
-	JSON.h
-	Management.h
 	Misc.h
 	Version.h
 	

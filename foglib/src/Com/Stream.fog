@@ -313,6 +313,7 @@ public:
 #define CharStream			Stream::CharStream
 #define FileIn				Stream::FileIn
 #define FileOut				Stream::FileOut
+#define LoadFile			Stream::LoadFile
 #define StringStream		Stream::StringStream
 #define MemReadStream		Stream::MemReadStream
 #define LoadFromFile		Stream::LoadFromFile

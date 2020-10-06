@@ -34,6 +34,7 @@ file
 	CompilerBase.fog,
 	Tokenizer.fog,
 	JSON.fog,
+	Make.fog,
 	"C++ Support" readonly separator,
 	Com.h,
 	Com.cpp,
