@@ -1,0 +1,600 @@
+namespace LockedContainer {
+using/implementation Interface;
+
+
+struct OrderedLinkedItem {
+	typedef OrderedLinkedItem Item;
+	
+	Item* prev = NULL;
+	Item* next = NULL;
+	dword value = 0;
+	dword key = 0;
+	
+	
+};
+
+
+/*
+	OrderedLinkedList
+	- can has many duplicate "key" values, but only single "value" value.
+	- e.g.
+		- "key" is some measured sorter value, where lower is better
+		- "value" is unique identifier
+		- by popping the begin pointer, you can process the unique identifier with best sorter
+		  value
+*/
+#define Item OrderedLinkedItem
+struct OrderedLinkedList {
+	
+	Array<Item> items;
+	VectorPtr<Item> begins;
+	VectorPtr<Item> unused;
+	Item* begin = NULL, *end = NULL;
+	dword min = 0, max = 0, step = 0;
+	Mutex lock;
+	dword total_added = 0;
+	dword count = 0;
+	
+	
+	void Clear();
+	void Zero();
+	void Init(dword min, dword max, dword step);
+	Item& Alloc();
+	void Free(OrderedLinkedItem* t);
+	int CountDistanceNotZero(Item* a, Item* b);
+	bool IsOrdered() const;
+	void InsertBetween(Item* it, Item* prev, Item* next);
+	void RemoveBetween(Item* it);
+	Item* FindWhereNext(dword key, Item* prev);
+	Item* FindClosest(dword begin_i, dword key);
+	dword GetBeginPos(dword key);
+	void Add(dword key, dword value);
+	void Remove(dword key, dword value);
+	void Remove(Item* it);
+	void RemoveUnsafe(Item* it);
+	dword GetMinKey() const {if (begin) return begin->key; return 0;}
+	dword GetMaxKey() const {if (end) return end->key; return 0;}
+	bool PopBegin(dword& key, dword& value);
+};
+#undef Item
+
+
+class RecyclerBase {
+	
+public:
+	virtual ~RecyclerBase() {}
+	virtual void Clear() {}
+	
+};
+
+template <class T>
+class Recycler : public RecyclerBase {
+	Array<T> arr;
+	VectorPtr<T> used;
+	Mutex arr_lock, used_lock;
+	
+	
+	T* Used() {
+		if (used.IsEmpty()) return NULL;
+		
+		T* e = NULL;
+		used_lock.Enter();
+		if (!used.IsEmpty())
+			e = used.Pop();
+		used_lock.Leave();
+		
+		Refurbish(*e);
+		
+		return e;
+	}
+	
+	T& New() {
+		arr_lock.Enter();
+		T& e = arr.Add(NewOperator());
+		arr_lock.Leave();
+		return e;
+	}
+	
+protected:
+	virtual T* NewOperator() = 0;
+	virtual void Refurbish(T& o) {}
+	virtual void Cleanup(T& o) {}
+	
+public:
+	
+	virtual void Clear() {
+		arr_lock.Enter();
+		used_lock.Enter();
+		
+		arr.Clear();
+		used.Clear();
+		
+		used_lock.Leave();
+		arr_lock.Leave();
+	}
+	
+	T& Create() {T* e = Used(); if (e) return *e; return New();}
+	void Recycle(T& e) {
+		Cleanup(e);
+		used_lock.Enter();
+		used.Add(&e);
+		used_lock.Leave();
+	}
+	void Reserve(int i) {arr.Reserve(i);}
+	
+	Array<T>& GetArray() {return arr;}
+	
+};
+
+
+struct HugePersistent {
+	
+	// Persistent
+	String filename;
+	int64 data_size = 0;
+	int64 persistent_size = 0;
+	
+	
+	// Persistent in own file
+	void* data = NULL;
+	
+	
+	
+	~HugePersistent() {Free();}
+	void Alloc() {Free(); ASSERT(data_size > 0); data = MemoryAlloc(data_size);}
+	void Free() {if (data) {MemoryFree(data); data = NULL;}}
+	void StoreData();
+	void LoadData();
+	
+	
+	void Serialize(StreamBase& s) {
+		s	% filename
+			% data_size
+			% persistent_size
+			;
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define Item OrderedLinkedItem
+
+void OrderedLinkedList::Clear() {
+	items.SetCount(0);
+	begins.SetCount(0);
+	unused.SetCount(0);
+	begin = NULL;
+	end = NULL;
+	min = 0;
+	max = 0;
+	step = 0;
+	total_added = 0;
+	count = 0;
+}
+
+void OrderedLinkedList::Zero() {
+	lock.Enter();
+	
+	FwdPtrIterator<Item> it = begins.Begin();
+	FwdPtrIterator<Item> end = begins.End();
+	for(; it != end; ++it)
+		it.Ref() = NULL;
+	unused.SetCount(items.GetCount());
+	FwdPtrIterator<Item> dst = unused.Begin();
+	it = items.Begin();
+	end = items.End();
+	for(; it != end; ++it, ++dst)
+		dst.Ref() = it.Get();
+	begin = NULL;
+	end = NULL;
+	total_added = 0;
+	count = 0;
+	
+	lock.Leave();
+}
+
+void OrderedLinkedList::Init(dword min, dword max, dword step) {
+	Clear();
+	if (max <= min || !step)
+		Panic(
+			Formater("Invalid OrderedLinkedList usage: min=%v, max=%v, step=%v")
+				(min)(max)(step));
+	this->min = min;
+	this->max = max;
+	this->step = step;
+	dword count = (max - min) / step + 1;
+	if (!count || count > 10000000)
+		Panic(Formater("Invalid OrderedLinkedList usage: count=%v")(count));
+	begins.SetCount(count);
+}
+
+OrderedLinkedItem& OrderedLinkedList::Alloc() {
+	if (unused.GetCount())
+		return *unused.Pop();
+	else
+		return items.Add();
+}
+
+void OrderedLinkedList::Free(OrderedLinkedItem* t) {
+	unused.Add(t);
+}
+
+int OrderedLinkedList::CountDistanceNotZero(Item* a, Item* b) {
+	bool do_next = true;;
+	if (b->key < a->key)
+		do_next = false;
+	for(int i = 0; i < 2; i++) {
+		if (i) do_next = !do_next;
+		Item* it = a;
+		int dist = 0;
+		while (true) {
+			if (dist > 0 && it == b)
+				return dist;
+			if (do_next) {
+				if (it->next)
+					it = it->next;
+				else
+					break;
+			}
+			else {
+				if (it->prev)
+					it = it->prev;
+				else
+					break;
+			}
+			dist++;
+		}
+	}
+	return -1;
+}
+
+bool OrderedLinkedList::IsOrdered() const {
+	Item* it = begin;
+	dword key = min;
+	while (it != end) {
+		if (it->key < key)
+			return false;
+		key = it->key;
+		it = it->next;
+	}
+	return true;
+}
+
+void OrderedLinkedList::InsertBetween(Item* it, Item* prev, Item* next) {
+	it->prev = prev;
+	it->next = next;
+	//
+	if (!prev) {
+		begin = it;
+		if (next) {
+			ASSERT(next->prev != it);
+			next->prev = it;
+		}
+		else
+			end = it;
+	}
+	else if (!next) {
+		end = it;
+		if (prev) {
+			ASSERT(prev->next != it);
+			prev->next = it;
+		}
+		else
+			begin = it;
+	}
+	else {
+		ASSERT(prev->next != it);
+		ASSERT(next->prev != it);
+		prev->next = it;
+		next->prev = it;
+	}
+	//ASSERT(IsOrdered());
+}
+
+void OrderedLinkedList::RemoveBetween(Item* it) {
+	//ASSERT(IsOrdered());
+	if (it->prev && it->next) {
+		it->next->prev = it->prev;
+		it->prev->next = it->next;
+	}
+	else if (it->prev) {
+		end = it->prev;
+		it->prev->next = NULL;
+	}
+	else if (it->next) {
+		begin = it->next;
+		it->next->prev = NULL;
+	}
+	else {
+		begin = NULL;
+		end = NULL;
+	}
+	it->prev = NULL;
+	it->next = NULL;
+	//ASSERT(CountDistanceNotZero(it, it) < 0);
+}
+
+OrderedLinkedItem* OrderedLinkedList::FindWhereNext(dword key, Item* prev) {
+	while (prev->next) {
+		if (prev->next->key > key)
+			break;
+		prev = prev->next;
+	}
+	return prev;
+}
+
+OrderedLinkedItem* OrderedLinkedList::FindClosest(dword begin_i, dword key) {
+	int dec = begin_i - 1;
+	int inc = begin_i + 1;
+	while (true) {
+		bool part_succ = false;
+		if (dec >= 0) {
+			Item* it = &begins[dec];
+			if (it) {
+				while (it->next && it->next->key < key)
+					it = it->next;
+				return it;
+			}
+			dec--;
+			part_succ = true;
+		}
+		if (inc < begins.GetCount()) {
+			Item* it = &begins[inc];
+			if (it)
+				return it;
+			inc++;
+			part_succ = true;
+		}
+		if (!part_succ) break;
+	}
+	return NULL;
+}
+
+!inline dword OrderedLinkedList::GetBeginPos(dword key) {
+	if (key < min || key >= max + step)
+		Panic(Formater("Invalid key %v (not between %v and %v)")(key)(min)(max));
+	dword begin_i = (key - min) / step;
+	return begin_i;
+}
+
+void OrderedLinkedList::Add(dword key, dword value) {
+	lock.Enter();
+	Item& it = Alloc();
+	it.key = key;
+	it.value = value;
+	dword begin_i = GetBeginPos(key);
+	Item*& key_begin = begins.Ref(begin_i);
+	if (key_begin) {
+		if (key < key_begin->key) {
+			InsertBetween(&it, key_begin->prev, key_begin);
+			key_begin = &it;
+		}
+		else {
+			Item* prev = FindWhereNext(key, key_begin);
+			ASSERT(prev->key <= key);
+			InsertBetween(&it, prev, prev->next);
+		}
+	}
+	else {
+		key_begin = &it;
+		Item* closest = FindClosest(begin_i, key);
+		if (!closest)
+			InsertBetween(&it, NULL, NULL);
+		else {
+			if (closest->key <= key)
+				InsertBetween(&it, closest, closest->next);
+			else
+				InsertBetween(&it, closest->prev, closest);
+		}
+	}
+	total_added++;
+	count++;
+	
+	lock.Leave();
+}
+
+void OrderedLinkedList::Remove(dword key, dword value) {
+	if (key < min || key >= max + step)
+		Panic(Formater("Invalid key %v (not between %v and %v)")(key)(min)(max));
+	
+	lock.Enter();
+	dword begin_i = GetBeginPos(key);
+	Item* it = NULL;
+	Item*& key_begin = begins.Ref(begin_i);
+	ASSERT(key_begin);
+	if (key_begin->value == value) {
+		it = key_begin;
+		if (key_begin->next) {
+			dword next_begin_i = GetBeginPos(key_begin->next->key);
+			if (begin_i == next_begin_i)
+				key_begin = key_begin->next;
+			else
+				key_begin = NULL;
+		}
+		else key_begin = NULL;
+	}
+	else {
+		Item* find = key_begin->next;
+		while (find && find->value != value && find->next)
+			find = find->next;
+		ASSERT(find && find->value == value);
+		it = find;
+	}
+	ASSERT(it && it->value == value);
+	if (it && it->value == value) {
+		RemoveBetween(it);
+		Free(it);
+		count--;
+	}
+	
+	lock.Leave();
+}
+
+void OrderedLinkedList::Remove(Item* it) {
+	if (!it)
+		return;
+	lock.Enter();
+	RemoveUnsafe(it);
+	lock.Leave();
+}
+
+void OrderedLinkedList::RemoveUnsafe(Item* it) {
+	dword begin_i = GetBeginPos(it->key);
+	Item*& key_begin = begins.Ref(begin_i);
+	ASSERT(key_begin);
+	if (key_begin == it) {
+		if (key_begin->next) {
+			dword next_begin_i = GetBeginPos(key_begin->next->key);
+			if (begin_i == next_begin_i)
+				key_begin = key_begin->next;
+			else
+				key_begin = NULL;
+		}
+		else key_begin = NULL;
+	}
+	RemoveBetween(it);
+	count--;
+	Free(it);
+}
+
+bool OrderedLinkedList::PopBegin(dword& key, dword& value) {
+	bool succ = false;
+	lock.Enter();
+	if (begin) {
+		Item* it = begin;
+		key   = it->key;
+		value = it->value;
+		RemoveUnsafe(it);
+		succ = true;
+	}
+	lock.Leave();
+	return succ;
+}
+
+#undef Item
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void HugePersistent::StoreData() {
+	ASSERT(data_size > 0);
+	ASSERT(persistent_size > 0);
+	ASSERT(data);
+	ASSERT(filename.GetCount());
+	RealizeDirectory(GetDataDirectory());
+	String file = AppendFileName(GetDataDirectory(), filename);
+	String prev_file = file + ".0";
+	
+	if (FileExists(file)) {
+		if (FileExists(prev_file))
+			DeleteFile(prev_file);
+		RenameFile(file, prev_file);
+	}
+	FileOut fout(file);
+	fout.Put(&persistent_size, sizeof(persistent_size));
+	
+	dword* data = (dword*)this->data;
+	int64 data_left = persistent_size;
+	int chunk_dwords = 0x1000000;
+	int chunk = chunk_dwords * sizeof(int);
+	while (data_left > 0) {
+		if (data_left > chunk) {
+			fout.Put(data, chunk);
+			data += chunk_dwords;
+			data_left -= chunk;
+		}
+		else {
+			fout.Put(data, data_left);
+			data_left = 0;
+		}
+	}
+	// TODO: maybe use slower backup drive
+	DeleteFile(prev_file);
+}
+
+void HugePersistent::LoadData() {
+	if (persistent_size == 0)
+		SysBreak("Database size is 0");
+	ASSERT(filename.GetCount());
+	RealizeDirectory(GetDataDirectory());
+	String file = AppendFileName(GetDataDirectory(), filename);
+	String prev_file = file + ".0";
+	
+	if (FileExists(prev_file))
+		file = prev_file;
+	
+	FileIn fin(file);
+	int64 file_persistent_size = 0;
+	fin.Get(&file_persistent_size, sizeof(file_persistent_size));
+	if (file_persistent_size != persistent_size)
+		Panic((String)"File header size mismatch configuration size: " + IntStr64(file_persistent_size) + " != " + IntStr64(persistent_size));
+	
+	if (!data) {
+		data = MemoryAlloc(data_size);
+		
+		byte* zero_begin = (byte*)data + persistent_size;
+		int64 zero_size = data_size - persistent_size;
+		MemorySet(data, 0, zero_size);
+	}
+	
+	TimeStop ts;
+	dword* data = (dword*)this->data;
+	int64 data_left = persistent_size;
+	int chunk_dwords = 0x1000000;
+	int chunk = chunk_dwords * sizeof(int);
+	while (data_left > 0) {
+		if (data_left > chunk) {
+			fin.Get(data, chunk);
+			data += chunk_dwords;
+			data_left -= chunk;
+		}
+		else {
+			fin.Get(data, data_left);
+			data_left = 0;
+		}
+	}
+	LOG("Loading database took " << ts.AsString());
+}
+
+}
+
+#define OrderedLinkedItem	Container::OrderedLinkedItem
+#define OrderedLinkedList	Container::OrderedLinkedList
+#define RecyclerBase		Container::RecyclerBase
+#define Recycler			Container::Recycler
+#define HugePersistent		Container::HugePersistent

@@ -46,6 +46,8 @@ file
 	Indirect.cxx,
 	Concurrency.hxx,
 	Concurrency.cxx,
+	LockedContainer.hxx,
+	LockedContainer.cxx,
 	Network.hxx,
 	Network.cxx,
 	Interface.hxx,

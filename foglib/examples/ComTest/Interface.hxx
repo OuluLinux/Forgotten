@@ -3,11 +3,16 @@
 
 #include <new>
 
+#ifndef NETWORK_HXX
+#include <Network.hxx>
+#endif
+
 #ifndef SHARED_HXX
 #include <Shared.hxx>
 #endif
-#ifndef NETWORK_HXX
-#include <Network.hxx>
+
+#ifndef ABSTRACT_HXX
+#include <Abstract.hxx>
 #endif
 
 namespace Interface
@@ -47,8 +52,6 @@ namespace Interface
 #line 155 "../../src/Com/Interface.fog"
     template < class _1 >
     inline Value AsValue(const _1& o);
-#line 318
-    Text::String Format(Text::String pattern, Value v0, Value v1, Value v2, Value v3, Value v4, Value v5, Value v6, Value v7);
 #line 252
     Text::String GetValueTreeString(const Value& v, Text::String key, int indent);
 #line 9
@@ -109,6 +112,22 @@ namespace Interface
 #line 247
     template <>
     inline Lang::dword ValueTypeNo < ValueMap > (const ValueMap *);
+    
+    struct Formater
+    {
+#line 319
+        Text::String pattern;
+        Container::Vector < Value > values;
+        
+        inline Formater(Text::String pattern);
+        inline Formater& operator()(Value v);
+#line 325
+        Formater& operator()(Text::String s);
+#line 324
+        Formater& operator()(int i);
+#line 326
+        operator Text::String();
+    };
 };
 
 namespace Interface {
@@ -151,24 +170,24 @@ namespace Interface
 #line 98
         template < class _1 >
         inline _1& Create1(const _1& arg);
-#line 388
+#line 394
         ValueArray& CreateArray();
-#line 383
+#line 389
         ValueMap& CreateMap();
-#line 511
+#line 517
         void DeepCopyArrayMap(Value v);
 #line 125
         template < class _1 >
         inline _1& Get() const;
 #line 140
         Value *GetAddMapSub(Text::String key, Value *def = 0);
-#line 459
+#line 465
         ValueArray& GetArray();
-#line 447
-        const ValueArray& GetArray() const;
 #line 453
+        const ValueArray& GetArray() const;
+#line 459
         ValueMap& GetMap();
-#line 441
+#line 447
         const ValueMap& GetMap() const;
 #line 138
         Value *GetMapSub(Text::String key, Value *def = 0);
@@ -179,14 +198,14 @@ namespace Interface
 #line 112
         template < class _1 >
         inline bool Is() const;
-#line 393
+#line 399
         bool IsArray() const;
-#line 401
+#line 407
         bool IsArrayMapComb() const;
 #line 148
         bool IsInt() const;
         bool IsInt64() const;
-#line 397
+#line 403
         bool IsMap() const;
 #line 147
         bool IsString() const;
@@ -197,13 +216,13 @@ namespace Interface
         inline void Set(const _1& o);
         template < class _1 >
         inline _1 *Try() const;
-#line 423
+#line 429
         ValueArray *TryGetArray();
-#line 405
+#line 411
         const ValueArray *TryGetArray() const;
-#line 432
+#line 438
         ValueMap *TryGetMap();
-#line 414
+#line 420
         const ValueMap *TryGetMap() const;
     };
     
@@ -239,7 +258,7 @@ namespace Interface
         inline const Value& At(int i) const;
 #line 167
         inline void Clear();
-#line 528
+#line 534
         void DeepCopyArrayMap(ValueArray& arr);
 #line 173
         inline int GetCount() const;
@@ -291,7 +310,7 @@ namespace Interface
         inline const Value& At(int i) const;
 #line 215
         void Clear();
-#line 541
+#line 547
         void DeepCopyArrayMap(ValueMap& map);
 #line 211
         int Find(Text::String key) const;
@@ -327,7 +346,7 @@ namespace Interface
         Text::String AsString() const;
 #line 239
         void Clear();
-#line 554
+#line 560
         void DeepCopyArrayMap(ValueArrayMapComb& am);
 #line 240
         int GetTotal() const;
@@ -502,6 +521,21 @@ namespace Interface
     {
 #line 247
         return VALUEMAP_V;
+    };
+    
+#line 322
+    inline Formater::Formater(Text::String pattern)
+    :
+        pattern(pattern)
+    {};
+    
+#line 323
+    inline Formater& Formater::operator()(Value v)
+    {
+#line 323
+        values.Add(v);
+#line 323
+        return *this;
     };
     
 #line 91

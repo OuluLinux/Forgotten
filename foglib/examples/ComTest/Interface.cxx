@@ -9,96 +9,7 @@
 
 namespace Interface
 {
-#line 318 "../../src/Com/Interface.fog"
-    Text::String Format(Text::String pattern, Value v0, Value v1, Value v2, Value v3, Value v4, Value v5, Value v6, Value v7)
-    {
-#line 319
-        static const int MAX_ARGS = 8;
-        Value * v[MAX_ARGS] = 
-        {
-            &v0,
-            &v1,
-            &v2,
-            &v3,
-            &v4,
-            &v5,
-            &v6,
-            &v7
-        };
-#line 322
-        if (pattern.IsEmpty())
-#line 322
-            return "";
-#line 324
-        int arg = 0;
-        Text::String out;
-        const char * it = pattern.Begin();
-        const char * end = pattern.End();
-        while (it != end)
-            {
-#line 329
-                int chr = *it ++ ;
-#line 332
-                if (chr == 92 && *it == 37)
-                {
-#line 333
-                    chr = *it ++ ;
-                    out.Cat(chr);
-                }
-                else 
-                if (chr == 37)
-                {
-#line 338
-                    int state = FMT_MAIN_SWITCH;
-                    int type = FMT_TYPE_INVALID;
-                    while (it != end)
-                        {
-#line 341
-                            chr = *it ++ ;
-                            if (state == FMT_MAIN_SWITCH)
-                            {
-#line 343
-                                if (chr == 'v')
-                                {
-#line 344
-                                    type = FMT_TYPE_VALUE;
-                                    break;
-                                
-                                }
-                                else
-#line 347
-                                    break;
-                            
-                            }
-                            else
-#line 349
-                                break;
-                        
-                        }
-#line 351
-                    if (type == FMT_TYPE_INVALID)
-                        out << "<invalid>";
-                    else 
-#line 353
-                    if (type == FMT_TYPE_VALUE)
-                    {
-#line 354
-                        if (arg < MAX_ARGS)
-                            out << v[arg ++ ] -> AsString();
-                        else
-                            out << "<arg overflow " << arg ++ << ">";
-                    }
-                }
-                else
-                {
-#line 361
-                    out.Cat(chr);
-                }
-            }
-        return out;
-    };
-    
-#line 252
+#line 252 "../../src/Com/Interface.fog"
     Text::String GetValueTreeString(const Value& v, Text::String key, int indent)
     {
 #line 253
@@ -182,6 +93,100 @@ namespace Interface
         return s;
     };
     
+#line 325
+    Formater& Formater::operator()(Text::String s)
+    {
+#line 325
+        values.Add().Create1 < Text::String > (s);
+#line 325
+        return *this;
+    };
+    
+#line 324
+    Formater& Formater::operator()(int i)
+    {
+#line 324
+        values.Add().Create1 < int > (i);
+#line 324
+        return *this;
+    };
+    
+#line 326
+    Formater::operator Text::String()
+    {
+#line 327
+        if (pattern.IsEmpty())
+#line 327
+            return "";
+#line 329
+        int arg = 0;
+        Text::String out;
+        const char * it = pattern.Begin();
+        const char * end = pattern.End();
+        while (it != end)
+            {
+#line 334
+                int chr = *it ++ ;
+#line 337
+                if (chr == 92 && *it == 37)
+                {
+#line 338
+                    chr = *it ++ ;
+                    out.Cat(chr);
+                }
+                else 
+                if (chr == 37)
+                {
+#line 343
+                    int state = FMT_MAIN_SWITCH;
+                    int type = FMT_TYPE_INVALID;
+                    while (it != end)
+                        {
+#line 346
+                            chr = *it ++ ;
+                            if (state == FMT_MAIN_SWITCH)
+                            {
+#line 348
+                                if (chr == 'v')
+                                {
+#line 349
+                                    type = FMT_TYPE_VALUE;
+                                    break;
+                                
+                                }
+                                else
+#line 352
+                                    break;
+                            
+                            }
+                            else
+#line 354
+                                break;
+                        
+                        }
+#line 356
+                    if (type == FMT_TYPE_INVALID)
+                        out << "<invalid>";
+                    else 
+#line 358
+                    if (type == FMT_TYPE_VALUE)
+                    {
+#line 359
+                        if (arg < values.GetCount())
+                            out << values[arg ++ ].AsString();
+                        else
+                            out << "<arg overflow " << arg ++ << ">";
+                    }
+                }
+                else
+                {
+#line 366
+                    out.Cat(chr);
+                }
+            }
+        return out;
+    };
+    
 #line 93
     Value::Value(const char *str)
     {
@@ -194,105 +199,105 @@ namespace Interface
 #line 139
     Value *Value::AddMapSub(Text::String key, Value *def)
     {
-#line 480
+#line 486
         if (IsMap() || IsArrayMapComb())
         {
-#line 481
+#line 487
             ValueMap * map;
             if (IsMap())
-#line 482
+#line 488
                 map = &Get < ValueMap > ();
             else
-#line 483
+#line 489
                 map = &Get < ValueArrayMapComb > ().map;
             int i = map -> Find(key);
             if (i >= 0)
                 return 0;
             else 
-#line 487
+#line 493
             if (def)
                 return&map -> Add(key, *def);
             else
                 return&map -> Add(key);
         }
         else
-#line 492
+#line 498
             return 0;
     };
     
-#line 388
+#line 394
     ValueArray& Value::CreateArray()
     {
-#line 389
+#line 395
         Create < ValueArray > ();
         return GetArray();
     };
     
-#line 383
+#line 389
     ValueMap& Value::CreateMap()
     {
-#line 384
+#line 390
         Create < ValueMap > ();
         return GetMap();
     };
     
-#line 511
+#line 517
     void Value::DeepCopyArrayMap(Value v)
     {
-#line 512
+#line 518
         if (v.IsArray())
             CreateArray().DeepCopyArrayMap(v.GetArray());
         else 
-#line 514
+#line 520
         if (v.IsMap())
             CreateMap().DeepCopyArrayMap(v.GetMap());
         else
-#line 516
+#line 522
             *this = v;
     };
     
 #line 140
     Value *Value::GetAddMapSub(Text::String key, Value *def)
     {
-#line 496
+#line 502
         if (IsMap() || IsArrayMapComb())
         {
-#line 497
+#line 503
             ValueMap * map;
             if (IsMap())
-#line 498
+#line 504
                 map = &Get < ValueMap > ();
             else
-#line 499
+#line 505
                 map = &Get < ValueArrayMapComb > ().map;
             int i = map -> Find(key);
             if (i >= 0)
                 return&map -> At(i);
             else 
-#line 503
+#line 509
             if (def)
                 return&map -> Add(key, *def);
             else
                 return&map -> Add(key);
         }
         else
-#line 508
+#line 514
             return 0;
     };
     
-#line 459
+#line 465
     ValueArray& Value::GetArray()
     {
-#line 460
+#line 466
         if (!Is < ValueArray > ())
             throw Text::Exc("Not a ValueArray");
         return Get < ValueArray > ();
     };
     
-#line 447
+#line 453
     const ValueArray& Value::GetArray() const
     {
-#line 448
+#line 454
         if (!Is < ValueArray > ())
             throw Text::Exc("Not a ValueArray");
         return Get < ValueArray > ();
@@ -300,16 +305,16 @@ namespace Interface
     
     ValueMap& Value::GetMap()
     {
-#line 454
+#line 460
         if (!Is < ValueMap > ())
             throw Text::Exc("Not a ValueMap");
         return Get < ValueMap > ();
     };
     
-#line 441
+#line 447
     const ValueMap& Value::GetMap() const
     {
-#line 442
+#line 448
         if (!Is < ValueMap > ())
             throw Text::Exc("Not a ValueMap");
         return Get < ValueMap > ();
@@ -318,16 +323,16 @@ namespace Interface
 #line 138
     Value *Value::GetMapSub(Text::String key, Value *def)
     {
-#line 466
+#line 472
         if (IsMap() || IsArrayMapComb())
         {
-#line 467
+#line 473
             ValueMap * map;
             if (IsMap())
-#line 468
+#line 474
                 map = &Get < ValueMap > ();
             else
-#line 469
+#line 475
                 map = &Get < ValueArrayMapComb > ().map;
             int i = map -> Find(key);
             if (i >= 0)
@@ -336,21 +341,21 @@ namespace Interface
                 return 0;
         }
         else
-#line 476
+#line 482
             return 0;
     };
     
-#line 393
+#line 399
     bool Value::IsArray() const
     {
-#line 394
+#line 400
         return Is < ValueArray > ();
     };
     
-#line 401
+#line 407
     bool Value::IsArrayMapComb() const
     {
-#line 402
+#line 408
         return Is < ValueArrayMapComb > ();
     };
     
@@ -368,10 +373,10 @@ namespace Interface
         return !obj.IsEmpty() && obj -> GetType() == INT64_V;
     };
     
-#line 397
+#line 403
     bool Value::IsMap() const
     {
-#line 398
+#line 404
         return Is < ValueMap > ();
     };
     
@@ -393,56 +398,56 @@ namespace Interface
         return true;
     };
     
-#line 423
+#line 429
     ValueArray *Value::TryGetArray()
     {
-#line 424
+#line 430
         if (IsArray())
             return&Get < ValueArray > ();
         else 
-#line 426
+#line 432
         if (IsArrayMapComb())
             return&Get < ValueArrayMapComb > ().arr;
         else
             return 0;
     };
     
-#line 405
+#line 411
     const ValueArray *Value::TryGetArray() const
     {
-#line 406
+#line 412
         if (IsArray())
             return&Get < ValueArray > ();
         else 
-#line 408
+#line 414
         if (IsArrayMapComb())
             return&Get < ValueArrayMapComb > ().arr;
         else
             return 0;
     };
     
-#line 432
+#line 438
     ValueMap *Value::TryGetMap()
     {
-#line 433
+#line 439
         if (IsMap())
             return&Get < ValueMap > ();
         else 
-#line 435
+#line 441
         if (IsArrayMapComb())
             return&Get < ValueArrayMapComb > ().map;
         else
             return 0;
     };
     
-#line 414
+#line 420
     const ValueMap *Value::TryGetMap() const
     {
-#line 415
+#line 421
         if (IsMap())
             return&Get < ValueMap > ();
         else 
-#line 417
+#line 423
         if (IsArrayMapComb())
             return&Get < ValueArrayMapComb > ().map;
         else
@@ -460,15 +465,15 @@ namespace Interface
         return s;
     };
     
-#line 528
+#line 534
     void ValueArray::DeepCopyArrayMap(ValueArray& arr)
     {
-#line 529
+#line 535
         Clear();
         SetCount(arr.GetCount());
         for (int i = 0; i < GetCount(); i ++ )
             {
-#line 532
+#line 538
                 Value & from = arr.At(i);
                 Value & dst = At(i);
                 dst.DeepCopyArrayMap(from);
@@ -504,22 +509,22 @@ namespace Interface
         map.Clear();
     };
     
-#line 554
+#line 560
     void ValueArrayMapComb::DeepCopyArrayMap(ValueArrayMapComb& am)
     {
-#line 555
+#line 561
         Clear();
         arr.SetCount(am.arr.GetCount());
         for (int i = 0; i < arr.GetCount(); i ++ )
             {
-#line 558
+#line 564
                 Value & from = am.arr.At(i);
                 Value & dst = arr.At(i);
                 dst.DeepCopyArrayMap(from);
             }
         for (int i = 0; i < am.map.GetCount(); i ++ )
             {
-#line 563
+#line 569
                 Text::String key = am.map.GetKey(i);
                 Value & from = am.map.At(i);
                 Value & dst = map.Add(key);
@@ -580,14 +585,14 @@ namespace Interface
         values.Clear();
     };
     
-#line 541
+#line 547
     void ValueMap::DeepCopyArrayMap(ValueMap& map)
     {
-#line 542
+#line 548
         Clear();
         for (int i = 0; i < map.GetCount(); i ++ )
             {
-#line 544
+#line 550
                 Text::String key = map.GetKey(i);
                 Value & from = map.At(i);
                 Value & dst = Add(key);

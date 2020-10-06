@@ -14,12 +14,6 @@ struct NamespaceInterfaceLinker
 #ifndef TEXTPROC_HXX
 #include <TextProc.hxx>
 #endif
-#ifndef CONCURRENCY_HXX
-#include <Concurrency.hxx>
-#endif
-#ifndef MATH_HXX
-#include <Math.hxx>
-#endif
 
 namespace Main
 {

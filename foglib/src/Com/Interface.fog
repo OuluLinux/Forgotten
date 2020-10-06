@@ -315,54 +315,60 @@ enum {
 	FMT_TYPE_VALUE,
 };
 
-String Format(String pattern, Value v0, Value v1, Value v2, Value v3, Value v4, Value v5, Value v6, Value v7) {
-	static const int MAX_ARGS = 8;
-	Value* v[MAX_ARGS] = {&v0, &v1, &v2, &v3, &v4, &v5, &v6, &v7};
+struct Formater {
+	String pattern;
+	Vector<Value> values;
 	
-	if (pattern.IsEmpty()) return "";
-	
-	int arg = 0;
-	String out;
-	const char* it  = pattern.Begin();
-	const char* end = pattern.End();
-	while (it != end) {
-		int chr = *it++;
+	Formater(String pattern) : pattern(pattern) {}
+	Formater& operator()(Value v) {values.Add(v); return *this;}
+	Formater& operator()(int i) {values.Add().Create1<int>(i); return *this;}
+	Formater& operator()(String s) {values.Add().Create1<String>(s); return *this;}
+	operator String() {
+		if (pattern.IsEmpty()) return "";
 		
-		// \ or %
-		if (chr == 92 && *it == 37) {
-			chr = *it++;
-			out.Cat(chr);
-		}
-		// %
-		else if (chr == 37) {
-			int state = FMT_MAIN_SWITCH;
-			int type = FMT_TYPE_INVALID;
-			while (it != end) {
+		int arg = 0;
+		String out;
+		const char* it  = pattern.Begin();
+		const char* end = pattern.End();
+		while (it != end) {
+			int chr = *it++;
+			
+			// \ or %
+			if (chr == 92 && *it == 37) {
 				chr = *it++;
-				if (state == FMT_MAIN_SWITCH) {
-					if (chr == 'v') {
-						type = FMT_TYPE_VALUE;
-						break;
+				out.Cat(chr);
+			}
+			// %
+			else if (chr == 37) {
+				int state = FMT_MAIN_SWITCH;
+				int type = FMT_TYPE_INVALID;
+				while (it != end) {
+					chr = *it++;
+					if (state == FMT_MAIN_SWITCH) {
+						if (chr == 'v') {
+							type = FMT_TYPE_VALUE;
+							break;
+						}
+						else break;
 					}
 					else break;
 				}
-				else break;
+				if (type == FMT_TYPE_INVALID)
+					out << "<invalid>";
+				else if (type == FMT_TYPE_VALUE) {
+					if (arg < values.GetCount())
+						out << values[arg++].AsString();
+					else
+						out << "<arg overflow " << arg++ << ">";
+				}
 			}
-			if (type == FMT_TYPE_INVALID)
-				out << "<invalid>";
-			else if (type == FMT_TYPE_VALUE) {
-				if (arg < MAX_ARGS)
-					out << v[arg++]->AsString();
-				else
-					out << "<arg overflow " << arg++ << ">";
+			else {
+				out.Cat(chr);
 			}
 		}
-		else {
-			out.Cat(chr);
-		}
+		return out;
 	}
-	return out;
-}
+};
 
 
 
@@ -575,4 +581,6 @@ void ValueArrayMapComb::DeepCopyArrayMap(ValueArrayMapComb& am) {
 #define ValueArray			Interface::ValueArray
 #define ValueArrayMapComb	Interface::ValueArrayMapComb
 #define GetValueTreeString	Interface::GetValueTreeString
+#define Formater			Interface::Formater
+#define AsValue				Interface::AsValue
 

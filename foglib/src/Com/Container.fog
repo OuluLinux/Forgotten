@@ -287,7 +287,12 @@ public:
 	inline void Append(const VectorPtr& v) {data.Append(v.data);}
 	inline K& operator[](int i) {return *data[i];}
 	inline const K& operator[](int i) const {return *data[i];}
+	inline K*& Ref(int i) {return data[i];}
 	inline void Clear() {data.Clear();}
+	inline K* Pop() {return data.Pop();}
+	inline void SetCount(int i) {data.SetCount(i, 0);}
+	inline FwdPtrIterator<K> Begin() {return FwdPtrIterator<K>(data.Get());}
+	inline FwdPtrIterator<K> End() {return FwdPtrIterator<K>(data.GetEnd());}
 	
 	inline String Join(String join_str = "", bool ignore_empty = true) const {
 		String out;
@@ -877,6 +882,15 @@ struct CachingVector {
 	typename FwdIterator<T> end() {return data.begin() + count;}
 	typename FwdIterator<T> End() {return data.begin() + count;}
 };
+
+
+
+
+
+
+
+
+
 
 }
 

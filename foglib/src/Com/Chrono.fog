@@ -67,6 +67,16 @@ public:
 	double ElapsedSeconds() const {return tp->ElapsedSeconds();}
 	int ResetElapsed() {return tp->ResetElapsed();}
 	double ResetElapsedSeconds() {return tp->ResetElapsedSeconds();}
+	String AsString() const {
+		double d = ElapsedSeconds();
+		int sec = d;
+		int ms = (d - (double)sec) * 1000;
+		String s;
+		if (!sec && !ms) return "0 ms";
+		if (sec)	{s << IntStr(sec) << " seconds";}
+		if (ms)		{if (sec) {s.Cat(' ');} s << IntStr(ms) << " ms";}
+		return s;
+	}
 };
 
 
@@ -313,3 +323,4 @@ double OnlineFrequencyWindow::Get() const {
 
 #define Date		Chrono::Date
 #define Time		Chrono::Time
+#define TimeStop		Chrono::TimeStop

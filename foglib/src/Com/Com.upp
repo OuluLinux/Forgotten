@@ -31,6 +31,7 @@ file
 	Concurrency.fog,
 	Network.fog,
 	Interface.fog,
+	LockedContainer.fog,
 	CompilerBase.fog,
 	Tokenizer.fog,
 	JSON.fog,

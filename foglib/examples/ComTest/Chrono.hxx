@@ -22,7 +22,7 @@ namespace Chrono
 {
 #line 52 "../../src/Com/Chrono.fog"
     inline Time operator+ (const Time& t, Lang::int64 seconds);
-#line 272
+#line 282
     Text::String GetTimeDurationString(Time begin, Time end);
     
     class Date
@@ -38,23 +38,23 @@ namespace Chrono
         inline Date();
 #line 17
         bool operator== (const Date& d) const;
-#line 132
+#line 142
         Lang::int64 Get() const;
 #line 15
         void Set(Lang::int64 scalar);
-#line 147
+#line 157
         void Set(int d);
-#line 141
+#line 151
         void Set(int y, int m, int d);
         
     public:
-#line 113
-        static const int *DaysInMonth();
-#line 127
-        static int GetDaysOfMonth(int m, int y);
 #line 123
+        static const int *DaysInMonth();
+#line 137
+        static int GetDaysOfMonth(int m, int y);
+#line 133
         static bool IsLeapYear(int year);
-#line 118
+#line 128
         static const int *MonthDayOffset();
     };
     
@@ -74,24 +74,24 @@ namespace Chrono
         inline Time(int y, int m, int d, int h, int min, int s);
 #line 43
         bool operator== (const Time& t) const;
-#line 228
+#line 238
         Text::String AsDiffString() const;
-#line 211
+#line 221
         Text::String AsString() const;
 #line 39
         Lang::int64 Get() const;
         Lang::uint32 GetHashValue();
-#line 267
+#line 277
         int GetStamp() const;
-#line 201
+#line 211
         void Set(Lang::int64 scalar);
-#line 194
+#line 204
         void Set(int y, int mon, int d, int h, int m, int s);
-#line 262
+#line 272
         void SetFromStamp(int seconds);
         
     public:
-#line 256
+#line 266
         static Time GetSys();
     };
     
@@ -103,6 +103,8 @@ namespace Chrono
     public:
         TimeStop();
         inline ~TimeStop();
+#line 70
+        Text::String AsString() const;
 #line 66
         inline int Elapsed() const;
         inline double ElapsedSeconds() const;
@@ -115,45 +117,46 @@ namespace Chrono
     
     struct OnlineFrequency
     {
+#line 84
         TimeStop timer;
         int ticks;
         
         inline OnlineFrequency();
-#line 83
+#line 93
         inline double operator++ ();
-#line 82
+#line 92
         inline operator double() const;
-#line 79
+#line 89
         double Get() const;
-#line 78
+#line 88
         inline void Reset();
-#line 80
+#line 90
         inline void Tick();
     };
     
     struct OnlineFrequencyWindow
     {
-#line 87
+#line 97
         OnlineFrequency freq0;
-#line 87
+#line 97
         OnlineFrequency freq1;
         bool which;
         double interval;
         
         OnlineFrequencyWindow();
-#line 98
+#line 108
         inline double operator++ ();
-#line 97
+#line 107
         inline operator double() const;
-#line 306
+#line 316
         double Get() const;
-#line 287
-        OnlineFrequency& GetActive();
-#line 292
-        OnlineFrequency& GetInactive();
-#line 94
-        inline void SwitchActive();
 #line 297
+        OnlineFrequency& GetActive();
+#line 302
+        OnlineFrequency& GetInactive();
+#line 104
+        inline void SwitchActive();
+#line 307
         void Tick();
     };
 };
@@ -172,64 +175,64 @@ namespace Chrono
 #line 12
     inline Date::Date() {};
     
-#line 77
+#line 87
     inline OnlineFrequency::OnlineFrequency()
     :
         ticks(0)
     {};
     
-#line 83
+#line 93
     inline double OnlineFrequency::operator++ ()
     {
-#line 83
+#line 93
         Tick();
-#line 83
+#line 93
         return Get();
     };
     
-#line 82
+#line 92
     inline OnlineFrequency::operator double() const
     {
-#line 82
+#line 92
         return Get();
     };
     
-#line 78
+#line 88
     inline void OnlineFrequency::Reset()
     {
-#line 78
+#line 88
         timer.Reset();
-#line 78
+#line 88
         ticks = 0;
     };
     
-#line 80
+#line 90
     inline void OnlineFrequency::Tick()
     {
-#line 80
+#line 90
         ticks ++ ;
     };
     
-#line 98
+#line 108
     inline double OnlineFrequencyWindow::operator++ ()
     {
-#line 98
+#line 108
         Tick();
-#line 98
+#line 108
         return Get();
     };
     
-#line 97
+#line 107
     inline OnlineFrequencyWindow::operator double() const
     {
-#line 97
+#line 107
         return Get();
     };
     
-#line 94
+#line 104
     inline void OnlineFrequencyWindow::SwitchActive()
     {
-#line 94
+#line 104
         which = !which;
     };
     

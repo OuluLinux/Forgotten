@@ -146,6 +146,7 @@ auto declaration MakeIterator(bool is_const, bool is_ptr, identifier name, numbe
 				K** kit;
 				public inline ${name}(K** kit) : kit(kit) {}
 				public inline K* Get() const {return *kit;}
+				public inline K*& Ref() {return *kit;}
 			} else {
 				K* kit;
 				public inline ${name}(K* kit) : kit(kit) {}

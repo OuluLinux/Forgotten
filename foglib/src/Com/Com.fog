@@ -15,9 +15,10 @@ namespace Math			{using/interface Util;};
 namespace Chrono		{using/interface Math;};
 namespace Indirect		{using/interface Chrono;};
 namespace Concurrency	{using/interface Indirect;};
-namespace Network		{using/interface Concurrency;};
-namespace Interface		{using/interface Network;};
-namespace TextProc		{using/interface Interface;};
+namespace Network			{using/interface Concurrency;};
+namespace Interface			{using/interface Network;};
+namespace LockedContainer	{using/interface Interface;};
+namespace TextProc			{using/interface LockedContainer;};
 
 #define NULL 0
 
@@ -41,6 +42,7 @@ using "Com/Indirect.fog";
 using "Com/Concurrency.fog";
 using "Com/Network.fog";
 using "Com/Interface.fog";
+using "Com/LockedContainer.fog";
 using "Com/CompilerBase.fog";
 using "Com/Tokenizer.fog";
 using "Com/JSON.fog";

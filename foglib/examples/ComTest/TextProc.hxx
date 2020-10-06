@@ -10,6 +10,10 @@
 #include <Util.hxx>
 #endif
 
+#ifndef LOCKEDCONTAINER_HXX
+#include <LockedContainer.hxx>
+#endif
+
 namespace TextProc
 {
     enum _anon_19
