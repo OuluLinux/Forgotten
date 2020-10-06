@@ -19,7 +19,7 @@ namespace Concurrency
     };
     
 #line 110
-    Mutex_Locker::Mutex_Locker(Mutex& m)
+    MutexLocker::MutexLocker(Mutex& m)
     :
         m(m)
     {
@@ -37,7 +37,7 @@ namespace Concurrency
     };
     
 #line 132
-    RWMutex_ReadLocker::RWMutex_ReadLocker(RWMutex& m)
+    RWMutexReadLocker::RWMutexReadLocker(RWMutex& m)
     :
         m(m)
     {
@@ -46,12 +46,73 @@ namespace Concurrency
     };
     
 #line 139
-    RWMutex_WriteLocker::RWMutex_WriteLocker(RWMutex& m)
+    RWMutexWriteLocker::RWMutexWriteLocker(RWMutex& m)
     :
         m(m)
     {
 #line 139
         m.EnterWrite();
+    };
+    
+#line 363
+    RunningFlag::RunningFlag()
+    :
+        sleep_time(100),
+        running(false)
+    {
+#line 363
+        workers_running = 0;
+    };
+    
+#line 368
+    void RunningFlag::DecreaseRunning()
+    {
+#line 368
+        workers_running -- ;
+#line 368
+        if (workers_running == 0)
+#line 368
+            running = false;
+    };
+    
+#line 364
+    void RunningFlag::Start(int count)
+    {
+#line 364
+        Stop();
+#line 364
+        running = true;
+#line 364
+        workers_running = count;
+    };
+    
+#line 365
+    void RunningFlag::Stop()
+    {
+#line 365
+        running = false;
+#line 365
+        while (workers_running > 0)
+#line 365
+            Native::Sleep(sleep_time);
+    };
+    
+#line 349
+    RunningFlagSingle::RunningFlagSingle()
+    :
+        running(false),
+        stopped(true)
+    {};
+    
+#line 354
+    void RunningFlagSingle::Stop()
+    {
+#line 354
+        running = false;
+#line 354
+        while (!stopped)
+#line 354
+            Native::Sleep(100);
     };
     
 #line 72

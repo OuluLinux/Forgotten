@@ -663,19 +663,233 @@ inline I FindIf(I first, I last, P pred) {
 
 
 
+
+
+
+
+
+
+
+
+auto declaration MakeFixedArray(token I) {
+	template <class T>
+	struct FixedArray$I {
+		static const int size = $I;
+		
+		T vector[$I];
+		
+		inline T&       operator[](int i)				{ASSERT(i >= 0 && i < size); return vector[i];}
+		inline const T& operator[](int i) const		{ASSERT(i >= 0 && i < size); return vector[i];}
+		inline void operator=(const T& value)			{for(int i = 0; i < size; i++) this->vector[i] = value;}
+		inline void operator=(const FixedArray$I& value)	{for(int i = 0; i < size; i++) this->vector[i] = value.vector[i];}
+	};
 }
 
-#define Pick		Container::Pick
-#define Swap		Container::Swap
-#define Reverse		Container::Reverse
-#define One			Container::One
-#define FutureOne	Container::FutureOne
-#define Optional	Container::Optional
-#define Vector		Container::Vector
-#define VectorPtr	Container::VectorPtr
-#define Array		Container::Array
-#define Index		Container::Index
-#define VectorMap	Container::VectorMap
-#define ArrayMap	Container::ArrayMap
-#define FindIf		Container::FindIf
+$MakeFixedArray(2);
+
+
+auto declaration MakeTopValueSorter(token I, token Key=int, token Value=double) {
+	struct TopValueSorter$I {
+		static const int size = $I;
+		typedef $Key Key;
+		typedef $Value Value;
+		
+		Key		key[$I];
+		Value	value[$I];
+		int		count = 0;
+		
+		
+		TopValueSorter${I}() {Reset();}
+		void Reset() {
+			count = 0;
+			for(int i = 0; i < size; i++) {
+				value[i] = -DBL_MAX;
+				key[i] = -1;
+			}
+		}
+		void Add(const Key& key, const Value& value) {
+			if (value <= this->value[size-1])
+				return;
+			for(int i = 0; i < size; i++) {
+				if (value > this->value[i]) {
+					for(int j = size-1; j > i; j--) {
+						this->value[j] = this->value[j-1];
+						this->key[j]   = this->key[j-1];
+					}
+					this->value[i] = value;
+					this->key[i] = key;
+					count = Min(count+1, size);
+					break;
+				}
+			}
+		}
+		void Serialize(StreamBase& s) {
+			for(int i = 0; i < size; i++)
+				s % value[i] % key[i];
+		}
+	};
+}
+
+$MakeTopValueSorter(10);
+
+
+
+template <class T>
+class TreeArray {
+	
+public:
+	typedef TreeArray<T> PA;
+	
+private:
+	PA* down = NULL;
+	Array<T> branch;
+	
+protected:
+	
+	inline T& Add() {T& t = branch.Add(); t.down = this; return t;}
+	inline T& Insert(int i) {T& t = branch.Insert(i); t.down = this; return t;}
+	
+	inline void Copy(const PA& src) {branch <<= src.branch; for(int i = 0; i < branch.GetCount(); i++) branch[i].down = this;}
+	
+public:
+	
+	inline T* GetParent() const {return down;}
+	inline T& Add(T* n) {ASSERT(n->down == NULL); T& t = branch.Add(n); t.down = this; return t;}
+	inline T& Insert(int i, T* n) {ASSERT(n->down == NULL); T& t = branch.Insert(i, n); t.down = this; return t;}
+	
+	inline void Clear() {branch.Clear();}
+	inline void Remove(int i) {branch.Remove(i);}
+	inline void Remove(int i, int count) {branch.Remove(i, count);}
+	inline void RemoveLast() {branch.Remove(branch.GetCount()-1);}
+	inline T* Detach(int i) {T* t = branch.Detach(i); t->down = NULL; return t;}
+	
+	inline T& At(int i) {return branch[i];}
+	inline T& AtTop(int i) {if (i < branch.GetCount()) return branch[i]; return branch.Top();}
+	inline T& At(int i, T& n) {if (i < branch.GetCount()) return branch[i]; return n;}
+	inline const T& At(int i) const {return branch[i];}
+	inline T& Top() {return branch.Top();}
+	
+	inline int GetCount() const {return branch.GetCount();}
+	inline bool IsEmpty() const {return branch.IsEmpty();}
+	
+	inline void SortByInt() {
+		struct Sorter {
+			bool operator() (const T& a, const T& b) const {return a.GetInt() < b.GetInt();}
+		};
+		Sort(branch, Sorter());
+	}
+	
+	inline void Serialize(StreamBase& s) {
+		s % branch;
+		if (s.IsLoading())
+			for(int i = 0; i < branch.GetCount(); i++)
+				branch[i].down = this;
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct SortedIntMap {
+	DynArray<DynArray<int> > data;
+	DynArray<uint64> value_mask;
+	int count = 0;
+	int first_data_i = INT_MAX;
+	
+	void Reserve(int count) {
+		if (count > data.GetCount()) {
+			data.SetCount(count);
+			int value_count = count / 64 + 1;
+			value_mask.SetCount(value_count, 0);
+		}
+	}
+	
+	void Clear() {
+		{
+			FwdIterator<DynArray<int> > it = data.Begin();
+			FwdIterator<DynArray<int> > end = data.End();
+			for (; it != end; ++it) it->SetCount(0);
+		}
+		{
+			FwdIterator<uint64> it = value_mask.Begin();
+			FwdIterator<uint64> end = value_mask.End();
+			for (; it != end; ++it) *it = 0;
+		}
+		//for(int i = 0; i < data.GetCount(); i++) data[i].SetCount(0);
+		//for(int i = 0; i < value_mask.GetCount(); i++) value_mask[i] = 0;
+		count = 0;
+		first_data_i = INT_MAX;
+	}
+	
+	void Add(int key, int value) {
+		DynArray<int>& key_vec = data[key];
+		if (key_vec.IsEmpty()) {
+			int mask_i = key / 64;
+			int64 bit_i = key % 64;
+			uint64& v = value_mask[mask_i];
+			uint64 add = 1LL << bit_i;
+			v |= add;
+		}
+		key_vec.Add(value);
+		count++;
+		if (key < first_data_i)
+			first_data_i = key;
+	}
+	
+};
+
+
+
+
+
+
+
+
+// Destroying objects might be costly and pointless in some code, so use this.
+template <class T>
+struct CachingVector {
+	$MakeMoveable();
+	
+	typedef Vector<T> Vec;
+	Vector<T> data;
+	int count = 0;
+
+
+	const T& operator[](int i) const {return data[i];}
+	T& operator[](int i) {return data[i];}
+	int GetCount() const {return count;}
+	void SetCount(int i) {if (data.GetCount() < i) data.SetCount(i); count = i;}
+	typename FwdIterator<T> begin() {return data.begin();}
+	typename FwdIterator<T> Begin() {return data.begin();}
+	typename FwdIterator<T> end() {return data.begin() + count;}
+	typename FwdIterator<T> End() {return data.begin() + count;}
+};
+
+}
+
+#define Pick				Container::Pick
+#define Swap				Container::Swap
+#define Reverse				Container::Reverse
+#define One					Container::One
+#define FutureOne			Container::FutureOne
+#define Optional			Container::Optional
+#define Vector				Container::Vector
+#define VectorPtr			Container::VectorPtr
+#define Array				Container::Array
+#define Index				Container::Index
+#define VectorMap			Container::VectorMap
+#define ArrayMap			Container::ArrayMap
+#define FindIf				Container::FindIf
+#define FixedArray2			Container::FixedArray2
+#define TopValueSorter10	Container::TopValueSorter10
+#define CachingVector		Container::CachingVector
 

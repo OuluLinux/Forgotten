@@ -31,15 +31,15 @@ class Mutex;
 
 namespace Concurrency
 {
-    class Mutex_Locker
+    class MutexLocker
     {
 #line 108
         Mutex& m;
         
     public:
 #line 110
-        Mutex_Locker(Mutex& m);
-        inline ~Mutex_Locker();
+        MutexLocker(Mutex& m);
+        inline ~MutexLocker();
     };
     
     namespace Native
@@ -140,26 +140,68 @@ namespace Concurrency
         inline void LeaveWrite();
     };
     
-    class RWMutex_ReadLocker
+    class RWMutexReadLocker
     {
 #line 130
         RWMutex& m;
         
     public:
 #line 132
-        RWMutex_ReadLocker(RWMutex& m);
-        inline ~RWMutex_ReadLocker();
+        RWMutexReadLocker(RWMutex& m);
+        inline ~RWMutexReadLocker();
     };
     
-    class RWMutex_WriteLocker
+    class RWMutexWriteLocker
     {
 #line 137
         RWMutex& m;
         
     public:
 #line 139
-        RWMutex_WriteLocker(RWMutex& m);
-        inline ~RWMutex_WriteLocker();
+        RWMutexWriteLocker(RWMutex& m);
+        inline ~RWMutexWriteLocker();
+    };
+    
+    struct RunningFlag
+    {
+#line 359
+        int sleep_time;
+        bool running;
+        Lang::AtomicInt workers_running;
+        
+        RunningFlag();
+#line 368
+        void DecreaseRunning();
+#line 367
+        inline void IncreaseRunning();
+#line 369
+        inline bool IsRunning() const;
+#line 366
+        inline void SetNotRunning();
+#line 364
+        void Start(int count);
+        void Stop();
+#line 370
+        inline void Wait();
+    };
+    
+    class RunningFlagSingle
+    {
+#line 346
+        bool running;
+#line 346
+        bool stopped;
+        
+    public:
+        RunningFlagSingle();
+        inline bool IsRunning() const;
+#line 352
+        inline void SetNotRunning();
+#line 351
+        inline void SetStopped();
+#line 353
+        inline void Start();
+        void Stop();
     };
     
     class Thread
@@ -318,7 +360,7 @@ namespace Concurrency
     };
     
 #line 111
-    inline Mutex_Locker::~Mutex_Locker()
+    inline MutexLocker::~MutexLocker()
     {
 #line 111
         m.Leave();
@@ -359,17 +401,77 @@ namespace Concurrency
     };
     
 #line 133
-    inline RWMutex_ReadLocker::~RWMutex_ReadLocker()
+    inline RWMutexReadLocker::~RWMutexReadLocker()
     {
 #line 133
         m.LeaveRead();
     };
     
 #line 140
-    inline RWMutex_WriteLocker::~RWMutex_WriteLocker()
+    inline RWMutexWriteLocker::~RWMutexWriteLocker()
     {
 #line 140
         m.LeaveWrite();
+    };
+    
+#line 367
+    inline void RunningFlag::IncreaseRunning()
+    {
+#line 367
+        workers_running ++ ;
+    };
+    
+#line 369
+    inline bool RunningFlag::IsRunning() const
+    {
+#line 369
+        return running;
+    };
+    
+#line 366
+    inline void RunningFlag::SetNotRunning()
+    {
+#line 366
+        running = false;
+    };
+    
+#line 370
+    inline void RunningFlag::Wait()
+    {
+#line 370
+        while ((int) workers_running != 0)
+#line 370
+            Native::Sleep(100);
+    };
+    
+#line 350
+    inline bool RunningFlagSingle::IsRunning() const
+    {
+#line 350
+        return running;
+    };
+    
+#line 352
+    inline void RunningFlagSingle::SetNotRunning()
+    {
+#line 352
+        running = false;
+    };
+    
+#line 351
+    inline void RunningFlagSingle::SetStopped()
+    {
+#line 351
+        stopped = true;
+    };
+    
+#line 353
+    inline void RunningFlagSingle::Start()
+    {
+#line 353
+        running = true;
+#line 353
+        stopped = false;
     };
     
 #line 57

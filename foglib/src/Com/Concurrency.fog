@@ -104,11 +104,11 @@ public:
 
 
 
-class Mutex_Locker {
+class MutexLocker {
 	Mutex& m;
 public:
-	Mutex_Locker(Mutex& m) : m(m) {m.Enter();}
-	~Mutex_Locker() {m.Leave();}
+	MutexLocker(Mutex& m) : m(m) {m.Enter();}
+	~MutexLocker() {m.Leave();}
 };
 
 
@@ -126,18 +126,18 @@ public:
 };
 
 
-class RWMutex_ReadLocker {
+class RWMutexReadLocker {
 	RWMutex& m;
 public:
-	RWMutex_ReadLocker(RWMutex& m) : m(m) {m.EnterRead();}
-	~RWMutex_ReadLocker() {m.LeaveRead();}
+	RWMutexReadLocker(RWMutex& m) : m(m) {m.EnterRead();}
+	~RWMutexReadLocker() {m.LeaveRead();}
 };
 
-class RWMutex_WriteLocker {
+class RWMutexWriteLocker {
 	RWMutex& m;
 public:
-	RWMutex_WriteLocker(RWMutex& m) : m(m) {m.EnterWrite();}
-	~RWMutex_WriteLocker() {m.LeaveWrite();}
+	RWMutexWriteLocker(RWMutex& m) : m(m) {m.EnterWrite();}
+	~RWMutexWriteLocker() {m.LeaveWrite();}
 };
 
 
@@ -333,10 +333,64 @@ private:
 	byte dummy;
 };
 
+
+
+
+
+
+
+
+
+
+class RunningFlagSingle {
+	bool running = false, stopped = true;
+	
+public:
+	RunningFlagSingle() {}
+	bool IsRunning() const {return running;}
+	void SetStopped() {stopped = true;}
+	void SetNotRunning() {running = false;}
+	void Start() {running = true; stopped = false;}
+	void Stop() {running = false; while (!stopped) Native::Sleep(100);}
+	
+};
+
+struct RunningFlag {
+	int sleep_time = 100;
+	bool running = false;
+	AtomicInt workers_running;
+	
+	RunningFlag() {workers_running = 0;}
+	void Start(int count) {Stop(); running = true; workers_running = count;}
+	void Stop() {running = false; while (workers_running > 0) Native::Sleep(sleep_time);}
+	void SetNotRunning() {running = false;}
+	void IncreaseRunning() {workers_running++;}
+	void DecreaseRunning() {workers_running--; if (workers_running == 0) running = false;}
+	bool IsRunning() const {return running;}
+	void Wait() {while ((int)workers_running != 0) Native::Sleep(100);}
+};
+
+
+
+
+
+
+
 }
 
-#define Thread			Concurrency::Thread
-#define Mutex			Concurrency::Mutex
 
-
+#define Thread				Concurrency::Thread
+#define Mutex				Concurrency::Mutex
+#define MutexLocker			Concurrency::MutexLocker
+#define RWMutex				Concurrency::RWMutex
+#define RWMutexReadLocker	Concurrency::RWMutexReadLocker
+#define RWMutexWriteLocker	Concurrency::RWMutexWriteLocker
+#define TimelineEnv			Concurrency::TimelineEnv
+#define GetTimelineEnv		Concurrency::GetTimelineEnv
+#define PostCallback		Concurrency::PostCallback
+#define TimeCallback		Concurrency::TimeCallback
+#define RunningFlagSingle	Concurrency::RunningFlagSingle
+#define RunningFlag			Concurrency::RunningFlag
+#define FixedArray			Concurrency::FixedArray
+#define TopValueSorter		Concurrency::TopValueSorter
 

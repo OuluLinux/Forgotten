@@ -41,6 +41,37 @@ using "Com/Concurrency.fog";
 using "Com/CompilerBase.fog";
 
 /*
-using "Com/Concurrency.fog";
+TODO:
+	Types.h
+	TypeTraits.h
+	Socket.h
+	Graph.h
+	Geom.h
+	Ptr.h
+	Topt.h
+	Value.h
+	Tokenizer.h
+	JSON.h
+	Management.h
+	Neural.h
+	Misc.h
+	CLI.h
+	DCT.h
+	Heap.h
+	Version.h
+	GeneticOptimizer.h
+	Coordinate.h
+	ECS.h
+	
+	ActionPlanner
+		PipelinePlanner
+	
+	HtmlElements
+	FFT
+	NativeGuiWindow
+	WindowManager
+	
 */
+
+
 

@@ -113,6 +113,24 @@ namespace Container
     };
     
     template < class _1 >
+    struct FixedArray2
+    {
+#line 679
+        _1 vector[2];
+        
+#line 684
+        inline void operator= (const FixedArray2& value);
+#line 683
+        inline void operator= (const _1& value);
+#line 681
+        inline _1& operator[](int i);
+        inline const _1& operator[](int i) const;
+        
+#line 677
+        static const int size;
+    };
+    
+    template < class _1 >
     class Index
     {
     public:
@@ -416,6 +434,98 @@ namespace Container
         void Pick(Optional& o);
     };
     
+    struct SortedIntMap
+    {
+#line 803
+        Lang::DynArray < Lang::DynArray < int > > data;
+        Lang::DynArray < Lang::uint64 > value_mask;
+        int count;
+        int first_data_i;
+        
+#line 833
+        void Add(int key, int value);
+#line 816
+        void Clear();
+#line 808
+        void Reserve(int count);
+    };
+    
+    struct TopValueSorter10
+    {
+#line 694
+        typedef int Key;
+        typedef double Value;
+        
+        Key key[10];
+        Value value[10];
+        int count;
+        
+#line 702
+        inline TopValueSorter10();
+#line 710
+        void Add(const Key& key, const Value& value);
+#line 703
+        void Reset();
+#line 726
+        void Serialize(Abstract::StreamBase& s);
+        
+#line 693
+        static const int size;
+    };
+    
+    template < class _1 >
+    class TreeArray
+    {
+    public:
+#line 741
+        typedef TreeArray < _1 > PA;
+        
+#line 744
+        PA *down;
+        Array < _1 > branch;
+        
+    public:
+#line 757
+        inline _1& Add(_1 *n);
+#line 766
+        inline _1& At(int i);
+#line 768
+        inline _1& At(int i, _1& n);
+        inline const _1& At(int i) const;
+#line 767
+        inline _1& AtTop(int i);
+#line 760
+        inline void Clear();
+#line 764
+        inline _1 *Detach(int i);
+#line 772
+        inline int GetCount() const;
+#line 756
+        inline _1 *GetParent() const;
+#line 758
+        inline _1& Insert(int i, _1 *n);
+#line 773
+        inline bool IsEmpty() const;
+#line 761
+        inline void Remove(int i);
+        inline void Remove(int i, int count);
+        inline void RemoveLast();
+#line 782
+        inline void Serialize(Abstract::StreamBase& s);
+#line 775
+        inline void SortByInt();
+#line 770
+        inline _1& Top();
+        
+    protected:
+#line 749
+        inline _1& Add();
+#line 752
+        inline void Copy(const PA& src);
+#line 750
+        inline _1& Insert(int i);
+    };
+    
     template < class _1 >
     class Vector : public Lang::DynArray < _1 >
     {
@@ -439,6 +549,32 @@ namespace Container
         inline void Serialize(Abstract::StreamBase& s);
 #line 222
         inline void Split(Text::String to_split, Text::String split_str, bool ignore_empty = true);
+    };
+    
+    template < class _1 >
+    struct CachingVector
+    {
+#line 862
+        typedef Vector < _1 > Vec;
+        
+#line 863
+        Vector < _1 > data;
+        int count;
+        
+#line 868
+        inline _1& operator[](int i);
+#line 867
+        inline const _1& operator[](int i) const;
+#line 872
+        inline typename Lang::FwdIterator < _1 > Begin();
+#line 874
+        inline typename Lang::FwdIterator < _1 > End();
+#line 869
+        inline int GetCount() const;
+        void SetCount(int i);
+        inline typename Lang::FwdIterator < _1 > begin();
+#line 873
+        inline typename Lang::FwdIterator < _1 > end();
     };
     
     template < class _1, class _2 >
@@ -1438,6 +1574,118 @@ namespace Container
         return End();
     };
     
+#line 868
+    template < class _1 >
+    inline _1& CachingVector < _1 >::operator[](int i)
+    {
+#line 868
+        return data[i];
+    };
+    
+#line 867
+    template < class _1 >
+    inline const _1& CachingVector < _1 >::operator[](int i) const
+    {
+#line 867
+        return data[i];
+    };
+    
+#line 872
+    template < class _1 >
+    inline typename Lang::FwdIterator < _1 > CachingVector < _1 >::Begin()
+    {
+#line 872
+        return data.begin();
+    };
+    
+#line 874
+    template < class _1 >
+    inline typename Lang::FwdIterator < _1 > CachingVector < _1 >::End()
+    {
+#line 874
+        return data.begin() + count;
+    };
+    
+#line 869
+    template < class _1 >
+    inline int CachingVector < _1 >::GetCount() const
+    {
+#line 869
+        return count;
+    };
+    
+#line 871
+    template < class _1 >
+    inline typename Lang::FwdIterator < _1 > CachingVector < _1 >::begin()
+    {
+#line 871
+        return data.begin();
+    };
+    
+#line 873
+    template < class _1 >
+    inline typename Lang::FwdIterator < _1 > CachingVector < _1 >::end()
+    {
+#line 873
+        return data.begin() + count;
+    };
+    
+#line 684
+    template < class _1 >
+    inline void FixedArray2 < _1 >::operator= (const FixedArray2& value)
+    {
+#line 684
+        for (int i = 0; i < size; i ++ )
+#line 684
+            this -> vector[i] = value.vector[i];
+    };
+    
+#line 683
+    template < class _1 >
+    inline void FixedArray2 < _1 >::operator= (const _1& value)
+    {
+#line 683
+        for (int i = 0; i < size; i ++ )
+#line 683
+            this -> vector[i] = value;
+    };
+    
+#line 681
+    template < class _1 >
+    inline _1& FixedArray2 < _1 >::operator[](int i)
+    {
+        {
+#line 681
+            if (!(i >= 0 && i < size))
+            {
+#line 681
+                Lang::SysBreak("Assertion failed: i >= 0 && i < size");
+            }
+        }
+#line 681
+        ;
+#line 681
+        return vector[i];
+    };
+    
+#line 682
+    template < class _1 >
+    inline const _1& FixedArray2 < _1 >::operator[](int i) const
+    {
+        {
+#line 682
+            if (!(i >= 0 && i < size))
+            {
+#line 682
+                Lang::SysBreak("Assertion failed: i >= 0 && i < size");
+            }
+        }
+#line 682
+        ;
+#line 682
+        return vector[i];
+    };
+    
 #line 86
     template < class _1 >
     inline FutureOne < _1 >::FutureOne() {};
@@ -2164,6 +2412,232 @@ namespace Container
     {
 #line 23
         return Pick < _1 > (p);
+    };
+    
+#line 702
+    inline TopValueSorter10::TopValueSorter10()
+    :
+        count(0)
+    {
+#line 702
+        Reset();
+    };
+    
+#line 749
+    template < class _1 >
+    inline _1& TreeArray < _1 >::Add()
+    {
+#line 749
+        _1 & t = branch.Add();
+#line 749
+        t.down = this;
+#line 749
+        return t;
+    };
+    
+#line 757
+    template < class _1 >
+    inline _1& TreeArray < _1 >::Add(_1 *n)
+    {
+        {
+#line 757
+            if (!(n -> down == 0))
+            {
+#line 757
+                Lang::SysBreak("Assertion failed: n->down == NULL");
+            }
+        }
+#line 757
+        ;
+#line 757
+        _1 & t = branch.Add(n);
+#line 757
+        t.down = this;
+#line 757
+        return t;
+    };
+    
+#line 766
+    template < class _1 >
+    inline _1& TreeArray < _1 >::At(int i)
+    {
+#line 766
+        return branch[i];
+    };
+    
+#line 768
+    template < class _1 >
+    inline _1& TreeArray < _1 >::At(int i, _1& n)
+    {
+#line 768
+        if (i < branch.GetCount())
+#line 768
+            return branch[i];
+#line 768
+        return n;
+    };
+    
+#line 769
+    template < class _1 >
+    inline const _1& TreeArray < _1 >::At(int i) const
+    {
+#line 769
+        return branch[i];
+    };
+    
+#line 767
+    template < class _1 >
+    inline _1& TreeArray < _1 >::AtTop(int i)
+    {
+#line 767
+        if (i < branch.GetCount())
+#line 767
+            return branch[i];
+#line 767
+        return branch.Top();
+    };
+    
+#line 760
+    template < class _1 >
+    inline void TreeArray < _1 >::Clear()
+    {
+#line 760
+        branch.Clear();
+    };
+    
+#line 752
+    template < class _1 >
+    inline void TreeArray < _1 >::Copy(const PA& src)
+    {
+#line 752
+        branch <<= src.branch;
+#line 752
+        for (int i = 0; i < branch.GetCount(); i ++ )
+#line 752
+            branch[i].down = this;
+    };
+    
+#line 764
+    template < class _1 >
+    inline _1 *TreeArray < _1 >::Detach(int i)
+    {
+#line 764
+        _1 * t = branch.Detach(i);
+#line 764
+        t -> down = 0;
+#line 764
+        return t;
+    };
+    
+#line 772
+    template < class _1 >
+    inline int TreeArray < _1 >::GetCount() const
+    {
+#line 772
+        return branch.GetCount();
+    };
+    
+#line 756
+    template < class _1 >
+    inline _1 *TreeArray < _1 >::GetParent() const
+    {
+#line 756
+        return down;
+    };
+    
+#line 750
+    template < class _1 >
+    inline _1& TreeArray < _1 >::Insert(int i)
+    {
+#line 750
+        _1 & t = branch.Insert(i);
+#line 750
+        t.down = this;
+#line 750
+        return t;
+    };
+    
+#line 758
+    template < class _1 >
+    inline _1& TreeArray < _1 >::Insert(int i, _1 *n)
+    {
+        {
+#line 758
+            if (!(n -> down == 0))
+            {
+#line 758
+                Lang::SysBreak("Assertion failed: n->down == NULL");
+            }
+        }
+#line 758
+        ;
+#line 758
+        _1 & t = branch.Insert(i, n);
+#line 758
+        t.down = this;
+#line 758
+        return t;
+    };
+    
+#line 773
+    template < class _1 >
+    inline bool TreeArray < _1 >::IsEmpty() const
+    {
+#line 773
+        return branch.IsEmpty();
+    };
+    
+#line 761
+    template < class _1 >
+    inline void TreeArray < _1 >::Remove(int i)
+    {
+#line 761
+        branch.Remove(i);
+    };
+    
+#line 762
+    template < class _1 >
+    inline void TreeArray < _1 >::Remove(int i, int count)
+    {
+#line 762
+        branch.Remove(i, count);
+    };
+    
+#line 763
+    template < class _1 >
+    inline void TreeArray < _1 >::RemoveLast()
+    {
+#line 763
+        branch.Remove(branch.GetCount() - 1);
+    };
+    
+#line 782
+    template < class _1 >
+    inline void TreeArray < _1 >::Serialize(Abstract::StreamBase& s)
+    {
+#line 783
+        s % branch;
+        if (s.IsLoading())
+            for (int i = 0; i < branch.GetCount(); i ++ )
+                branch[i].down = this;
+    };
+    
+#line 775
+    template < class _1 >
+    inline void TreeArray < _1 >::SortByInt()
+    {
+#line 776
+        struct Sorter;
+#line 779
+        Sort(branch, Sorter());
+    };
+    
+#line 770
+    template < class _1 >
+    inline _1& TreeArray < _1 >::Top()
+    {
+#line 770
+        return branch.Top();
     };
     
 #line 160

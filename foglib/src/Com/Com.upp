@@ -29,7 +29,6 @@ file
 	Chrono.fog,
 	Indirect.fog,
 	Concurrency.fog,
-	StringUtil.fog,
 	"Basic Compiler" readonly separator,
 	CompilerBase.fog,
 	"C++ Support" readonly separator,
