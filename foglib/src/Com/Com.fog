@@ -17,6 +17,7 @@ namespace Indirect		{using/interface Chrono;};
 namespace Concurrency	{using/interface Indirect;};
 namespace Network		{using/interface Concurrency;};
 namespace Interface		{using/interface Network;};
+namespace TextProc		{using/interface Interface;};
 
 #define NULL 0
 
@@ -40,8 +41,8 @@ using "Com/Indirect.fog";
 using "Com/Concurrency.fog";
 using "Com/Network.fog";
 using "Com/Interface.fog";
-
 using "Com/CompilerBase.fog";
+using "Com/Tokenizer.fog";
 
 /*
 Core:

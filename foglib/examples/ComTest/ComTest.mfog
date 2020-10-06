@@ -11,6 +11,7 @@ using/interface Chrono;
 using/interface Indirect;
 using/interface Concurrency;
 using/interface Network;
+using/interface TextProc;
 
 
 class App {
@@ -227,6 +228,12 @@ class App {
 			TcpSocket s;
 			ASSERT(s.Listen(8005, 5));
 		}
+		
+		{
+			Tokenizer t;
+			
+		}
+		
 		/* TODO
 			- log init GetSysTime
 		*/

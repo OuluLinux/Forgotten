@@ -11,34 +11,40 @@ struct NamespaceInterfaceLinker
 {
 };
 
-#ifndef NETWORK_HXX
-#include <Network.hxx>
+#ifndef TEXTPROC_HXX
+#include <TextProc.hxx>
+#endif
+#ifndef CONCURRENCY_HXX
+#include <Concurrency.hxx>
+#endif
+#ifndef MATH_HXX
+#include <Math.hxx>
 #endif
 
 namespace Main
 {
     class App
     {
-#line 21 "ComTest.mfog"
+#line 22 "ComTest.mfog"
         Container::VectorMap < int, int > arr;
         
     public:
-#line 45
+#line 46
         inline void Run();
         
-#line 262
+#line 269
         void TestShared();
         
         struct Dumber
         {
-#line 254
+#line 261
             inline Dumber();
             virtual ~Dumber();
         };
         
         struct Dumb : public Main::App::Dumber
         {
-#line 258
+#line 265
             inline Dumb();
             inline ~Dumb();
         };
@@ -64,26 +70,26 @@ namespace Main
         
         struct TestCmp
         {
-#line 25 "ComTest.mfog"
+#line 26 "ComTest.mfog"
             inline bool operator()(const char& c);
         };
         
         struct VirtualBase
         {
-#line 34
+#line 35
             int a;
             
-#line 31
+#line 32
             inline VirtualBase();
             virtual ~VirtualBase();
         };
         
         struct DerivedBase : public Main::App::VirtualBase
         {
-#line 39
+#line 40
             int a;
             
-#line 37
+#line 38
             inline DerivedBase();
         };
     };
@@ -91,535 +97,535 @@ namespace Main
 
 namespace Main
 {
-#line 45
+#line 46
     inline void App::Run()
     {
-#line 46
+#line 47
         Lang::uint64 v = 4294967295U;
         {
-#line 47
+#line 48
             if (!(sizeof (v) == 8))
             {
-#line 47
+#line 48
                 Lang::SysBreak("Assertion failed: sizeof(v) == 8");
             }
         }
-#line 48
+#line 49
         ;
         Lang::VoidPtr p;
         {
-#line 50
+#line 51
             if (!(p == 0))
             {
-#line 50
+#line 51
                 Lang::SysBreak("Assertion failed: p == NULL");
             }
         }
-#line 51
+#line 52
         ;
         {
-#line 52
+#line 53
             if (!(Native::SignificantBits(0x8000) == 16))
             {
-#line 52
+#line 53
                 Lang::SysBreak("Assertion failed: SignificantBits(0x8000) == 16");
             }
         }
-#line 53
+#line 54
         ;
         {
-#line 53
+#line 54
             if (!(Native::SignificantBits64(0x8000) == 16))
             {
-#line 53
+#line 54
                 Lang::SysBreak("Assertion failed: SignificantBits64(0x8000) == 16");
             }
         }
-#line 54
+#line 55
         ;
         Hash::Combine ch;
         ch.Put(777999777).Put(123).Put64(0xF0F0F0F0F0F0F0F0);
         Lang::dword hash = ch;
         {
-#line 58
+#line 59
             if (!(hash == 1894504625))
             {
-#line 58
+#line 59
                 Lang::SysBreak("Assertion failed: hash == 1894504625");
             }
         }
-#line 59
+#line 60
         ;
-#line 59
+#line 60
         int a = 0;
         int b = 1;
         {
-#line 61
+#line 62
             if (!(Algorithm::Minimum(a, b) < Algorithm::Maximum(a, b)))
             {
-#line 61
+#line 62
                 Lang::SysBreak("Assertion failed: Min(a, b) < Max(a, b)");
             }
         }
-#line 62
+#line 63
         ;
         int r = Random::Int();
         float f = Random::Float();
         float d = Random::Double();
         int j = d;
-#line 69
+#line 70
         const char * test_str = "abcdef";
         int test_strlen = Lang::StringLength(test_str);
         {
-#line 71
+#line 72
             if (!(Container::FindIf(test_str, test_str + test_strlen, TestCmp()) == test_str + 2))
             {
-#line 71
+#line 72
                 Lang::SysBreak("Assertion failed: FindIf(test_str, test_str + test_strlen, TestCmp()) == test_str + 2");
             }
         }
-#line 72
+#line 73
         ;
         {
             if (!(Text::String("test") == "test"))
             {
-#line 74
+#line 75
                 Lang::SysBreak("Assertion failed: String(\"test\") == \"test\"");
             }
         }
-#line 75
+#line 76
         ;
         {
-#line 75
+#line 76
             if (!(Text::String::DblStr(1.2) == "1.2"))
             {
-#line 75
+#line 76
                 Lang::SysBreak("Assertion failed: DblStr(1.2) == \"1.2\"");
             }
         }
-#line 76
+#line 77
         ;
         {
-#line 76
+#line 77
             if (!((Text::String)"abc" + Text::String("def") == "abcdef"))
             {
-#line 76
+#line 77
                 Lang::SysBreak("Assertion failed: (String)\"abc\" + String(\"def\") == \"abcdef\"");
             }
         }
-#line 77
+#line 78
         ;
         {
-#line 77
+#line 78
             if (!(Text::String("abc") + "def" == "abcdef"))
             {
-#line 77
+#line 78
                 Lang::SysBreak("Assertion failed: String(\"abc\") + \"def\" == \"abcdef\"");
             }
         }
-#line 78
+#line 79
         ;
         {
-#line 78
+#line 79
             if (!(Text::ToString(Text::ToWString < Text::String > ("abc")) == "abc"))
             {
-#line 78
+#line 79
                 Lang::SysBreak("Assertion failed: ToString(ToWString<String>(\"abc\")) == \"abc\"");
             }
         }
-#line 79
+#line 80
         ;
         {
-#line 79
+#line 80
             if (!(Text::ToInt < Text::String > ("123") == 123))
             {
-#line 79
+#line 80
                 Lang::SysBreak("Assertion failed: ToInt<String>(\"123\") == 123");
             }
         }
-#line 80
+#line 81
         ;
         {
-#line 80
+#line 81
             if (!(Text::ToString(123) == "123"))
             {
-#line 80
+#line 81
                 Lang::SysBreak("Assertion failed: ToString(123) == \"123\"");
-            }
-        }
-#line 81
-        ;
-        {
-#line 81
-            if (!(Text::HexStr((void * )0x123f) == "0x123F"))
-            {
-#line 81
-                Lang::SysBreak("Assertion failed: HexStr((void*)0x123f) == \"0x123F\"");
             }
         }
 #line 82
         ;
-#line 84
+        {
+#line 82
+            if (!(Text::HexStr((void * )0x123f) == "0x123F"))
+            {
+#line 82
+                Lang::SysBreak("Assertion failed: HexStr((void*)0x123f) == \"0x123F\"");
+            }
+        }
+#line 83
+        ;
+#line 85
         SomeTuple2 ttt = 
         {
             1,
             1.2
         };
         {
-#line 85
+#line 86
             if (!(Text::ToString(ttt) == "1, 1.2"))
             {
-#line 85
+#line 86
                 Lang::SysBreak("Assertion failed: ToString(ttt) == \"1, 1.2\"");
             }
         }
-#line 86
+#line 87
         ;
         SomeRefTuple2 tttref(ttt.a, ttt.b);
         {
-#line 88
+#line 89
             if (!(Text::ToString(tttref) == "1, 1.2"))
             {
-#line 88
+#line 89
                 Lang::SysBreak("Assertion failed: ToString(tttref) == \"1, 1.2\"");
             }
         }
-#line 89
+#line 90
         ;
         Container::One < Text::String > onestr;
         onestr.Create();
         *onestr = "hello";
         {
-#line 93
+#line 94
             if (!(*onestr == "hello"))
             {
-#line 93
+#line 94
                 Lang::SysBreak("Assertion failed: *onestr == \"hello\"");
             }
         }
-#line 94
+#line 95
         ;
         Container::One < VirtualBase > onebase;
         onebase.CreateDerived < DerivedBase > ();
         {
-#line 97
+#line 98
             if (!(onebase.GetDerived < DerivedBase > ()-> a == 8))
             {
-#line 97
+#line 98
                 Lang::SysBreak("Assertion failed: onebase.GetDerived<DerivedBase>()->a == 8");
             }
         }
-#line 98
+#line 99
         ;
         Container::FutureOne < Text::String > fone;
         fone = new Text::String;
         fone.Wait();
-#line 103
+#line 104
         Container::Vector < Text::String > strvec;
         Container::Array < Text::String > strarr;
         for (int i = 0; i < 3; i ++ )
             {
-#line 106
+#line 107
                 strvec << Text::String::IntStr(i);
                 strarr << Text::String::IntStr(i);
             }
         for (int i = 0; i < 3; i ++ )
             {
                 {
-#line 110
+#line 111
                     if (!(strvec[i] == strarr[i]))
                     {
-#line 110
+#line 111
                         Lang::SysBreak("Assertion failed: strvec[i] == strarr[i]");
                     }
                 }
-#line 111
+#line 112
                 ;
             }
         Container::Index < Text::String > stridx;
         stridx.Add("abc");
         {
-#line 115
+#line 116
             if (!(stridx.GetCount() == 1))
             {
-#line 115
+#line 116
                 Lang::SysBreak("Assertion failed: stridx.GetCount() == 1");
             }
         }
-#line 116
+#line 117
         ;
         {
-#line 116
+#line 117
             if (!(stridx.Find("abc") == 0))
             {
-#line 116
+#line 117
                 Lang::SysBreak("Assertion failed: stridx.Find(\"abc\") == 0");
             }
         }
-#line 117
+#line 118
         ;
-#line 117
+#line 118
         stridx.Add("def");
         {
-#line 118
+#line 119
             if (!(stridx.Find("abc") == 0))
             {
-#line 118
+#line 119
                 Lang::SysBreak("Assertion failed: stridx.Find(\"abc\") == 0");
-            }
-        }
-#line 119
-        ;
-        {
-#line 119
-            if (!(stridx.Find("def") == 1))
-            {
-#line 119
-                Lang::SysBreak("Assertion failed: stridx.Find(\"def\") == 1");
             }
         }
 #line 120
         ;
-#line 122
+        {
+#line 120
+            if (!(stridx.Find("def") == 1))
+            {
+#line 120
+                Lang::SysBreak("Assertion failed: stridx.Find(\"def\") == 1");
+            }
+        }
+#line 121
+        ;
+#line 123
         Container::VectorMap < Text::String, int > vmap;
         Container::ArrayMap < Text::String, int > amap;
-#line 125
+#line 126
         vmap.Add("abc", 123);
         vmap.Add("def", 456);
         {
-#line 127
+#line 128
             if (!(vmap.GetKeys().Find("abc") == 0))
             {
-#line 127
+#line 128
                 Lang::SysBreak("Assertion failed: vmap.GetKeys().Find(\"abc\") == 0");
             }
         }
-#line 128
+#line 129
         ;
         {
-#line 128
+#line 129
             if (!(vmap.GetValues()[0] == 123))
             {
-#line 128
+#line 129
                 Lang::SysBreak("Assertion failed: vmap.GetValues()[0] == 123");
             }
         }
-#line 129
+#line 130
         ;
         {
-#line 129
+#line 130
             if (!(vmap.Find("abc") == 0))
             {
-#line 129
+#line 130
                 Lang::SysBreak("Assertion failed: vmap.Find(\"abc\") == 0");
             }
         }
-#line 130
+#line 131
         ;
         {
-#line 130
+#line 131
             if (!(vmap.Find("dfasgsg") == - 1))
             {
-#line 130
+#line 131
                 Lang::SysBreak("Assertion failed: vmap.Find(\"dfasgsg\") == -1");
             }
         }
-#line 131
+#line 132
         ;
         {
-#line 131
+#line 132
             if (!(vmap.GetValues().Join() == "123456"))
             {
-#line 131
+#line 132
                 Lang::SysBreak("Assertion failed: vmap.GetValues().Join() == \"123456\"");
             }
         }
-#line 132
+#line 133
         ;
-#line 132
+#line 133
         Container::Vector < int > vmap_keys;
         vmap_keys.Split(vmap.GetValues().Join(" "), " ");
         {
-#line 134
+#line 135
             if (!(vmap_keys.GetCount() == 2 && vmap_keys[0] == 123 && vmap_keys[1] == 456))
             {
-#line 134
+#line 135
                 Lang::SysBreak("Assertion failed: vmap_keys.GetCount() == 2 && vmap_keys[0] == 123 && vmap_keys[1] == 456");
             }
         }
-#line 135
+#line 136
         ;
-#line 137
+#line 138
         amap.Add("abc", 123);
         amap.Add("def", 456);
         {
-#line 139
+#line 140
             if (!(amap.GetKeys().Find("abc") == 0))
             {
-#line 139
+#line 140
                 Lang::SysBreak("Assertion failed: amap.GetKeys().Find(\"abc\") == 0");
             }
         }
-#line 140
+#line 141
         ;
         {
-#line 140
+#line 141
             if (!(amap.GetValues()[0] == 123))
             {
-#line 140
+#line 141
                 Lang::SysBreak("Assertion failed: amap.GetValues()[0] == 123");
             }
         }
-#line 141
+#line 142
         ;
         {
-#line 141
+#line 142
             if (!(amap.Find("abc") == 0))
             {
-#line 141
+#line 142
                 Lang::SysBreak("Assertion failed: amap.Find(\"abc\") == 0");
             }
         }
-#line 142
+#line 143
         ;
         {
-#line 142
+#line 143
             if (!(amap.Find("dfasgsg") == - 1))
             {
-#line 142
+#line 143
                 Lang::SysBreak("Assertion failed: amap.Find(\"dfasgsg\") == -1");
             }
         }
-#line 143
+#line 144
         ;
-#line 143
+#line 144
         Lang::FwdPairPtrIterator < Text::String, int > it = amap.Begin();
         for (int i = 0; i < 2; i ++ )
             {
-#line 145
+#line 146
                 if (i == 0)
                 {
                     {
-#line 146
+#line 147
                         if (!(it.Key() == "abc"))
                         {
-#line 146
+#line 147
                             Lang::SysBreak("Assertion failed: it.Key() == \"abc\"");
-                        }
-                    }
-#line 147
-                    ;
-                    {
-#line 147
-                        if (!(it.Value() == 123))
-                        {
-#line 147
-                            Lang::SysBreak("Assertion failed: it.Value() == 123");
                         }
                     }
 #line 148
                     ;
+                    {
+#line 148
+                        if (!(it.Value() == 123))
+                        {
+#line 148
+                            Lang::SysBreak("Assertion failed: it.Value() == 123");
+                        }
+                    }
+#line 149
+                    ;
                 }
                 else 
-#line 149
+#line 150
                 if (i == 1)
                 {
                     {
-#line 150
+#line 151
                         if (!(it.Key() == "def"))
                         {
-#line 150
+#line 151
                             Lang::SysBreak("Assertion failed: it.Key() == \"def\"");
-                        }
-                    }
-#line 151
-                    ;
-                    {
-#line 151
-                        if (!(it.Value() == 456))
-                        {
-#line 151
-                            Lang::SysBreak("Assertion failed: it.Value() == 456");
                         }
                     }
 #line 152
                     ;
-                }
+                    {
+#line 152
+                        if (!(it.Value() == 456))
+                        {
+#line 152
+                            Lang::SysBreak("Assertion failed: it.Value() == 456");
+                        }
+                    }
 #line 153
+                    ;
+                }
+#line 154
                 ++ it;
             }
         {
-#line 158
+#line 159
             Shared::Attachable a;
             Shared::Slot s;
             a.Attach(s);
             s.Clear();
         }
-#line 165
+#line 166
         TestShared();
         {
-#line 168
+#line 169
             Stream::StringStream ss;
             ss << "abc";
         }
-#line 172
+#line 173
         Text::String s;
         {
             Stream::FileIn fin;
             {
-#line 175
+#line 176
                 if (!(fin.Open("/home/sblo/Fuck.cxx")))
                 {
-#line 175
+#line 176
                     Lang::SysBreak("Assertion failed: fin.Open(\"/home/sblo/Fuck.cxx\")");
                 }
             }
-#line 176
+#line 177
             ;
-#line 176
+#line 177
             s = fin.Get(fin.GetSize());
             int sz = s.GetCount();
         }
-#line 180
+#line 181
         Util::Log() << "Lol does this work\?\n";
-#line 182
+#line 183
         Stream::FileOut fout;
         fout % r % f % d;
-#line 185
+#line 186
         const Container::Vector < Text::String > & cmd = Util::Env::Local().CommandLine();
         for (int i = 0; i < cmd.GetCount(); i ++ )
             {
-#line 187
+#line 188
                 Text::String arg = cmd[i];
             }
-#line 190
+#line 191
         Container::Index < Text::String > files;
         Util::GetDirectoryFiles("/", files);
         {
-#line 192
+#line 193
             if (!(files.Find("home") >= 0))
             {
-#line 192
+#line 193
                 Lang::SysBreak("Assertion failed: files.Find(\"home\") >= 0");
             }
         }
-#line 193
+#line 194
         ;
-#line 193
+#line 194
         for (int i = 0; i < files.GetCount(); i ++ )
             {
-#line 194
+#line 195
                 Text::String s = files[i];
                 const char * c = s.Begin();
                 int len = Lang::StringLength(c);
             }
         {
-#line 200
+#line 201
             double d = Math::FastSin(3.14159265358979323846);
             d = Math::FastCos(3.14159265358979323846);
         }
         {
-#line 205
+#line 206
             Math::RandomGaussian & gaus = Math::GetRandomGaussian(13);
             double d = gaus;
             d = gaus;
@@ -627,78 +633,81 @@ namespace Main
             d = gaus;
         }
         {
-#line 213
+#line 214
             Chrono::Time t1(2020, 10, 5, 3, 28, 0);
             Lang::int64 i64 = t1.Get();
             Chrono::Time t2;
             t2.Set(i64);
             {
-#line 217
+#line 218
                 if (!(t1 == t2))
                 {
-#line 217
+#line 218
                     Lang::SysBreak("Assertion failed: t1 == t2");
                 }
             }
-#line 218
+#line 219
             ;
         }
         {
-#line 222
+#line 223
             Concurrency::Thread t;
             Concurrency::Mutex m;
         }
         {
-#line 227
+#line 228
             Network::TcpSocket s;
             {
-#line 228
+#line 229
                 if (!(s.Listen(8005, 5)))
                 {
-#line 228
+#line 229
                     Lang::SysBreak("Assertion failed: s.Listen(8005, 5)");
                 }
             }
-#line 229
+#line 230
             ;
+        }
+        {
+            TextProc::Tokenizer t;
         }
     };
     
-#line 37
+#line 38
     inline App::DerivedBase::DerivedBase()
     :
         a(8)
     {};
     
-#line 258
+#line 265
     inline App::Dumb::Dumb()
     {
-#line 258
+#line 265
         ;
     };
     
-#line 259
+#line 266
     inline App::Dumb::~Dumb()
     {
-#line 259
+#line 266
         ;
     };
     
-#line 254
+#line 261
     inline App::Dumber::Dumber()
     {
-#line 254
+#line 261
         ;
     };
     
-#line 25
+#line 26
     inline bool App::TestCmp::operator()(const char& c)
     {
-#line 26
+#line 27
         return c == 'c';
     };
     
-#line 31
+#line 32
     inline App::VirtualBase::VirtualBase()
     :
         a(3)

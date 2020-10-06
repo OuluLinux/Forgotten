@@ -9,7 +9,32 @@
 
 namespace Text
 {
-#line 783 "../../src/Com/Text.fog"
+#line 896 "../../src/Com/Text.fog"
+    String EscapeCharacter(String s)
+    {
+#line 897
+        s.Replace("\n", "\\n");
+        s.Replace("\t", "\\t");
+        s.Replace("\r", "\\r");
+        s.Replace("\"", "\\\"");
+        s.Replace("'", "\\'");
+#line 903
+        return s;
+    };
+    
+#line 887
+    String EscapeString(String s)
+    {
+#line 888
+        s.Replace("\n", "\\n");
+        s.Replace("\t", "\\t");
+        s.Replace("\r", "\\r");
+        s.Replace("\"", "\\\"");
+#line 893
+        return s;
+    };
+    
+#line 783
     String ToLower(const String& s)
     {
 #line 784

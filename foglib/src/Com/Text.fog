@@ -884,7 +884,24 @@ inline String HexStr(uint64 p) {
 inline String HexStr(void* p) {return HexStr((uint64)p);}
 
 
+String EscapeString(String s) {
+	s.Replace("\n", "\\n");
+	s.Replace("\t", "\\t");
+	s.Replace("\r", "\\r");
+	s.Replace("\"", "\\\"");
+	
+	return s;
+}
 
+String EscapeCharacter(String s) {
+	s.Replace("\n", "\\n");
+	s.Replace("\t", "\\t");
+	s.Replace("\r", "\\r");
+	s.Replace("\"", "\\\"");
+	s.Replace("\'", "\\\'");
+	
+	return s;
+}
 }
 
 
@@ -935,4 +952,6 @@ auto declaration HaveTextOperators() {
 #define IsSpace			Text::IsSpace
 #define IsAlpha			Text::IsAlpha
 #define GetHexDigit		Text::GetHexDigit
+#define EscapeString		Text::EscapeString
+#define EscapeCharacter		Text::EscapeCharacter
 

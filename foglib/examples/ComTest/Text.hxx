@@ -27,9 +27,9 @@ namespace Text
 {
 #line 797 "../../src/Com/Text.fog"
     inline String Capitalize(const String& s);
-#line 811
+#line 896
     String EscapeCharacter(String s);
-#line 810
+#line 887
     String EscapeString(String s);
 #line 850
     inline void FromString(const String& s, Lang::byte& o);
