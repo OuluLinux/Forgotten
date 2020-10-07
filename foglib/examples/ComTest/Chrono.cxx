@@ -20,10 +20,10 @@ namespace Chrono
         return t;
     };
     
-#line 282
+#line 286
     Text::String GetTimeDurationString(Time begin, Time end)
     {
-#line 283
+#line 287
         Lang::int64 diff = end.Get() - begin.Get();
         Time t;
         t.Set(diff);
@@ -35,6 +35,13 @@ namespace Chrono
     {
 #line 15
         return year == d.year && month == d.month && day == d.day;
+    };
+    
+#line 151
+    Text::String Date::AsString() const
+    {
+#line 152
+        return Text::String::IntStr(day) + "." + Text::String::IntStr(month) + "." + Text::String::IntStr(day);
     };
     
 #line 123
@@ -116,17 +123,17 @@ namespace Chrono
         return month_off;
     };
     
-#line 157
+#line 161
     void Date::Set(int d)
     {
-#line 158
+#line 162
         if (d == 0)
         {
-#line 159
+#line 163
             day = 0;
-#line 159
+#line 163
             month = 0;
-#line 159
+#line 163
             year = 0;
             return;
         }
@@ -138,14 +145,14 @@ namespace Chrono
         d -= q * (400 * 365 + 100 - 3);
         if (d < 0)
         {
-#line 169
+#line 173
             year -= 400;
             d += 400 * 365 + 100 - 3;
         }
         leap = 1;
         if (d >= 100 * 365 + 24 + 1)
         {
-#line 174
+#line 178
             d -- ;
             q = d / (100 * 365 + 24);
             year += 100 * q;
@@ -154,7 +161,7 @@ namespace Chrono
         }
         if (d >= 365 * 4 + leap)
         {
-#line 181
+#line 185
             q = (d + 1 - leap) / (365 * 4 + 1);
             year += 4 * q;
             d -= q * (365 * 4 + 1) - 1 + leap;
@@ -162,7 +169,7 @@ namespace Chrono
         }
         if (d >= 365 + leap)
         {
-#line 187
+#line 191
             q = (d - leap) / 365;
             year += q;
             d -= q * 365 + leap;
@@ -172,23 +179,23 @@ namespace Chrono
         const int * s_month = DaysInMonth();
         for (i = 0; i < 12; i ++ )
             {
-#line 195
+#line 199
                 int q = s_month[i] + (i == 1) * leap;
                 if (q > d)
-#line 196
+#line 200
                     break;
                 
-#line 197
+#line 201
                 d -= q;
             }
         month = i + 1;
         day = d + 1;
     };
     
-#line 151
+#line 155
     void Date::Set(int y, int m, int d)
     {
-#line 152
+#line 156
         year = y;
         month = m;
         day = d;
@@ -208,49 +215,49 @@ namespace Chrono
         interval(0.5)
     {};
     
-#line 316
+#line 320
     double OnlineFrequencyWindow::Get() const
     {
-#line 317
+#line 321
         if (which)
-#line 317
+#line 321
             return freq1.Get();
         else
-#line 318
+#line 322
             return freq0.Get();
     };
     
-#line 297
+#line 301
     OnlineFrequency& OnlineFrequencyWindow::GetActive()
     {
-#line 298
+#line 302
         if (which)
-#line 298
+#line 302
             return freq1;
         else
-#line 299
+#line 303
             return freq0;
     };
     
     OnlineFrequency& OnlineFrequencyWindow::GetInactive()
     {
-#line 303
+#line 307
         if (which)
-#line 303
+#line 307
             return freq0;
         else
-#line 304
+#line 308
             return freq1;
     };
     
     void OnlineFrequencyWindow::Tick()
     {
-#line 308
+#line 312
         freq0.Tick();
         freq1.Tick();
         if (GetInactive().timer.Elapsed() >= interval)
         {
-#line 311
+#line 315
             SwitchActive();
             GetActive().Reset();
         }
@@ -263,123 +270,123 @@ namespace Chrono
         return hour == t.hour && min == t.min && sec == t.sec;
     };
     
-#line 238
+#line 242
     Text::String Time::AsDiffString() const
     {
-#line 239
+#line 243
         Text::String out;
         Lang::int64 seconds = Get();
-#line 242
+#line 246
         if (seconds > - 60 && seconds < 60)
-#line 242
+#line 246
             return "Now";
-#line 244
+#line 248
         if (seconds < 0)
         {
-#line 244
+#line 248
             out += "-";
-#line 244
+#line 248
             seconds *= - 1;
         }
         else 
-#line 245
+#line 249
         if (seconds > 0)
-#line 245
+#line 249
             out += "+";
-#line 247
+#line 251
         Lang::int64 years;
         Lang::int64 months;
         Lang::int64 days;
         Lang::int64 hours;
         Lang::int64 minutes;
-#line 253
-#line 235
-        years = seconds / (31536000);
-#line 235
-        seconds = seconds % (31536000);;
-#line 254
-#line 235
-        months = seconds / (2592000);
-#line 235
-        seconds = seconds % (2592000);;
-#line 255
-#line 235
-        days = seconds / (86400);
-#line 235
-        seconds = seconds % (86400);;
-#line 256
-#line 235
-        hours = seconds / (3600);
-#line 235
-        seconds = seconds % (3600);;
 #line 257
-#line 235
-        minutes = seconds / (60);
-#line 235
-        seconds = seconds % (60);;
+#line 239
+        years = seconds / (31536000);
+#line 239
+        seconds = seconds % (31536000);;
 #line 258
-#line 236
+#line 239
+        months = seconds / (2592000);
+#line 239
+        seconds = seconds % (2592000);;
+#line 259
+#line 239
+        days = seconds / (86400);
+#line 239
+        seconds = seconds % (86400);;
+#line 260
+#line 239
+        hours = seconds / (3600);
+#line 239
+        seconds = seconds % (3600);;
+#line 261
+#line 239
+        minutes = seconds / (60);
+#line 239
+        seconds = seconds % (60);;
+#line 262
+#line 240
         if (years)
         {
-#line 236
+#line 240
             out.Cat(' ');
-#line 236
+#line 240
             out += Text::String::IntStr64(years) + " " + "years";
         }
-#line 236
-        ;;
-#line 259
-#line 236
-        if (months)
-        {
-#line 236
-            out.Cat(' ');
-#line 236
-            out += Text::String::IntStr64(months) + " " + "months";
-        }
-#line 236
-        ;;
-#line 260
-#line 236
-        if (days)
-        {
-#line 236
-            out.Cat(' ');
-#line 236
-            out += Text::String::IntStr64(days) + " " + "days";
-        }
-#line 236
-        ;;
-#line 261
-#line 236
-        if (hours)
-        {
-#line 236
-            out.Cat(' ');
-#line 236
-            out += Text::String::IntStr64(hours) + " " + "hours";
-        }
-#line 236
-        ;;
-#line 262
-#line 236
-        if (minutes)
-        {
-#line 236
-            out.Cat(' ');
-#line 236
-            out += Text::String::IntStr64(minutes) + " " + "minutes";
-        }
-#line 236
+#line 240
         ;;
 #line 263
+#line 240
+        if (months)
+        {
+#line 240
+            out.Cat(' ');
+#line 240
+            out += Text::String::IntStr64(months) + " " + "months";
+        }
+#line 240
+        ;;
+#line 264
+#line 240
+        if (days)
+        {
+#line 240
+            out.Cat(' ');
+#line 240
+            out += Text::String::IntStr64(days) + " " + "days";
+        }
+#line 240
+        ;;
+#line 265
+#line 240
+        if (hours)
+        {
+#line 240
+            out.Cat(' ');
+#line 240
+            out += Text::String::IntStr64(hours) + " " + "hours";
+        }
+#line 240
+        ;;
+#line 266
+#line 240
+        if (minutes)
+        {
+#line 240
+            out.Cat(' ');
+#line 240
+            out += Text::String::IntStr64(minutes) + " " + "minutes";
+        }
+#line 240
+        ;;
+#line 267
         return out;
     };
     
-#line 221
+#line 225
     Text::String Time::AsString() const
     {
-#line 222
+#line 226
         char m[3];
         m[0] = '0' + min / 10;
         m[1] = '0' + min / 10;
@@ -405,27 +412,27 @@ namespace Chrono
         return sec + 32 * (min + 32 * (hour + 16 * (day + 32 * (month + 8 * year))));
     };
     
-#line 277
+#line 281
     int Time::GetStamp() const
     {
-#line 278
+#line 282
         static Lang::int64 begin = Time(1970, 1, 1).Get();
         return Get() - begin;
     };
     
-#line 266
+#line 270
     Time Time::GetSys()
     {
-#line 267
+#line 271
         Time t;
         t.Set(Native::CurrentTime());
         return t;
     };
     
-#line 211
+#line 215
     void Time::Set(Lang::int64 scalar)
     {
-#line 212
+#line 216
         int q = (int)(scalar / (24 * 3600));
         Date::Set(q);
         int n = int(scalar - (Lang::int64) q * 24 * 3600);
@@ -435,20 +442,20 @@ namespace Chrono
         sec = n % 60;
     };
     
-#line 204
+#line 208
     void Time::Set(int y, int mon, int d, int h, int m, int s)
     {
-#line 205
+#line 209
         Date::Set(y, mon, d);
         hour = h;
         min = m;
         sec = s;
     };
     
-#line 272
+#line 276
     void Time::SetFromStamp(int seconds)
     {
-#line 273
+#line 277
         static Lang::int64 begin = Time(1970, 1, 1).Get();
         Set(begin + (Lang::int64) seconds);
     };

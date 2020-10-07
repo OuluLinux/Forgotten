@@ -39,6 +39,11 @@ inline void Destruct(float& o) {}
 inline void Destruct(double& o) {}
 inline void Destruct(void* o) {}
 
+
+inline bool FitsInInt64(double x) {
+	return x >= -9223372036854775808.0 && x < 9223372036854775808.0;
+}
+
 namespace Memory {
 	
 void* Alloc(int sz) :{ export/noimplementation; };
@@ -47,6 +52,7 @@ int Compare(const void* m1, const void* m2, int sz) :{ export/noimplementation; 
 void* Copy(void *dest, const void* src, int sz) :{ export/noimplementation; };
 void* Move(void *dest, const void* src, int sz) :{ export/noimplementation; };
 void Set(void *dest, int byte_value, int sz) :{ export/noimplementation; };
+int StringCompare(const char* a, const char* b) :{ export/noimplementation; };
 
 }
 
@@ -362,6 +368,19 @@ public:
 			new (&data[i]) K(a[j]);
 		count = new_count;
 	}
+	inline void Append(const DynArray& a, int i, int n) {
+		ASSERT(i >= 0 && i < a.GetCount() && n >= 0 && i+n <= a.GetCount());
+		if (n <= 0) return;
+		i = Max(0, Min(a.GetCount()-1, i));
+		if (i >= a.GetCount()) return;
+		n = Min(n, a.GetCount()-i);
+		int begin = count;
+		int new_count = count + n;
+		Reserve(new_count);
+		for (int k = begin, j = i; k < new_count; k++, j++)
+			new (&data[k]) K(a[j]);
+		count = new_count;
+	}
 	inline void IncreaseReserve(int more_reserved) {Reserve(GetCount() + more_reserved);}
 	inline void Reserve(int new_reserved) {
 		if (new_reserved <= reserved || new_reserved <= 0)
@@ -379,14 +398,17 @@ public:
 	inline int GetReserved() const { return reserved; }
 	inline bool IsEmpty() const { return GetCount() == 0; }
 
-	inline K& operator[](int i) {
+	inline K& At(int i) {
 		ASSERT(i >= 0 && i < count);
 		return *(data + i);
 	}
-	inline const K& operator[](int i) const {
+	inline const K& At(int i) const {
 		ASSERT(i >= 0 && i < count);
 		return *(data + i);
 	}
+
+	inline K& operator[](int i) {return At(i);}
+	inline const K& operator[](int i) const {return At(i);}
 
 	inline void Remove(int i) {
 		ASSERT(i >= 0 && i < count);
@@ -442,9 +464,21 @@ public:
 			Memory::Copy(data + npos++, data + pos++, sizeof(K));
 		count = npos;
 	}
+	inline void InsertN(int i, int n) {
+		if (n <= 0) return;
+		if (count + n > reserved) Reserve(count + n);
+		if (count + n > reserved)
+			throw MemoryLimitExc("DynArray maximum size exceeded");
+		int tail = this->count - i;
+		if (tail > 0)
+			Memory::Move(data + i + 1, data + i, tail * sizeof(K));
+		for(int j = 0; j < n; j++)
+			new (&data[i + j]) K();
+		count += n;
+	}
 	inline K& Insert(int i) {
 		if (count + 1 > reserved) IncreaseReserved();
-		if (count >= reserved)
+		if (count + 1 > reserved)
 			throw MemoryLimitExc("DynArray maximum size exceeded");
 		int tail = this->count - i;
 		if (tail > 0)
@@ -455,7 +489,7 @@ public:
 	}
 	inline K& Insert(int i, ConstK& key) {
 		if (count + 1 > reserved) IncreaseReserved();
-		if (count >= reserved)
+		if (count + 1 > reserved)
 			throw MemoryLimitExc("DynArray maximum size exceeded");
 		int tail = this->count - i;
 		if (tail > 0)
@@ -494,6 +528,36 @@ public:
 	}
 };
 
+
+
+
+template <class T>
+inline int NumberCompare__(const T& a, const T& b)
+{
+	if(a < b) return -1;
+	if(a > b) return 1;
+	return 0;
+}
+
+template<class T> inline int SgnCompare(const T& a, const T& b) {return a.Compare(b);}
+
+inline int SgnCompare(const char& a, const char& b)                     { return NumberCompare__<char>(a, b); }
+inline int SgnCompare(const signed char& a, const signed char& b)       { return NumberCompare__<char>(a, b); }
+inline int SgnCompare(const unsigned char& a, const unsigned char& b)   { return NumberCompare__<unsigned char>(a, b); }
+inline int SgnCompare(const short& a, const short& b)                   { return NumberCompare__<short>(a, b); }
+inline int SgnCompare(const unsigned short& a, const unsigned short& b) { return NumberCompare__<unsigned short>(a, b); }
+inline int SgnCompare(const int& a, const int& b)                       { return NumberCompare__<int>(a, b); }
+inline int SgnCompare(const unsigned int& a, const unsigned int& b)     { return NumberCompare__<unsigned int>(a, b); }
+inline int SgnCompare(const long& a, const long& b)                     { return NumberCompare__<long>(a, b); }
+inline int SgnCompare(const unsigned long& a, const unsigned long& b)   { return NumberCompare__<unsigned long>(a, b); }
+inline int SgnCompare(const bool& a, const bool& b)                     { return NumberCompare__<bool>(a, b); }
+inline int SgnCompare(const int64& a, const int64& b)                   { return NumberCompare__<int64>(a, b); }
+inline int SgnCompare(const uint64& a, const uint64& b)                 { return NumberCompare__<uint64>(a, b); }
+inline int SgnCompare(const float& a, const float& b)                   { return NumberCompare__<float>(a, b); }
+inline int SgnCompare(const double& a, const double& b)                 { return NumberCompare__<double>(a, b); }
+
+
+
 }
 
 
@@ -511,6 +575,7 @@ public:
 #define qword		Lang::qword
 #define CString		Lang::CString
 #define VoidPtr		Lang::VoidPtr
+#define FitsInInt64		Lang::FitsInInt64
 #define ConstVoidPtr	Lang::ConstVoidPtr
 #define Destruct		Lang::Destruct
 #define MemoryAlloc		Lang::Memory::Alloc
@@ -519,6 +584,7 @@ public:
 #define MemoryCopy		Lang::Memory::Copy
 #define MemoryMove		Lang::Memory::Move
 #define MemorySet		Lang::Memory::Set
+#define StringCompare	Lang::Memory::StringCompare
 #define SysBreak		Lang::SysBreak
 #define StringLength	Lang::StringLength
 #define AtomicFlag		Lang::AtomicFlag
@@ -543,7 +609,8 @@ public:
 #define BwdPairPtrIterator		Lang::BwdPairPtrIterator
 #define ConstFwdPairPtrIterator	Lang::ConstFwdPairPtrIterator
 #define ConstBwdPairPtrIterator	Lang::ConstBwdPairPtrIterator
-#define DynArray		Lang::DynArray
+#define DynArray				Lang::DynArray
+#define SgnCompare				Lang::SgnCompare
 
 #undef ASSERT
 #undef ASSERT_

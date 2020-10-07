@@ -3,11 +3,8 @@
 
 #include <new>
 
-#ifndef ALGORITHM_HXX
-#include <Algorithm.hxx>
-#endif
-#ifndef NATIVE_HXX
-#include <Native.hxx>
+#ifndef RANDOM_HXX
+#include <Random.hxx>
 #endif
 
 namespace Abstract

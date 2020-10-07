@@ -107,9 +107,9 @@ public:
 	//template <class T> Value&	operator=(T* o) {Set<T>(o); return *this;}
 	//template <class T> Value&	operator=(const T& o) {Set<T>(o); return *this;}
 	
-	template <class T> inline void     Attach(T* o) {obj = new ValueTemplate<T>(o);}
-	template <class T> inline void     Set(const T& o) {obj.WrapObject(new ValueTemplate<T>(o));}
-	template <class T> inline bool		Is() const {if (obj) return obj->GetType() == ValueTypeNo<T>(0); return false;}
+	template <class T> inline void	Attach(T* o) {obj = new ValueTemplate<T>(o);}
+	template <class T> inline void	Set(const T& o) {obj.WrapObject(new ValueTemplate<T>(o));}
+	template <class T> inline bool	Is() const {if (obj) return obj->GetType() == ValueTypeNo<T>(0); return false;}
 	template <class T> inline T* Try() const {
 		if (obj && obj->GetType() == ValueTypeNo<T>(0))
 			return (T*)obj->Get();
@@ -127,6 +127,7 @@ public:
 			return *(T*)obj->Get();
 		throw Exc("Unexpected value type");
 	}
+	template <class T> inline T& ForcedGet() const {return *(T*)obj->Get();}
 	const ValueMap* TryGetMap() const;
 	const ValueArray* TryGetArray() const;
 	ValueMap* TryGetMap();
@@ -312,7 +313,8 @@ enum {
 	FMT_MAIN_SWITCH = 0,
 
 	FMT_TYPE_INVALID = 0,
-	FMT_TYPE_VALUE,
+	FMT_TYPE_STRING,
+	FMT_TYPE_INT,
 };
 
 struct Formater {
@@ -345,8 +347,12 @@ struct Formater {
 				while (it != end) {
 					chr = *it++;
 					if (state == FMT_MAIN_SWITCH) {
-						if (chr == 'v') {
-							type = FMT_TYPE_VALUE;
+						if (chr == 's') {
+							type = FMT_TYPE_STRING;
+							break;
+						}
+						else if (chr == 'd') {
+							type = FMT_TYPE_INT;
 							break;
 						}
 						else break;
@@ -355,9 +361,15 @@ struct Formater {
 				}
 				if (type == FMT_TYPE_INVALID)
 					out << "<invalid>";
-				else if (type == FMT_TYPE_VALUE) {
+				else if (type == FMT_TYPE_STRING) {
 					if (arg < values.GetCount())
 						out << values[arg++].AsString();
+					else
+						out << "<arg overflow " << arg++ << ">";
+				}
+				else if (type == FMT_TYPE_INT) {
+					if (arg < values.GetCount())
+						out << IntStr(values[arg++].AsInt());
 					else
 						out << "<arg overflow " << arg++ << ">";
 				}
@@ -574,6 +586,83 @@ void ValueArrayMapComb::DeepCopyArrayMap(ValueArrayMapComb& am) {
 }
 
 
+
+
+
+
+
+
+
+
+
+class Convert {
+public:
+	Convert();
+	virtual ~Convert();
+
+	virtual Value  Format(const Value& q) const;
+	virtual Value  Scan(const Value& text) const;
+	virtual int    Filter(int chr) const;
+
+	Value operator()(const Value& q) const              { return Format(q); }
+};
+
+const Convert& StdConvert() {
+	static Convert h;
+	return h;
+}
+
+String StdFormat(const Value& q) {
+	return StdConvert().Format(q);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+Convert::Convert() {}
+Convert::~Convert() {}
+
+Value Convert::Format(const Value& q) const {
+	if(q.IsVoid())
+		return AsValue(String());
+	switch(q.GetType()) {
+	case INT64_V:
+		return AsValue(IntStr64((int64)q));
+	case INT_V:
+	case BOOL_V:
+		return AsValue(IntStr((int)q));
+	case DOUBLE_V:
+		return AsValue(DblStr((double)q));
+	case DATE_V:
+		return AsValue(q.ForcedGet<Date>().AsString());
+	case TIME_V:
+		return AsValue(q.ForcedGet<Time>().AsString());
+	case STRING_V:
+	case WSTRING_V:
+		return q;
+	}
+	return AsValue(q.AsString());
+}
+
+Value Convert::Scan(const Value& text) const {
+	return text;
+};
+
+int Convert::Filter(int chr) const {
+	return chr;
+}
+
+
+
 }
 
 #define Value				Interface::Value
@@ -583,4 +672,5 @@ void ValueArrayMapComb::DeepCopyArrayMap(ValueArrayMapComb& am) {
 #define GetValueTreeString	Interface::GetValueTreeString
 #define Formater			Interface::Formater
 #define AsValue				Interface::AsValue
+#define StdFormat			Interface::StdFormat
 

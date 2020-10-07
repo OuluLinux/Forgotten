@@ -170,6 +170,15 @@ class App {
 			ss << "abc";
 		}
 		
+		{
+			WStringStream wss;
+			wss.Cat('t');
+			wss.Cat('e');
+			wss.Cat('s');
+			wss.Cat('t');
+			ASSERT(ToString(wss.GetResult()) == "test");
+		}
+		
 		String s;
 		{
 			FileIn fin;
@@ -231,7 +240,7 @@ class App {
 		}
 		
 		{
-			Tokenizer t;
+			TextProc::Tokenizer t;
 			
 		}
 		

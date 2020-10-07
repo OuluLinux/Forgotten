@@ -2,6 +2,8 @@ namespace TextProc {
 using/interface Container;
 using/interface Util;
 
+$MakeException(InputExc);
+
 enum {
 	FP_INT,
 	FP_DEC,
@@ -103,7 +105,8 @@ struct Token {
 	bool operator!=(const Token& t) const {return !(t == *this);}
 	bool IsType(int i) const {return type == i;}
 	String GetString() const {return str_value;}
-	String GetTypeString() const {
+	String GetTypeString() const {return StaticGetTypeString(type);}
+	static String StaticGetTypeString(int type) {
 		switch (type) {
 			case TK_UNKNOWN: return "<unknown>";
 			case TK_ID: return "id";
@@ -152,7 +155,8 @@ struct Token {
 		String s = GetTypeString() + ": " + EscapeString(GetTextValue());
 		return s;
 	}
-	String GetTextValue() const {
+	String GetTextValue() const {return StaticGetTextValue(type, str_value);}
+	static String StaticGetTextValue(int type, String str_value) {
 		switch (type) {
 			case TK_UNKNOWN: return "";
 			case TK_ID: return str_value;
@@ -253,7 +257,7 @@ public:
 };
 
 
-class CParser {
+class CBase {
 	const Vector<Token>* tokens = NULL;
 	int pos = 0;
 	
@@ -262,17 +266,18 @@ class CParser {
 	typedef TextProc::Tokenizer Toknzr;
 	One<Toknzr> t;
 public:
-	typedef CParser CLASSNAME;
-	CParser() {}
-	CParser(String s) {t.Create(); t->Load(s, "cparser"); Load(t->GetTokens());}
-	CParser(const Vector<Token>& tokens) {Load(tokens);}
+	typedef CBase CLASSNAME;
+	CBase() {}
+	CBase(String s) {t.Create(); t->Load(s, "cparser"); Load(t->GetTokens());}
+	CBase(const Vector<Token>& tokens) {Load(tokens);}
 	
 	void Load(const Vector<Token>& tokens);
 	void IgnoreNewline(bool b);
 	
 	const Vector<Token>& GetTokens() const {return *tokens;}
 	
-	void Next() {pos++;}
+	void Next()		{pos++;}
+	void SkipTerm()	{pos++;}
 	const Token& GetCurrent() const;
 	bool IsEnd() const;
 	int GetTokenCount() const {if (tokens) return tokens->GetCount(); else return 0;}
@@ -286,12 +291,21 @@ public:
 	bool Id(String id);
 	bool Newline();
 	bool Type(int i);
+	void PassType(int i) {if (!Type(i)) {throw InputExc((String)"Expected type '" + Token::StaticGetTypeString(i) + "'");}}
+	void PassId(String s) {
+		if (IsType(TextProc::TK_ID) && GetCurrent().GetString() == s)
+			Next();
+		else
+			throw InputExc((String)"Expected id '" + s + "'");
+	}
 	
 	bool IsId() const;
 	bool IsInt() const;
 	bool IsType(int i) const;
 	
+	void ThrowError(String msg) {throw TextProc::InputExc(msg);}
 };
+
 
 
 
@@ -327,7 +341,7 @@ protected Token& Tokenizer::Add(int token_id) {
 }*/
 
 void Tokenizer::PassToken(int tk) {
-	if (!IsToken(tk)) throw Exc("Unexpected token");
+	if (!IsToken(tk)) throw InputExc("Unexpected token");
 	pass_cursor++;
 }
 
@@ -343,22 +357,22 @@ bool Tokenizer::TryPassToken(int tk) {
 }
 
 String Tokenizer::ReadString() {
-	if (!IsToken(TK_STRING)) throw Exc("Unexpected token");
+	if (!IsToken(TK_STRING)) throw InputExc("Unexpected token");
 	return tokens[pass_cursor++].str_value;
 }
 
 String Tokenizer::ReadId() {
-	if (!IsToken(TK_ID)) throw Exc("Unexpected token");
+	if (!IsToken(TK_ID)) throw InputExc("Unexpected token");
 	return tokens[pass_cursor++].str_value;
 }
 
 int64 Tokenizer::ReadInt() {
-	if (!IsToken(TK_INTEGER)) throw Exc("Unexpected token");
+	if (!IsToken(TK_INTEGER)) throw InputExc("Unexpected token");
 	return StrInt64(tokens[pass_cursor++].str_value);
 }
 
 double Tokenizer::ReadDouble() {
-	if (!IsToken(TK_DOUBLE) && !IsToken(TK_FLOAT)) throw Exc("Unexpected token");
+	if (!IsToken(TK_DOUBLE) && !IsToken(TK_FLOAT)) throw InputExc("Unexpected token");
 	return StrDbl(tokens[pass_cursor++].str_value);
 }
 
@@ -873,52 +887,40 @@ protected void Tokenizer::AppendString(String& s) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-void CParser::Load(const Vector<Token>& tokens) {
+void CBase::Load(const Vector<Token>& tokens) {
 	this->tokens = &tokens;
 	pos = 0;
 }
 
-const Token& CParser::GetCurrent() const {
+const Token& CBase::GetCurrent() const {
 	if (!tokens)
-		throw Exc("No token vector set");
+		throw InputExc("No token vector set");
 	if (pos < 0 || pos >= tokens->GetCount())
-		throw Exc("Invalid token position");
+		throw InputExc("Invalid token position");
 	return (*tokens)[pos];
 }
 
-void CParser::IgnoreNewline(bool b) {
+void CBase::IgnoreNewline(bool b) {
 	ignore_newline = b;
 }
 
-bool CParser::IsEnd() const {
+bool CBase::IsEnd() const {
 	return !tokens || pos >= tokens->GetCount();
 }
 
-FileLocation CParser::GetLocation() const {
+FileLocation CBase::GetLocation() const {
 	return GetCurrent().loc;
 }
 
-String CParser::ReadId() {
+String CBase::ReadId() {
 	const Token& tk = GetCurrent();
 	if (!tk.IsType(TK_ID))
-		throw Exc("Token is not id");
+		throw InputExc("Token is not id");
 	pos++;
 	return tk.str_value;
 }
 
-int CParser::ReadInt() {
+int CBase::ReadInt() {
 	const Token& tk = GetCurrent();
 	pos++;
 	if (tk.IsType(TK_OCT))
@@ -928,17 +930,17 @@ int CParser::ReadInt() {
 	if (tk.IsType(TK_INTEGER))
 		return StrInt(tk.str_value);
 	pos--;
-	throw Exc("Token is not int");
+	throw InputExc("Token is not int");
 }
 
-void CParser::PassNewline() {
+void CBase::PassNewline() {
 	const Token& tk = GetCurrent();
 	if (tk.IsType(TK_NEWLINE))
-		throw Exc("Token is not newline");
+		throw InputExc("Token is not newline");
 	pos++;
 }
 
-bool CParser::Id(String id) {
+bool CBase::Id(String id) {
 	const Token& tk = GetCurrent();
 	if (tk.IsType(TK_ID) && tk.str_value == id) {
 		pos++;
@@ -947,7 +949,7 @@ bool CParser::Id(String id) {
 	return false;
 }
 
-bool CParser::Type(int i) {
+bool CBase::Type(int i) {
 	const Token& tk = GetCurrent();
 	if (tk.IsType(i)) {
 		pos++;
@@ -956,7 +958,7 @@ bool CParser::Type(int i) {
 	return false;
 }
 
-bool CParser::Newline() {
+bool CBase::Newline() {
 	const Token& tk = GetCurrent();
 	if (tk.IsType(TK_NEWLINE)) {
 		pos++;
@@ -965,21 +967,19 @@ bool CParser::Newline() {
 	return false;
 }
 
-bool CParser::IsId() const {
+bool CBase::IsId() const {
 	return GetCurrent().IsType(TK_ID);
 }
 
-bool CParser::IsInt() const {
+bool CBase::IsInt() const {
 	return GetCurrent().IsType(TK_INTEGER);
 }
 
-bool CParser::IsType(int i) const {
+bool CBase::IsType(int i) const {
 	return GetCurrent().IsType(i);
 }
 
-
 }
 
-#define Token				TextProc::Token
-#define Tokenizer			TextProc::Tokenizer
-#define CParser				TextProc::CParser
+
+#define CParser			TextProc::CBase

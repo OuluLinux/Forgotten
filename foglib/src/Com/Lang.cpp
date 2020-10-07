@@ -133,6 +133,10 @@ void Set(void *dest, int byte_value, int sz) {
 	memset(dest, byte_value, sz);
 }
 
+int StringCompare(const char* a, const char* b) {
+	return strcmp(a, b);
+}
+
 }
 
 

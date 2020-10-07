@@ -9,7 +9,7 @@
 
 namespace Container
 {
-#line 660 "../../src/Com/Container.fog"
+#line 661 "../../src/Com/Container.fog"
     template < class _1, class _2 >
     inline _1 FindIf(_1 first, _1 last, _2 pred);
 #line 36
@@ -23,116 +23,116 @@ namespace Container
     class Array
     {
     public:
-#line 337
+#line 338
         typedef Lang::ConstFwdPtrIterator < _1 > CIterator;
         typedef Lang::ConstBwdPtrIterator < _1 > CRIterator;
-#line 334
-        typedef const _1 ConstK;
-#line 333
-        typedef _1 IndirectK;
 #line 335
+        typedef const _1 ConstK;
+#line 334
+        typedef _1 IndirectK;
+#line 336
         typedef Lang::FwdPtrIterator < _1 > Iterator;
         typedef Lang::BwdPtrIterator < _1 > RIterator;
         
-#line 329
+#line 330
         Lang::DynArray < _1 * > l;
         
     public:
-#line 341
+#line 342
         inline Array();
         inline ~Array();
-#line 439
+#line 440
         inline Array < _1 > & operator<< (const _1& v);
-#line 432
+#line 433
         inline void operator<<= (const Array& a);
-#line 392
+#line 393
         inline _1& operator[](int i);
-#line 398
+#line 399
         inline const _1& operator[](int i) const;
-#line 383
-        inline _1& Add();
-#line 385
-        inline _1& Add(_1 *k);
 #line 384
+        inline _1& Add();
+#line 386
+        inline _1& Add(_1 *k);
+#line 385
         inline _1& Add(const _1& v);
-#line 353
-        inline Lang::ConstFwdPtrIterator < _1 > Begin() const;
-#line 351
-        inline Lang::FwdPtrIterator < _1 > Begin();
-#line 419
-        inline void Clear();
-#line 390
-        inline _1 *Detach(int i);
 #line 354
-        inline Lang::ConstFwdPtrIterator < _1 > End() const;
+        inline Lang::ConstFwdPtrIterator < _1 > Begin() const;
 #line 352
+        inline Lang::FwdPtrIterator < _1 > Begin();
+#line 420
+        inline void Clear();
+#line 391
+        inline _1 *Detach(int i);
+#line 355
+        inline Lang::ConstFwdPtrIterator < _1 > End() const;
+#line 353
         inline Lang::FwdPtrIterator < _1 > End();
-#line 346
+#line 347
         inline _1 **Get() const;
-#line 348
+#line 349
         inline const _1 **GetConst() const;
         inline const _1 **GetConstEnd() const;
-#line 388
+#line 389
         inline int GetCount() const;
-#line 347
+#line 348
         inline _1 **GetEnd() const;
-#line 386
+#line 387
         inline _1& Insert(int i);
         inline _1& Insert(int i, const _1& key);
-#line 389
+#line 390
         inline bool IsEmpty() const;
-#line 359
-        inline Lang::BwdPtrIterator < _1 > RBegin();
-#line 361
-        inline Lang::ConstBwdPtrIterator < _1 > RBegin() const;
 #line 360
-        inline Lang::BwdPtrIterator < _1 > REnd();
+        inline Lang::BwdPtrIterator < _1 > RBegin();
 #line 362
+        inline Lang::ConstBwdPtrIterator < _1 > RBegin() const;
+#line 361
+        inline Lang::BwdPtrIterator < _1 > REnd();
+#line 363
         inline Lang::ConstBwdPtrIterator < _1 > REnd() const;
-#line 409
+#line 410
         inline void Remove(const int *sorted_list, int n);
-#line 403
+#line 404
         inline void Remove(int i);
-#line 418
+#line 419
         inline void RemoveLast();
-#line 368
+#line 369
         inline void Reserve(int i);
         inline void SetCount(int new_count);
-#line 428
+#line 429
         inline _1& Top();
-#line 357
-        inline Lang::ConstFwdPtrIterator < _1 > begin() const;
-#line 355
-        inline Lang::FwdPtrIterator < _1 > begin();
 #line 358
-        inline Lang::ConstFwdPtrIterator < _1 > end() const;
+        inline Lang::ConstFwdPtrIterator < _1 > begin() const;
 #line 356
+        inline Lang::FwdPtrIterator < _1 > begin();
+#line 359
+        inline Lang::ConstFwdPtrIterator < _1 > end() const;
+#line 357
         inline Lang::FwdPtrIterator < _1 > end();
-#line 363
-        inline Lang::BwdPtrIterator < _1 > rbegin();
-#line 365
-        inline Lang::ConstBwdPtrIterator < _1 > rbegin() const;
 #line 364
-        inline Lang::BwdPtrIterator < _1 > rend();
+        inline Lang::BwdPtrIterator < _1 > rbegin();
 #line 366
+        inline Lang::ConstBwdPtrIterator < _1 > rbegin() const;
+#line 365
+        inline Lang::BwdPtrIterator < _1 > rend();
+#line 367
         inline Lang::ConstBwdPtrIterator < _1 > rend() const;
     };
     
     template < class _1 >
     struct FixedArray2
     {
-#line 688
+#line 689
         _1 vector[2];
         
-#line 693
+#line 694
         inline void operator= (const FixedArray2& value);
-#line 692
+#line 693
         inline void operator= (const _1& value);
-#line 690
+#line 691
         inline _1& operator[](int i);
         inline const _1& operator[](int i) const;
         
-#line 686
+#line 687
         static const int size;
     };
     
@@ -140,57 +140,57 @@ namespace Container
     class Index
     {
     public:
-#line 452
+#line 453
         typedef Lang::FwdPtrIterator < _1 > Iterator;
         typedef Lang::BwdPtrIterator < _1 > RIterator;
         
-#line 448
+#line 449
         Lang::DynArray < unsigned int > hashes;
         Lang::DynArray < _1 > values;
         
     public:
-#line 455
+#line 456
         inline Index();
-#line 510
+#line 511
         inline void operator<<= (const Index& a);
-#line 466
+#line 467
         inline const _1& operator[](int i) const;
-#line 476
+#line 477
         inline const _1& Add(const _1& value);
-#line 461
-        inline Lang::ConstFwdPtrIterator < _1 > Begin() const;
-#line 457
-        inline Lang::FwdPtrIterator < _1 > Begin();
-#line 505
-        inline void Clear();
 #line 462
+        inline Lang::ConstFwdPtrIterator < _1 > Begin() const;
+#line 458
+        inline Lang::FwdPtrIterator < _1 > Begin();
+#line 506
+        inline void Clear();
+#line 463
         inline Lang::ConstFwdPtrIterator < _1 > End() const;
-#line 459
+#line 460
         inline Lang::FwdPtrIterator < _1 > End();
-#line 490
+#line 491
         inline int Find(const _1& key) const;
         inline int FindAdd(const _1& key);
-#line 493
+#line 494
         inline int FindHash(Lang::uint32 hash) const;
-#line 463
-        inline _1 *Get();
-#line 475
-        inline int GetCount() const;
 #line 464
+        inline _1 *Get();
+#line 476
+        inline int GetCount() const;
+#line 465
         inline _1 *GetEnd();
-#line 483
+#line 484
         inline _1& Insert(int i, const _1& value);
-#line 506
-        inline void Remove(int i);
-#line 508
-        inline void RemoveKey(const _1& key);
 #line 507
+        inline void Remove(int i);
+#line 509
+        inline void RemoveKey(const _1& key);
+#line 508
         inline void RemoveLast();
-#line 471
+#line 472
         inline void Set(const Index& i);
-#line 458
+#line 459
         inline Lang::FwdPtrIterator < _1 > begin();
-#line 460
+#line 461
         inline Lang::FwdPtrIterator < _1 > end();
     };
     
@@ -198,98 +198,98 @@ namespace Container
     class ArrayMap
     {
     public:
-#line 522
-        typedef Array < _2 > ArrayV;
-#line 521
-        typedef Index < _1 > IndexK;
-#line 622
-        typedef Lang::FwdPairPtrIterator < _1, _2 > Iterator;
 #line 523
-        typedef ArrayMap < _1, _2 > MapKV;
+        typedef Array < _2 > ArrayV;
+#line 522
+        typedef Index < _1 > IndexK;
 #line 623
+        typedef Lang::FwdPairPtrIterator < _1, _2 > Iterator;
+#line 524
+        typedef ArrayMap < _1, _2 > MapKV;
+#line 624
         typedef Lang::BwdPairPtrIterator < _1, _2 > RIterator;
         
-#line 517
+#line 518
         Index < _1 > keys;
         Array < _2 > values;
         
     public:
-#line 525
+#line 526
         inline ArrayMap();
-#line 586
+#line 587
         inline void operator<<= (const ArrayMap& a);
-#line 569
+#line 570
         inline _2& operator[](int i);
-#line 568
+#line 569
         inline const _2& operator[](int i) const;
-#line 531
+#line 532
         inline _2& Add(const _1& key);
-#line 541
+#line 542
         inline _2& Add(const _1& key, _2 *value);
-#line 536
+#line 537
         inline _2& Add(const _1& key, const _2& value);
-#line 563
+#line 564
         inline _2& At(int i);
-#line 558
+#line 559
         inline const _2& At(int i) const;
-#line 643
-        inline Lang::ConstFwdPairPtrIterator < _1, _2 > Begin() const;
-#line 641
-        inline Lang::FwdPairPtrIterator < _1, _2 > Begin();
-#line 581
-        inline void Clear();
 #line 644
-        inline Lang::ConstFwdPairPtrIterator < _1, _2 > End() const;
+        inline Lang::ConstFwdPairPtrIterator < _1, _2 > Begin() const;
 #line 642
+        inline Lang::FwdPairPtrIterator < _1, _2 > Begin();
+#line 582
+        inline void Clear();
+#line 645
+        inline Lang::ConstFwdPairPtrIterator < _1, _2 > End() const;
+#line 643
         inline Lang::FwdPairPtrIterator < _1, _2 > End();
-#line 573
-        inline int Find(const _1& key) const;
-#line 634
-        inline Lang::FwdPairPtrIterator < _1, _2 > FindIterator(const _1& key) const;
-#line 575
-        inline _2 Get(const _1& key, _2 value);
 #line 574
-        inline _2& Get(const _1& key);
-#line 546
-        inline _2& GetAdd(const _1& key);
+        inline int Find(const _1& key) const;
+#line 635
+        inline Lang::FwdPairPtrIterator < _1, _2 > FindIterator(const _1& key) const;
 #line 576
+        inline _2 Get(const _1& key, _2 value) const;
+#line 575
+        inline _2& Get(const _1& key);
+#line 547
+        inline _2& GetAdd(const _1& key);
+#line 577
         inline int GetCount() const;
-#line 556
+#line 557
         inline const _1& GetKey(int i) const;
-#line 527
-        inline const Index < _1 > & GetKeys() const;
-#line 624
-        inline int GetPos(const Iterator& it);
-#line 529
-        inline Array < _2 > & GetValues();
 #line 528
+        inline const Index < _1 > & GetKeys() const;
+#line 625
+        inline int GetPos(const Iterator& it);
+#line 530
+        inline Array < _2 > & GetValues();
+#line 529
         inline const Array < _2 > & GetValues() const;
-#line 553
+#line 554
         inline _2& Insert(int i, const _1& key);
         inline _2& Insert(int i, const _1& key, const _2& value);
-#line 633
+#line 634
         inline Lang::FwdPairPtrIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key);
-#line 632
+#line 633
         inline Lang::FwdPairPtrIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key, _2 *value);
-#line 631
+#line 632
         inline Lang::FwdPairPtrIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key, const _2& value);
-#line 577
+#line 578
         inline bool IsEmpty() const;
-#line 630
+#line 631
         inline void Remove(const Iterator& it);
-#line 580
+#line 581
         inline void Remove(int i);
-#line 579
+#line 580
         inline void RemoveKey(const _1& key);
-#line 571
+#line 572
         inline _2& Top();
-#line 647
-        inline Lang::ConstFwdPairPtrIterator < _1, _2 > begin() const;
-#line 645
-        inline Lang::FwdPairPtrIterator < _1, _2 > begin();
 #line 648
-        inline Lang::ConstFwdPairPtrIterator < _1, _2 > end() const;
+        inline Lang::ConstFwdPairPtrIterator < _1, _2 > begin() const;
 #line 646
+        inline Lang::FwdPairPtrIterator < _1, _2 > begin();
+#line 649
+        inline Lang::ConstFwdPairPtrIterator < _1, _2 > end() const;
+#line 647
         inline Lang::FwdPairPtrIterator < _1, _2 > end();
     };
     
@@ -442,23 +442,23 @@ namespace Container
     
     struct SortedIntMap
     {
-#line 812
+#line 813
         Lang::DynArray < Lang::DynArray < int > > data;
         Lang::DynArray < Lang::uint64 > value_mask;
         int count;
         int first_data_i;
         
-#line 842
+#line 843
         void Add(int key, int value);
-#line 825
+#line 826
         void Clear();
-#line 817
+#line 818
         void Reserve(int count);
     };
     
     struct TopValueSorter10
     {
-#line 703
+#line 704
         typedef int Key;
         typedef double Value;
         
@@ -466,16 +466,16 @@ namespace Container
         Value value[10];
         int count;
         
-#line 711
-        inline TopValueSorter10();
-#line 719
-        void Add(const Key& key, const Value& value);
 #line 712
+        inline TopValueSorter10();
+#line 720
+        void Add(const Key& key, const Value& value);
+#line 713
         void Reset();
-#line 735
+#line 736
         void Serialize(Abstract::StreamBase& s);
         
-#line 702
+#line 703
         static const int size;
     };
     
@@ -483,52 +483,52 @@ namespace Container
     class TreeArray
     {
     public:
-#line 750
+#line 751
         typedef TreeArray < _1 > PA;
         
-#line 753
+#line 754
         PA *down;
         Array < _1 > branch;
         
     public:
-#line 766
+#line 767
         inline _1& Add(_1 *n);
-#line 775
+#line 776
         inline _1& At(int i);
-#line 777
+#line 778
         inline _1& At(int i, _1& n);
         inline const _1& At(int i) const;
-#line 776
+#line 777
         inline _1& AtTop(int i);
-#line 769
-        inline void Clear();
-#line 773
-        inline _1 *Detach(int i);
-#line 781
-        inline int GetCount() const;
-#line 765
-        inline _1 *GetParent() const;
-#line 767
-        inline _1& Insert(int i, _1 *n);
-#line 782
-        inline bool IsEmpty() const;
 #line 770
+        inline void Clear();
+#line 774
+        inline _1 *Detach(int i);
+#line 782
+        inline int GetCount() const;
+#line 766
+        inline _1 *GetParent() const;
+#line 768
+        inline _1& Insert(int i, _1 *n);
+#line 783
+        inline bool IsEmpty() const;
+#line 771
         inline void Remove(int i);
         inline void Remove(int i, int count);
         inline void RemoveLast();
-#line 791
+#line 792
         inline void Serialize(Abstract::StreamBase& s);
-#line 784
+#line 785
         inline void SortByInt();
-#line 779
+#line 780
         inline _1& Top();
         
     protected:
-#line 758
-        inline _1& Add();
-#line 761
-        inline void Copy(const PA& src);
 #line 759
+        inline _1& Add();
+#line 762
+        inline void Copy(const PA& src);
+#line 760
         inline _1& Insert(int i);
     };
     
@@ -560,26 +560,26 @@ namespace Container
     template < class _1 >
     struct CachingVector
     {
-#line 871
+#line 872
         typedef Vector < _1 > Vec;
         
-#line 872
+#line 873
         Vector < _1 > data;
         int count;
         
-#line 877
-        inline _1& operator[](int i);
-#line 876
-        inline const _1& operator[](int i) const;
-#line 881
-        inline typename Lang::FwdIterator < _1 > Begin();
-#line 883
-        inline typename Lang::FwdIterator < _1 > End();
 #line 878
+        inline _1& operator[](int i);
+#line 877
+        inline const _1& operator[](int i) const;
+#line 882
+        inline typename Lang::FwdIterator < _1 > Begin();
+#line 884
+        inline typename Lang::FwdIterator < _1 > End();
+#line 879
         inline int GetCount() const;
         void SetCount(int i);
         inline typename Lang::FwdIterator < _1 > begin();
-#line 882
+#line 883
         inline typename Lang::FwdIterator < _1 > end();
     };
     
@@ -587,98 +587,98 @@ namespace Container
     class VectorMap
     {
     public:
-#line 522
-        typedef Vector < _2 > ArrayV;
-#line 521
-        typedef Index < _1 > IndexK;
-#line 593
-        typedef Lang::FwdPairIterator < _1, _2 > Iterator;
 #line 523
-        typedef VectorMap < _1, _2 > MapKV;
+        typedef Vector < _2 > ArrayV;
+#line 522
+        typedef Index < _1 > IndexK;
 #line 594
+        typedef Lang::FwdPairIterator < _1, _2 > Iterator;
+#line 524
+        typedef VectorMap < _1, _2 > MapKV;
+#line 595
         typedef Lang::BwdPairIterator < _1, _2 > RIterator;
         
-#line 517
+#line 518
         Index < _1 > keys;
         Vector < _2 > values;
         
     public:
-#line 525
+#line 526
         inline VectorMap();
-#line 586
+#line 587
         inline void operator<<= (const VectorMap& a);
-#line 569
+#line 570
         inline _2& operator[](int i);
-#line 568
+#line 569
         inline const _2& operator[](int i) const;
-#line 531
+#line 532
         inline _2& Add(const _1& key);
-#line 541
+#line 542
         inline _2& Add(const _1& key, _2 *value);
-#line 536
+#line 537
         inline _2& Add(const _1& key, const _2& value);
-#line 563
+#line 564
         inline _2& At(int i);
-#line 558
+#line 559
         inline const _2& At(int i) const;
-#line 614
-        inline Lang::ConstFwdPairIterator < _1, _2 > Begin() const;
-#line 612
-        inline Lang::FwdPairIterator < _1, _2 > Begin();
-#line 581
-        inline void Clear();
 #line 615
-        inline Lang::ConstFwdPairIterator < _1, _2 > End() const;
+        inline Lang::ConstFwdPairIterator < _1, _2 > Begin() const;
 #line 613
+        inline Lang::FwdPairIterator < _1, _2 > Begin();
+#line 582
+        inline void Clear();
+#line 616
+        inline Lang::ConstFwdPairIterator < _1, _2 > End() const;
+#line 614
         inline Lang::FwdPairIterator < _1, _2 > End();
-#line 573
-        inline int Find(const _1& key) const;
-#line 605
-        inline Lang::FwdPairIterator < _1, _2 > FindIterator(const _1& key) const;
-#line 575
-        inline _2 Get(const _1& key, _2 value);
 #line 574
-        inline _2& Get(const _1& key);
-#line 546
-        inline _2& GetAdd(const _1& key);
+        inline int Find(const _1& key) const;
+#line 606
+        inline Lang::FwdPairIterator < _1, _2 > FindIterator(const _1& key) const;
 #line 576
+        inline _2 Get(const _1& key, _2 value) const;
+#line 575
+        inline _2& Get(const _1& key);
+#line 547
+        inline _2& GetAdd(const _1& key);
+#line 577
         inline int GetCount() const;
-#line 556
+#line 557
         inline const _1& GetKey(int i) const;
-#line 527
-        inline const Index < _1 > & GetKeys() const;
-#line 595
-        inline int GetPos(const Iterator& it);
-#line 529
-        inline Vector < _2 > & GetValues();
 #line 528
+        inline const Index < _1 > & GetKeys() const;
+#line 596
+        inline int GetPos(const Iterator& it);
+#line 530
+        inline Vector < _2 > & GetValues();
+#line 529
         inline const Vector < _2 > & GetValues() const;
-#line 553
+#line 554
         inline _2& Insert(int i, const _1& key);
         inline _2& Insert(int i, const _1& key, const _2& value);
-#line 604
+#line 605
         inline Lang::FwdPairIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key);
-#line 603
+#line 604
         inline Lang::FwdPairIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key, _2 *value);
-#line 602
+#line 603
         inline Lang::FwdPairIterator < _1, _2 > InsertIterator(const Iterator& it, const _1& key, const _2& value);
-#line 577
+#line 578
         inline bool IsEmpty() const;
-#line 601
+#line 602
         inline void Remove(const Iterator& it);
-#line 580
+#line 581
         inline void Remove(int i);
-#line 579
+#line 580
         inline void RemoveKey(const _1& key);
-#line 571
+#line 572
         inline _2& Top();
-#line 618
-        inline Lang::ConstFwdPairIterator < _1, _2 > begin() const;
-#line 616
-        inline Lang::FwdPairIterator < _1, _2 > begin();
 #line 619
-        inline Lang::ConstFwdPairIterator < _1, _2 > end() const;
+        inline Lang::ConstFwdPairIterator < _1, _2 > begin() const;
 #line 617
+        inline Lang::FwdPairIterator < _1, _2 > begin();
+#line 620
+        inline Lang::ConstFwdPairIterator < _1, _2 > end() const;
+#line 618
         inline Lang::FwdPairIterator < _1, _2 > end();
     };
     
@@ -699,50 +699,51 @@ namespace Container
 #line 281
         inline VectorPtr();
         inline VectorPtr(const VectorPtr& v);
-#line 288
+#line 289
         inline _1& operator[](int i);
         inline const _1& operator[](int i) const;
 #line 285
         inline _1& Add(_1 *o);
 #line 287
         inline void Append(const VectorPtr& v);
-#line 294
-        inline Lang::FwdPtrIterator < _1 > Begin();
-#line 291
-        inline void Clear();
+        inline void Append(const VectorPtr& v, int i, int n);
 #line 295
+        inline Lang::FwdPtrIterator < _1 > Begin();
+#line 292
+        inline void Clear();
+#line 296
         inline Lang::FwdPtrIterator < _1 > End();
 #line 286
         inline int GetCount() const;
-#line 297
+#line 298
         inline Text::String Join(Text::String join_str = "", bool ignore_empty = true) const;
-#line 292
-        inline _1 *Pop();
-#line 290
-        inline _1 *& Ref(int i);
 #line 293
+        inline _1 *Pop();
+#line 291
+        inline _1 *& Ref(int i);
+#line 294
         inline void SetCount(int i);
     };
 };
 
 namespace Container
 {
-#line 660
+#line 661
     template < class _1, class _2 >
     inline _1 FindIf(_1 first, _1 last, _2 pred)
     {
-#line 662
+#line 663
         while (first != last)
             {
-#line 663
+#line 664
                 int i = pred._2::operator()(*first);
                 if (i)
-#line 664
+#line 665
                     return first;
-#line 666
+#line 667
                 ++ first;
             }
-#line 669
+#line 670
         return last;
     };
     
@@ -773,132 +774,132 @@ namespace Container
         Lang::Memory::Copy(&b, tmp, sizeof (_1));
     };
     
-#line 341
+#line 342
     template < class _1 >
     inline Array < _1 >::Array() {};
     
-#line 342
+#line 343
     template < class _1 >
     inline Array < _1 >::~Array()
     {
-#line 342
+#line 343
         Clear();
     };
     
-#line 439
+#line 440
     template < class _1 >
     inline Array < _1 > & Array < _1 >::operator<< (const _1& v)
     {
-#line 439
+#line 440
         Add(v);
-#line 439
+#line 440
         return *this;
     };
     
-#line 432
+#line 433
     template < class _1 >
     inline void Array < _1 >::operator<<= (const Array& a)
     {
-#line 433
+#line 434
         Clear();
         l.SetCount(a.GetCount(), 0);
         for (int i = 0; i < a.GetCount(); i ++ )
             l[i] = new _1(*a.l[i]);
     };
     
-#line 392
+#line 393
     template < class _1 >
     inline _1& Array < _1 >::operator[](int i)
     {
         {
-#line 393
+#line 394
             if (!(i >= 0 && i < l.GetCount()))
             {
-#line 393
+#line 394
                 Lang::SysBreak("Assertion failed: i >= 0 && i < l.GetCount()");
             }
         }
-#line 394
+#line 395
         ;
-#line 394
+#line 395
         _1 * *it = l.Get();
         it = it + i;
         return **it;
     };
     
-#line 398
+#line 399
     template < class _1 >
     inline const _1& Array < _1 >::operator[](int i) const
     {
         {
-#line 399
+#line 400
             if (!(i >= 0 && i < l.GetCount()))
             {
-#line 399
+#line 400
                 Lang::SysBreak("Assertion failed: i >= 0 && i < l.GetCount()");
             }
         }
-#line 400
+#line 401
         ;
-#line 400
+#line 401
         return **(l.Get() + i);
     };
     
-#line 383
+#line 384
     template < class _1 >
     inline _1& Array < _1 >::Add()
     {
-#line 383
+#line 384
         _1 * k = new _1;
-#line 383
+#line 384
         l.Add(k);
-#line 383
+#line 384
         return *k;
     };
     
-#line 385
+#line 386
     template < class _1 >
     inline _1& Array < _1 >::Add(_1 *k)
     {
-#line 385
+#line 386
         l.Add(k);
-#line 385
+#line 386
         return *k;
     };
     
-#line 384
+#line 385
     template < class _1 >
     inline _1& Array < _1 >::Add(const _1& v)
     {
-#line 384
+#line 385
         _1 * k = new _1(v);
-#line 384
+#line 385
         l.Add(k);
-#line 384
+#line 385
         return *k;
     };
     
-#line 353
+#line 354
     template < class _1 >
     inline Lang::ConstFwdPtrIterator < _1 > Array < _1 >::Begin() const
     {
-#line 353
+#line 354
         return CIterator((const _1 * *) l.Get());
     };
     
-#line 351
+#line 352
     template < class _1 >
     inline Lang::FwdPtrIterator < _1 > Array < _1 >::Begin()
     {
-#line 351
+#line 352
         return Iterator(l.Get());
     };
     
-#line 419
+#line 420
     template < class _1 >
     inline void Array < _1 >::Clear()
     {
-#line 420
+#line 421
         Lang::DynArray < _1 * > tmp;
         Swap(tmp, l);
         _1 * *ptr = tmp.Get();
@@ -907,137 +908,137 @@ namespace Container
             delete *(ptr ++ );
     };
     
-#line 390
+#line 391
     template < class _1 >
     inline _1 *Array < _1 >::Detach(int i)
     {
-#line 390
+#line 391
         _1 * o = l[i];
-#line 390
+#line 391
         l.Remove(i);
-#line 390
+#line 391
         return o;
     };
     
-#line 354
+#line 355
     template < class _1 >
     inline Lang::ConstFwdPtrIterator < _1 > Array < _1 >::End() const
     {
-#line 354
+#line 355
         return CIterator((const _1 * *) l.GetEnd());
     };
     
-#line 352
+#line 353
     template < class _1 >
     inline Lang::FwdPtrIterator < _1 > Array < _1 >::End()
     {
-#line 352
+#line 353
         return Iterator(l.GetEnd());
     };
     
-#line 346
+#line 347
     template < class _1 >
     inline _1 **Array < _1 >::Get() const
     {
-#line 346
+#line 347
         return l.Get();
     };
     
-#line 348
+#line 349
     template < class _1 >
     inline const _1 **Array < _1 >::GetConst() const
     {
-#line 348
+#line 349
         return l.Get();
     };
     
-#line 349
+#line 350
     template < class _1 >
     inline const _1 **Array < _1 >::GetConstEnd() const
     {
-#line 349
+#line 350
         return l.GetEnd();
     };
     
-#line 388
+#line 389
     template < class _1 >
     inline int Array < _1 >::GetCount() const
     {
-#line 388
+#line 389
         return l.GetCount();
     };
     
-#line 347
+#line 348
     template < class _1 >
     inline _1 **Array < _1 >::GetEnd() const
     {
-#line 347
+#line 348
         return l.GetEnd();
     };
     
-#line 386
+#line 387
     template < class _1 >
     inline _1& Array < _1 >::Insert(int i)
     {
-#line 386
+#line 387
         return *l.Insert(i, new _1);
     };
     
-#line 387
+#line 388
     template < class _1 >
     inline _1& Array < _1 >::Insert(int i, const _1& key)
     {
-#line 387
+#line 388
         return *l.Insert(i, new _1(key));
     };
     
-#line 389
+#line 390
     template < class _1 >
     inline bool Array < _1 >::IsEmpty() const
     {
-#line 389
+#line 390
         return GetCount() == 0;
     };
     
-#line 359
+#line 360
     template < class _1 >
     inline Lang::BwdPtrIterator < _1 > Array < _1 >::RBegin()
     {
-#line 359
+#line 360
         return RIterator(l.GetEnd() - 1);
     };
     
-#line 361
+#line 362
     template < class _1 >
     inline Lang::ConstBwdPtrIterator < _1 > Array < _1 >::RBegin() const
     {
-#line 361
+#line 362
         return CRIterator(l.GetConstEnd() - 1);
     };
     
-#line 360
+#line 361
     template < class _1 >
     inline Lang::BwdPtrIterator < _1 > Array < _1 >::REnd()
     {
-#line 360
+#line 361
         return RIterator(l.Get() - 1);
     };
     
-#line 362
+#line 363
     template < class _1 >
     inline Lang::ConstBwdPtrIterator < _1 > Array < _1 >::REnd() const
     {
-#line 362
+#line 363
         return CRIterator(l.GetConst() - 1);
     };
     
-#line 409
+#line 410
     template < class _1 >
     inline void Array < _1 >::Remove(const int *sorted_list, int n)
     {
-#line 410
+#line 411
         if (!n)
-#line 410
+#line 411
             return;
         const int * it = sorted_list;
         const int * end = sorted_list + n;
@@ -1047,674 +1048,674 @@ namespace Container
         l.Remove(sorted_list, n);
     };
     
-#line 403
+#line 404
     template < class _1 >
     inline void Array < _1 >::Remove(int i)
     {
         {
-#line 404
+#line 405
             if (!(i >= 0 && i < l.GetCount()))
             {
-#line 404
+#line 405
                 Lang::SysBreak("Assertion failed: i >= 0 && i < l.GetCount()");
             }
         }
-#line 405
+#line 406
         ;
-#line 405
+#line 406
         delete *(l.Get() + i);
         l.Remove(i);
     };
     
-#line 418
+#line 419
     template < class _1 >
     inline void Array < _1 >::RemoveLast()
     {
         {
-#line 418
+#line 419
             if (!(GetCount()))
             {
-#line 418
+#line 419
                 Lang::SysBreak("Assertion failed: GetCount()");
             }
         }
-#line 418
+#line 419
         ;
-#line 418
+#line 419
         Remove(GetCount() - 1);
-    };
-    
-#line 368
-    template < class _1 >
-    inline void Array < _1 >::Reserve(int i)
-    {
-#line 368
-        l.Reserve(i);
     };
     
 #line 369
     template < class _1 >
+    inline void Array < _1 >::Reserve(int i)
+    {
+#line 369
+        l.Reserve(i);
+    };
+    
+#line 370
+    template < class _1 >
     inline void Array < _1 >::SetCount(int new_count)
     {
-#line 370
+#line 371
         int count = l.GetCount();
         if (new_count == count)
-#line 371
+#line 372
             return;
         if (new_count > count)
         {
-#line 373
+#line 374
             l.SetCount(new_count);
             for (int i = count; i < new_count; i ++ )
                 l[i] = new _1;
         }
         else
         {
-#line 378
+#line 379
             for (int i = count - 1; i >= new_count; i -- )
                 delete l[i];
             l.SetCount(new_count);
         }
     };
     
-#line 428
+#line 429
     template < class _1 >
     inline _1& Array < _1 >::Top()
     {
         {
-#line 429
+#line 430
             if (!(GetCount() > 0))
             {
-#line 429
+#line 430
                 Lang::SysBreak("Assertion failed: GetCount() > 0");
             }
         }
-#line 430
+#line 431
         ;
-#line 430
+#line 431
         return **(l.Get() + l.GetCount() - 1);
     };
     
-#line 357
+#line 358
     template < class _1 >
     inline Lang::ConstFwdPtrIterator < _1 > Array < _1 >::begin() const
     {
-#line 357
+#line 358
         return Begin();
     };
     
-#line 355
+#line 356
     template < class _1 >
     inline Lang::FwdPtrIterator < _1 > Array < _1 >::begin()
     {
-#line 355
+#line 356
         return Begin();
     };
     
     template < class _1 >
     inline Lang::ConstFwdPtrIterator < _1 > Array < _1 >::end() const
     {
-#line 358
+#line 359
         return End();
     };
     
-#line 356
+#line 357
     template < class _1 >
     inline Lang::FwdPtrIterator < _1 > Array < _1 >::end()
     {
-#line 356
+#line 357
         return End();
     };
     
-#line 363
+#line 364
     template < class _1 >
     inline Lang::BwdPtrIterator < _1 > Array < _1 >::rbegin()
     {
-#line 363
+#line 364
         return RBegin();
     };
     
-#line 365
+#line 366
     template < class _1 >
     inline Lang::ConstBwdPtrIterator < _1 > Array < _1 >::rbegin() const
     {
-#line 365
+#line 366
         return RBegin();
     };
     
-#line 364
+#line 365
     template < class _1 >
     inline Lang::BwdPtrIterator < _1 > Array < _1 >::rend()
     {
-#line 364
+#line 365
         return REnd();
     };
     
-#line 366
+#line 367
     template < class _1 >
     inline Lang::ConstBwdPtrIterator < _1 > Array < _1 >::rend() const
     {
-#line 366
+#line 367
         return REnd();
     };
     
-#line 525
+#line 526
     template < class _1, class _2 >
     inline ArrayMap < _1, _2 >::ArrayMap() {};
     
-#line 586
+#line 587
     template < class _1, class _2 >
     inline void ArrayMap < _1, _2 >::operator<<= (const ArrayMap& a)
     {
-#line 587
+#line 588
         keys <<= a.keys;
         values <<= a.values;
     };
     
-#line 569
+#line 570
     template < class _1, class _2 >
     inline _2& ArrayMap < _1, _2 >::operator[](int i)
     {
+#line 570
+        return At(i);
+    };
+    
+#line 569
+    template < class _1, class _2 >
+    inline const _2& ArrayMap < _1, _2 >::operator[](int i) const
+    {
 #line 569
         return At(i);
     };
     
-#line 568
-    template < class _1, class _2 >
-    inline const _2& ArrayMap < _1, _2 >::operator[](int i) const
-    {
-#line 568
-        return At(i);
-    };
-    
-#line 531
+#line 532
     template < class _1, class _2 >
     inline _2& ArrayMap < _1, _2 >::Add(const _1& key)
     {
-#line 532
+#line 533
         keys.Add(key);
         return values.Add();
     };
     
-#line 541
+#line 542
     template < class _1, class _2 >
     inline _2& ArrayMap < _1, _2 >::Add(const _1& key, _2 *value)
     {
-#line 542
+#line 543
         keys.Add(key);
         return values.Add(value);
     };
     
-#line 536
+#line 537
     template < class _1, class _2 >
     inline _2& ArrayMap < _1, _2 >::Add(const _1& key, const _2& value)
     {
-#line 537
+#line 538
         keys.Add(key);
         return values.Add(value);
     };
     
-#line 563
+#line 564
     template < class _1, class _2 >
     inline _2& ArrayMap < _1, _2 >::At(int i)
     {
         {
-#line 564
+#line 565
             if (!(i >= 0 && i < values.GetCount()))
             {
-#line 564
+#line 565
                 Lang::SysBreak("Assertion failed: i >= 0 && i < values.GetCount()");
             }
         }
-#line 565
+#line 566
         ;
-#line 565
+#line 566
         return values[i];
     };
     
-#line 558
+#line 559
     template < class _1, class _2 >
     inline const _2& ArrayMap < _1, _2 >::At(int i) const
     {
         {
-#line 559
+#line 560
             if (!(i >= 0 && i < values.GetCount()))
             {
-#line 559
+#line 560
                 Lang::SysBreak("Assertion failed: i >= 0 && i < values.GetCount()");
             }
         }
-#line 560
+#line 561
         ;
-#line 560
+#line 561
         return values[i];
     };
     
-#line 643
+#line 644
     template < class _1, class _2 >
     inline Lang::ConstFwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::Begin() const
     {
-#line 643
+#line 644
         return Iterator(keys.Get(), values.Get());
     };
     
-#line 641
+#line 642
     template < class _1, class _2 >
     inline Lang::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::Begin()
     {
-#line 641
+#line 642
         return Iterator(keys.Get(), values.Get());
     };
     
-#line 581
+#line 582
     template < class _1, class _2 >
     inline void ArrayMap < _1, _2 >::Clear()
     {
-#line 582
+#line 583
         keys.Clear();
         values.Clear();
     };
     
-#line 644
+#line 645
     template < class _1, class _2 >
     inline Lang::ConstFwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::End() const
     {
-#line 644
+#line 645
         return Iterator(keys.GetEnd(), values.GetEnd());
     };
     
-#line 642
+#line 643
     template < class _1, class _2 >
     inline Lang::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::End()
     {
-#line 642
+#line 643
         return Iterator(keys.GetEnd(), values.GetEnd());
     };
     
-#line 573
+#line 574
     template < class _1, class _2 >
     inline int ArrayMap < _1, _2 >::Find(const _1& key) const
     {
-#line 573
+#line 574
         return keys.Find(key);
     };
     
-#line 634
+#line 635
     template < class _1, class _2 >
     inline Lang::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::FindIterator(const _1& key) const
     {
-#line 635
+#line 636
         Iterator it = Begin();
         int pos = Find(key);
         if (pos == - 1)
-#line 637
+#line 638
             it += GetCount();
         else
-#line 638
+#line 639
             it += pos;
         return it;
     };
     
-#line 575
+#line 576
     template < class _1, class _2 >
-    inline _2 ArrayMap < _1, _2 >::Get(const _1& key, _2 value)
+    inline _2 ArrayMap < _1, _2 >::Get(const _1& key, _2 value) const
     {
-#line 575
+#line 576
         int i = Find(key);
-#line 575
+#line 576
         if (i < 0)
-#line 575
+#line 576
             return value;
-#line 575
+#line 576
         return values[i];
     };
     
-#line 574
+#line 575
     template < class _1, class _2 >
     inline _2& ArrayMap < _1, _2 >::Get(const _1& key)
     {
-#line 574
+#line 575
         return values[Find(key)];
     };
     
-#line 546
+#line 547
     template < class _1, class _2 >
     inline _2& ArrayMap < _1, _2 >::GetAdd(const _1& key)
     {
-#line 547
+#line 548
         int i = keys.Find(key);
         if (i >= 0)
-#line 548
+#line 549
             return values[i];
         keys.Add(key);
         return values.Add();
     };
     
-#line 576
+#line 577
     template < class _1, class _2 >
     inline int ArrayMap < _1, _2 >::GetCount() const
     {
-#line 576
+#line 577
         return keys.GetCount();
     };
     
-#line 556
+#line 557
     template < class _1, class _2 >
     inline const _1& ArrayMap < _1, _2 >::GetKey(int i) const
     {
-#line 556
+#line 557
         return keys[i];
     };
     
-#line 527
+#line 528
     template < class _1, class _2 >
     inline const Index < _1 > & ArrayMap < _1, _2 >::GetKeys() const
     {
-#line 527
+#line 528
         return keys;
     };
     
-#line 624
+#line 625
     template < class _1, class _2 >
     inline int ArrayMap < _1, _2 >::GetPos(const Iterator& it)
     {
-#line 625
+#line 626
         _1 * begin = keys.Get();
         _1 * cur = &it.Key();
         int pos = cur - begin;
         return pos;
     };
     
-#line 529
+#line 530
     template < class _1, class _2 >
     inline Array < _2 > & ArrayMap < _1, _2 >::GetValues()
     {
+#line 530
+        return values;
+    };
+    
+#line 529
+    template < class _1, class _2 >
+    inline const Array < _2 > & ArrayMap < _1, _2 >::GetValues() const
+    {
 #line 529
         return values;
     };
     
-#line 528
-    template < class _1, class _2 >
-    inline const Array < _2 > & ArrayMap < _1, _2 >::GetValues() const
-    {
-#line 528
-        return values;
-    };
-    
-#line 553
+#line 554
     template < class _1, class _2 >
     inline _2& ArrayMap < _1, _2 >::Insert(int i, const _1& key)
     {
-#line 553
+#line 554
         keys.Insert(i, key);
-#line 553
+#line 554
         return values.Insert(i);
     };
     
-#line 554
+#line 555
     template < class _1, class _2 >
     inline _2& ArrayMap < _1, _2 >::Insert(int i, const _1& key, const _2& value)
     {
-#line 554
+#line 555
         keys.Insert(i, key);
-#line 554
+#line 555
         return values.Insert(i, value);
     };
     
-#line 633
+#line 634
     template < class _1, class _2 >
     inline Lang::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key)
     {
-#line 633
+#line 634
         int pos = GetPos(it);
-#line 633
+#line 634
         Insert(pos, key);
-#line 633
+#line 634
         Iterator cur = Begin();
-#line 633
+#line 634
         cur += pos;
-#line 633
+#line 634
         return cur;
     };
     
-#line 632
+#line 633
     template < class _1, class _2 >
     inline Lang::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key, _2 *value)
     {
-#line 632
+#line 633
         int pos = GetPos(it);
-#line 632
+#line 633
         Insert(pos, key, value);
-#line 632
+#line 633
         Iterator cur = Begin();
-#line 632
+#line 633
         cur += pos;
-#line 632
+#line 633
         return cur;
     };
     
-#line 631
+#line 632
     template < class _1, class _2 >
     inline Lang::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key, const _2& value)
     {
-#line 631
+#line 632
         int pos = GetPos(it);
-#line 631
+#line 632
         Insert(pos, key, value);
-#line 631
+#line 632
         Iterator cur = Begin();
-#line 631
+#line 632
         cur += pos;
-#line 631
+#line 632
         return cur;
     };
     
-#line 577
+#line 578
     template < class _1, class _2 >
     inline bool ArrayMap < _1, _2 >::IsEmpty() const
     {
-#line 577
+#line 578
         return GetCount() == 0;
     };
     
-#line 630
+#line 631
     template < class _1, class _2 >
     inline void ArrayMap < _1, _2 >::Remove(const Iterator& it)
     {
-#line 630
+#line 631
         Remove(GetPos(it));
     };
     
-#line 580
+#line 581
     template < class _1, class _2 >
     inline void ArrayMap < _1, _2 >::Remove(int i)
     {
         {
-#line 580
+#line 581
             if (!(i >= 0 && i < keys.GetCount()))
             {
-#line 580
+#line 581
                 Lang::SysBreak("Assertion failed: i >= 0 && i < keys.GetCount()");
             }
         }
-#line 580
+#line 581
         ;
-#line 580
+#line 581
         keys.Remove(i);
-#line 580
+#line 581
         values.Remove(i);
     };
     
-#line 579
+#line 580
     template < class _1, class _2 >
     inline void ArrayMap < _1, _2 >::RemoveKey(const _1& key)
     {
-#line 579
+#line 580
         int i = Find(key);
-#line 579
+#line 580
         if (i >= 0)
-#line 579
+#line 580
             Remove(i);
     };
     
-#line 571
+#line 572
     template < class _1, class _2 >
     inline _2& ArrayMap < _1, _2 >::Top()
     {
         {
-#line 571
+#line 572
             if (!(GetCount() > 0))
             {
-#line 571
+#line 572
                 Lang::SysBreak("Assertion failed: GetCount() > 0");
             }
         }
-#line 571
+#line 572
         ;
-#line 571
+#line 572
         return values.Top();
     };
     
-#line 647
+#line 648
     template < class _1, class _2 >
     inline Lang::ConstFwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::begin() const
     {
-#line 647
+#line 648
         return Begin();
     };
     
-#line 645
+#line 646
     template < class _1, class _2 >
     inline Lang::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::begin()
     {
-#line 645
+#line 646
         return Begin();
     };
     
     template < class _1, class _2 >
     inline Lang::ConstFwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::end() const
     {
-#line 648
+#line 649
         return End();
     };
     
-#line 646
+#line 647
     template < class _1, class _2 >
     inline Lang::FwdPairPtrIterator < _1, _2 > ArrayMap < _1, _2 >::end()
     {
-#line 646
+#line 647
         return End();
     };
     
-#line 877
+#line 878
     template < class _1 >
     inline _1& CachingVector < _1 >::operator[](int i)
     {
+#line 878
+        return data[i];
+    };
+    
+#line 877
+    template < class _1 >
+    inline const _1& CachingVector < _1 >::operator[](int i) const
+    {
 #line 877
         return data[i];
     };
     
-#line 876
-    template < class _1 >
-    inline const _1& CachingVector < _1 >::operator[](int i) const
-    {
-#line 876
-        return data[i];
-    };
-    
-#line 881
+#line 882
     template < class _1 >
     inline typename Lang::FwdIterator < _1 > CachingVector < _1 >::Begin()
     {
+#line 882
+        return data.begin();
+    };
+    
+#line 884
+    template < class _1 >
+    inline typename Lang::FwdIterator < _1 > CachingVector < _1 >::End()
+    {
+#line 884
+        return data.begin() + count;
+    };
+    
+#line 879
+    template < class _1 >
+    inline int CachingVector < _1 >::GetCount() const
+    {
+#line 879
+        return count;
+    };
+    
+#line 881
+    template < class _1 >
+    inline typename Lang::FwdIterator < _1 > CachingVector < _1 >::begin()
+    {
 #line 881
         return data.begin();
     };
     
 #line 883
     template < class _1 >
-    inline typename Lang::FwdIterator < _1 > CachingVector < _1 >::End()
+    inline typename Lang::FwdIterator < _1 > CachingVector < _1 >::end()
     {
 #line 883
         return data.begin() + count;
     };
     
-#line 878
-    template < class _1 >
-    inline int CachingVector < _1 >::GetCount() const
-    {
-#line 878
-        return count;
-    };
-    
-#line 880
-    template < class _1 >
-    inline typename Lang::FwdIterator < _1 > CachingVector < _1 >::begin()
-    {
-#line 880
-        return data.begin();
-    };
-    
-#line 882
-    template < class _1 >
-    inline typename Lang::FwdIterator < _1 > CachingVector < _1 >::end()
-    {
-#line 882
-        return data.begin() + count;
-    };
-    
-#line 693
+#line 694
     template < class _1 >
     inline void FixedArray2 < _1 >::operator= (const FixedArray2& value)
     {
-#line 693
+#line 694
         for (int i = 0; i < size; i ++ )
-#line 693
+#line 694
             this -> vector[i] = value.vector[i];
     };
     
-#line 692
+#line 693
     template < class _1 >
     inline void FixedArray2 < _1 >::operator= (const _1& value)
     {
-#line 692
+#line 693
         for (int i = 0; i < size; i ++ )
-#line 692
+#line 693
             this -> vector[i] = value;
     };
     
-#line 690
+#line 691
     template < class _1 >
     inline _1& FixedArray2 < _1 >::operator[](int i)
     {
         {
-#line 690
+#line 691
             if (!(i >= 0 && i < size))
             {
-#line 690
+#line 691
                 Lang::SysBreak("Assertion failed: i >= 0 && i < size");
             }
         }
-#line 690
+#line 691
         ;
-#line 690
+#line 691
         return vector[i];
     };
     
-#line 691
+#line 692
     template < class _1 >
     inline const _1& FixedArray2 < _1 >::operator[](int i) const
     {
         {
-#line 691
+#line 692
             if (!(i >= 0 && i < size))
             {
-#line 691
+#line 692
                 Lang::SysBreak("Assertion failed: i >= 0 && i < size");
             }
         }
-#line 691
+#line 692
         ;
-#line 691
+#line 692
         return vector[i];
     };
     
@@ -1812,41 +1813,41 @@ namespace Container
         cond.Wait();
     };
     
-#line 455
+#line 456
     template < class _1 >
     inline Index < _1 >::Index() {};
     
-#line 510
+#line 511
     template < class _1 >
     inline void Index < _1 >::operator<<= (const Index& a)
     {
-#line 510
+#line 511
         Set(a);
     };
     
-#line 466
+#line 467
     template < class _1 >
     inline const _1& Index < _1 >::operator[](int i) const
     {
         {
-#line 467
+#line 468
             if (!(i >= 0 && i < values.GetCount()))
             {
-#line 467
+#line 468
                 Lang::SysBreak("Assertion failed: i >= 0 && i < values.GetCount()");
             }
         }
-#line 468
+#line 469
         ;
-#line 468
+#line 469
         return values[i];
     };
     
-#line 476
+#line 477
     template < class _1 >
     inline const _1& Index < _1 >::Add(const _1& value)
     {
-#line 477
+#line 478
         Lang::uint32 hash = Hash::GetValue(value);
         if (FindHash(hash) >= 0)
             throw Text::Exc("Index has value already");
@@ -1854,85 +1855,85 @@ namespace Container
         return values.Add(value);
     };
     
-#line 461
+#line 462
     template < class _1 >
     inline Lang::ConstFwdPtrIterator < _1 > Index < _1 >::Begin() const
     {
-#line 461
+#line 462
         return Iterator(values.Begin());
     };
     
-#line 457
+#line 458
     template < class _1 >
     inline Lang::FwdPtrIterator < _1 > Index < _1 >::Begin()
     {
-#line 457
+#line 458
         return Iterator(values.Begin());
     };
     
-#line 505
+#line 506
     template < class _1 >
     inline void Index < _1 >::Clear()
     {
-#line 505
+#line 506
         hashes.Clear();
-#line 505
+#line 506
         values.Clear();
     };
     
-#line 462
+#line 463
     template < class _1 >
     inline Lang::ConstFwdPtrIterator < _1 > Index < _1 >::End() const
     {
-#line 462
+#line 463
         return Iterator(values.End());
     };
     
-#line 459
+#line 460
     template < class _1 >
     inline Lang::FwdPtrIterator < _1 > Index < _1 >::End()
     {
-#line 459
+#line 460
         return Iterator(values.End());
     };
     
-#line 490
+#line 491
     template < class _1 >
     inline int Index < _1 >::Find(const _1& key) const
     {
-#line 490
+#line 491
         return FindHash(Hash::GetValue(key));
     };
     
-#line 491
+#line 492
     template < class _1 >
     inline int Index < _1 >::FindAdd(const _1& key)
     {
-#line 491
+#line 492
         int i = Find(key);
-#line 491
+#line 492
         if (i >= 0)
-#line 491
+#line 492
             return i;
-#line 491
+#line 492
         i = GetCount();
-#line 491
+#line 492
         Add(key);
-#line 491
+#line 492
         return i;
     };
     
-#line 493
+#line 494
     template < class _1 >
     inline int Index < _1 >::FindHash(Lang::uint32 hash) const
     {
-#line 494
+#line 495
         unsigned int * begin = hashes.Get();
         unsigned int * it = begin;
         unsigned int * end = begin + hashes.GetCount();
         while (it != end)
             {
-#line 498
+#line 499
                 if (*it == hash)
                     return it - begin;
                 it ++ ;
@@ -1940,35 +1941,35 @@ namespace Container
         return - 1;
     };
     
-#line 463
+#line 464
     template < class _1 >
     inline _1 *Index < _1 >::Get()
     {
-#line 463
+#line 464
         return values.Get();
     };
     
-#line 475
+#line 476
     template < class _1 >
     inline int Index < _1 >::GetCount() const
     {
-#line 475
+#line 476
         return values.GetCount();
     };
     
-#line 464
+#line 465
     template < class _1 >
     inline _1 *Index < _1 >::GetEnd()
     {
-#line 464
+#line 465
         return values.GetEnd();
     };
     
-#line 483
+#line 484
     template < class _1 >
     inline _1& Index < _1 >::Insert(int i, const _1& value)
     {
-#line 484
+#line 485
         Lang::uint32 hash = Hash::GetValue(value);
         if (FindHash(hash) >= 0)
             throw Text::Exc("Index has value already");
@@ -1976,70 +1977,70 @@ namespace Container
         return values.Insert(i, value);
     };
     
-#line 506
+#line 507
     template < class _1 >
     inline void Index < _1 >::Remove(int i)
     {
-#line 506
+#line 507
         hashes.Remove(i);
-#line 506
+#line 507
         values.Remove(i);
     };
     
-#line 508
+#line 509
     template < class _1 >
     inline void Index < _1 >::RemoveKey(const _1& key)
     {
-#line 508
+#line 509
         int i = Find(key);
-#line 508
+#line 509
         if (i >= 0)
-#line 508
+#line 509
             Remove(i);
     };
     
-#line 507
+#line 508
     template < class _1 >
     inline void Index < _1 >::RemoveLast()
     {
         {
-#line 507
+#line 508
             if (!(GetCount()))
             {
-#line 507
+#line 508
                 Lang::SysBreak("Assertion failed: GetCount()");
             }
         }
-#line 507
+#line 508
         ;
-#line 507
+#line 508
         if (GetCount())
-#line 507
+#line 508
             Remove(GetCount() - 1);
     };
     
-#line 471
+#line 472
     template < class _1 >
     inline void Index < _1 >::Set(const Index& i)
     {
-#line 472
+#line 473
         hashes <<= i.hashes;
         values <<= i.values;
     };
     
-#line 458
+#line 459
     template < class _1 >
     inline Lang::FwdPtrIterator < _1 > Index < _1 >::begin()
     {
-#line 458
+#line 459
         return Iterator(values.Begin());
     };
     
-#line 460
+#line 461
     template < class _1 >
     inline Lang::FwdPtrIterator < _1 > Index < _1 >::end()
     {
-#line 460
+#line 461
         return Iterator(values.End());
     };
     
@@ -2446,229 +2447,229 @@ namespace Container
         return Pick < _1 > (p);
     };
     
-#line 711
+#line 712
     inline TopValueSorter10::TopValueSorter10()
     :
         count(0)
     {
-#line 711
+#line 712
         Reset();
     };
     
-#line 758
+#line 759
     template < class _1 >
     inline _1& TreeArray < _1 >::Add()
     {
-#line 758
+#line 759
         _1 & t = branch.Add();
-#line 758
+#line 759
         t.down = this;
-#line 758
+#line 759
         return t;
     };
     
-#line 766
+#line 767
     template < class _1 >
     inline _1& TreeArray < _1 >::Add(_1 *n)
     {
         {
-#line 766
+#line 767
             if (!(n -> down == 0))
             {
-#line 766
+#line 767
                 Lang::SysBreak("Assertion failed: n->down == NULL");
             }
         }
-#line 766
+#line 767
         ;
-#line 766
+#line 767
         _1 & t = branch.Add(n);
-#line 766
+#line 767
         t.down = this;
-#line 766
+#line 767
         return t;
     };
     
-#line 775
+#line 776
     template < class _1 >
     inline _1& TreeArray < _1 >::At(int i)
     {
-#line 775
+#line 776
         return branch[i];
     };
     
-#line 777
+#line 778
     template < class _1 >
     inline _1& TreeArray < _1 >::At(int i, _1& n)
     {
-#line 777
+#line 778
         if (i < branch.GetCount())
-#line 777
+#line 778
             return branch[i];
-#line 777
+#line 778
         return n;
     };
     
-#line 778
+#line 779
     template < class _1 >
     inline const _1& TreeArray < _1 >::At(int i) const
     {
-#line 778
+#line 779
         return branch[i];
     };
     
-#line 776
+#line 777
     template < class _1 >
     inline _1& TreeArray < _1 >::AtTop(int i)
     {
-#line 776
+#line 777
         if (i < branch.GetCount())
-#line 776
+#line 777
             return branch[i];
-#line 776
+#line 777
         return branch.Top();
     };
     
-#line 769
+#line 770
     template < class _1 >
     inline void TreeArray < _1 >::Clear()
     {
-#line 769
+#line 770
         branch.Clear();
     };
     
-#line 761
+#line 762
     template < class _1 >
     inline void TreeArray < _1 >::Copy(const PA& src)
     {
-#line 761
+#line 762
         branch <<= src.branch;
-#line 761
+#line 762
         for (int i = 0; i < branch.GetCount(); i ++ )
-#line 761
+#line 762
             branch[i].down = this;
     };
     
-#line 773
+#line 774
     template < class _1 >
     inline _1 *TreeArray < _1 >::Detach(int i)
     {
-#line 773
+#line 774
         _1 * t = branch.Detach(i);
-#line 773
+#line 774
         t -> down = 0;
-#line 773
+#line 774
         return t;
     };
     
-#line 781
+#line 782
     template < class _1 >
     inline int TreeArray < _1 >::GetCount() const
     {
-#line 781
+#line 782
         return branch.GetCount();
     };
     
-#line 765
+#line 766
     template < class _1 >
     inline _1 *TreeArray < _1 >::GetParent() const
     {
-#line 765
+#line 766
         return down;
     };
     
-#line 759
+#line 760
     template < class _1 >
     inline _1& TreeArray < _1 >::Insert(int i)
     {
-#line 759
+#line 760
         _1 & t = branch.Insert(i);
-#line 759
+#line 760
         t.down = this;
-#line 759
+#line 760
         return t;
     };
     
-#line 767
+#line 768
     template < class _1 >
     inline _1& TreeArray < _1 >::Insert(int i, _1 *n)
     {
         {
-#line 767
+#line 768
             if (!(n -> down == 0))
             {
-#line 767
+#line 768
                 Lang::SysBreak("Assertion failed: n->down == NULL");
             }
         }
-#line 767
+#line 768
         ;
-#line 767
+#line 768
         _1 & t = branch.Insert(i, n);
-#line 767
+#line 768
         t.down = this;
-#line 767
+#line 768
         return t;
     };
     
-#line 782
+#line 783
     template < class _1 >
     inline bool TreeArray < _1 >::IsEmpty() const
     {
-#line 782
+#line 783
         return branch.IsEmpty();
     };
     
-#line 770
+#line 771
     template < class _1 >
     inline void TreeArray < _1 >::Remove(int i)
     {
-#line 770
+#line 771
         branch.Remove(i);
     };
     
-#line 771
+#line 772
     template < class _1 >
     inline void TreeArray < _1 >::Remove(int i, int count)
     {
-#line 771
+#line 772
         branch.Remove(i, count);
     };
     
-#line 772
+#line 773
     template < class _1 >
     inline void TreeArray < _1 >::RemoveLast()
     {
-#line 772
+#line 773
         branch.Remove(branch.GetCount() - 1);
     };
     
-#line 791
+#line 792
     template < class _1 >
     inline void TreeArray < _1 >::Serialize(Abstract::StreamBase& s)
     {
-#line 792
+#line 793
         s % branch;
         if (s.IsLoading())
             for (int i = 0; i < branch.GetCount(); i ++ )
                 branch[i].down = this;
     };
     
-#line 784
+#line 785
     template < class _1 >
     inline void TreeArray < _1 >::SortByInt()
     {
-#line 785
+#line 786
         struct Sorter;
-#line 788
+#line 789
         Sort(branch, Sorter());
     };
     
-#line 779
+#line 780
     template < class _1 >
     inline _1& TreeArray < _1 >::Top()
     {
-#line 779
+#line 780
         return branch.Top();
     };
     
@@ -2813,411 +2814,411 @@ namespace Container
         }
     };
     
-#line 525
+#line 526
     template < class _1, class _2 >
     inline VectorMap < _1, _2 >::VectorMap() {};
     
-#line 586
+#line 587
     template < class _1, class _2 >
     inline void VectorMap < _1, _2 >::operator<<= (const VectorMap& a)
     {
-#line 587
+#line 588
         keys <<= a.keys;
         values <<= a.values;
     };
     
-#line 569
+#line 570
     template < class _1, class _2 >
     inline _2& VectorMap < _1, _2 >::operator[](int i)
     {
+#line 570
+        return At(i);
+    };
+    
+#line 569
+    template < class _1, class _2 >
+    inline const _2& VectorMap < _1, _2 >::operator[](int i) const
+    {
 #line 569
         return At(i);
     };
     
-#line 568
-    template < class _1, class _2 >
-    inline const _2& VectorMap < _1, _2 >::operator[](int i) const
-    {
-#line 568
-        return At(i);
-    };
-    
-#line 531
+#line 532
     template < class _1, class _2 >
     inline _2& VectorMap < _1, _2 >::Add(const _1& key)
     {
-#line 532
+#line 533
         keys.Add(key);
         return values.Add();
     };
     
-#line 541
+#line 542
     template < class _1, class _2 >
     inline _2& VectorMap < _1, _2 >::Add(const _1& key, _2 *value)
     {
-#line 542
+#line 543
         keys.Add(key);
         return values.Add(value);
     };
     
-#line 536
+#line 537
     template < class _1, class _2 >
     inline _2& VectorMap < _1, _2 >::Add(const _1& key, const _2& value)
     {
-#line 537
+#line 538
         keys.Add(key);
         return values.Add(value);
     };
     
-#line 563
+#line 564
     template < class _1, class _2 >
     inline _2& VectorMap < _1, _2 >::At(int i)
     {
         {
-#line 564
+#line 565
             if (!(i >= 0 && i < values.GetCount()))
             {
-#line 564
+#line 565
                 Lang::SysBreak("Assertion failed: i >= 0 && i < values.GetCount()");
             }
         }
-#line 565
+#line 566
         ;
-#line 565
+#line 566
         return values[i];
     };
     
-#line 558
+#line 559
     template < class _1, class _2 >
     inline const _2& VectorMap < _1, _2 >::At(int i) const
     {
         {
-#line 559
+#line 560
             if (!(i >= 0 && i < values.GetCount()))
             {
-#line 559
+#line 560
                 Lang::SysBreak("Assertion failed: i >= 0 && i < values.GetCount()");
             }
         }
-#line 560
+#line 561
         ;
-#line 560
+#line 561
         return values[i];
     };
     
-#line 614
+#line 615
     template < class _1, class _2 >
     inline Lang::ConstFwdPairIterator < _1, _2 > VectorMap < _1, _2 >::Begin() const
     {
-#line 614
+#line 615
         return Iterator(keys.Get(), values.Get());
     };
     
-#line 612
+#line 613
     template < class _1, class _2 >
     inline Lang::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::Begin()
     {
-#line 612
+#line 613
         return Iterator(keys.Get(), values.Get());
     };
     
-#line 581
+#line 582
     template < class _1, class _2 >
     inline void VectorMap < _1, _2 >::Clear()
     {
-#line 582
+#line 583
         keys.Clear();
         values.Clear();
     };
     
-#line 615
+#line 616
     template < class _1, class _2 >
     inline Lang::ConstFwdPairIterator < _1, _2 > VectorMap < _1, _2 >::End() const
     {
-#line 615
+#line 616
         return Iterator(keys.GetEnd(), values.GetEnd());
     };
     
-#line 613
+#line 614
     template < class _1, class _2 >
     inline Lang::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::End()
     {
-#line 613
+#line 614
         return Iterator(keys.GetEnd(), values.GetEnd());
     };
     
-#line 573
+#line 574
     template < class _1, class _2 >
     inline int VectorMap < _1, _2 >::Find(const _1& key) const
     {
-#line 573
+#line 574
         return keys.Find(key);
     };
     
-#line 605
+#line 606
     template < class _1, class _2 >
     inline Lang::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::FindIterator(const _1& key) const
     {
-#line 606
+#line 607
         Iterator it = Begin();
         int pos = Find(key);
         if (pos == - 1)
-#line 608
+#line 609
             it += GetCount();
         else
-#line 609
+#line 610
             it += pos;
         return it;
     };
     
-#line 575
+#line 576
     template < class _1, class _2 >
-    inline _2 VectorMap < _1, _2 >::Get(const _1& key, _2 value)
+    inline _2 VectorMap < _1, _2 >::Get(const _1& key, _2 value) const
     {
-#line 575
+#line 576
         int i = Find(key);
-#line 575
+#line 576
         if (i < 0)
-#line 575
+#line 576
             return value;
-#line 575
+#line 576
         return values[i];
     };
     
-#line 574
+#line 575
     template < class _1, class _2 >
     inline _2& VectorMap < _1, _2 >::Get(const _1& key)
     {
-#line 574
+#line 575
         return values[Find(key)];
     };
     
-#line 546
+#line 547
     template < class _1, class _2 >
     inline _2& VectorMap < _1, _2 >::GetAdd(const _1& key)
     {
-#line 547
+#line 548
         int i = keys.Find(key);
         if (i >= 0)
-#line 548
+#line 549
             return values[i];
         keys.Add(key);
         return values.Add();
     };
     
-#line 576
+#line 577
     template < class _1, class _2 >
     inline int VectorMap < _1, _2 >::GetCount() const
     {
-#line 576
+#line 577
         return keys.GetCount();
     };
     
-#line 556
+#line 557
     template < class _1, class _2 >
     inline const _1& VectorMap < _1, _2 >::GetKey(int i) const
     {
-#line 556
+#line 557
         return keys[i];
     };
     
-#line 527
+#line 528
     template < class _1, class _2 >
     inline const Index < _1 > & VectorMap < _1, _2 >::GetKeys() const
     {
-#line 527
+#line 528
         return keys;
     };
     
-#line 595
+#line 596
     template < class _1, class _2 >
     inline int VectorMap < _1, _2 >::GetPos(const Iterator& it)
     {
-#line 596
+#line 597
         _1 * begin = keys.Get();
         _1 * cur = &it.Key();
         int pos = cur - begin;
         return pos;
     };
     
-#line 529
+#line 530
     template < class _1, class _2 >
     inline Vector < _2 > & VectorMap < _1, _2 >::GetValues()
     {
+#line 530
+        return values;
+    };
+    
+#line 529
+    template < class _1, class _2 >
+    inline const Vector < _2 > & VectorMap < _1, _2 >::GetValues() const
+    {
 #line 529
         return values;
     };
     
-#line 528
-    template < class _1, class _2 >
-    inline const Vector < _2 > & VectorMap < _1, _2 >::GetValues() const
-    {
-#line 528
-        return values;
-    };
-    
-#line 553
+#line 554
     template < class _1, class _2 >
     inline _2& VectorMap < _1, _2 >::Insert(int i, const _1& key)
     {
-#line 553
+#line 554
         keys.Insert(i, key);
-#line 553
+#line 554
         return values.Insert(i);
     };
     
-#line 554
+#line 555
     template < class _1, class _2 >
     inline _2& VectorMap < _1, _2 >::Insert(int i, const _1& key, const _2& value)
     {
-#line 554
+#line 555
         keys.Insert(i, key);
-#line 554
+#line 555
         return values.Insert(i, value);
     };
     
-#line 604
+#line 605
     template < class _1, class _2 >
     inline Lang::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key)
     {
-#line 604
+#line 605
         int pos = GetPos(it);
-#line 604
+#line 605
         Insert(pos, key);
-#line 604
+#line 605
         Iterator cur = Begin();
-#line 604
+#line 605
         cur += pos;
-#line 604
+#line 605
         return cur;
     };
     
-#line 603
+#line 604
     template < class _1, class _2 >
     inline Lang::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key, _2 *value)
     {
-#line 603
+#line 604
         int pos = GetPos(it);
-#line 603
+#line 604
         Insert(pos, key, value);
-#line 603
+#line 604
         Iterator cur = Begin();
-#line 603
+#line 604
         cur += pos;
-#line 603
+#line 604
         return cur;
     };
     
-#line 602
+#line 603
     template < class _1, class _2 >
     inline Lang::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::InsertIterator(const Iterator& it, const _1& key, const _2& value)
     {
-#line 602
+#line 603
         int pos = GetPos(it);
-#line 602
+#line 603
         Insert(pos, key, value);
-#line 602
+#line 603
         Iterator cur = Begin();
-#line 602
+#line 603
         cur += pos;
-#line 602
+#line 603
         return cur;
     };
     
-#line 577
+#line 578
     template < class _1, class _2 >
     inline bool VectorMap < _1, _2 >::IsEmpty() const
     {
-#line 577
+#line 578
         return GetCount() == 0;
     };
     
-#line 601
+#line 602
     template < class _1, class _2 >
     inline void VectorMap < _1, _2 >::Remove(const Iterator& it)
     {
-#line 601
+#line 602
         Remove(GetPos(it));
     };
     
-#line 580
+#line 581
     template < class _1, class _2 >
     inline void VectorMap < _1, _2 >::Remove(int i)
     {
         {
-#line 580
+#line 581
             if (!(i >= 0 && i < keys.GetCount()))
             {
-#line 580
+#line 581
                 Lang::SysBreak("Assertion failed: i >= 0 && i < keys.GetCount()");
             }
         }
-#line 580
+#line 581
         ;
-#line 580
+#line 581
         keys.Remove(i);
-#line 580
+#line 581
         values.Remove(i);
     };
     
-#line 579
+#line 580
     template < class _1, class _2 >
     inline void VectorMap < _1, _2 >::RemoveKey(const _1& key)
     {
-#line 579
+#line 580
         int i = Find(key);
-#line 579
+#line 580
         if (i >= 0)
-#line 579
+#line 580
             Remove(i);
     };
     
-#line 571
+#line 572
     template < class _1, class _2 >
     inline _2& VectorMap < _1, _2 >::Top()
     {
         {
-#line 571
+#line 572
             if (!(GetCount() > 0))
             {
-#line 571
+#line 572
                 Lang::SysBreak("Assertion failed: GetCount() > 0");
             }
         }
-#line 571
+#line 572
         ;
-#line 571
+#line 572
         return values.Top();
     };
     
-#line 618
+#line 619
     template < class _1, class _2 >
     inline Lang::ConstFwdPairIterator < _1, _2 > VectorMap < _1, _2 >::begin() const
     {
-#line 618
+#line 619
         return Begin();
     };
     
-#line 616
+#line 617
     template < class _1, class _2 >
     inline Lang::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::begin()
     {
-#line 616
+#line 617
         return Begin();
     };
     
     template < class _1, class _2 >
     inline Lang::ConstFwdPairIterator < _1, _2 > VectorMap < _1, _2 >::end() const
     {
-#line 619
+#line 620
         return End();
     };
     
-#line 617
+#line 618
     template < class _1, class _2 >
     inline Lang::FwdPairIterator < _1, _2 > VectorMap < _1, _2 >::end()
     {
-#line 617
+#line 618
         return End();
     };
     
@@ -3232,18 +3233,19 @@ namespace Container
         data(v)
     {};
     
+#line 289
     template < class _1 >
     inline _1& VectorPtr < _1 >::operator[](int i)
     {
-#line 288
+#line 289
         return *data[i];
     };
     
-#line 289
+#line 290
     template < class _1 >
     inline const _1& VectorPtr < _1 >::operator[](int i) const
     {
-#line 289
+#line 290
         return *data[i];
     };
     
@@ -3265,27 +3267,35 @@ namespace Container
         data.Append(v.data);
     };
     
-#line 294
+#line 288
+    template < class _1 >
+    inline void VectorPtr < _1 >::Append(const VectorPtr& v, int i, int n)
+    {
+#line 288
+        data.Append(v.data, i, n);
+    };
+    
+#line 295
     template < class _1 >
     inline Lang::FwdPtrIterator < _1 > VectorPtr < _1 >::Begin()
     {
-#line 294
+#line 295
         return Lang::FwdPtrIterator < _1 > (data.Get());
     };
     
-#line 291
+#line 292
     template < class _1 >
     inline void VectorPtr < _1 >::Clear()
     {
-#line 291
+#line 292
         data.Clear();
     };
     
-#line 295
+#line 296
     template < class _1 >
     inline Lang::FwdPtrIterator < _1 > VectorPtr < _1 >::End()
     {
-#line 295
+#line 296
         return Lang::FwdPtrIterator < _1 > (data.GetEnd());
     };
     
@@ -3297,21 +3307,21 @@ namespace Container
         return data.GetCount();
     };
     
-#line 297
+#line 298
     template < class _1 >
     inline Text::String VectorPtr < _1 >::Join(Text::String join_str, bool ignore_empty) const
     {
-#line 298
+#line 299
         Text::String out;
         ConstIterator end = data.End();
         for (ConstIterator it = data.Begin(); it != end; ++ it)
             {
-#line 301
+#line 302
                 Text::String s = Text::ToString < _1 > (**it);
                 if (s.IsEmpty() && ignore_empty)
                     continue;
                 
-#line 304
+#line 305
                 if (!out.IsEmpty())
                     out << join_str;
                 out << s;
@@ -3319,26 +3329,26 @@ namespace Container
         return out;
     };
     
-#line 292
+#line 293
     template < class _1 >
     inline _1 *VectorPtr < _1 >::Pop()
     {
-#line 292
+#line 293
         return data.Pop();
     };
     
-#line 290
+#line 291
     template < class _1 >
     inline _1 *& VectorPtr < _1 >::Ref(int i)
     {
-#line 290
+#line 291
         return data[i];
     };
     
     template < class _1 >
     inline void VectorPtr < _1 >::SetCount(int i)
     {
-#line 293
+#line 294
         data.SetCount(i, 0);
     };
     

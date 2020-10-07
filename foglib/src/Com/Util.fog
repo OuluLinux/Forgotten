@@ -994,6 +994,53 @@ struct Version {
 #define VER(x) Version v(x, s)
 #define FOR_VER(x) if (v.Is(x))
 
+
+
+
+
+
+
+
+
+auto declaration MakeIntFindArg(function_specifier Method, token args) {
+	$Method {
+		auto for (int i = 0; i < $args; i++)
+			if (value == a$i)
+				return $i;
+		return -1;
+	}
+}
+
+auto declaration MakeStrFindArg(function_specifier Method, token args) {
+	$Method {
+		auto for (int i = 0; i < $args; i++)
+			if (!StringCompare(value, a$i))
+				return $i;
+		return -1;
+	}
+}
+
+#define ARGS1(t)			, t a0
+#define ARGS2(t)	ARGS1(t), t a1
+#define ARGS3(t)	ARGS2(t), t a2
+#define ARGS4(t)	ARGS3(t), t a3
+#define ARGS5(t)	ARGS4(t), t a4
+#define ARGS6(t)	ARGS5(t), t a5
+#define ARGS7(t)	ARGS6(t), t a6
+#define ARGS8(t)	ARGS7(t), t a7
+#define __FINDARG__(t, x, y) $MakeIntFindArg(int ${Namespace}::FindArg(t value x), y);
+#define MAKE_FIND_ARGS(t) \
+	__FINDARG__(t, ARGS1(t), 1) \
+	__FINDARG__(t, ARGS2(t), 2) \
+	__FINDARG__(t, ARGS3(t), 3) \
+	__FINDARG__(t, ARGS4(t), 4) \
+	__FINDARG__(t, ARGS5(t), 5) \
+	__FINDARG__(t, ARGS6(t), 6) \
+	__FINDARG__(t, ARGS7(t), 7) \
+	__FINDARG__(t, ARGS8(t), 8)
+MAKE_FIND_ARGS(int)
+MAKE_FIND_ARGS(const char*)
+
 }
 
 #define Env							Util::Env
@@ -1044,4 +1091,5 @@ struct Version {
 #define StreamCopy					Util::StreamCopy
 #define DtorValueSetter				Util::DtorValueSetter
 #define FlagDisabler				Util::FlagDisabler
+#define FindArg						Util::FindArg
 

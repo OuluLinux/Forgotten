@@ -1,11 +1,11 @@
 
 namespace Prim			{};
-namespace Lang			{using/interface Prim;};
+namespace Algorithm		{using/interface Prim;};
+namespace Lang			{using/interface Algorithm;};
 namespace Native		{using/interface Lang;};
 namespace Hash			{using/interface Native;};
 namespace Random		{using/interface Hash;};
-namespace Algorithm		{using/interface Random;};
-namespace Abstract		{using/interface Algorithm;};
+namespace Abstract		{using/interface Random;};
 namespace Text			{using/interface Abstract;};
 namespace Container		{using/interface Text;};
 namespace Shared		{using/interface Container;};
@@ -19,17 +19,18 @@ namespace Network			{using/interface Concurrency;};
 namespace Interface			{using/interface Network;};
 namespace LockedContainer	{using/interface Interface;};
 namespace TextProc			{using/interface LockedContainer;};
+namespace Shell				{using/interface TextProc;};
 
 #define NULL 0
 
 using "Com/Meta.fog";
 using "Com/Macros.fog";
 using "Com/Prim.fog";
+using "Com/Algorithm.fog";
 using "Com/Lang.fog";
 using "Com/Native.fog";
 using "Com/Hash.fog";
 using "Com/Random.fog";
-using "Com/Algorithm.fog";
 using "Com/Abstract.fog";
 using "Com/Text.fog";
 using "Com/Container.fog";
@@ -45,8 +46,10 @@ using "Com/Interface.fog";
 using "Com/LockedContainer.fog";
 using "Com/CompilerBase.fog";
 using "Com/Tokenizer.fog";
+using "Com/Parser.fog";
 using "Com/JSON.fog";
 using "Com/Make.fog";
+using "Com/Shell.fog";
 
 /*
 Core:

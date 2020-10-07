@@ -196,15 +196,7 @@ public:
 	void SetStoring()			{is_storing = true;}
 	void SetLoading()			{is_storing = false;}
 	
-	virtual StreamBase& operator << (String str) {
-		Put(str.Begin(), str.GetCount());
-		return *this;
-	}
-	virtual StreamBase& operator << (int i) {
-		String str = IntStr(i);
-		Put(str.Begin(), str.GetCount());
-		return *this;
-	}
+	
 	virtual int Put(const void* mem, int size) {
 		int64 end = cursor + size;
 		ASSERT(end < INT_MAX);
@@ -228,9 +220,63 @@ public:
 	}
 	virtual int64 GetCursor() { return cursor; }
 	virtual int64 GetSize() const {return s.GetCount();}
-
+	void Clear() {s.SetCount(0);}
+	
 	virtual void Seek(int64 i) { cursor = i; }
-	String GetResult() { return String(s.Begin(), s.GetCount()); }
+	String GetResult() const {return String(s.Begin(), s.GetCount());}
+	operator String() const {return GetResult(); }
+};
+
+
+
+class WStringStream : public CharStream {
+	Vector<short> s;
+	int64 cursor = 0;
+	bool is_storing = true;
+	
+public:
+	WStringStream() {}
+
+	virtual bool IsLoading()	{ return !is_storing; }
+	virtual bool IsStoring()	{ return is_storing; }
+	virtual bool IsEof()		{ return cursor >= s.GetCount(); }
+	
+	void SetStoring()			{is_storing = true;}
+	void SetLoading()			{is_storing = false;}
+	
+	virtual int Put(const void* mem, int size) {
+		ASSERT(size % 2 == 0);
+		if (size / 2 == 0 || size % 2 != 0)
+			return 0;
+		int chars = size / 2;
+		int64 end = cursor + chars;
+		ASSERT(end < INT_MAX);
+		if (end > s.GetCount())
+			s.SetCount((int)end);
+		short* dst = s.Begin() + cursor;
+		const short* src = (const short*)mem;
+		MemoryCopy(dst, src, size);
+		cursor += chars;
+		return size;
+	}
+	virtual int Put(char c) {ASSERT_(false, "Not supported"); return Put(&c, 1); }
+	virtual int Cat(short c) { return Put(&c, 2); }
+	virtual int Get(void* mem, int size) {
+		int64 sz = Min((int64)size, ((int64)s.GetCount() - cursor) * 2);
+		if (sz <= 1) return 0;
+		ASSERT(sz < INT_MAX);
+		char* b = (char*)mem;
+		MemoryCopy(b, s.Begin() + cursor, (int)sz);
+		cursor += sz / 2;
+		return (int)sz;
+	}
+	virtual int64 GetCursor() { return cursor; }
+	virtual int64 GetSize() const {return s.GetCount();}
+	void Clear() {s.SetCount(0);}
+	
+	virtual void Seek(int64 i) { cursor = i; }
+	WString GetResult() const {return WString(s.Get(), s.GetCount());}
+	operator WString() const {return GetResult(); }
 };
 
 
@@ -316,6 +362,7 @@ public:
 #define FileOut				Stream::FileOut
 #define LoadFile			Stream::LoadFile
 #define StringStream		Stream::StringStream
+#define WStringStream		Stream::WStringStream
 #define MemReadStream		Stream::MemReadStream
 #define LoadFromFile		Stream::LoadFromFile
 #define StoreToFile			Stream::StoreToFile

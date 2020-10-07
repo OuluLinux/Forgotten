@@ -25,7 +25,7 @@ namespace Chrono
     inline Time operator+ (const Time& t, Lang::int64 seconds);
 #line 48
     Time GetSysTime();
-#line 282
+#line 286
     Text::String GetTimeDurationString(Time begin, Time end);
     
     struct Date
@@ -40,13 +40,15 @@ namespace Chrono
         inline Date();
 #line 15
         bool operator== (const Date& d) const;
+#line 151
+        Text::String AsString() const;
 #line 142
         Lang::int64 Get() const;
 #line 13
         void Set(Lang::int64 scalar);
-#line 157
+#line 161
         void Set(int d);
-#line 151
+#line 155
         void Set(int y, int m, int d);
         
 #line 123
@@ -61,37 +63,37 @@ namespace Chrono
     
     struct Time : public Chrono::Date
     {
-#line 25
+#line 26
         Lang::byte hour;
-#line 25
+#line 26
         Lang::byte min;
-#line 25
+#line 26
         Lang::byte sec;
         
-#line 28
+#line 29
         inline Time();
         inline Time(const Time& t);
         inline Time(int y, int m, int d);
         inline Time(int y, int m, int d, int h, int min, int s);
 #line 41
         bool operator== (const Time& t) const;
-#line 238
+#line 242
         Text::String AsDiffString() const;
-#line 221
+#line 225
         Text::String AsString() const;
 #line 37
         Lang::int64 Get() const;
         Lang::uint32 GetHashValue();
-#line 277
+#line 281
         int GetStamp() const;
-#line 211
+#line 215
         void Set(Lang::int64 scalar);
-#line 204
+#line 208
         void Set(int y, int mon, int d, int h, int m, int s);
-#line 272
+#line 276
         void SetFromStamp(int seconds);
         
-#line 266
+#line 270
         static Time GetSys();
     };
     
@@ -148,15 +150,15 @@ namespace Chrono
         inline double operator++ ();
 #line 107
         inline operator double() const;
-#line 316
+#line 320
         double Get() const;
-#line 297
+#line 301
         OnlineFrequency& GetActive();
-#line 302
+#line 306
         OnlineFrequency& GetInactive();
 #line 104
         inline void SwitchActive();
-#line 307
+#line 311
         void Tick();
     };
 };
@@ -236,27 +238,27 @@ namespace Chrono
         which = !which;
     };
     
-#line 28
+#line 29
     inline Time::Time() {};
     
-#line 29
+#line 30
     inline Time::Time(const Time& t)
     {
-#line 29
+#line 30
         Lang::Memory::Copy(this, &t, sizeof (Time));
     };
     
-#line 30
+#line 31
     inline Time::Time(int y, int m, int d)
     {
-#line 30
+#line 31
         Set(y, m, d, 0, 0, 0);
     };
     
-#line 31
+#line 32
     inline Time::Time(int y, int m, int d, int h, int min, int s)
     {
-#line 31
+#line 32
         Set(y, m, d, h, min, s);
     };
     

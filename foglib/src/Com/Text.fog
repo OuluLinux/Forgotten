@@ -102,6 +102,8 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 		!inline ~${Scope} () {Clear();}
 		
 		
+		${Scope}& Cat() {return *this;}
+		
 		void Clear() {
 			if (is_ref) { REF->Dec(); REF = NULL; is_ref = false;}
 			else {REF = 0;}
@@ -736,16 +738,6 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 $MakeStringClass(String, char, 1);
 $MakeStringClass(WString, short, 2);
 
-
-
-
-auto declaration MakeException(identifier Exc) {
-	struct $Exc : public String {
-		${Exc}() {}
-		${Exc}(const String& s) : String(s) {}
-	};
-}
-
 $MakeException(Exc);
 
 
@@ -902,6 +894,13 @@ String EscapeCharacter(String s) {
 	
 	return s;
 }
+
+String CharToUTF8(uint16 chr) {
+	WString ws;
+	ws.Cat((int)chr);
+	return ToString(ws);
+}
+
 }
 
 
@@ -952,6 +951,7 @@ auto declaration HaveTextOperators() {
 #define IsSpace			Text::IsSpace
 #define IsAlpha			Text::IsAlpha
 #define GetHexDigit		Text::GetHexDigit
-#define EscapeString		Text::EscapeString
-#define EscapeCharacter		Text::EscapeCharacter
+#define EscapeString	Text::EscapeString
+#define EscapeCharacter	Text::EscapeCharacter
+#define CharToUTF8		Text::CharToUTF8
 

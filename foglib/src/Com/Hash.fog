@@ -23,7 +23,13 @@ public:
 
 template <class K> inline uint32 GetValue(const K& k) { return k.GetHashValue(); }
 inline uint32 GetValue(const char& k) { return k; }
-inline uint32 GetValue(const int& k) { return k; }
+inline uint32 GetValue(const int32& k) { return k; }
+inline uint32 GetValue(const int64& k) {
+	uint32 a = k & 0xFFFFFFFFULL;
+	uint32 b = k >> 32ULL;
+	uint32 hash = a ^ b;
+	return hash;
+}
 inline uint32 GetValue(const uint32& k) { return k; }
 inline uint32 GetValue(const uint64& k) {
 	uint32 a = k & 0xFFFFFFFFULL;

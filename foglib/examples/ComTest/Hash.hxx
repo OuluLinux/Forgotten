@@ -6,10 +6,16 @@
 #ifndef NATIVE_HXX
 #include <Native.hxx>
 #endif
+#ifndef PRIM_HXX
+#include <Prim.hxx>
+#endif
 
 namespace Hash
 {
-#line 27 "../../src/Com/Hash.fog"
+#line 26 "../../src/Com/Hash.fog"
+    inline Lang::uint32 GetValue(const Lang::int32& k);
+    inline Lang::uint32 GetValue(const Lang::int64& k);
+#line 33
     inline Lang::uint32 GetValue(const Lang::uint32& k);
     inline Lang::uint32 GetValue(const Lang::uint64& k);
 #line 24
@@ -17,13 +23,11 @@ namespace Hash
     inline Lang::uint32 GetValue(const _1& k);
 #line 25
     inline Lang::uint32 GetValue(const char& k);
-#line 35
+#line 41
     inline Lang::uint32 GetValue(const double& k);
-#line 34
+#line 40
     inline Lang::uint32 GetValue(const float& k);
-#line 26
-    inline Lang::uint32 GetValue(const int& k);
-#line 36
+#line 42
     inline Lang::uint32 GetValue(void *const& k);
     
     class Combine
@@ -48,17 +52,34 @@ namespace Hash
 
 namespace Hash
 {
-#line 27
-    inline Lang::uint32 GetValue(const Lang::uint32& k)
+#line 26
+    inline Lang::uint32 GetValue(const Lang::int32& k)
     {
-#line 27
+#line 26
         return k;
     };
     
+#line 27
+    inline Lang::uint32 GetValue(const Lang::int64& k)
+    {
 #line 28
+        Lang::uint32 a = k & 0xFFFFFFFFULL;
+        Lang::uint32 b = k >> 32ULL;
+        Lang::uint32 hash = a ^ b;
+        return hash;
+    };
+    
+#line 33
+    inline Lang::uint32 GetValue(const Lang::uint32& k)
+    {
+#line 33
+        return k;
+    };
+    
+#line 34
     inline Lang::uint32 GetValue(const Lang::uint64& k)
     {
-#line 29
+#line 35
         Lang::uint32 a = k & 0xFFFFFFFFULL;
         Lang::uint32 b = k >> 32ULL;
         Lang::uint32 hash = a ^ b;
@@ -80,28 +101,21 @@ namespace Hash
         return k;
     };
     
-#line 35
+#line 41
     inline Lang::uint32 GetValue(const double& k)
     {
-#line 35
+#line 41
         return GetValue(*(Lang::uint64 * ) & k);
     };
     
-#line 34
+#line 40
     inline Lang::uint32 GetValue(const float& k)
     {
-#line 34
+#line 40
         return static_cast< Lang::uint32 >(k);
     };
     
-#line 26
-    inline Lang::uint32 GetValue(const int& k)
-    {
-#line 26
-        return k;
-    };
-    
-#line 36
+#line 42
     inline Lang::uint32 GetValue(void *const& k)
     {
         return GetValue(k);

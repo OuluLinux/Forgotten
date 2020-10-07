@@ -56,6 +56,8 @@ file
 	TextProc.cxx,
 	Make.hxx,
 	Make.cxx,
+	Shell.hxx,
+	Shell.cxx,
 	_ readonly separator;
 
 mainconfig

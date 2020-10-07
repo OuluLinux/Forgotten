@@ -3,13 +3,16 @@
 
 #include <new>
 
-#ifndef SHARED_HXX
-#include <Shared.hxx>
-#endif
 #ifndef NATIVE_HXX
 #include <Native.hxx>
 #endif
+#ifndef CONTAINER_HXX
+#include <Container.hxx>
+#endif
 
+#ifndef SHARED_HXX
+#include <Shared.hxx>
+#endif
 #ifndef ABSTRACT_HXX
 #include <Abstract.hxx>
 #endif
@@ -18,17 +21,17 @@ namespace Stream
 {
 #line 118 "../../src/Com/Stream.fog"
     Text::String LoadFile(Text::String path);
-#line 264
+#line 310
     template < class _1 >
     bool LoadFromFile(_1& o, Text::String path);
-#line 273
+#line 319
     template < class _1 >
     bool StoreToFile(_1& o, Text::String path);
     
     class AudioFrame
     {
     public:
-#line 290
+#line 336
         virtual ~AudioFrame();
     };
     
@@ -133,33 +136,33 @@ namespace Stream
     class MediaStream
     {
     public:
-#line 308
+#line 354
         virtual Text::String GetLastError() const;
-#line 307
+#line 353
         /*pure*/virtual bool Initialize(AudioFrame& a, VideoFrame& v) = 0;
     };
     
     class MemReadStream : public Stream::CharStream
     {
-#line 238
+#line 284
         const char *buf;
         Lang::int64 size;
         Lang::int64 cursor;
         
     public:
         MemReadStream(const char *buf, Lang::int64 size);
-#line 249
+#line 295
         virtual int Get(void *mem, int size);
-#line 258
+#line 304
         virtual Lang::int64 GetCursor();
-#line 260
+#line 306
         virtual Lang::int64 GetSize() const;
-#line 247
+#line 293
         virtual bool IsEof();
-#line 245
+#line 291
         virtual bool IsLoading();
         virtual bool IsStoring();
-#line 259
+#line 305
         virtual void Seek(Lang::int64 i);
     };
     
@@ -172,28 +175,28 @@ namespace Stream
         
     public:
         StringStream();
-#line 199
-        virtual Abstract::StreamBase& operator<< (Text::String str);
-#line 203
-        virtual Abstract::StreamBase& operator<< (int i);
-#line 220
+#line 227
+        inline operator Text::String() const;
+#line 223
+        inline void Clear();
+#line 212
         virtual int Get(void *mem, int size);
-#line 229
+#line 221
         virtual Lang::int64 GetCursor();
-#line 233
-        Text::String GetResult();
-#line 230
+#line 226
+        Text::String GetResult() const;
+#line 222
         virtual Lang::int64 GetSize() const;
 #line 194
         virtual bool IsEof();
 #line 192
         virtual bool IsLoading();
         virtual bool IsStoring();
-#line 219
+#line 211
         virtual int Put(char c);
-#line 208
+#line 200
         virtual int Put(const void *mem, int size);
-#line 232
+#line 225
         virtual void Seek(Lang::int64 i);
 #line 197
         inline void SetLoading();
@@ -204,8 +207,48 @@ namespace Stream
     class VideoFrame
     {
     public:
-#line 298
+#line 344
         virtual ~VideoFrame();
+    };
+    
+    class WStringStream : public Stream::CharStream
+    {
+#line 233
+        Container::Vector < short > s;
+        Lang::int64 cursor;
+        bool is_storing;
+        
+    public:
+        WStringStream();
+#line 279
+        inline operator Text::WString() const;
+#line 263
+        virtual int Cat(short c);
+#line 275
+        inline void Clear();
+#line 264
+        virtual int Get(void *mem, int size);
+#line 273
+        virtual Lang::int64 GetCursor();
+#line 278
+        Text::WString GetResult() const;
+#line 274
+        virtual Lang::int64 GetSize() const;
+#line 242
+        virtual bool IsEof();
+#line 240
+        virtual bool IsLoading();
+        virtual bool IsStoring();
+#line 262
+        virtual int Put(char c);
+#line 247
+        virtual int Put(const void *mem, int size);
+#line 277
+        virtual void Seek(Lang::int64 i);
+#line 245
+        inline void SetLoading();
+#line 244
+        inline void SetStoring();
     };
 };
 
@@ -276,6 +319,20 @@ namespace Stream
         Close();
     };
     
+#line 227
+    inline StringStream::operator Text::String() const
+    {
+#line 227
+        return GetResult();
+    };
+    
+#line 223
+    inline void StringStream::Clear()
+    {
+#line 223
+        s.SetCount(0);
+    };
+    
 #line 197
     inline void StringStream::SetLoading()
     {
@@ -287,6 +344,34 @@ namespace Stream
     inline void StringStream::SetStoring()
     {
 #line 196
+        is_storing = true;
+    };
+    
+#line 279
+    inline WStringStream::operator Text::WString() const
+    {
+#line 279
+        return GetResult();
+    };
+    
+#line 275
+    inline void WStringStream::Clear()
+    {
+#line 275
+        s.SetCount(0);
+    };
+    
+#line 245
+    inline void WStringStream::SetLoading()
+    {
+#line 245
+        is_storing = false;
+    };
+    
+#line 244
+    inline void WStringStream::SetStoring()
+    {
+#line 244
         is_storing = true;
     };
     

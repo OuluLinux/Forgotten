@@ -285,6 +285,7 @@ public:
 	inline K& Add(K* o) {data.Add(o); return *o;}
 	inline int GetCount() const {return data.GetCount();}
 	inline void Append(const VectorPtr& v) {data.Append(v.data);}
+	inline void Append(const VectorPtr& v, int i, int n) {data.Append(v.data, i, n);}
 	inline K& operator[](int i) {return *data[i];}
 	inline const K& operator[](int i) const {return *data[i];}
 	inline K*& Ref(int i) {return data[i];}
@@ -572,7 +573,7 @@ auto declaration MakeMap(identifier Map, identifier Array, bool is_ptr_iter) {
 	
 		inline int Find(const K& key) const { return keys.Find(key); }
 		inline V& Get(const K& key) { return values[Find(key)]; }
-		inline V  Get(const K& key, V value) {int i = Find(key); if (i < 0) return value; return values[i]; }
+		inline V  Get(const K& key, V value) const {int i = Find(key); if (i < 0) return value; return values[i]; }
 		inline int GetCount() const { return keys.GetCount(); }
 		inline bool IsEmpty() const { return GetCount() == 0; }
 	

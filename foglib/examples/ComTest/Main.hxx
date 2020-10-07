@@ -26,19 +26,19 @@ namespace Main
 #line 46
         inline void Run();
         
-#line 274
+#line 283
         void TestShared();
         
         struct Dumber
         {
-#line 266
+#line 275
             inline Dumber();
             virtual ~Dumber();
         };
         
         struct Dumb : public Main::App::Dumber
         {
-#line 270
+#line 279
             inline Dumb();
             inline ~Dumb();
         };
@@ -562,64 +562,81 @@ namespace Main
             Stream::StringStream ss;
             ss << "abc";
         }
-#line 173
+        {
+#line 174
+            Stream::WStringStream wss;
+            wss.Cat('t');
+            wss.Cat('e');
+            wss.Cat('s');
+            wss.Cat('t');
+            {
+#line 179
+                if (!(Text::ToString(wss.GetResult()) == "test"))
+                {
+#line 179
+                    Lang::SysBreak("Assertion failed: ToString(wss.GetResult()) == \"test\"");
+                }
+            }
+#line 180
+            ;
+        }
         Text::String s;
         {
             Stream::FileIn fin;
             {
-#line 176
+#line 185
                 if (!(fin.Open("/home/sblo/Fuck.cxx")))
                 {
-#line 176
+#line 185
                     Lang::SysBreak("Assertion failed: fin.Open(\"/home/sblo/Fuck.cxx\")");
                 }
             }
-#line 177
+#line 186
             ;
-#line 177
+#line 186
             s = fin.Get(fin.GetSize());
             int sz = s.GetCount();
         }
-#line 181
+#line 190
         Util::Log() << "Lol does this work\?\n";
-#line 183
+#line 192
         Stream::FileOut fout;
         fout % r % f % d;
-#line 186
+#line 195
         const Container::Vector < Text::String > & cmd = Util::Env::Local().CommandLine();
         for (int i = 0; i < cmd.GetCount(); i ++ )
             {
-#line 188
+#line 197
                 Text::String arg = cmd[i];
             }
-#line 191
+#line 200
         Container::Index < Text::String > files;
         Util::GetDirectoryFiles("/", files);
         {
-#line 193
+#line 202
             if (!(files.Find("home") >= 0))
             {
-#line 193
+#line 202
                 Lang::SysBreak("Assertion failed: files.Find(\"home\") >= 0");
             }
         }
-#line 194
+#line 203
         ;
-#line 194
+#line 203
         for (int i = 0; i < files.GetCount(); i ++ )
             {
-#line 195
+#line 204
                 Text::String s = files[i];
                 const char * c = s.Begin();
                 int len = Lang::StringLength(c);
             }
         {
-#line 201
+#line 210
             double d = Math::FastSin(3.14159265358979323846);
             d = Math::FastCos(3.14159265358979323846);
         }
         {
-#line 206
+#line 215
             Math::RandomGaussian & gaus = Math::GetRandomGaussian(13);
             double d = gaus;
             d = gaus;
@@ -627,48 +644,48 @@ namespace Main
             d = gaus;
         }
         {
-#line 214
+#line 223
             Chrono::Time t1(2020, 10, 5, 3, 28, 0);
             Lang::int64 i64 = t1.Get();
             Chrono::Time t2;
             t2.Set(i64);
             {
-#line 218
+#line 227
                 if (!(t1 == t2))
                 {
-#line 218
+#line 227
                     Lang::SysBreak("Assertion failed: t1 == t2");
                 }
             }
-#line 219
+#line 228
             ;
-#line 219
+#line 228
             Chrono::Time t3 = Chrono::GetSysTime();
         }
         {
-#line 224
+#line 233
             Concurrency::Thread t;
             Concurrency::Mutex m;
         }
         {
-#line 229
+#line 238
             Network::TcpSocket s;
             {
-#line 230
+#line 239
                 if (!(s.Listen(8005, 5)))
                 {
-#line 230
+#line 239
                     Lang::SysBreak("Assertion failed: s.Listen(8005, 5)");
                 }
             }
-#line 231
+#line 240
             ;
         }
         {
             TextProc::Tokenizer t;
         }
         {
-#line 239
+#line 248
             TextProc::JSON j;
         }
     };
@@ -679,24 +696,24 @@ namespace Main
         a(8)
     {};
     
-#line 270
+#line 279
     inline App::Dumb::Dumb()
     {
-#line 270
+#line 279
         ;
     };
     
-#line 271
+#line 280
     inline App::Dumb::~Dumb()
     {
-#line 271
+#line 280
         ;
     };
     
-#line 266
+#line 275
     inline App::Dumber::Dumber()
     {
-#line 266
+#line 275
         ;
     };
     

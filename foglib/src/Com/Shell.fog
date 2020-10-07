@@ -1,0 +1,2299 @@
+/*
+		Forked from Ultimate++ Esc
+		Copyright (c) 1998, 2019, The U++ Project
+		All rights reserved.
+*/
+
+namespace Shell {
+
+
+
+
+enum EscTypeKind {
+	ESC_VOID,
+	ESC_DOUBLE,
+	ESC_ARRAY,
+	ESC_MAP,
+	ESC_LAMBDA,
+	ESC_INT64
+};
+
+String EscTypeName(int sv_type);
+
+struct EscEscape;
+class  EscLambda;
+struct EscHandle;
+struct Esc;
+
+
+
+class EscValue {
+	
+public:
+	$MakeMoveable();
+	
+	struct RefCount {
+		AtomicInt refcount;
+		RefCount()              { refcount = 1; }
+	};
+
+	struct EscArray : public RefCount {
+		Vector<EscValue> array;
+	
+		void     Retain()        { ++refcount; }
+		void     Release()       { if(--refcount == 0) delete this; }
+	};
+	
+	
+	struct EscMap : public RefCount {
+		VectorMap<EscValue, EscValue> map;
+		int                           count;
+	
+		void     Retain()        { ++refcount; }
+		void     Release()       { if(--refcount == 0) delete this; }
+	
+		EscMap()                 { count = 0; }
+	};
+
+
+	VectorMap<EscValue, EscValue>& CloneMap();
+	
+private:
+	int              type;
+	mutable unsigned hash;
+
+	union {
+		double         number;
+		int64          i64;
+		EscArray      *array;
+		EscMap        *map;
+		EscLambda     *lambda;
+	};
+
+	void                  Free();
+	void                  Assign(const EscValue& s);
+
+	void                  InitString(const WString& w);
+	Vector<EscValue>&     CloneArray();
+
+
+	static int             total;
+	static int             max_total;
+
+public:
+	static int             GetTotalCount();
+	static void            SetMaxTotalCount(int n);
+	static int             GetMaxTotalCount();
+
+	bool IsVoid() const                          { return type == ESC_VOID; }
+	EscValue();
+
+	bool                   IsNumber() const      { return FindArg(type, ESC_DOUBLE, ESC_INT64) >= 0; }
+	double                 GetNumber() const;
+	bool                   IsInt64() const       { return type == ESC_INT64; }
+	int64                  GetInt64() const;
+	bool                   IsInt() const;
+	int                    GetInt() const;
+	EscValue(double n);
+	EscValue(int64 n);
+	EscValue(int n);
+
+	bool                    IsArray() const      { return type == ESC_ARRAY; }
+	const Vector<EscValue>& GetArray() const;
+	EscValue                ArrayGet(int i) const;
+	EscValue                ArrayGet(int i, int n) const;
+	bool                    ArraySet(int i, EscValue val);
+	bool                    Replace(int i, int n, EscValue a);
+	void                    SetEmptyArray();
+	void                    ArrayAdd(EscValue val);
+	bool                    Append(EscValue a);
+	
+	WString GetWString() const;
+	operator WString() const					{ return GetWString(); }
+	operator String() const                     { return ToString(GetWString()); }
+
+	EscValue(const char *s)                     { InitString(ToWString(String(s))); }
+	EscValue(const WString& s)                  { InitString(s);                    }
+	EscValue(const String& s)                   { InitString(ToWString(s));         }
+
+	bool                                 IsMap() const         { return type == ESC_MAP; }
+	const VectorMap<EscValue, EscValue>& GetMap() const;
+	EscValue                             MapGet(EscValue key) const;
+	void                                 MapSet(EscValue key, EscValue value);
+	void                                 SetEmptyMap();
+
+	bool                                 IsLambda() const     { return type == ESC_LAMBDA; }
+	const EscLambda&                     GetLambda() const;
+	EscLambda&                           CreateLambda();
+
+
+	void    Escape(const char *method, Event<EscEscape&> escape);
+	void    Escape(const char *method, EscHandle *h, Event<EscEscape&> escape);
+	bool    HasNumberField(const char *id) const;
+	int     GetFieldInt(const char *id) const;
+
+	int     GetType() const                                   { return type; }
+	String  GetTypeName() const                               { return EscTypeName(type); }
+
+	int     GetCount() const;
+
+	unsigned GetHashValue() const;
+	bool     operator==(const EscValue& a) const;
+	bool     operator!=(const EscValue& a) const              { return !(*this == a); }
+
+	String AsString(int maxlen = INT_MAX, int indent_step = 4, bool hex = false, int indent = 0) const;
+
+	EscValue& operator=(const EscValue& s);
+	EscValue(const EscValue& src);
+
+	~EscValue();
+};
+
+
+
+
+
+struct EscHandle {
+	AtomicInt  refcount;
+
+	void       Retain()        { ++refcount; }
+	void       Release()       { if(--refcount == 0) delete this; }
+
+	EscHandle()                { refcount = 0; }
+	virtual ~EscHandle()       {}
+};
+
+class EscLambda {
+	AtomicInt refcount;
+
+	void      Retain()       { ++refcount; }
+	void      Release()      { if(--refcount == 0) delete this; }
+
+	EscLambda()              { refcount = 1; varargs = false; handle = NULL; }
+	~EscLambda()             { if(handle) handle->Release(); }
+
+	friend class EscValue;
+
+public:
+	Vector<String>        arg;
+	Vector<String>        def;
+	Vector<bool>          inout;
+	String                code;
+	EscHandle            *handle;
+	Event<EscEscape&>     escape;
+	bool                  varargs;
+	String                filename;
+	int                   line;
+
+private:
+	EscLambda(const EscLambda&);
+	void operator=(const EscLambda&);
+};
+
+template<> inline unsigned GetHashValue(const EscValue& v) {
+	return v.GetHashValue();
+}
+
+bool     IsTrue(const EscValue& a);
+
+void     SkipBlock(CParser& p);
+EscValue ReadLambda(CParser& p);
+EscValue ReadLambda(const char *s);
+
+
+struct SRVal {
+	EscValue *lval;
+	EscValue  rval;
+	EscValue  sbs;
+
+	SRVal()                    { lval = NULL; }
+	SRVal(const EscValue& v)   { lval = NULL; rval = v; }
+	SRVal(double n)            { lval = NULL; rval = n; }
+	SRVal(int64 n)             { lval = NULL; rval = n; }
+	SRVal(uint64 n)            { lval = NULL; rval = (int64)n; }
+	SRVal(bool n)              { lval = NULL; rval = (int64)n; }
+};
+
+
+struct Esc : public CParser {
+	$MakeMoveable();
+	
+
+	ArrayMap<String, EscValue>& global;
+	EscValue                    self;
+	ArrayMap<String, EscValue>  var;
+
+	int      skipexp;
+	int      loop;
+	bool     no_break, no_return, no_continue;
+	int&     op_limit;
+	int      r_stack_level;
+	EscValue return_value;
+
+	static int stack_level;
+
+	void       OutOfMemory();
+
+	void       TestLimit();
+	double     DoCompare(const EscValue& a, const EscValue& b, const char *op);
+	double     DoCompare(const SRVal& a, const char *op);
+	String     ReadName();
+	EscValue   ExecuteLambda(const String& id, EscValue lambda, SRVal self, Vector<SRVal>& arg);
+
+	void       Assign(EscValue& val, const Vector<EscValue>& sbs, int si, const EscValue& src);
+
+	EscValue   Get(const SRVal& val);
+	void       Assign(const SRVal& val, const EscValue& src);
+
+	EscValue   GetExp();
+
+	double Number(const EscValue& a, const char *oper);
+	int64  Int(const EscValue& a, const char *oper);
+	double Number(const SRVal& a, const char *oper);
+	int64  Int(const SRVal& a, const char *oper);
+
+	EscValue   MulArray(EscValue array, EscValue times);
+
+	void  Subscript(SRVal& r, SRVal _self, String id);
+	void  Subscript(SRVal& r);
+	void  Term(SRVal& r);
+	void  Unary(SRVal& r);
+	void  Mul(SRVal& r);
+	void  Add(SRVal& r);
+	void  Shift(SRVal& r);
+	void  Compare(SRVal& r);
+	void  Equal(SRVal& r);
+	void  BinAnd(SRVal& r);
+	void  BinXor(SRVal& r);
+	void  BinOr(SRVal& r);
+	void  And(SRVal& r);
+	void  Or(SRVal& r);
+	void  Cond(SRVal& r);
+	void  Assign(SRVal& r);
+	void  Exp(SRVal& r);
+
+	void  SkipTerm();
+	void  SkipStatement();
+	void  SkipExp();
+	bool  PCond();
+	void  FinishSwitch();
+	void  DoStatement();
+
+	void  Run();
+
+	Esc(ArrayMap<String, EscValue>& global,
+		const char *s,
+		int& oplimit,
+	    const String& fn,
+	    int line = 1)
+	    : global(global), op_limit(oplimit) {
+	    // : CParser(s, fn, line), )
+	    TODO
+		r_stack_level = stack_level;
+		skipexp = false;
+	}
+	~Esc() { stack_level = r_stack_level; }
+};
+
+
+
+struct EscEscape {
+	Esc&             esc;
+	EscValue         self;
+	Array<EscValue>& arg;
+	EscValue         ret_val;
+	String           id;
+
+	EscValue&    operator[](int i)             { return arg[i]; }
+	int          GetCount() const              { return arg.GetCount(); }
+	void         operator=(const EscValue& v)  { ret_val = v; }
+	operator     EscValue&()                   { return ret_val; }
+	void         ThrowError(const char *s)     { esc.ThrowError(s); }
+
+	String       DumpType(int i);
+	String       InCall();
+
+	void         CheckNumber(int i);
+	void         CheckArray(int i);
+	void         CheckMap(int i);
+
+	double       Number(int i);
+	int          Int(int i);
+
+	EscEscape(Esc& esc, EscValue self, Array<EscValue>& arg)
+	  : esc(esc), self(self), arg(arg) {}
+};
+
+
+void Escape(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscape& e));
+
+inline // resolve overloading with Function...
+void Escfn(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscape& e))
+{
+	return Escape(globals, function, escape);
+}
+
+void Escape(ArrayMap<String, EscValue>& globals, const char *function, Event<EscEscape&> escape);
+
+void Scan(ArrayMap<String, EscValue>& global, const char *code, const char *filename = "");
+
+void StdLib(ArrayMap<String, EscValue>& global);
+
+void     LambdaArgs(CParser& p, EscLambda& l);
+
+EscValue Execute(ArrayMap<String, EscValue>& global, EscValue *self,
+                 const EscValue& lambda, Vector<EscValue>& arg, int oplimit = 50000);
+EscValue Execute(ArrayMap<String, EscValue>& global, EscValue *self,
+                 const char *name, Vector<EscValue>& arg, int oplimit = 50000);
+EscValue Execute(ArrayMap<String, EscValue>& global, const char *name, int oplimit = 50000);
+
+EscValue Evaluatex(const char *expression, ArrayMap<String, EscValue>& global, int oplimit = 50000);
+EscValue Evaluate(const char *expression, ArrayMap<String, EscValue>& global, int oplimit = 50000);
+
+EscValue EscFromStdValue(const Value& v);
+Value    StdValueFromEsc(const EscValue& v);
+void     StdValueLib(ArrayMap<String, EscValue>& global);
+
+bool     IsDate(const EscValue& v);
+bool     IsTime(const EscValue& v);
+
+String   Expand(const String& doc, ArrayMap<String, EscValue>& global,
+                int oplimit = 50000, String (*format)(const Value& v) = StdFormat);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////// VALUE
+
+#define LTIMING(x)  // RTIMING(x)
+
+String EscTypeName(int sv_type)
+{
+	switch(sv_type)
+	{
+	case ESC_VOID:   return "void";
+	case ESC_DOUBLE: return "double";
+	case ESC_INT64:  return "int64";
+	case ESC_ARRAY:  return "array";
+	case ESC_MAP:    return "map";
+	case ESC_LAMBDA: return "lambda";
+	default:         return Formater("unknown(%d)")(sv_type);
+	}
+}
+
+!inline static private int EscValue::total;
+!inline static private int EscValue::max_total = 1000000;
+
+private void EscValue::Free()
+{
+	LTIMING("Free");
+	if(type == ESC_ARRAY)
+		array->Release();
+	if(type == ESC_MAP)
+		map->Release();
+	if(type == ESC_LAMBDA)
+		lambda->Release();
+	type = ESC_VOID;
+	hash = 0;
+}
+
+EscValue::~EscValue()
+{
+	LTIMING("~EscValue");
+	total--;
+	Free();
+}
+
+private void EscValue::Assign(const EscValue& s)
+{
+	LTIMING("Assign");
+	type = s.type;
+	hash = s.hash;
+	switch(type) {
+	case ESC_ARRAY:
+		array = s.array;
+		array->Retain();
+		break;
+	case ESC_MAP:
+		map = s.map;
+		map->Retain();
+		break;
+	case ESC_LAMBDA:
+		lambda = s.lambda;
+		lambda->Retain();
+		break;
+	case ESC_DOUBLE:
+		number = s.number;
+		break;
+	case ESC_INT64:
+		i64 = s.i64;
+		break;
+	}
+}
+
+EscValue& EscValue::operator=(const EscValue& s)
+{
+	LTIMING("Sval=Sval");
+	Free();
+	Assign(s);
+	return *this;
+}
+
+EscValue::EscValue(const EscValue& s)
+{
+	LTIMING("Sval(Sval)");
+	Assign(s);
+	total++;
+}
+
+EscLambda& EscValue::CreateLambda()
+{
+	Free();
+	lambda = new EscLambda;
+	type = ESC_LAMBDA;
+	hash = 0;
+	return *lambda;
+}
+
+const EscLambda& EscValue::GetLambda() const
+{
+	ASSERT(IsLambda());
+	return *lambda;
+}
+
+int EscValue::GetCount() const
+{
+	switch(type) {
+	case ESC_VOID:
+		return 0;
+	case ESC_ARRAY:
+		return array->array.GetCount();
+	case ESC_MAP:
+		return map->count;
+	}
+	return 1;
+}
+
+unsigned EscValue::GetHashValue() const
+{
+	LTIMING("GetHashValue");
+	unsigned& mutable_hash = (unsigned&)this->hash;
+	
+	if(hash == 0) {
+		switch(type) {
+		case ESC_VOID:
+			mutable_hash = 1;
+			break;
+		case ESC_DOUBLE:
+			mutable_hash = GetValueHash(number) | 0x80000;
+			break;
+		case ESC_INT64:
+			mutable_hash = GetValueHash(i64) | 0x80000;
+			break;
+		case ESC_ARRAY:
+			for(int i = 0; i < array->array.GetCount(); i++)
+				mutable_hash = mutable_hash ^ array->array[i].GetHashValue();
+			mutable_hash |= 0x40000;
+			break;
+		case ESC_MAP:
+			for(int i = 0; i < map->map.GetCount(); i++)
+				if(!map->map[i].IsVoid())
+					mutable_hash ^= map->map.GetKey(i).GetHashValue() ^ map->map[i].GetHashValue();
+			mutable_hash |= 0x8000000;
+			break;
+		case ESC_LAMBDA:
+			mutable_hash = GetValueHash(lambda->code) | 0x4000000;
+			break;
+		}
+	}
+	return hash;
+}
+
+template <class T>
+bool EqVector(const T& a, const T& b)
+{
+	if(a.GetCount() != b.GetCount())
+		return false;
+	for(int i = 0; i < a.GetCount(); i++)
+		if(a[i] != b[i])
+			return false;
+	return true;
+}
+
+bool EscValue::operator==(const EscValue& a) const
+{
+	LTIMING("operator==");
+	int i;
+	switch(type) {
+	case ESC_VOID:
+		return a.type == ESC_VOID;
+	case ESC_INT64:
+		if(a.type == ESC_INT64)
+			return i64 == a.i64;
+	case ESC_DOUBLE:
+		return a.IsNumber() && GetNumber() == a.GetNumber();
+	case ESC_ARRAY:
+		if(a.type != ESC_ARRAY) return false;
+		if(array->array.GetCount() != a.array->array.GetCount())
+			return false;
+		return EqVector(array->array, a.array->array);
+	case ESC_MAP: {
+		if(a.type != ESC_MAP) return false;
+		const VectorMap<EscValue, EscValue>& x = GetMap();
+		const VectorMap<EscValue, EscValue>& y = a.GetMap();
+		for(i = 0; i < x.GetCount(); i++)
+			/*if(!x.IsUnlinked(i))*/ {
+				int q = y.Find(x.GetKey(i));
+				if(q < 0)
+					return false;
+				if(x[i] != y[q])
+					return false;
+			}
+		for(i = 0; i < y.GetCount(); i++)
+			/*if(!y.IsUnlinked(i))*/
+				if(x.Find(y.GetKey(i)) < 0)
+					return false;
+		return true;
+	}
+	case ESC_LAMBDA:
+		return lambda->code == a.lambda->code &&
+		       EqVector(lambda->arg, a.lambda->arg) && EqVector(lambda->inout, a.lambda->inout);
+	}
+	return false;
+}
+
+String EscValue::AsString(int maxlen, int indent_step, bool hex, int indent) const
+{
+	String ind;
+	ind.Cat(' ', indent);
+	StringStream r;
+	String s;
+	int i;
+	switch(type) {
+	case ESC_DOUBLE:
+		{
+			s = ind;
+			if((int64)number == number)
+				s << IntStr64((int64)number);
+			else
+				s << DblStr(number);
+			if(hex && FitsInInt64(number) && (int64)number == number)
+				s << " 0x" << HexStr((int64)number);
+			if(hex && number >= 0 && number < 65536 && (int)number == number)
+				s << " " << CharToUTF8((int)number);
+			return s;
+		}
+	case ESC_INT64:
+		{
+			s = ind;
+			s << IntStr64(i64);
+			if(hex)
+				s << " 0x" << HexStr(i64);
+			if(hex && i64 >= 0 && i64 < 65536)
+				s << " " << CharToUTF8(i64);
+			return s;
+		}
+	case ESC_ARRAY:
+		{
+			const Vector<EscValue>& a = GetArray();
+			int i;
+			int c = Min(100, a.GetCount());
+			for(i = 0; i < a.GetCount(); i++) {
+				if(!a[i].IsInt())
+					break;
+				int c = a[i].GetInt();
+				if(c >= 32 && c < 256)
+					s.Cat(c);
+				else
+					break;
+			}
+			if(i < a.GetCount()) {
+				r << ind << "[ ";
+				for(i = 0; i < c; i++) {
+					if(i)
+						r << ", ";
+					r << array->array[i].AsString(maxlen, indent_step, hex, 0);
+				}
+				r << " ]";
+				if(r.GetSize() >= maxlen) {
+					r.Clear();
+					r << ind << "[\n";
+					for(i = 0; i < c; i++) {
+						if(i)
+							r << ",\n";
+						r << array->array[i].AsString(maxlen, indent_step, hex, indent + indent_step);
+					}
+					r << '\n' << ind << "]";
+				}
+				s = r;
+			}
+			else {
+				r << ind << '\"' << s << '\"';
+				s = r;
+			}
+			if(a.GetCount() > 100)
+				s << ind << "\n...more than 100 elements";
+			return s;
+		}
+	case ESC_LAMBDA:
+		r << ind << "@(";
+		for(i = 0; i < lambda->arg.GetCount(); i++) {
+			if(i)
+				r << ", ";
+			if(lambda->inout[i])
+				r << "&";
+			r << lambda->arg[i];
+		}
+		r << ")\n" << lambda->code;
+		return r;
+	case ESC_MAP:
+		r << ind << "{ ";
+		int c = Min(map->map.GetCount(), 100);
+		bool q = false;
+		for(i = 0; i < c; i++) {
+			if(q)
+				r << ", ";
+			/*if(!map->map.IsUnlinked(i))*/ {
+				r << map->map.GetKey(i).AsString(maxlen, indent_step, hex, 0)
+				  << ":" << map->map[i].AsString(maxlen, indent_step, hex, 0);
+				q = true;
+			}
+		}
+		r << " }";
+		if(r.GetSize() >= maxlen) {
+			r.Clear();
+			r << ind << "{\n";
+			q = false;
+			for(i = 0; i < c; i++) {
+				if(q)
+					r << ",\n";
+				/*if(!map->map.IsUnlinked(i))*/ {
+					r << map->map.GetKey(i).AsString(maxlen, indent_step, hex, indent + indent_step)
+					  << ":\n" << map->map[i].AsString(maxlen, indent_step, hex, indent + indent_step);
+					q = true;
+				}
+			}
+			r << '\n' << ind << "}";
+		}
+		s = r;
+		if(map->map.GetCount() > 100)
+			s << ind << "\n...more than 100 elements";
+		return s;
+	}
+	return "void";
+}
+
+double EscValue::GetNumber() const
+{
+	if(type == ESC_INT64)
+		return (double)i64;
+	if(type == ESC_DOUBLE)
+		return number;
+	return 0;
+}
+
+int64 EscValue::GetInt64() const
+{
+	if(type == ESC_INT64)
+		return i64;
+	if(type == ESC_DOUBLE && number >= INT64_MINd && number <= INT64_MAXd)
+		return (int64)number;
+	return 0;
+}
+
+bool EscValue::IsInt() const
+{
+	if(IsInt64()) {
+		int64 n = GetInt64();
+		return n >= INT_MIN && n <= INT_MAX;
+	}
+	if(IsNumber()) {
+		double n = GetNumber();
+		return n >= INT_MIN && n <= INT_MAX;
+	}
+	return false;
+}
+
+int EscValue::GetInt() const {
+	if (IsInt())	return (int)GetInt64();
+	else			return 0;
+}
+
+bool IsTrue(const EscValue& a)
+{
+	if(a.IsNumber())
+		return a.GetNumber();
+	return a.GetCount();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////// ARRAY
+
+private Vector<EscValue>& EscValue::CloneArray()
+{
+	LTIMING("CloneArray");
+	ASSERT(IsArray());
+	if(array->refcount != 1) {
+		EscArray *c = new EscArray;
+		c->array <<= array->array;
+		array->Release();
+		array = c;
+	}
+	hash = 0;
+	return array->array;
+}
+
+const Vector<EscValue>& EscValue::GetArray() const
+{
+	ASSERT(IsArray());
+	return array->array;
+}
+
+EscValue EscValue::ArrayGet(int i) const
+{
+	return GetArray()[i];
+}
+
+EscValue EscValue::ArrayGet(int i, int n) const
+{
+	LTIMING("ArrayGet");
+	const Vector<EscValue>& sa = GetArray();
+	ASSERT(i >= 0 && i + n <= sa.GetCount());
+	EscValue t;
+	t.SetEmptyArray();
+	t.array->array.Append(sa, i, n);
+	return t;
+}
+
+void EscValue::SetEmptyArray()
+{
+	Free();
+	type = ESC_ARRAY;
+	hash = 0;
+	array = new EscArray;
+}
+
+bool EscValue::ArraySet(int i, EscValue val)
+{
+	LTIMING("ArraySet");
+	Vector<EscValue>& ta = CloneArray();
+	if(i > max_total || i - ta.GetCount() + total > max_total)
+		return false;
+	CloneArray().At(i) = val;
+	return true;
+}
+
+void EscValue::ArrayAdd(EscValue val)
+{
+	LTIMING("ArrayAdd");
+	if(IsVoid())
+		SetEmptyArray();
+	CloneArray().Add(val);
+}
+
+bool EscValue::Replace(int i, int n, EscValue a)
+{
+	LTIMING("Array Replace");
+	ASSERT(i >= 0);
+	Vector<EscValue>& ta = CloneArray();
+	if(i > max_total || i + n > max_total || i + n - ta.GetCount() + total > max_total)
+		return false;
+	if(i > 0)
+		ta.At(i - 1);
+	const Vector<EscValue>& sa = a.GetArray();
+	int q = sa.GetCount() - n;
+	if(q > 0)
+		ta.InsertN(i, q);
+	else
+		ta.Remove(i, -q);
+	for(q = 0; q < sa.GetCount(); q++)
+		ta[q + i] = sa[q];
+	return true;
+}
+
+bool EscValue::Append(EscValue a)
+{
+	if(IsVoid())
+		SetEmptyArray();
+	return Replace(GetCount(), 0, a);
+}
+
+EscValue::operator WString() const
+{
+	LTIMING("operator String");
+	WStringStream s;
+	if(IsArray()) {
+		const Vector<EscValue>& a = GetArray();
+		for(int i = 0; i < a.GetCount(); i++)
+			if(a[i].IsInt()) {
+				int c = a[i].GetInt();
+				if(c >= 0 && c < 65536)
+					s.Cat(c);
+			}
+	}
+	return s;
+}
+
+private void EscValue::InitString(const WString& s)
+{
+	type = ESC_ARRAY;
+	array = new EscArray();
+	hash = 0;
+	Vector<EscValue>& a = array->array;
+	a.SetCount(s.GetCount());
+	for(int i = 0; i < s.GetCount(); i++)
+		a[i] = (int64)s[i];
+	total++;
+}
+
+int   EscValue::GetTotalCount()
+{
+	return total;
+}
+
+void  EscValue::SetMaxTotalCount(int n)
+{
+	max_total = n;
+}
+
+int   EscValue::GetMaxTotalCount()
+{
+	return max_total;
+}
+
+EscValue::EscValue()
+{
+	type = ESC_VOID; hash = 0; total++;
+}
+
+EscValue::EscValue(double n)
+{
+	number = n;
+	type = ESC_DOUBLE;
+	hash = 0;
+	total++;
+}
+
+EscValue::EscValue(int64 n)
+{
+	i64 = n;
+	type = ESC_INT64;
+	hash = 0;
+	total++;
+}
+
+EscValue::EscValue(int n)
+{
+	i64 = n;
+	type = ESC_INT64;
+	hash = 0;
+	total++;
+}
+
+
+
+
+
+
+
+
+/////////////// MAP
+
+VectorMap<EscValue, EscValue>& EscValue::CloneMap()
+{
+	LTIMING("CloneMap");
+	ASSERT(IsMap());
+	if(map->refcount != 1) {
+		EscMap *c = new EscMap;
+		c->map <<= map->map;
+		map->Release();
+		map = c;
+	}
+	hash = 0;
+	return map->map;
+}
+
+const VectorMap<EscValue, EscValue>& EscValue::GetMap() const
+{
+	ASSERT(IsMap());
+	return map->map;
+}
+
+void  EscValue::SetEmptyMap()
+{
+	Free();
+	type = ESC_MAP;
+	hash = 0;
+	map = new EscMap;
+}
+
+EscValue EscValue::MapGet(EscValue key) const
+{
+	LTIMING("MapGet");
+	return GetMap().Get(key, EscValue());
+}
+
+void EscValue::MapSet(EscValue key, EscValue value)
+{
+	LTIMING("MapSet");
+	if(IsVoid())
+		SetEmptyMap();
+	VectorMap<EscValue, EscValue>& m = CloneMap();
+	int q = m.Find(key);
+	if(q >= 0) {
+		/*if(value.IsVoid()) {
+			m.Unlink(q);
+			map->count--;
+		}
+		else*/
+			m[q] = value;
+	}
+	else
+		if(!value.IsVoid()) {
+			map->count++;
+			m.Add(key, value);
+		}
+}
+
+bool EscValue::HasNumberField(const char *id) const
+{
+	return IsMap() && GetMap().Find(id) >= 0;
+}
+
+int  EscValue::GetFieldInt(const char *id) const
+{
+	if (HasNumberField(id))
+		return MapGet(id).GetInt();
+	else
+		return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////// <Base>
+
+void Esc::OutOfMemory()
+{
+	ThrowError("Out of memory");
+}
+
+void Esc::TestLimit()
+{
+	LTIMING("TestLimit");
+	if(!IsNull(op_limit))
+		if(op_limit < 0)
+			ThrowError("out of operations limit - considered frozen");
+	if(EscValue::GetTotalCount() >= EscValue::GetMaxTotalCount())
+		OutOfMemory();
+}
+
+EscValue Esc::Get(const SRVal& val)
+{
+	LTIMING("Get");
+	if(skipexp)
+		return (int64)1;
+	EscValue v;
+	if (val.lval) v = *val.lval; else v = val.rval;
+	if(val.sbs.IsArray()) {
+		const Vector<EscValue>& sbs = val.sbs.GetArray();
+		for(int i = 0; i < sbs.GetCount(); i++) {
+			const EscValue& ss = sbs[i];
+			if(v.IsMap()) //!!!! (problem with a[1, 2]
+				v = v.MapGet(ss);
+			else
+			if(v.IsArray()) {
+				int count = v.GetCount();
+				if(ss.IsArray() && ss.GetArray().GetCount() >= 2) {
+					EscValue v1 = ss.ArrayGet(0);
+					EscValue v2 = ss.ArrayGet(1);
+					int i = v1.GetInt();
+					int n = count - i;
+					if(ss.GetCount() == 2) {
+						if (v2.IsInt()) n = v2.GetInt();
+					}
+					else {
+						if(v2.IsInt()) {
+							n = v2.GetInt();
+							if(n < 0)
+								n += count;
+							n -= i;
+						}
+					}
+					if(i >= 0 && n >= 0 && i + n <= count)
+						v = v.ArrayGet(i, n);
+					else
+						ThrowError("slice out of range");
+				}
+				else {
+					int64 i = Int(ss, "index");
+					if(i < 0)
+						i += count;
+					if(i >= 0 && i < count)
+						v = v.ArrayGet((int)i);
+					else
+						ThrowError("index out of range");
+				}
+			}
+			else
+				ThrowError("invalid indirection");
+			TestLimit();
+		}
+	}
+	return v;
+}
+
+void Esc::Assign(EscValue& val, const Vector<EscValue>& sbs, int si, const EscValue& src)
+{
+	LTIMING("Assign");
+	const EscValue& ss = sbs[si++];
+	if(val.IsVoid())
+		val.SetEmptyMap();
+	if(val.IsMap()) {
+		if(si < sbs.GetCount()) {
+			EscValue x = val.MapGet(ss);
+			val.MapSet(ss, 0.0);
+			Assign(x, sbs, si, src);
+			val.MapSet(ss, x);
+		}
+		else
+			val.MapSet(ss, src);
+		return;
+	}
+	else
+	if(val.IsArray()) {
+		if(si < sbs.GetCount()) {
+			if(ss.IsArray())
+				ThrowError("slice must be last subscript");
+			int64 i = Int(ss, "index");
+			if(i >= 0 && i < val.GetCount()) {
+				EscValue x = val.ArrayGet((int)i);
+				val.ArraySet((int)i, 0.0);
+				Assign(x, sbs, si, src);
+				if(!val.ArraySet((int)i, x))
+					OutOfMemory();
+				return;
+			}
+		}
+		else {
+			int count = val.GetCount();
+			if(ss.IsArray()) {
+				if(!src.IsArray() || ss.GetArray().GetCount() < 2)
+					ThrowError("only array can be assigned to the slice");
+				EscValue v1 = ss.ArrayGet(0);
+				EscValue v2 = ss.ArrayGet(1);
+				int i = 0;
+				if (v1.IsInt()) i = v1.GetInt();
+				int n = count - i;
+				if(ss.GetCount() == 2) {
+					if (v2.IsInt())
+						n = v2.GetInt();
+				}
+				else {
+					if(v2.IsInt()) {
+						n = v2.GetInt();
+						if(n < 0)
+							n += count;
+						n -= i;
+					}
+				}
+				if(i >= 0 && n >= 0 && i + n <= count) {
+					val.Replace(i, n, src);
+					return;
+				}
+				else
+					ThrowError("slice out of range");
+			}
+			else {
+				int64 i;
+				if (ss.IsVoid())
+					i = val.GetCount();
+				else
+					i = Int(ss, "index");
+				
+				if (i < 0)
+					i = count + i;
+				
+				if (i >= 0 && i < INT_MAX) {
+					if(!val.ArraySet((int)i, src))
+						ThrowError("out of memory");
+					return;
+				}
+			}
+		}
+	}
+	ThrowError("invalid indirection");
+}
+
+void Esc::Assign(const SRVal& val, const EscValue& src)
+{
+	if(skipexp)
+		return;
+	if(!val.lval)
+		ThrowError("l-value required");
+	if(val.sbs.IsArray() && val.sbs.GetCount())
+		Assign(*val.lval, val.sbs.GetArray(), 0, src);
+	else
+		*val.lval = src;
+}
+
+EscValue Esc::ExecuteLambda(const String& id, EscValue lambda, SRVal self, Vector<SRVal>& arg)
+{
+	LTIMING("ExecuteLambda");
+	if(!lambda.IsLambda())
+		ThrowError(Formater("'%s' is not a lambda")(id));
+	const EscLambda& l = lambda.GetLambda();
+	if(!l.varargs && arg.GetCount() > l.arg.GetCount()
+	   || arg.GetCount() < l.arg.GetCount() - l.def.GetCount())
+		ThrowError((String)"invalid number of arguments in call to '" + id + "'");
+	Esc sub(global, l.code, op_limit, l.filename, l.line);
+	sub.self = Get(self);
+	for(int i = 0; i < l.arg.GetCount(); i++) {
+		if (i < arg.GetCount())
+			sub.var.GetAdd(l.arg[i]) = Get(arg[i]);
+		else
+			sub.var.GetAdd(l.arg[i]) = Evaluatex(l.def[i - (l.arg.GetCount() - l.def.GetCount())], global, op_limit);
+		TestLimit();
+	}
+	EscValue retval;
+	Array<EscValue> argvar;
+	if (l.escape) {
+		argvar = sub.var.PickValues();
+		for(int i = l.arg.GetCount(); i < arg.GetCount(); i++) {
+			argvar.Add(Get(arg[i]));
+		}
+		EscValue v = Get(self);
+		EscEscape e(*this, v, argvar);
+		e.id = id;
+		l.escape(e);
+		retval = e.ret_val;
+		self = e.self;
+	}
+	else {
+		if(l.varargs) {
+			EscValue& argv = sub.var.GetAdd("argv");
+			argv.SetEmptyArray();
+			for(int i = l.arg.GetCount(); i < arg.GetCount(); i++)
+				argv.ArrayAdd(Get(arg[i]));
+		}
+		sub.Run();
+		retval = sub.return_value;
+		argvar = sub.var.PickValues();
+	}
+	for(int i = 0; i < l.inout.GetCount(); i++)
+		if(l.inout[i] && i < arg.GetCount() && arg[i].lval)
+			Assign(arg[i], argvar[i]);
+	if(self.lval)
+		Assign(self, sub.self);
+	return retval;
+}
+
+void Esc::Subscript(SRVal& r, SRVal _self, String id)
+{
+	LTIMING("Subscript");
+	for(;;) {
+		TestLimit();
+		if(Type('[')) {
+			if(Type(']'))
+				r.sbs.ArrayAdd(EscValue());
+			else {
+				EscValue v1, v2;
+				if(!IsType(',') && !IsType(':'))
+					v1 = GetExp();
+				if(Type(',')) {
+					if(!IsType(']'))
+						v2 = GetExp();
+					EscValue x;
+					x.ArrayAdd(v1);
+					x.ArrayAdd(v2);
+					r.sbs.ArrayAdd(x);
+				}
+				else
+				if(Type(':')) {
+					if(!IsType(']'))
+						v2 = GetExp();
+					EscValue x;
+					x.ArrayAdd(v1);
+					x.ArrayAdd(v2);
+					x.ArrayAdd(EscValue());
+					r.sbs.ArrayAdd(x);
+				}
+				else
+					r.sbs.ArrayAdd(v1);
+				PassType(']');
+			}
+		}
+		else
+		if(Type('.')) {
+			_self = r;
+			r.sbs.ArrayAdd(id = ReadId());
+		}
+		else
+		if(Type('(')) {
+			LTIMING("call fn");
+			Vector<SRVal> arg;
+			if(!Type(')'))
+				for(;;) {
+					LTIMING("make args");
+					Exp(arg.Add());
+					if(Type(')')) break;
+					PassType(',');
+				}
+			if(!IsType('!', '=') && Type('!')) {
+				Term(_self);
+				EscValue g = Get(_self);
+				if(!_self.lval || (!g.IsVoid() && !g.IsMap()))
+					ThrowError("l-value map or l-value void expected on the right side of !");
+				if(g.IsVoid()) {
+					EscValue v;
+					v.SetEmptyMap();
+					Assign(_self, v);
+				}
+			}
+			if(!skipexp)
+				try {
+					r = ExecuteLambda(id, Get(r), _self, arg);
+				}
+				catch(Exc e) {
+					throw Error(NFormat("%s.%s(): %s", Get(r).GetTypeName(), id, e));
+				}
+		}
+		else
+			return;
+	}
+}
+
+void Esc::Subscript(SRVal& r)
+{
+	Subscript(r, SRVal(), String());
+}
+
+void Esc::Term(SRVal& r)
+{
+	RTIMING("Term");
+
+	r.sbs = EscValue();
+
+	op_limit--;
+	TestLimit();
+	if(Type('0', 'x') || Char2('0', 'X')) {
+		r = ReadNumber64(16);
+		return;
+	}
+	if(Type('0', 'b') || Char2('0', 'B')) {
+		r = ReadNumber64(2);
+		return;
+	}
+	if(IsType('0', '.')) {
+		r = ReadDouble();
+		return;
+	}
+	if(Type('0')) {
+		if (IsNumber())
+			r = ReadNumber64(8);
+		else
+			r = 0;
+		return;
+	}
+	if(IsNumber()) {
+		// TODO: int64 !
+		r = ReadDouble();
+		return;
+	}
+	if(IsString()) {
+		r = EscValue(FromUtf8(ReadString()));
+		return;
+	}
+	if(IsType('\'')) {
+		WString s = FromUtf8(ReadString('\''));
+		if(s.GetLength() != 1)
+			ThrowError("invalid character literal");
+		r = (int64)s[0];
+		return;
+	}
+	if(Type('@')) {
+		r = ReadLambda(*this);
+		Subscript(r);
+		return;
+	}
+	if(Id("void")) {
+		r = EscValue();
+		return;
+	}
+	if(Type('{')) {
+		EscValue map;
+		map.SetEmptyMap();
+		if(!Type('}'))
+			for(;;) {
+				EscValue v = GetExp();
+				PassType(':');
+				map.MapSet(v, GetExp());
+				if(Type('}'))
+					break;
+				PassType(',');
+				TestLimit();
+			}
+		r = map;
+		Subscript(r);
+		return;
+	}
+	if(Type('[')) {
+		EscValue array;
+		array.SetEmptyArray();
+		if(!Type(']'))
+			for(;;) {
+				array.ArrayAdd(GetExp());
+				if(Type(']'))
+					break;
+				PassType(',');
+				TestLimit();
+			}
+		r = array;
+		Subscript(r);
+		return;
+	}
+	if(Type('(')) {
+		Exp(r);
+		PassType(')');
+		Subscript(r);
+		return;
+	}
+
+	SRVal _self;
+	bool  _global = false;
+	if(Type('.')) {
+		if(!self.IsMap())
+			ThrowError("member-access in non-member code");
+		_self.lval = &self;
+	}
+	else
+	if(Type(':'))
+		_global = true;
+	if(IsId()) {
+		RTIMING("Id1");
+		String id = ReadId();
+		EscValue method;
+		int locali = var.Find(id);
+		int ii;
+
+		if(id == "self") {
+			if(!self.IsMap())
+				ThrowError("self in non-member code");
+			_self.lval = &self;
+			r = self;
+		}
+		else
+		if(!_self.lval && !_global && locali < 0 && IsType('(') &&
+		   self.IsMap() && (method = self.MapGet(id)).IsLambda()) {
+		    _self.lval = &self;
+			r = method;
+		}
+		else
+		if(!_self.lval && !_global && locali < 0 && IsType('(') &&
+		   (ii = global.Find(id)) >= 0 && global[ii].IsLambda()) {
+			r = global[ii];
+		}
+		else
+		if(_self.lval) {
+			r = _self;
+			r.sbs.ArrayAdd(id);
+		}
+		else
+		if(_global)
+			r.lval = &global.GetPut(id);
+		else
+			r.lval = &var.GetPut(id);
+
+		RTIMING("Id2");
+		try {
+			Subscript(r, _self, id);
+		}
+		catch(TextProc::InputExc e) {
+			throw TextProc::InputExc(id + ": " + e);
+		}
+	}
+	else
+		ThrowError("invalid expression");
+}
+
+String Lims(const String& s)
+{
+	if (s.GetCount() > 80)
+		return s.Mid(0, 80);
+	return s;
+}
+
+double Esc::Number(const EscValue& a, const char *oper)
+{
+	if(!a.IsNumber())
+		ThrowError(String().Cat() << "number expected for '" << oper << "', encountered " << Lims(a.AsString()));
+	return a.GetNumber();
+}
+
+int64 Esc::Int(const EscValue& a, const char *oper)
+{
+	if(!a.IsNumber())
+		ThrowError(String().Cat() << "integer expected for '" << oper << "', encountered " << Lims(a.AsString()));
+	return a.GetInt64();
+}
+
+double Esc::Number(const SRVal& a, const char *oper)
+{
+	return Number(Get(a), oper);
+}
+
+int64 Esc::Int(const SRVal& a, const char *oper)
+{
+	return Int(Get(a), oper);
+}
+
+void Esc::Unary(SRVal& r)
+{
+	if(Type(TextProc::TK_INC)) {
+		Unary(r);
+		EscValue v = Get(r);
+		if(v.IsInt64())
+			Assign(r, Int(v, "++") + 1);
+		else
+			Assign(r, Number(v, "++") + 1);
+	}
+	else
+	if(Type(TextProc::TK_DEC)) {
+		Unary(r);
+		EscValue v = Get(r);
+		if(v.IsInt64())
+			Assign(r, Int(v, "--") - 1);
+		else
+			Assign(r, Number(v, "--") - 1);
+	}
+	else
+	if(Type('-')) {
+		Unary(r);
+		EscValue v = Get(r);
+		if(v.IsInt64())
+			r = -Int(v, "-");
+		else
+			r = -Number(v, "-");
+	}
+	else
+	if(Type('+')) {
+		Unary(r);
+		EscValue v = Get(r);
+		if(v.IsInt64())
+			r = Int(v, "+");
+		else
+			r = Number(v, "+");
+	}
+	else
+	if(Type('!')) {
+		Unary(r);
+		r = (int64)!IsTrue(Get(r));
+	}
+	else
+	if(Type('~')) {
+		Unary(r);
+		r = ~Int(Get(r), "~");
+	}
+	else
+		Term(r);
+
+	if(Type(TextProc::TK_INC)) {
+		EscValue v = Get(r);
+		if(v.IsInt64())
+			Assign(r, Int(v, "++") + 1);
+		else
+			Assign(r, Number(v, "++") + 1);
+		r = v;
+	}
+	if(Type(TextProc::TK_DEC)) {
+		EscValue v = Get(r);
+		if(v.IsInt64())
+			Assign(r, Int(v, "--") - 1);
+		else
+			Assign(r, Number(v, "--") - 1);
+		r = v;
+	}
+}
+
+EscValue Esc::MulArray(EscValue array, EscValue times)
+{
+	EscValue r;
+	r.SetEmptyArray();
+	for(int n = times.GetInt(); n > 0; n >>= 1) {
+		if(n & 1)
+			if(!r.Append(array))
+				OutOfMemory();
+		if(!array.Append(array))
+			OutOfMemory();
+		TestLimit();
+	}
+	return r;
+}
+
+void Esc::Mul(SRVal& r)
+{
+	Unary(r);
+	for(;;)
+		if(!IsType(TextProc::TK_MULASS) && Type('*')) {
+			EscValue x = Get(r);
+			SRVal w;
+			Unary(w);
+			EscValue y = Get(w);
+			if(x.IsArray() && y.IsInt())
+				r = MulArray(x, y);
+			else
+			if(y.IsArray() && x.IsInt())
+				r = MulArray(y, x);
+			else
+			if(x.IsInt64() && y.IsInt64())
+				r = Int(x, "*") * Int(y, "*");
+			else
+				r = Number(x, "*") * Number(y, "*");
+		}
+		else
+		if(!IsType(TextProc::TK_DIVASS) && Type('/')) {
+			SRVal w;
+			Unary(w);
+			EscValue x = Get(r);
+			EscValue y = Get(w);
+			double b = Number(y, "/");
+			if(b == 0)
+				ThrowError("divide by zero");
+			r = Number(x, "/") / b;
+		}
+		else
+		if(!IsType(TextProc::TK_MODASS) && Type('%')) {
+			SRVal w;
+			Unary(w);
+			int64 b = Int(w, "%");
+			if(b == 0)
+				ThrowError("divide by zero");
+			r = Int(r, "%") % b;
+		}
+		else
+			return;
+}
+
+void Esc::Add(SRVal& r)
+{
+	Mul(r);
+	for(;;)
+		if(!IsType(TextProc::TK_ADDASS) && Type('+')) {
+			EscValue v = Get(r);
+			SRVal w;
+			Mul(w);
+			EscValue b = Get(w);
+			if(v.IsArray() && b.IsArray()) {
+				if(!v.Replace(v.GetCount(), 0, b))
+					OutOfMemory();
+				r = v;
+			}
+			else
+			if(!(v.IsArray() && b.IsVoid())) {
+				if(v.IsInt64() && b.IsInt64())
+					r = Int(v, "+") + Int(b, "+");
+				else
+					r = Number(v, "+") + Number(b, "+");
+			}
+		}
+		else
+		if(!IsType(TextProc::TK_SUBASS) && Type('-')) {
+			SRVal w;
+			Mul(w);
+			EscValue v = Get(r);
+			EscValue b = Get(w);
+			if(v.IsInt64() && b.IsInt64())
+				r = Int(v, "-") - Int(b, "-");
+			else
+				r = Number(v, "-") - Number(b, "-");
+		}
+		else
+			return;
+}
+
+void Esc::Shift(SRVal& r)
+{
+	Add(r);
+	for(;;)
+		if(Type(TextProc::TK_LSHIFT)) {
+			EscValue v = Get(r);
+			SRVal w;
+			Add(w);
+			EscValue b = Get(w);
+			if(v.IsArray() && b.IsArray()) {
+				if(!v.Replace(v.GetCount(), 0, b))
+					OutOfMemory();
+				Assign(r, v);
+			}
+			else
+			if(!(v.IsArray() && b.IsVoid()))
+				r = Int(v, "<<") << Int(b, "<<");
+		}
+		else
+		if(Type(TextProc::TK_RSHIFT)) {
+			SRVal w;
+			Add(w);
+			r = Int(r, ">>") >> Int(w,  ">>");
+		}
+		else
+			return;
+}
+
+double Esc::DoCompare(const EscValue& a, const EscValue& b, const char *op)
+{
+	LTIMING("DoCompare");
+	if(a.IsInt64() && b.IsInt64())
+		return SgnCompare(a.GetInt64(), b.GetInt64());
+	if(a.IsNumber() && b.IsNumber())
+		return SgnCompare(a.GetNumber(), b.GetNumber());
+	if(a.IsArray() && b.IsArray()) {
+		const Vector<EscValue>& x = a.GetArray();
+		const Vector<EscValue>& y = b.GetArray();
+		int i = 0;
+		for(;;) {
+			if(i >= x.GetCount()) {
+				if (i < y.GetCount())	return -1;
+				return 0;
+			}
+			if(i >= y.GetCount()) {
+				if (i < x.GetCount())	return 1;
+				return 0;
+			}
+			double q = DoCompare(x[i], y[i], op);
+			if(q) return q;
+			i++;
+		}
+	}
+	if(a.IsVoid() && b.IsVoid())
+		return 0;
+	if(!a.IsVoid() && b.IsVoid())
+		return 1;
+	if(a.IsVoid() && !b.IsVoid())
+		return -1;
+	ThrowError((String)"invalid values for comparison " + a.GetTypeName() + " " + op + " " + b.GetTypeName());
+	return 0;
+}
+
+double Esc::DoCompare(const SRVal& a, const char *op)
+{
+	SRVal w;
+	Shift(w);
+	return DoCompare(Get(a), Get(w), op);
+}
+
+void Esc::Compare(SRVal& r)
+{
+	Shift(r);
+	for(;;)
+		if     (Type(TextProc::TK_GREQ))
+			r = DoCompare(r, ">=") >= 0;
+		else if(Type(TextProc::TK_LSEQ))
+			r = DoCompare(r, "<=") <= 0;
+		else if(Type('>'))
+			r = DoCompare(r, ">") > 0;
+		else if(Type('<'))
+			r = DoCompare(r, "<") < 0;
+		else
+			return;
+}
+
+void Esc::Equal(SRVal& r)
+{
+	Compare(r);
+	for(;;)
+		if(Type(TextProc::TK_EQ)) {
+			SRVal w;
+			Compare(w);
+			r = Get(r) == Get(w);
+		}
+		else if(Type(TextProc::TK_INEQ)) {
+			SRVal w;
+			Compare(w);
+			r = Get(r) != Get(w);
+		}
+		else
+			return;
+}
+
+void Esc::BinAnd(SRVal& r)
+{
+	Equal(r);
+	while(!IsType(TextProc::TK_LOGAND) && Type('&')) {
+		SRVal w;
+		Equal(w);
+		r = Int(r, "&") & Int(w, "&");
+	}
+}
+
+void Esc::BinXor(SRVal& r)
+{
+	BinAnd(r);
+	while(Type('^')) {
+		SRVal w;
+		BinAnd(w);
+		r = Int(r, "^") ^ Int(w, "^");
+	}
+}
+
+void Esc::BinOr(SRVal& r)
+{
+	BinXor(r);
+	while(!IsType(TextProc::TK_LOGOR) && Type('|')) {
+		SRVal w;
+		BinXor(w);
+		r = Int(r, "|") | Int(w, "|");
+	}
+}
+
+void Esc::And(SRVal& r)
+{
+	BinOr(r);
+	if(IsType(TextProc::TK_LOGAND)) {
+		bool b = IsTrue(Get(r));
+		while(Type(TextProc::TK_LOGAND)) {
+			SRVal w;
+			if(b) {
+				BinOr(w);
+				b = b && IsTrue(Get(w));
+			}
+			else {
+				skipexp++;
+				BinOr(w);
+				skipexp--;
+			}
+		}
+		r = b;
+	}
+}
+
+void Esc::Or(SRVal& r)
+{
+	And(r);
+	if(IsType(TextProc::TK_LOGOR)) {
+		bool b = IsTrue(Get(r));
+		while(Type(TextProc::TK_LOGOR)) {
+			SRVal w;
+			if(b) {
+				skipexp++;
+				And(w);
+				skipexp--;
+			}
+			else {
+				And(w);
+				b = b || IsTrue(Get(w));
+			}
+		}
+		r = b;
+	}
+}
+
+void Esc::Cond(SRVal& r)
+{
+	Or(r);
+	if(Type('?')) {
+		bool t = IsTrue(Get(r));
+		SRVal dummy;
+		if(t) {
+			Cond(r);
+			PassType(':');
+			skipexp++;
+			Cond(dummy);
+			skipexp--;
+		}
+		else {
+			skipexp++;
+			Cond(dummy);
+			skipexp--;
+			PassType(':');
+			Cond(r);
+		}
+	}
+}
+
+void Esc::Assign(SRVal& r)
+{
+	Cond(r);
+	if(Type('=')) {
+		SRVal w;
+		Assign(w);
+		Assign(r, Get(w));
+	}
+	else
+	if(Type(TextProc::TK_ADDASS)) {
+		EscValue v = Get(r);
+		SRVal w;
+		Cond(w);
+		EscValue b = Get(w);
+		if(v.IsArray() && b.IsArray()) {
+			if(!v.Replace(v.GetCount(), 0, b))
+				OutOfMemory();
+			Assign(r, v);
+		}
+		else
+		if(!(v.IsArray() && b.IsVoid())) {
+			if(v.IsInt64() && b.IsInt64())
+				Assign(r, Int(v, "+=") + Int(b, "+="));
+			else
+				Assign(r, Number(v, "+=") + Number(b, "+="));
+		}
+	}
+	else
+	if (Type(TextProc::TK_SUBASS)) {
+		SRVal w;
+		Cond(w);
+		EscValue v = Get(r);
+		EscValue b = Get(w);
+		if(v.IsInt64() && b.IsInt64())
+			Assign(r, Int(v, "-=") - Int(b, "-="));
+		else
+			Assign(r, Number(v, "-=") - Number(b, "-="));
+	}
+	else if (Type(TextProc::TK_MULASS)) {
+		SRVal w;
+		Cond(w);
+		EscValue x = Get(r);
+		EscValue y = Get(w);
+		if(x.IsInt64() && y.IsInt64())
+			Assign(r, Int(x, "*=") * Int(y, "*="));
+		else
+			Assign(r, Number(x, "*=") * Number(y, "*="));
+	}
+	else if(Type(TextProc::TK_DIVASS)) {
+		SRVal w;
+		Cond(w);
+		EscValue v = Get(r);
+		EscValue b = Get(w);
+		double q = Number(v, "/=");
+		if(q == 0)
+			ThrowError("divide by zero");
+		Assign(r, Number(b, "/=") / q);
+	}
+	else if(Type(TextProc::TK_MODASS)) {
+		SRVal w;
+		Cond(w);
+		int64 a = Int(r, "%=");
+		int64 b = Int(w, "%=");
+		if(b == 0)
+			ThrowError("divide by zero");
+		Assign(r, a % b);
+	}
+}
+
+int Esc::stack_level = 50;
+
+void Esc::Exp(SRVal& r)
+{
+	LTIMING("Exp");
+	//Spaces();
+	stack_level--;
+	if(stack_level <= 0)
+		ThrowError("stack overflow");
+	Assign(r);
+	stack_level++;
+}
+
+EscValue Esc::GetExp() {
+	SRVal r;
+	Exp(r);
+	return Get(r);
+}
+
+void Esc::SkipTerm()
+{
+	if(IsEnd())
+		ThrowError("unexpected end of file");
+	CParser::SkipTerm();
+	//Spaces();
+}
+
+void Esc::SkipExp()
+{
+	int level = 0;
+	for(;;) {
+		if(IsType(';'))
+			return;
+		if(IsType(')') && level == 0)
+			return;
+		if(Type(')'))
+			level--;
+		else
+		if(Type('('))
+			level++;
+		else
+			SkipTerm();
+		if(IsEnd())
+			ThrowError("unexpected end of file");
+	}
+}
+
+void SkipBlock(CParser& p)
+{
+	int level = 1;
+	while(level > 0 && !p.IsEnd()) {
+		if      (p.Type('{')) level++;
+		else if (p.Type('}')) level--;
+		else p.SkipTerm();
+	}
+}
+
+void Esc::SkipStatement()
+{
+	stack_level--;
+	if(stack_level <= 0)
+		ThrowError("stack overflow");
+	if(Id("if")) {
+		PassType('(');
+		SkipExp();
+		PassType(')');
+		SkipStatement();
+		if(Id("else"))
+			SkipStatement();
+	}
+	else
+	if(Id("for")) {
+		PassType('(');
+		if(!IsType(';'))
+			SkipExp();
+		PassType(';');
+		if(!IsType(';'))
+			SkipExp();
+		PassType(';');
+		if(!IsType(')'))
+			SkipExp();
+		PassType(')');
+		SkipStatement();
+	}
+	else
+	if(Id("while") || Id("switch")) {
+		PassType('(');
+		SkipExp();
+		PassType(')');
+		SkipStatement();
+	}
+	else
+	if(Id("do")) {
+		SkipBlock(*this);
+		PassId("while");
+		PassType('(');
+		SkipExp();
+		PassType(')');
+		PassType(';');
+	}
+	else
+	if(Type('{'))
+		SkipBlock(*this);
+	else {
+		SkipExp();
+		PassType(';');
+	}
+	stack_level++;
+}
+
+bool  Esc::PCond()
+{
+	PassType('(');
+	bool c = IsTrue(GetExp());
+	PassType(')');
+	return c;
+}
+
+void Esc::FinishSwitch()
+{
+	while(no_break && no_return && no_continue) {
+		if(Id("case")) {
+			SRVal r;
+			Exp(r);
+			PassType(':');
+		}
+		else
+		if(Id("default"))
+			PassType(':');
+		else
+			if(Type('}'))
+				return;
+		DoStatement();
+	}
+	while(!Type('}'))
+		SkipStatement();
+}
+
+void  Esc::DoStatement()
+{
+	op_limit--;
+	TestLimit();
+	if(Id("if"))
+		if(PCond()) {
+			DoStatement();
+			if(Id("else"))
+				SkipStatement();
+		}
+		else {
+			SkipStatement();
+			if(Id("else"))
+				DoStatement();
+		}
+	else
+	if(Id("do")) {
+		loop++;
+		Pos pos = GetPos();
+		do {
+			SetPos(pos);
+			DoStatement();
+			PassId("while");
+			no_continue = true;
+		}
+		while(PCond() && no_break && no_return);
+		PassType(';');
+		no_break = true;
+		loop--;
+	}
+	else
+	if(Id("while")) {
+		loop++;
+		Pos pos = GetPos();
+		for(;;) {
+			SetPos(pos);
+			if(!PCond() || !no_break || !no_return || !no_continue) {
+				SkipStatement();
+				break;
+			}
+			DoStatement();
+			no_continue = true;
+		}
+		no_break = true;
+		loop--;
+	}
+	else
+	if(Id("for")) {
+		loop++;
+		PassType('(');
+		SRVal var;
+		if (!IsType(';'))
+			Exp(var);
+		if (Id("in") || Type(':')) {
+			EscValue range = GetExp();
+			PassType(')');
+			Pos stmt = GetPos();
+			int i = 0;
+			for(;;) {
+				SetPos(stmt);
+				if(range.IsArray()) {
+					if(i >= range.GetCount())
+						break;
+					Assign(var, (int64)i);
+				}
+				else
+				if(range.IsMap()) {
+					const VectorMap<EscValue, EscValue>& map = range.GetMap();
+					if(i >= map.GetCount())
+						break;
+					/*if(map.IsUnlinked(i))*/ {
+						i++;
+						continue;
+					}
+					Assign(var, map.GetKey(i));
+				}
+				if(!no_break || !no_return || !no_continue) {
+					SkipStatement();
+					break;
+				}
+				DoStatement();
+				no_continue = true;
+				i++;
+			}
+			SkipStatement();
+		}
+		else {
+			PassType(';');
+			Pos cond;
+			if(!IsType(';')) {
+				cond = GetPos();
+				SkipExp();
+			}
+			PassType(';');
+			Pos after;
+			if(!IsType(')')) {
+				after = GetPos();
+				SkipExp();
+			}
+			PassType(')');
+			Pos stmt = GetPos();
+			for(;;) {
+				bool c = true;
+				if(cond.ptr) {
+					SetPos(cond);
+					c = IsTrue(GetExp());
+				}
+				SetPos(stmt);
+				if(!c || !no_break || !no_return || !no_continue) {
+					SkipStatement();
+					break;
+				}
+				DoStatement();
+				no_continue = true;
+				if(after.ptr) {
+					SetPos(after);
+					SRVal r;
+					Exp(r);
+				}
+			}
+		}
+		no_break = true;
+		loop--;
+	}
+	else
+	if(Id("break")) {
+		if(!loop)
+			ThrowError("misplaced 'break'");
+		no_break = false;
+		PassType(';');
+	}
+	else
+	if(Id("continue")) {
+		if(!loop)
+			ThrowError("misplaced 'continue'");
+		no_continue = false;
+		PassType(';');
+	}
+	else
+	if(Id("case"))
+		ThrowError("misplaced 'case'");
+	else
+	if(Id("default"))
+		ThrowError("misplaced 'default'");
+	else
+	if(Id("else"))
+		ThrowError("misplaced 'else'");
+	else
+	if(Id("return")) {
+		no_return = false;
+		if(!Type(';')) {
+			return_value = GetExp();
+			PassType(';');
+		}
+		else
+			return_value = EscValue();
+	}
+	else
+	if(Id("switch")) {
+		loop++;
+		PassType('(');
+		EscValue a = GetExp();
+		PassType(')');
+		PassType('{');
+		while(!Type('}')) {
+			if(Id("case")) {
+				EscValue b = GetExp();
+				PassType(':');
+				if(a == b) {
+					FinishSwitch();
+					break;
+				}
+			}
+			else
+			if(Id("default")) {
+				PassType(':');
+				FinishSwitch();
+				break;
+			}
+			else
+				SkipStatement();
+		}
+		loop--;
+		no_break = true;
+	}
+	else if (Type('#')) {
+		int type = 0;
+		if(Type('.'))
+			type = 1;
+		else
+		if(Type(':'))
+			type = 2;
+		String id = ReadId();
+		EscValue l = ReadLambda(*this);
+		if(type == 1) {
+			if(self.IsVoid())
+				ThrowError("no instance");
+			self.MapSet(id, l);
+		}
+		else
+		if(type == 2)
+			global.GetAdd(id) = l;
+		else
+			var.GetAdd(id) = l;
+	}
+	else
+	if(Type('{')) {
+		while(!Type('}') && no_break && no_return && no_continue)
+			DoStatement();
+	}
+	else
+	if(!Type(';')) {
+		SRVal v;
+		Exp(v);
+		PassType(';');
+	}
+}
+
+void  Esc::Run()
+{
+	no_return = no_break = no_continue = true;
+	loop = 0;
+	skipexp = 0;
+	while(!IsEnd() && no_return && no_break && no_continue)
+		DoStatement();
+}
+
+
+
+
+}

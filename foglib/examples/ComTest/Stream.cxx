@@ -9,11 +9,11 @@
 
 namespace Stream
 {
-#line 264 "../../src/Com/Stream.fog"
+#line 310 "../../src/Com/Stream.fog"
     template < class _1 >
     bool LoadFromFile(_1& o, Text::String path)
     {
-#line 266
+#line 312
         FileIn fin(path);
         if (!fin.IsOpen())
             return false;
@@ -24,7 +24,7 @@ namespace Stream
     template < class _1 >
     bool StoreToFile(_1& o, Text::String path)
     {
-#line 275
+#line 321
         FileOut fout(path);
         if (!fout.IsOpen())
             return false;
@@ -32,7 +32,7 @@ namespace Stream
         return !fout.IsCorrupted();
     };
     
-#line 290
+#line 336
     AudioFrame::~AudioFrame() {};
     
 #line 17
@@ -349,14 +349,14 @@ namespace Stream
         return(int) ret;
     };
     
-#line 308
+#line 354
     Text::String MediaStream::GetLastError() const
     {
-#line 308
+#line 354
         return "unknown";
     };
     
-#line 243
+#line 289
     MemReadStream::MemReadStream(const char *buf, Lang::int64 size)
     :
         buf(buf),
@@ -364,70 +364,70 @@ namespace Stream
         cursor(0)
     {};
     
-#line 249
+#line 295
     int MemReadStream::Get(void *mem, int size)
     {
-#line 250
+#line 296
         Lang::int64 sz = Algorithm::Minimum < Lang::int64 > (size, size - cursor);
         if (sz <= 0)
-#line 251
+#line 297
             return 0;
         {
-#line 252
+#line 298
             if (!(sz < 2147483647))
             {
-#line 252
+#line 298
                 Lang::SysBreak("Assertion failed: sz < INT_MAX");
             }
         }
-#line 253
+#line 299
         ;
-#line 253
+#line 299
         char * b = (char * ) mem;
         Lang::Memory::Copy(b, buf + cursor, (int) sz);
         cursor += sz;
         return(int) sz;
     };
     
-#line 258
+#line 304
     Lang::int64 MemReadStream::GetCursor()
     {
-#line 258
+#line 304
         return cursor;
     };
     
-#line 260
+#line 306
     Lang::int64 MemReadStream::GetSize() const
     {
-#line 260
+#line 306
         return size;
     };
     
-#line 247
+#line 293
     bool MemReadStream::IsEof()
     {
-#line 247
+#line 293
         return cursor >= size;
     };
     
-#line 245
+#line 291
     bool MemReadStream::IsLoading()
     {
-#line 245
+#line 291
         return true;
     };
     
-#line 246
+#line 292
     bool MemReadStream::IsStoring()
     {
-#line 246
+#line 292
         return false;
     };
     
-#line 259
+#line 305
     void MemReadStream::Seek(Lang::int64 i)
     {
-#line 259
+#line 305
         cursor = i;
     };
     
@@ -438,66 +438,49 @@ namespace Stream
         is_storing(true)
     {};
     
-#line 199
-    Abstract::StreamBase& StringStream::operator<< (Text::String str)
-    {
-#line 200
-        Put(str.Begin(), str.GetCount());
-        return *this;
-    };
-    
-#line 203
-    Abstract::StreamBase& StringStream::operator<< (int i)
-    {
-#line 204
-        Text::String str = Text::String::IntStr(i);
-        Put(str.Begin(), str.GetCount());
-        return *this;
-    };
-    
-#line 220
+#line 212
     int StringStream::Get(void *mem, int size)
     {
-#line 221
+#line 213
         Lang::int64 sz = Algorithm::Minimum((Lang::int64) size, (Lang::int64) s.GetCount() - cursor);
         if (sz <= 0)
-#line 222
+#line 214
             return 0;
         {
-#line 223
+#line 215
             if (!(sz < 2147483647))
             {
-#line 223
+#line 215
                 Lang::SysBreak("Assertion failed: sz < INT_MAX");
             }
         }
-#line 224
+#line 216
         ;
-#line 224
+#line 216
         char * b = (char * ) mem;
         Lang::Memory::Copy(b, s.Begin() + cursor, (int) sz);
         cursor += sz;
         return(int) sz;
     };
     
-#line 229
+#line 221
     Lang::int64 StringStream::GetCursor()
     {
-#line 229
+#line 221
         return cursor;
     };
     
-#line 233
-    Text::String StringStream::GetResult()
+#line 226
+    Text::String StringStream::GetResult() const
     {
-#line 233
+#line 226
         return Text::String(s.Begin(), s.GetCount());
     };
     
-#line 230
+#line 222
     Lang::int64 StringStream::GetSize() const
     {
-#line 230
+#line 222
         return s.GetCount();
     };
     
@@ -522,29 +505,29 @@ namespace Stream
         return is_storing;
     };
     
-#line 219
+#line 211
     int StringStream::Put(char c)
     {
-#line 219
+#line 211
         return Put(&c, 1);
     };
     
-#line 208
+#line 200
     int StringStream::Put(const void *mem, int size)
     {
-#line 209
+#line 201
         Lang::int64 end = cursor + size;
         {
-#line 210
+#line 202
             if (!(end < 2147483647))
             {
-#line 210
+#line 202
                 Lang::SysBreak("Assertion failed: end < INT_MAX");
             }
         }
-#line 211
+#line 203
         ;
-#line 211
+#line 203
         if (end > s.GetCount())
             s.SetCount((int) end);
         char * dst = s.Begin() + cursor;
@@ -554,15 +537,158 @@ namespace Stream
         return size;
     };
     
-#line 232
+#line 225
     void StringStream::Seek(Lang::int64 i)
     {
-#line 232
+#line 225
         cursor = i;
     };
     
-#line 298
+#line 344
     VideoFrame::~VideoFrame() {};
+    
+#line 238
+    WStringStream::WStringStream()
+    :
+        cursor(0),
+        is_storing(true)
+    {};
+    
+#line 263
+    int WStringStream::Cat(short c)
+    {
+#line 263
+        return Put(&c, 2);
+    };
+    
+#line 264
+    int WStringStream::Get(void *mem, int size)
+    {
+#line 265
+        Lang::int64 sz = Algorithm::Minimum((Lang::int64) size, ((Lang::int64) s.GetCount() - cursor) * 2);
+        if (sz <= 1)
+#line 266
+            return 0;
+        {
+#line 267
+            if (!(sz < 2147483647))
+            {
+#line 267
+                Lang::SysBreak("Assertion failed: sz < INT_MAX");
+            }
+        }
+#line 268
+        ;
+#line 268
+        char * b = (char * ) mem;
+        Lang::Memory::Copy(b, s.Begin() + cursor, (int) sz);
+        cursor += sz / 2;
+        return(int) sz;
+    };
+    
+#line 273
+    Lang::int64 WStringStream::GetCursor()
+    {
+#line 273
+        return cursor;
+    };
+    
+#line 278
+    Text::WString WStringStream::GetResult() const
+    {
+#line 278
+        return Text::WString(s.Get(), s.GetCount());
+    };
+    
+#line 274
+    Lang::int64 WStringStream::GetSize() const
+    {
+#line 274
+        return s.GetCount();
+    };
+    
+#line 242
+    bool WStringStream::IsEof()
+    {
+#line 242
+        return cursor >= s.GetCount();
+    };
+    
+#line 240
+    bool WStringStream::IsLoading()
+    {
+#line 240
+        return !is_storing;
+    };
+    
+#line 241
+    bool WStringStream::IsStoring()
+    {
+#line 241
+        return is_storing;
+    };
+    
+#line 262
+    int WStringStream::Put(char c)
+    {
+        {
+#line 262
+            if (!(false))
+            {
+#line 262
+                Lang::SysBreak("Assertion failed: Not supported");
+            }
+        }
+#line 262
+        ;
+#line 262
+        return Put(&c, 1);
+    };
+    
+#line 247
+    int WStringStream::Put(const void *mem, int size)
+    {
+        {
+#line 248
+            if (!(size % 2 == 0))
+            {
+#line 248
+                Lang::SysBreak("Assertion failed: size % 2 == 0");
+            }
+        }
+#line 249
+        ;
+#line 249
+        if (size / 2 == 0 || size % 2 != 0)
+            return 0;
+        int chars = size / 2;
+        Lang::int64 end = cursor + chars;
+        {
+#line 253
+            if (!(end < 2147483647))
+            {
+#line 253
+                Lang::SysBreak("Assertion failed: end < INT_MAX");
+            }
+        }
+#line 254
+        ;
+#line 254
+        if (end > s.GetCount())
+            s.SetCount((int) end);
+        short * dst = s.Begin() + cursor;
+        const short * src = (const short * ) mem;
+        Lang::Memory::Copy(dst, src, size);
+        cursor += chars;
+        return size;
+    };
+    
+#line 277
+    void WStringStream::Seek(Lang::int64 i)
+    {
+#line 277
+        cursor = i;
+    };
     
 };
 

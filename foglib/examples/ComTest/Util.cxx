@@ -39,18 +39,18 @@ namespace Util
         }
     };
     
-#line 394
+#line 393
     Stream::CharStream& Cerr()
     {
-#line 395
+#line 394
         static Stream::FileOut fout(Native::GetStdErr());
         return fout;
     };
     
-#line 389
+#line 388
     Stream::CharStream& Cin()
     {
-#line 390
+#line 389
         static Stream::FileOut fout(Native::GetStdIn());
         return fout;
     };
@@ -70,44 +70,356 @@ namespace Util
         return AppendFileName(dir, file_name);
     };
     
-#line 379
+#line 378
     Stream::CharStream& Cout()
     {
-#line 380
+#line 379
         static Stream::FileOut fout(Native::GetStdOut());
         return fout;
     };
     
     Stream::CharStream& Errout()
     {
-#line 385
+#line 384
         static Stream::FileOut fout(Native::GetStdErr());
         return fout;
     };
     
-#line 445
+#line 1042
+    int FindArg(const char *value, const char *a0)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+        return - 1;
+    };
+    
+#line 1042
+    int FindArg(const char *value, const char *a0, const char *a1)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+        return - 1;
+    };
+    
+#line 1042
+    int FindArg(const char *value, const char *a0, const char *a1, const char *a2)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+        return - 1;
+    };
+    
+#line 1042
+    int FindArg(const char *value, const char *a0, const char *a1, const char *a2, const char *a3)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+#line 1008
+        if (value == a3)
+            return 3;
+        return - 1;
+    };
+    
+#line 1042
+    int FindArg(const char *value, const char *a0, const char *a1, const char *a2, const char *a3, const char *a4)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+#line 1008
+        if (value == a3)
+            return 3;
+#line 1008
+        if (value == a4)
+            return 4;
+        return - 1;
+    };
+    
+#line 1042
+    int FindArg(const char *value, const char *a0, const char *a1, const char *a2, const char *a3, const char *a4, const char *a5)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+#line 1008
+        if (value == a3)
+            return 3;
+#line 1008
+        if (value == a4)
+            return 4;
+#line 1008
+        if (value == a5)
+            return 5;
+        return - 1;
+    };
+    
+#line 1042
+    int FindArg(const char *value, const char *a0, const char *a1, const char *a2, const char *a3, const char *a4, const char *a5, const char *a6)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+#line 1008
+        if (value == a3)
+            return 3;
+#line 1008
+        if (value == a4)
+            return 4;
+#line 1008
+        if (value == a5)
+            return 5;
+#line 1008
+        if (value == a6)
+            return 6;
+        return - 1;
+    };
+    
+#line 1042
+    int FindArg(const char *value, const char *a0, const char *a1, const char *a2, const char *a3, const char *a4, const char *a5, const char *a6, const char *a7)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+#line 1008
+        if (value == a3)
+            return 3;
+#line 1008
+        if (value == a4)
+            return 4;
+#line 1008
+        if (value == a5)
+            return 5;
+#line 1008
+        if (value == a6)
+            return 6;
+#line 1008
+        if (value == a7)
+            return 7;
+        return - 1;
+    };
+    
+#line 1041
+    int FindArg(int value, int a0)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+        return - 1;
+    };
+    
+#line 1041
+    int FindArg(int value, int a0, int a1)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+        return - 1;
+    };
+    
+#line 1041
+    int FindArg(int value, int a0, int a1, int a2)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+        return - 1;
+    };
+    
+#line 1041
+    int FindArg(int value, int a0, int a1, int a2, int a3)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+#line 1008
+        if (value == a3)
+            return 3;
+        return - 1;
+    };
+    
+#line 1041
+    int FindArg(int value, int a0, int a1, int a2, int a3, int a4)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+#line 1008
+        if (value == a3)
+            return 3;
+#line 1008
+        if (value == a4)
+            return 4;
+        return - 1;
+    };
+    
+#line 1041
+    int FindArg(int value, int a0, int a1, int a2, int a3, int a4, int a5)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+#line 1008
+        if (value == a3)
+            return 3;
+#line 1008
+        if (value == a4)
+            return 4;
+#line 1008
+        if (value == a5)
+            return 5;
+        return - 1;
+    };
+    
+#line 1041
+    int FindArg(int value, int a0, int a1, int a2, int a3, int a4, int a5, int a6)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+#line 1008
+        if (value == a3)
+            return 3;
+#line 1008
+        if (value == a4)
+            return 4;
+#line 1008
+        if (value == a5)
+            return 5;
+#line 1008
+        if (value == a6)
+            return 6;
+        return - 1;
+    };
+    
+#line 1041
+    int FindArg(int value, int a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7)
+    {
+#line 1008
+        if (value == a0)
+            return 0;
+#line 1008
+        if (value == a1)
+            return 1;
+#line 1008
+        if (value == a2)
+            return 2;
+#line 1008
+        if (value == a3)
+            return 3;
+#line 1008
+        if (value == a4)
+            return 4;
+#line 1008
+        if (value == a5)
+            return 5;
+#line 1008
+        if (value == a6)
+            return 6;
+#line 1008
+        if (value == a7)
+            return 7;
+        return - 1;
+    };
+    
+#line 444
     Text::String FindLocalFile(Text::String filename)
     {
-#line 446
+#line 445
         Text::String exe_dir_file = GetExeDirFile(filename);
         if (FileExists(exe_dir_file))
             return exe_dir_file;
-#line 450
+#line 449
         for (int i = 0; i < __LocalFileDirs().GetCount(); i ++ )
             {
-#line 451
+#line 450
                 Text::String dir_file = AppendFileName(__LocalFileDirs()[i], filename);
                 if (Native::PathExists(dir_file.Begin()) || Native::DirExists(dir_file.Begin()))
                     return dir_file;
             }
-#line 456
+#line 455
         return ConfigFile(filename);
     };
     
-#line 420
+#line 419
     Text::String GetDataDirectory()
     {
-#line 421
+#line 420
         if (__DataPath().GetCount())
             return __DataPath();
         return Native::GetEnv("UPP_MAIN__");
@@ -115,7 +427,7 @@ namespace Util
     
     Text::String GetDataFile(Text::String filename)
     {
-#line 427
+#line 426
         if (__DataPath().GetCount())
             return AppendFileName(__DataPath(), filename);
         Text::String s = Native::GetEnv("UPP_MAIN__");
@@ -125,27 +437,27 @@ namespace Util
             return GetExeDirFile(filename);
     };
     
-#line 473
+#line 472
     void GetDirectoryFiles(Text::String dir, Container::Index < Text::String > & files)
     {
-#line 474
+#line 473
         files.Clear();
         Native::GetDirFiles(dir.Begin(), &__FileAdder, (void * ) & files);
     };
     
-#line 410
+#line 409
     Text::String GetEnv(Text::String id)
     {
-#line 411
+#line 410
         if (id.IsEmpty())
             return Text::String();
         return Native::GetEnv(id.Begin());
     };
     
-#line 406
+#line 405
     Text::String GetExeDirFile(Text::String filename)
     {
-#line 407
+#line 406
         return AppendFileName(GetFileDirectory(Env::Local().GetExeFilePath()), filename);
     };
     
@@ -230,25 +542,25 @@ namespace Util
         return path;
     };
     
-#line 478
+#line 477
     bool IsClose(double a, double b)
     {
-#line 479
+#line 478
         if (Native::IsFinite(a) && Native::IsFinite(b))
         {
-#line 480
+#line 479
             double diff = Algorithm::Absolute(a - b);
             return diff < 0.0001;
         }
         else
-#line 483
+#line 482
             return a == b;
     };
     
-#line 464
+#line 463
     bool IsVerbose()
     {
-#line 464
+#line 463
         return __Verbose();
     };
     
@@ -279,10 +591,10 @@ namespace Util
                 fout.Open(path);
                 fout << " *** " << Chrono::GetSysTime().AsString() << " ***" << "\n";
                 fout << " *** " << exepath << " ***" << "\n";
-#line 370
+#line 369
                 if (ss.GetSize())
                     fout << ss.GetResult();
-#line 373
+#line 372
                 fout.Flush();
             }
         }
@@ -296,10 +608,10 @@ namespace Util
         Lang::SysBreak(s.Begin());
     };
     
-#line 399
+#line 398
     Text::String ReadStdIn()
     {
-#line 399
+#line 398
         return Cin().GetLine();
     };
     
@@ -329,38 +641,38 @@ namespace Util
 #line 108
     void SetVerbose(bool b)
     {
-#line 465
+#line 464
         __Verbose() = b;
     };
     
-#line 763
+#line 762
     template < class _1, class _2 >
     void Sort(_1& vector, const _2& sorter)
     {
-#line 765
+#line 764
         if (vector.GetCount() < 2)
             return;
-#line 768
+#line 767
         __Sort(vector.Begin().Get(), vector.End().Get(), sorter);
     };
     
-#line 913
+#line 912
     bool StreamCopy(Abstract::StreamBase& dest, Abstract::StreamBase& src)
     {
-#line 914
+#line 913
         dest.Seek(0);
         src.Seek(0);
         Lang::byte buf[1024];
         Lang::int64 size_left = src.GetSize();
         while (size_left > 0)
             {
-#line 919
+#line 918
                 int block;
                 if (size_left < 1024)
-#line 920
+#line 919
                     block = (int) size_left;
                 else
-#line 921
+#line 920
                     block = 1024;
                 int got = src.Get(buf, block);
                 if (got != block)
@@ -371,35 +683,35 @@ namespace Util
         return true;
     };
     
-#line 467
+#line 466
     void __FileAdder(const char *str, void *files_idx)
     {
-#line 468
+#line 467
         typedef Container::Index < Text::String > Idx;
         Idx * p = (Idx * ) files_idx;
         p -> Add(str);
     };
     
-#line 718
+#line 717
     template < class _1, class _2 >
     void __Sort(_1 l, _1 h, const _2& less)
     {
         for (;;)
             {
-#line 722
+#line 721
                 int count = int(h - l);
                 if (count < 2)
                     return;
                 if (count < 8)
                 {
-#line 726
+#line 725
                     __FinalSort(l, h, less);
                     return;
                 }
                 int pass = 4;
                 for (;;)
                     {
-#line 731
+#line 730
                         _1 middle = l + (count >> 1);
                         __OrderIter2(l, middle, less);
                         __OrderIter2(middle, h - 1, less);
@@ -415,23 +727,23 @@ namespace Util
                             ++ iih;
                         if (pass > 5 || min(ii - l, h - iih) > (max(ii - l, h - iih) >> pass))
                         {
-#line 745
+#line 744
                             if (ii - l < h - iih - 1)
                             {
-#line 746
+#line 745
                                 __Sort(l, ii, less);
                                 l = iih + 1;
                             }
                             else
                             {
-#line 750
+#line 749
                                 __Sort(iih + 1, h, less);
                                 h = ii;
                             }
                             break;
                         
                         }
-#line 755
+#line 754
                         __IterSwap(l, l + Random::Range(count));
                         __IterSwap(middle, l + Random::Range(count));
                         __IterSwap(h - 1, l + Random::Range(count));
@@ -440,12 +752,12 @@ namespace Util
             }
     };
     
-#line 463
+#line 462
     bool& __Verbose()
     {
-#line 463
+#line 462
         static bool b;
-#line 463
+#line 462
         return b;
     };
     
@@ -454,10 +766,10 @@ namespace Util
 #line 186
     const int CommandLineArguments::max_inputs = 300;
     
-#line 791
+#line 790
     void CommandLineArguments::AddArg(char key, const char *desc, bool has_value)
     {
-#line 792
+#line 791
         CmdArg & a = args.Add();
         a.key = key;
         a.desc = desc;
@@ -466,43 +778,43 @@ namespace Util
     
     bool CommandLineArguments::Parse()
     {
-#line 799
+#line 798
         const Container::Vector < Text::String > & args = Env::Local().CommandLine();
-#line 801
+#line 800
         for (int i = 0; i < args.GetCount(); i ++ )
             {
-#line 802
+#line 801
                 Text::String arg = args[i];
-#line 804
+#line 803
                 if (arg.GetCount() < 2)
-#line 804
+#line 803
                     return false;
-#line 806
+#line 805
                 bool found = false;
-#line 808
+#line 807
                 if (arg[0] == '-')
                 {
-#line 809
+#line 808
                     char key = arg[1];
                     if (key)
                     {
-#line 811
+#line 810
                         for (int j = 0; j < this -> args.GetCount(); j ++ )
                             {
-#line 812
+#line 811
                                 CmdArg & a = this -> args[j];
                                 if (a.key == key)
                                 {
-#line 814
+#line 813
                                     found = true;
                                     CmdInput & in = inputs.Add();
                                     in.key = key;
                                     if (a.has_value)
                                     {
-#line 818
+#line 817
                                         if (i + 1 >= args.GetCount())
                                         {
-#line 819
+#line 818
                                             Errout() << "No value provided: " << arg << "\n";
                                             return false;
                                         }
@@ -517,9 +829,9 @@ namespace Util
                 }
                 if (!found)
                 {
-#line 831
+#line 830
                     Errout() << "Invalid argument: " << arg << "\n";
-#line 831
+#line 830
                     return false;
                 }
             }
@@ -528,28 +840,28 @@ namespace Util
     
     void CommandLineArguments::PrintHelp()
     {
-#line 838
+#line 837
         Text::String exe = Env::Local().GetExeFilePath();
         int i = exe.ReverseFind("/");
         if (i >= 0)
             exe = exe.Mid(i + 1);
-#line 843
+#line 842
         Stream::CharStream & cout = Cout();
         cout << exe << " [-";
         for (int i = 0; i < args.GetCount(); i ++ )
             if (args[i].has_value)
                 cout << args[i].key;
         cout << " value]";
-#line 850
+#line 849
         cout << " [-";
         for (int i = 0; i < args.GetCount(); i ++ )
             if (!args[i].has_value)
                 cout << args[i].key;
         cout << "]" << "\n";
-#line 856
+#line 855
         for (int i = 0; i < args.GetCount(); i ++ )
             {
-#line 857
+#line 856
                 CmdArg & a = args[i];
                 cout << "\t-" << a.key;
                 if (a.has_value)
@@ -665,144 +977,144 @@ namespace Util
         }
     };
     
-#line 630
+#line 629
     FindFile::FindFile() {};
     
-#line 650
+#line 649
     Text::String FindFile::GetName() const
     {
         {
-#line 651
+#line 650
             Panic("TODO");
-#line 651
+#line 650
             throw Text::Exc();
         }
     };
     
-#line 646
+#line 645
     Text::String FindFile::GetPath() const
     {
         {
-#line 647
+#line 646
             Panic("TODO");
-#line 647
+#line 646
             throw Text::Exc();
         }
     };
     
-#line 642
+#line 641
     bool FindFile::IsDirectory() const
     {
         {
-#line 643
+#line 642
             Panic("TODO");
-#line 643
+#line 642
             throw Text::Exc();
         }
     };
     
-#line 638
+#line 637
     bool FindFile::Next()
     {
         {
-#line 639
+#line 638
             Panic("TODO");
-#line 639
+#line 638
             throw Text::Exc();
         }
     };
     
-#line 634
+#line 633
     bool FindFile::Search(Text::String path)
     {
         {
-#line 635
+#line 634
             Panic("TODO");
-#line 635
+#line 634
             throw Text::Exc();
         }
     };
     
-#line 947
+#line 946
     void FloatTrans::Serialize(Abstract::StreamBase& s)
     {
-#line 948
+#line 947
         if (s.IsLoading())
         {
-#line 949
+#line 948
             float f;
             s % f;
             value = f;
         }
         else
         {
-#line 954
+#line 953
             s % value;
         }
     };
     
-#line 574
+#line 573
     StringCache::StringCache()
     :
         str_counter(0)
     {};
     
-#line 611
+#line 610
     Text::String StringCache::Get(int i) const
     {
-#line 612
+#line 611
         return strings[i];
     };
     
-#line 576
+#line 575
     int StringCache::GetAdd(const Text::String& s)
     {
-#line 577
+#line 576
         Lang::uint32 hash = s.GetHashValue();
         Lang::FwdIterator < Lang::uint32 > it = hashes.Begin();
         Lang::FwdIterator < Lang::uint32 > end = hashes.End();
         int i = 0;
         while (it != end)
             {
-#line 582
+#line 581
                 if (*it == hash)
                     return i;
                 ++ i;
-#line 584
+#line 583
                 ++ it;
             }
-#line 587
+#line 586
         lock.Enter();
         if (free_slots.GetCount())
             i = free_slots.Pop();
         else
         {
-#line 591
+#line 590
             i = hashes.GetCount();
             hashes.Add();
             strings.Add();
         }
         lock.Leave();
-#line 597
+#line 596
         hashes[i] = hash;
         strings[i] = s;
         return i;
     };
     
-#line 615
+#line 614
     int StringCache::GetCount() const
     {
-#line 616
+#line 615
         return strings.GetCount();
     };
     
-#line 602
+#line 601
     void StringCache::Remove(int i)
     {
-#line 603
+#line 602
         hashes[i] = 0xFFFFFFFF;
         strings[i] = 0;
-#line 606
+#line 605
         lock.Enter();
         free_slots.Add(i);
         lock.Leave();
@@ -815,14 +1127,14 @@ namespace Util
         cursor(0)
     {};
     
-#line 500
+#line 499
     bool StringParser::Char(int chr)
     {
-#line 501
+#line 500
         int curchr = s[cursor];
         if (curchr == chr)
         {
-#line 503
+#line 502
             cursor ++ ;
             PassWhite();
             return true;
@@ -830,24 +1142,24 @@ namespace Util
         return false;
     };
     
-#line 541
+#line 540
     int StringParser::GetChar()
     {
-#line 542
+#line 541
         return s[cursor ++ ];
     };
     
-#line 549
+#line 548
     bool StringParser::IsChar(int chr)
     {
-#line 550
+#line 549
         return s[cursor] == chr;
     };
     
 #line 131
     void StringParser::PassChar(int chr, bool do_pass_white)
     {
-#line 493
+#line 492
         if (!IsChar(chr))
             throw Text::Exc("unexpected char");
         cursor ++ ;
@@ -855,13 +1167,13 @@ namespace Util
             PassWhite();
     };
     
-#line 553
+#line 552
     void StringParser::PassWhite()
     {
-#line 554
+#line 553
         while (cursor < s.GetCount())
             {
-#line 555
+#line 554
                 int chr = s[cursor];
                 if (Text::IsSpace(chr))
                     cursor ++ ;
@@ -871,34 +1183,34 @@ namespace Util
             }
     };
     
-#line 545
+#line 544
     int StringParser::PeekChar()
     {
-#line 546
+#line 545
         return s[cursor];
     };
     
-#line 519
+#line 518
     Text::String StringParser::ReadId()
     {
-#line 520
+#line 519
         Text::String id;
         while (cursor < s.GetCount())
             {
-#line 522
+#line 521
                 int chr = s[cursor];
                 if (Text::IsSpace(chr))
                     break;
                 
                 if (chr == '\\')
                 {
-#line 527
+#line 526
                     cursor ++ ;
                     chr = s[cursor];
                 }
                 if (Text::IsAlpha(chr) || chr == '_' || Text::IsDigit(chr))
                 {
-#line 531
+#line 530
                     id.Cat(chr);
                     cursor ++ ;
                 }
@@ -906,33 +1218,33 @@ namespace Util
                     break;
             
             }
-#line 537
+#line 536
         PassWhite();
         return id;
     };
     
-#line 510
+#line 509
     int StringParser::ReadInt()
     {
-#line 511
+#line 510
         Text::String i;
         while (Text::IsDigit(s[cursor]))
             {
-#line 513
+#line 512
                 i.Cat(s[cursor ++ ]);
             }
         PassWhite();
         return Text::String::StrInt(i);
     };
     
-#line 980
+#line 979
     Version::Version(Lang::byte write_v, Abstract::StreamBase& s)
     :
         write_v(write_v),
         read_v(0),
         s(s)
     {
-#line 981
+#line 980
         if (s.IsStoring())
             s.Put(&write_v, sizeof (write_v));
         else
@@ -941,7 +1253,7 @@ namespace Util
     
     bool Version::Is(Lang::byte cmp_v)
     {
-#line 988
+#line 987
         if (s.IsStoring())
             return cmp_v <= write_v;
         else

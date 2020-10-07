@@ -186,3 +186,10 @@ auto declaration MakeClassPtr(identifier Type, identifier postfix, identifier Pt
 	void Clear${postfix}(int i) {${PtrVar} = 0;}
 	void Set${postfix}(${Type}* ptr) {${PtrVar} = ptr;}
 }
+
+auto declaration MakeException(identifier Exc) {
+	struct $Exc : public Text::String {
+		${Exc}() {}
+		${Exc}(const Text::String& s) : Text::String(s) {}
+	};
+}

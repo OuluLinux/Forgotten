@@ -3,8 +3,8 @@
 
 #include <new>
 
-#ifndef RANDOM_HXX
-#include <Random.hxx>
+#ifndef PRIM_HXX
+#include <Prim.hxx>
 #endif
 
 namespace Algorithm

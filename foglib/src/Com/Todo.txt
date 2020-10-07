@@ -1,4 +1,7 @@
 
+Upgrade slow code:
+ - Index: too slow search
+
 Use meta functions for wrapping native classes like:
  - TimeStop
 

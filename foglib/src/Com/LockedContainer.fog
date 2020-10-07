@@ -214,14 +214,14 @@ void OrderedLinkedList::Init(dword min, dword max, dword step) {
 	Clear();
 	if (max <= min || !step)
 		Panic(
-			Formater("Invalid OrderedLinkedList usage: min=%v, max=%v, step=%v")
+			Formater("Invalid OrderedLinkedList usage: min=%s, max=%s, step=%s")
 				(min)(max)(step));
 	this->min = min;
 	this->max = max;
 	this->step = step;
 	dword count = (max - min) / step + 1;
 	if (!count || count > 10000000)
-		Panic(Formater("Invalid OrderedLinkedList usage: count=%v")(count));
+		Panic(Formater("Invalid OrderedLinkedList usage: count=%s")(count));
 	begins.SetCount(count);
 }
 
@@ -369,7 +369,7 @@ OrderedLinkedItem* OrderedLinkedList::FindClosest(dword begin_i, dword key) {
 
 !inline dword OrderedLinkedList::GetBeginPos(dword key) {
 	if (key < min || key >= max + step)
-		Panic(Formater("Invalid key %v (not between %v and %v)")(key)(min)(max));
+		Panic(Formater("Invalid key %s (not between %s and %s)")(key)(min)(max));
 	dword begin_i = (key - min) / step;
 	return begin_i;
 }
@@ -412,7 +412,7 @@ void OrderedLinkedList::Add(dword key, dword value) {
 
 void OrderedLinkedList::Remove(dword key, dword value) {
 	if (key < min || key >= max + step)
-		Panic(Formater("Invalid key %v (not between %v and %v)")(key)(min)(max));
+		Panic(Formater("Invalid key %s (not between %s and %s)")(key)(min)(max));
 	
 	lock.Enter();
 	dword begin_i = GetBeginPos(key);

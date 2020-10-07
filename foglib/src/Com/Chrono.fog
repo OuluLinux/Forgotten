@@ -13,6 +13,7 @@ struct Date {
 	void Set(int64 scalar);
 	int64 Get() const;
 	bool operator==(const Date& d) const {return year == d.year && month == d.month && day == d.day;}
+	String AsString() const;
 	
 	static const int* DaysInMonth();
 	static const int* MonthDayOffset();
@@ -29,8 +30,7 @@ struct Time : public Date {
 	Time(const Time& t) { MemoryCopy(this, &t, sizeof(Time)); }
 	Time(int y, int m, int d) {Set(y,m,d,0,0,0);}
 	Time(int y, int m, int d, int h, int min, int s) {Set(y,m,d,h,min,s);}
-	String AsString() const;
-
+	
 	void Set(int y, int mon, int d, int h, int m, int s);
 	void Set(int64 scalar);
 	void SetFromStamp(int seconds);
@@ -148,6 +148,10 @@ int64 Date::Get() const {
 	       (month > 2) * IsLeapYear(ym);
 }
 
+String Date::AsString() const {
+	return	IntStr(day) + "." + IntStr(month) + "." + IntStr(day);
+}
+
 void Date::Set(int y, int m, int d) {
 	year = y;
 	month = m;
@@ -229,7 +233,7 @@ String Time::AsString() const {
 	s[2] = 0;
 	return	IntStr(day) + "." + IntStr(month) + "." + IntStr(day) +
 			" " + IntStr(hour) + ":" + String(m) + ":" + String(s);
-	//return Format("%v.%v.%v %v:%v", (int)t.day(), (int)t.month(), (int)t.year(), (int)t.hour(), min);
+	//return Format("%s.%s.%s %s:%s", (int)t.day(), (int)t.month(), (int)t.year(), (int)t.hour(), min);
 }
 
 auto statement DIV(token x, expression y) {$x = seconds / ($y); seconds = seconds % ($y);};

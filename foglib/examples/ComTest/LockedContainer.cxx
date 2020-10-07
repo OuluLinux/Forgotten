@@ -398,7 +398,7 @@ namespace LockedContainer
     {
 #line 371
         if (key < min || key >= max + step)
-            Util::Panic(Interface::Formater("Invalid key %v (not between %v and %v)")(key)(min)(max));
+            Util::Panic(Interface::Formater("Invalid key %s (not between %s and %s)")(key)(min)(max));
         Lang::dword begin_i = (key - min) / step;
         return begin_i;
     };
@@ -409,14 +409,14 @@ namespace LockedContainer
 #line 214
         Clear();
         if (max <= min || !step)
-            Util::Panic(Interface::Formater("Invalid OrderedLinkedList usage: min=%v, max=%v, step=%v")(min)(max)(step));
+            Util::Panic(Interface::Formater("Invalid OrderedLinkedList usage: min=%s, max=%s, step=%s")(min)(max)(step));
 #line 219
         this -> min = min;
         this -> max = max;
         this -> step = step;
         Lang::dword count = (max - min) / step + 1;
         if (!count || count > 10000000)
-            Util::Panic(Interface::Formater("Invalid OrderedLinkedList usage: count=%v")(count));
+            Util::Panic(Interface::Formater("Invalid OrderedLinkedList usage: count=%s")(count));
         begins.SetCount(count);
     };
     
@@ -542,7 +542,7 @@ namespace LockedContainer
     {
 #line 414
         if (key < min || key >= max + step)
-            Util::Panic(Interface::Formater("Invalid key %v (not between %v and %v)")(key)(min)(max));
+            Util::Panic(Interface::Formater("Invalid key %s (not between %s and %s)")(key)(min)(max));
 #line 417
         lock.Enter();
         Lang::dword begin_i = GetBeginPos(key);

@@ -134,7 +134,7 @@ struct OnlineVariance {
 	double GetCDF(double limit, bool rside) const;
 	void Serialize(StreamBase& s) {s % k % count % ex % ex2;}
 	
-	//String AsString() const {return Format("k=%v count=%v ex=%v ex2=%v mean=%v", k, count, ex, ex2, GetMean());}
+	//String AsString() const {return Format("k=%s count=%s ex=%s ex2=%s mean=%s", k, count, ex, ex2, GetMean());}
 	
 };
 

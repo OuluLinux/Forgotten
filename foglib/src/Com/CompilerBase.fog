@@ -110,3 +110,5 @@ public:
 
 
 }
+
+#define FileLocation			TextProc::FileLocation
