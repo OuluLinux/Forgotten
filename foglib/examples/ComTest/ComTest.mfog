@@ -13,7 +13,14 @@ using/interface Concurrency;
 using/interface Network;
 using/interface TextProc;
 
+/*
+Esc tests:
+	
+for(i=0;i<3;i++)
+for(;a;++a)
+for(a in b)
 
+*/
 class App {
 	//typedef Vector<String> StrVec;
 	//StrVec strvec;

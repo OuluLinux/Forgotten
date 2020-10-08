@@ -5,7 +5,7 @@
 */
 
 namespace Shell {
-
+using/interface Indirect;
 
 
 
@@ -127,8 +127,8 @@ public:
 	EscLambda&                           CreateLambda();
 
 
-	void    Escape(const char *method, Event<EscEscape&> escape);
-	void    Escape(const char *method, EscHandle *h, Event<EscEscape&> escape);
+	void    Escape(const char *method, Callback1<EscEscape&> escape);
+	void    Escape(const char *method, EscHandle *h, Callback1<EscEscape&> escape);
 	bool    HasNumberField(const char *id) const;
 	int     GetFieldInt(const char *id) const;
 
@@ -175,16 +175,17 @@ class EscLambda {
 	friend class EscValue;
 
 public:
+	typedef CRef<EscEscape> EscEscapePtr;
 	Vector<String>        arg;
 	Vector<String>        def;
 	Vector<bool>          inout;
 	String                code;
 	EscHandle            *handle;
-	Event<EscEscape&>     escape;
 	bool                  varargs;
 	String                filename;
 	int                   line;
-
+	Callback1<EscEscapePtr> escape;
+	
 private:
 	EscLambda(const EscLambda&);
 	void operator=(const EscLambda&);
@@ -282,7 +283,7 @@ struct Esc : public CParser {
 	void  Run();
 
 	Esc(ArrayMap<String, EscValue>& global,
-		const char *s,
+		const String& s,
 		int& oplimit,
 	    const String& fn,
 	    int line = 1)
@@ -333,7 +334,7 @@ void Escfn(ArrayMap<String, EscValue>& globals, const char *function, void (*esc
 	return Escape(globals, function, escape);
 }
 
-void Escape(ArrayMap<String, EscValue>& globals, const char *function, Event<EscEscape&> escape);
+void Escape(ArrayMap<String, EscValue>& globals, const char *function, Callback1<EscEscape&> escape);
 
 void Scan(ArrayMap<String, EscValue>& global, const char *code, const char *filename = "");
 
@@ -347,8 +348,8 @@ EscValue Execute(ArrayMap<String, EscValue>& global, EscValue *self,
                  const char *name, Vector<EscValue>& arg, int oplimit = 50000);
 EscValue Execute(ArrayMap<String, EscValue>& global, const char *name, int oplimit = 50000);
 
-EscValue Evaluatex(const char *expression, ArrayMap<String, EscValue>& global, int oplimit = 50000);
-EscValue Evaluate(const char *expression, ArrayMap<String, EscValue>& global, int oplimit = 50000);
+EscValue Evaluatex(const String& expression, ArrayMap<String, EscValue>& global, int oplimit = 50000);
+EscValue Evaluate(const String& expression, ArrayMap<String, EscValue>& global, int oplimit = 50000);
 
 EscValue EscFromStdValue(const Value& v);
 Value    StdValueFromEsc(const EscValue& v);
@@ -384,6 +385,7 @@ String   Expand(const String& doc, ArrayMap<String, EscValue>& global,
 /////////////// VALUE
 
 #define LTIMING(x)  // RTIMING(x)
+#define RTIMING(x)
 
 String EscTypeName(int sv_type)
 {
@@ -1207,7 +1209,7 @@ EscValue Esc::ExecuteLambda(const String& id, EscValue lambda, SRVal self, Vecto
 	EscValue retval;
 	Array<EscValue> argvar;
 	if (l.escape) {
-		argvar = sub.var.PickValues();
+		sub.var.ClearAndPickValues(argvar);
 		for(int i = l.arg.GetCount(); i < arg.GetCount(); i++) {
 			argvar.Add(Get(arg[i]));
 		}
@@ -1227,7 +1229,7 @@ EscValue Esc::ExecuteLambda(const String& id, EscValue lambda, SRVal self, Vecto
 		}
 		sub.Run();
 		retval = sub.return_value;
-		argvar = sub.var.PickValues();
+		sub.var.ClearAndPickValues(argvar);
 	}
 	for(int i = 0; i < l.inout.GetCount(); i++)
 		if(l.inout[i] && i < arg.GetCount() && arg[i].lval)
@@ -1246,7 +1248,8 @@ void Esc::Subscript(SRVal& r, SRVal _self, String id)
 			if(Type(']'))
 				r.sbs.ArrayAdd(EscValue());
 			else {
-				EscValue v1, v2;
+				EscValue v1;
+				EscValue v2;
 				if(!IsType(',') && !IsType(':'))
 					v1 = GetExp();
 				if(Type(',')) {
@@ -1288,7 +1291,7 @@ void Esc::Subscript(SRVal& r, SRVal _self, String id)
 					if(Type(')')) break;
 					PassType(',');
 				}
-			if(!IsType('!', '=') && Type('!')) {
+			if(!IsType(TextProc::TK_INEQ) && Type('!')) {
 				Term(_self);
 				EscValue g = Get(_self);
 				if(!_self.lval || (!g.IsVoid() && !g.IsMap()))
@@ -1304,7 +1307,7 @@ void Esc::Subscript(SRVal& r, SRVal _self, String id)
 					r = ExecuteLambda(id, Get(r), _self, arg);
 				}
 				catch(Exc e) {
-					throw Error(NFormat("%s.%s(): %s", Get(r).GetTypeName(), id, e));
+					throw TextProc::InputExc(Formater("%s.%s(): %s")(Get(r).GetTypeName())(id)(e));
 				}
 		}
 		else
@@ -1325,39 +1328,44 @@ void Esc::Term(SRVal& r)
 
 	op_limit--;
 	TestLimit();
-	if(Type('0', 'x') || Char2('0', 'X')) {
-		r = ReadNumber64(16);
+	if(IsType(TextProc::TK_HEX)) {
+		r = (int64)HexInt(GetCurrent().GetString());
+		Next();
 		return;
 	}
-	if(Type('0', 'b') || Char2('0', 'B')) {
-		r = ReadNumber64(2);
+	if(IsType(TextProc::TK_BIN)) {
+		r = (int64)BinInt(GetCurrent().GetString());
+		Next();
 		return;
 	}
-	if(IsType('0', '.')) {
-		r = ReadDouble();
+	if(IsType(TextProc::TK_DOUBLE) || IsType(TextProc::TK_FLOAT)) {
+		r = StrDbl(GetCurrent().GetString());
+		Next();
 		return;
 	}
-	if(Type('0')) {
-		if (IsNumber())
-			r = ReadNumber64(8);
-		else
-			r = 0;
+	if(IsType(TextProc::TK_OCT)) {
+		r = (int64)OctInt(GetCurrent().GetString());
+		Next();
 		return;
 	}
-	if(IsNumber()) {
-		// TODO: int64 !
-		r = ReadDouble();
+	if(IsType(TextProc::TK_INTEGER)) {
+		r = StrInt64(GetCurrent().GetString());
+		Next();
 		return;
 	}
-	if(IsString()) {
-		r = EscValue(FromUtf8(ReadString()));
+	if(IsType(TextProc::TK_STRING)) {
+		r = SRVal(GetCurrent().GetString());
+		Next();
 		return;
 	}
-	if(IsType('\'')) {
-		WString s = FromUtf8(ReadString('\''));
-		if(s.GetLength() != 1)
+	if(IsType(TextProc::TK_CHAR)) {
+		String s = GetCurrent().GetString();
+		UnescapeNumbers(s);
+		WString ws = ToWString(s);
+		Next();
+		if(ws.GetCount() != 1)
 			ThrowError("invalid character literal");
-		r = (int64)s[0];
+		r = (int64)ws[0];
 		return;
 	}
 	if(Type('@')) {
@@ -1447,11 +1455,8 @@ void Esc::Term(SRVal& r)
 			r = _self;
 			r.sbs.ArrayAdd(id);
 		}
-		else
-		if(_global)
-			r.lval = &global.GetPut(id);
-		else
-			r.lval = &var.GetPut(id);
+		else if(_global)	r.lval = &global.GetAdd(id);
+		else				r.lval = &var.GetAdd(id);
 
 		RTIMING("Id2");
 		try {
@@ -2169,7 +2174,7 @@ void  Esc::DoStatement()
 			Pos stmt = GetPos();
 			for(;;) {
 				bool c = true;
-				if(cond.ptr) {
+				if(cond.Is()) {
 					SetPos(cond);
 					c = IsTrue(GetExp());
 				}
@@ -2180,7 +2185,7 @@ void  Esc::DoStatement()
 				}
 				DoStatement();
 				no_continue = true;
-				if(after.ptr) {
+				if(after.Is()) {
 					SetPos(after);
 					SRVal r;
 					Exp(r);

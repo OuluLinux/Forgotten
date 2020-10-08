@@ -2,6 +2,18 @@
 namespace Prim {
 
 
+template<class T> inline struct CRef {
+	T& value;
+	
+	
+	CRef() : value(0) {}
+	CRef(T& r) : value(r) {}
+	CRef(const CRef& r) : value(r.value) {}
+	operator T&() const {return value;}
+	T& Get() const {return value;}
+	bool operator==(const CRef& p) const {return &value == &p.value;}
+};
+
 template<class T> inline struct CPtr {
 	T* value;
 	
@@ -30,5 +42,6 @@ template<class T> T InlineIf(bool cond, T a, T b) {
 
 }
 
-#define InlineIf		Prim::InlineIf
+#define CRef			Prim::CRef
 #define CPtr			Prim::CPtr
+#define InlineIf		Prim::InlineIf

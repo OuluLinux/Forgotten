@@ -21,11 +21,11 @@ class Callback;
 
 namespace Indirect
 {
-#line 338 "../../src/Com/Indirect.fog"
+#line 340 "../../src/Com/Indirect.fog"
     inline void AddExitBlock(Callback cb);
-#line 337
+#line 339
     inline void AddInitBlock(Callback cb);
-#line 322
+#line 324
     inline Callback Proxy(Callback cb);
 };
 
@@ -35,16 +35,16 @@ template < class _1 > class Callback1;
 
 namespace Indirect
 {
-#line 326
+#line 328
     template < class _1 >
     inline Callback1 < _1 > Proxy_1(Callback1 < _1 > cb);
-#line 345
+#line 347
     void RunExitBlocks();
-#line 339
+#line 341
     void RunInitBlocks();
-#line 335
+#line 337
     inline Container::Vector < Callback > & __ExitBlocks();
-#line 334
+#line 336
     inline Container::Vector < Callback > & __InitBlocks();
     
     class CallBaseObject
@@ -110,7 +110,7 @@ namespace Indirect
 #line 128
         inline void operator= (const Callback& cb);
 #line 149
-        inline operator bool();
+        inline operator bool() const;
 #line 151
         inline Lang::int64 AsInt() const;
 #line 150
@@ -145,7 +145,7 @@ namespace Indirect
 #line 167
         inline void operator= (const Callback1& cb);
 #line 188
-        inline operator bool();
+        inline operator bool() const;
 #line 190
         inline Lang::int64 AsInt() const;
 #line 189
@@ -180,7 +180,7 @@ namespace Indirect
 #line 205
         inline void operator= (const Callback2& cb);
 #line 226
-        inline operator bool();
+        inline operator bool() const;
 #line 228
         inline Lang::int64 AsInt() const;
 #line 227
@@ -275,19 +275,19 @@ namespace Indirect
     
     struct Callexit
     {
-#line 357
+#line 359
         typedef void(*Fn)();
         
-#line 358
+#line 360
         inline Callexit(Fn fn);
     };
     
     struct Callinit
     {
-#line 352
+#line 354
         typedef void(*Fn)();
         
-#line 353
+#line 355
         inline Callinit(Fn fn);
     };
     
@@ -299,21 +299,26 @@ namespace Indirect
     public:
 #line 242
         inline ProxyCaller(const Callback& cb);
+#line 244
+        inline operator bool() const;
+#line 243
         virtual void Execute() const;
     };
     
     template < class _1 >
     class ProxyCaller1 : public Indirect::CallBase1 < _1 >
     {
-#line 248
         typedef Callback1 < _1 > Cb;
         
-#line 249
+#line 250
         const Cb *cb;
         
     public:
-#line 251
+#line 252
         inline ProxyCaller1(const Cb& cb);
+#line 254
+        inline operator bool() const;
+#line 253
         virtual void Execute(const _1& a0) const;
     };
     
@@ -330,11 +335,11 @@ namespace Indirect
     template < class _1 >
     struct callback
     {
-#line 266
+#line 268
         typedef _1 Cls;
         typedef void(Cls::*Fn)();
         
-#line 268
+#line 270
         Callback cb;
         
         inline callback(Fn fn, Cls *obj);
@@ -344,11 +349,11 @@ namespace Indirect
     template < class _1, class _2 >
     struct callback1
     {
-#line 286
+#line 288
         typedef _2 Cls;
         typedef void(Cls::*Fn)(_1);
         
-#line 288
+#line 290
         Callback cb;
         
         inline callback1(Fn fn, Cls *obj, _1 a0);
@@ -358,11 +363,11 @@ namespace Indirect
     template < class _1, class _2, class _3 >
     struct callback1_1
     {
-#line 296
+#line 298
         typedef _2 Cls;
         typedef void(Cls::*Fn)(_1, _3);
         
-#line 298
+#line 300
         Callback1 < _1 > cb;
         
         inline callback1_1(Fn fn, Cls *obj, _3 a1);
@@ -372,11 +377,11 @@ namespace Indirect
     template < class _1, class _2 >
     struct callback_1
     {
-#line 276
+#line 278
         typedef _2 Cls;
         typedef void(Cls::*Fn)(_1);
         
-#line 278
+#line 280
         Callback1 < _1 > cb;
         
         inline callback_1(Fn fn, Cls *obj);
@@ -386,11 +391,11 @@ namespace Indirect
     template < class _1, class _2, class _3 >
     struct callback_2
     {
-#line 306
+#line 308
         typedef _3 Cls;
         typedef void(Cls::*Fn)(_1, _2);
         
-#line 308
+#line 310
         Callback2 < _1, _2 > cb;
         
         inline callback_2(Fn fn, Cls *obj);
@@ -400,49 +405,49 @@ namespace Indirect
 
 namespace Indirect
 {
-#line 338
+#line 340
     inline void AddExitBlock(Callback cb)
     {
-#line 338
+#line 340
         __ExitBlocks() << cb;
     };
     
-#line 337
+#line 339
     inline void AddInitBlock(Callback cb)
     {
-#line 337
+#line 339
         __InitBlocks() << cb;
     };
     
-#line 322
+#line 324
     inline Callback Proxy(Callback cb)
     {
-#line 323
+#line 325
         return Callback(new ProxyCaller(cb));
     };
     
     template < class _1 >
     inline Callback1 < _1 > Proxy_1(Callback1 < _1 > cb)
     {
-#line 328
+#line 330
         return Callback1 < _1 > (new ProxyCaller1 < _1 > (cb));
     };
     
-#line 335
+#line 337
     inline Container::Vector < Callback > & __ExitBlocks()
     {
-#line 335
+#line 337
         static Container::Vector < Callback > v;
-#line 335
+#line 337
         return v;
     };
     
-#line 334
+#line 336
     inline Container::Vector < Callback > & __InitBlocks()
     {
-#line 334
+#line 336
         static Container::Vector < Callback > v;
-#line 334
+#line 336
         return v;
     };
     
@@ -498,7 +503,7 @@ namespace Indirect
     };
     
 #line 149
-    inline Callback::operator bool()
+    inline Callback::operator bool() const
     {
 #line 149
         return calls.GetCount();
@@ -557,7 +562,7 @@ namespace Indirect
     
 #line 188
     template < class _1 >
-    inline Callback1 < _1 >::operator bool()
+    inline Callback1 < _1 >::operator bool() const
     {
 #line 188
         return calls.GetCount();
@@ -618,7 +623,7 @@ namespace Indirect
     
 #line 226
     template < class _1, class _2 >
-    inline Callback2 < _1, _2 >::operator bool()
+    inline Callback2 < _1, _2 >::operator bool() const
     {
 #line 226
         return calls.GetCount();
@@ -640,17 +645,17 @@ namespace Indirect
         return "Callback2";
     };
     
-#line 358
+#line 360
     inline Callexit::Callexit(Fn fn)
     {
-#line 358
+#line 360
         AddExitBlock(Callback(fn));
     };
     
-#line 353
+#line 355
     inline Callinit::Callinit(Fn fn)
     {
-#line 353
+#line 355
         AddInitBlock(Callback(fn));
     };
     
@@ -660,12 +665,27 @@ namespace Indirect
         cb(&cb)
     {};
     
-#line 251
+#line 244
+    inline ProxyCaller::operator bool() const
+    {
+#line 244
+        return cb;
+    };
+    
+#line 252
     template < class _1 >
     inline ProxyCaller1 < _1 >::ProxyCaller1(const Cb& cb)
     :
         cb(&cb)
     {};
+    
+#line 254
+    template < class _1 >
+    inline ProxyCaller1 < _1 >::operator bool() const
+    {
+#line 254
+        return cb;
+    };
     
 #line 38
     inline StaticCaller::StaticCaller(void(*fn)())
@@ -673,83 +693,83 @@ namespace Indirect
         fn(fn)
     {};
     
-#line 270
+#line 272
     template < class _1 >
     inline callback < _1 >::callback(Fn fn, Cls *obj)
     {
-#line 270
+#line 272
         cb = Callback(new Caller < Cls > (fn, obj));
     };
     
-#line 271
+#line 273
     template < class _1 >
     inline callback < _1 >::operator Callback() const
     {
-#line 271
+#line 273
         return cb;
     };
     
-#line 290
+#line 292
     template < class _1, class _2 >
     inline callback1 < _1, _2 >::callback1(Fn fn, Cls *obj, _1 a0)
     {
-#line 290
+#line 292
         cb = Callback(new Caller_1 < _1, Cls > (fn, obj, a0));
     };
     
-#line 291
+#line 293
     template < class _1, class _2 >
     inline callback1 < _1, _2 >::operator Callback() const
     {
-#line 291
+#line 293
         return cb;
     };
     
-#line 300
+#line 302
     template < class _1, class _2, class _3 >
     inline callback1_1 < _1, _2, _3 >::callback1_1(Fn fn, Cls *obj, _3 a1)
     {
-#line 300
+#line 302
         cb = Callback1 < _1 > (new Caller1_1 < _1, Cls, _3 > (fn, obj, a1));
     };
     
-#line 301
+#line 303
     template < class _1, class _2, class _3 >
     inline callback1_1 < _1, _2, _3 >::operator Callback1 < _1 > () const
     {
-#line 301
+#line 303
         return cb;
     };
     
-#line 280
+#line 282
     template < class _1, class _2 >
     inline callback_1 < _1, _2 >::callback_1(Fn fn, Cls *obj)
     {
-#line 280
+#line 282
         cb = Callback1 < _1 > (new Caller1 < _1, Cls > (fn, obj));
     };
     
-#line 281
+#line 283
     template < class _1, class _2 >
     inline callback_1 < _1, _2 >::operator Callback1 < _1 > () const
     {
-#line 281
+#line 283
         return cb;
     };
     
-#line 310
+#line 312
     template < class _1, class _2, class _3 >
     inline callback_2 < _1, _2, _3 >::callback_2(Fn fn, Cls *obj)
     {
-#line 310
+#line 312
         cb = Callback2 < _1, _2 > (new Caller2 < _1, _2, Cls > (fn, obj));
     };
     
-#line 311
+#line 313
     template < class _1, class _2, class _3 >
     inline callback_2 < _1, _2, _3 >::operator Callback2 < _1, _2 > () const
     {
-#line 311
+#line 313
         return cb;
     };
     

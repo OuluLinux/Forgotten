@@ -583,6 +583,10 @@ auto declaration MakeMap(identifier Map, identifier Array, bool is_ptr_iter) {
 			keys.Clear();
 			values.Clear();
 		}
+		inline void ClearAndPickValues(${Array}<V>& a) {
+			Swap(a, values);
+			Clear();
+		}
 		
 		inline void operator <<=(const ${Map}& a) {
 			keys <<= a.keys;

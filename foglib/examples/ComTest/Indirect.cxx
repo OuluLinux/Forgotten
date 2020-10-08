@@ -9,25 +9,25 @@
 
 namespace Indirect
 {
-#line 345 "../../src/Com/Indirect.fog"
+#line 347 "../../src/Com/Indirect.fog"
     void RunExitBlocks()
     {
-#line 346
+#line 348
         Lang::FwdIterator < Callback > it = __ExitBlocks().Begin();
         Lang::FwdIterator < Callback > end = __ExitBlocks().End();
         for (; it != end; ++ it)
-#line 348
+#line 350
             it -> Execute();
     };
     
-#line 339
+#line 341
     void RunInitBlocks()
     {
-#line 340
+#line 342
         Lang::FwdIterator < Callback > it = __InitBlocks().Begin();
         Lang::FwdIterator < Callback > end = __InitBlocks().End();
         for (; it != end; ++ it)
-#line 342
+#line 344
             it -> Execute();
     };
     
@@ -280,11 +280,11 @@ namespace Indirect
         cb -> Execute();
     };
     
-#line 252
+#line 253
     template < class _1 >
     void ProxyCaller1 < _1 >::Execute(const _1& a0) const
     {
-#line 252
+#line 253
         cb -> Execute(a0);
     };
     

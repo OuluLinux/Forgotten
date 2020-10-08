@@ -146,7 +146,7 @@ public:
 	}
 
 	void operator()() const { Execute(); }
-	operator bool() {return calls.GetCount();}
+	operator bool() const {return calls.GetCount();}
 	String AsString() const {return "Callback";}
 	int64 AsInt() const {return calls.GetCount();}
 };
@@ -185,7 +185,7 @@ public:
 	}
 
 	void operator()(const A0& a0) const { Execute(a0); }
-	operator bool() {return calls.GetCount();}
+	operator bool() const {return calls.GetCount();}
 	String AsString() const {return "Callback1";}
 	int64 AsInt() const {return calls.GetCount();}
 };
@@ -223,7 +223,7 @@ public:
 	}
 
 	void operator()(const A0& a0, const A1& a1) const { Execute(a0, a1); }
-	operator bool() {return calls.GetCount();}
+	operator bool() const {return calls.GetCount();}
 	String AsString() const {return "Callback2";}
 	int64 AsInt() const {return calls.GetCount();}
 };
@@ -241,6 +241,7 @@ class ProxyCaller : public CallBase {
 public:
 	ProxyCaller(const Callback& cb) : cb(&cb) {}
 	virtual void Execute() const { cb->Execute(); }
+	operator bool() const {return cb;}
 };
 
 template <class A0>
@@ -250,6 +251,7 @@ class ProxyCaller1 : public CallBase1<A0> {
 public:
 	ProxyCaller1(const Cb& cb) : cb(&cb) {}
 	virtual void Execute(const A0& a0) const { cb->Execute(a0); }
+	operator bool() const {return cb;}
 };
 
 

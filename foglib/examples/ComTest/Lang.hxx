@@ -161,6 +161,27 @@ namespace Lang
     inline void Destruct(void *o);
 #line 43
     inline bool FitsInInt64(double x);
+#line 564
+    inline bool IsNull(const int16& v);
+    inline bool IsNull(const int32& v);
+    inline bool IsNull(const int64& v);
+#line 563
+    inline bool IsNull(const int8& v);
+#line 568
+    inline bool IsNull(const uint16& v);
+    inline bool IsNull(const uint32& v);
+    inline bool IsNull(const uint64& v);
+#line 567
+    inline bool IsNull(const uint8& v);
+#line 561
+    template < class _1 >
+    inline bool IsNull(const _1& o);
+#line 562
+    inline bool IsNull(const bool& v);
+#line 572
+    inline bool IsNull(const double& v);
+#line 571
+    inline bool IsNull(const float& v);
 #line 534
     template < class _1 >
     inline int NumberCompare__(const _1& a, const _1& b);
@@ -1013,6 +1034,91 @@ namespace Lang
     {
 #line 44
         return x >= - 9223372036854775808.0 && x < 9223372036854775808.0;
+    };
+    
+#line 564
+    inline bool IsNull(const int16& v)
+    {
+#line 564
+        return v == 0;
+    };
+    
+#line 565
+    inline bool IsNull(const int32& v)
+    {
+#line 565
+        return v == 0;
+    };
+    
+#line 566
+    inline bool IsNull(const int64& v)
+    {
+#line 566
+        return v == 0;
+    };
+    
+#line 563
+    inline bool IsNull(const int8& v)
+    {
+#line 563
+        return v == 0;
+    };
+    
+#line 568
+    inline bool IsNull(const uint16& v)
+    {
+#line 568
+        return v == 0;
+    };
+    
+#line 569
+    inline bool IsNull(const uint32& v)
+    {
+#line 569
+        return v == 0;
+    };
+    
+#line 570
+    inline bool IsNull(const uint64& v)
+    {
+#line 570
+        return v == 0;
+    };
+    
+#line 567
+    inline bool IsNull(const uint8& v)
+    {
+#line 567
+        return v == 0;
+    };
+    
+#line 561
+    template < class _1 >
+    inline bool IsNull(const _1& o)
+    {
+#line 561
+        return o.IsNull();
+    };
+    
+#line 562
+    inline bool IsNull(const bool& v)
+    {
+#line 562
+        return v == false;
+    };
+    
+#line 572
+    inline bool IsNull(const double& v)
+    {
+#line 572
+        return v == 0.0;
+    };
+    
+#line 571
+    inline bool IsNull(const float& v)
+    {
+#line 571
+        return v == 0.0f;
     };
     
 #line 534

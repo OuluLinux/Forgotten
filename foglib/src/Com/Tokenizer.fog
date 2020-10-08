@@ -12,6 +12,7 @@ enum {
 	FP_EXP,
 	FP_F,
 	FP_END,
+	FP_BIN,
 	FP_OCTHEX,
 	FP_OCT,
 	FP_HEX
@@ -52,6 +53,7 @@ enum {
 	
 	TK_ID = 1000,
 	TK_INTEGER,
+	TK_BIN,
 	TK_HEX,
 	TK_OCT,
 	TK_FLOAT,
@@ -144,6 +146,7 @@ struct Token {
 			case TK_NEWLINE: return "newline";
 			case TK_BLOCK_COMMENT: return "block-comment";
 			case TK_COMMENT: return "comment";
+			case TK_BIN: return "binary-number";
 			case TK_HEX: return "hex-number";
 			case TK_OCT: return "oct-number";
 			case TK_INVALID: return "invalid";
@@ -194,6 +197,7 @@ struct Token {
 			case TK_NEWLINE: return "\n";
 			case TK_BLOCK_COMMENT: return (String)"/* " + str_value + "*/";
 			case TK_COMMENT: return (String)"// " + str_value;
+			case TK_BIN: return str_value;
 			case TK_HEX: return str_value;
 			case TK_OCT: return str_value;
 			case TK_DOLLARSIGN: return "$";
@@ -256,14 +260,21 @@ public:
 	
 };
 
+struct Pos {
+	int pos = -1;
+	Pos() {}
+	Pos(const Pos& p) : pos(p.pos) {}
+	bool Is() const {return pos >= 0;}
+};
 
 class CBase {
+	typedef TextProc::Tokenizer Toknzr;
+	
 	const Vector<Token>* tokens = NULL;
 	int pos = 0;
 	
 	bool ignore_newline = true;
 	
-	typedef TextProc::Tokenizer Toknzr;
 	One<Toknzr> t;
 public:
 	typedef CBase CLASSNAME;
@@ -283,6 +294,8 @@ public:
 	int GetTokenCount() const {if (tokens) return tokens->GetCount(); else return 0;}
 	int GetTokenPos() const {return pos;}
 	FileLocation GetLocation() const;
+	Pos GetPos() {Pos p; p.pos = pos; return p;}
+	void SetPos(const Pos& p) {ASSERT(tokens && p.pos >= 0 && p.pos < tokens->GetCount()); pos = p.pos;}
 	
 	String ReadId();
 	int ReadInt();
@@ -469,7 +482,11 @@ bool Tokenizer::Load(String str, String path) {
 					}
 				}
 				else if (exp == FP_OCTHEX) {
-					if (chr == 'x' || chr == 'X') {
+					if (chr == 'b' || chr == 'B') {
+						exp = FP_BIN;
+						cat = true;
+					}
+					else if (chr == 'x' || chr == 'X') {
 						exp = FP_HEX;
 						cat = true;
 					}
@@ -506,10 +523,9 @@ bool Tokenizer::Load(String str, String path) {
 			
 			tk.str_value = n;
 			
-			if (exp == FP_HEX)
-				tk.type = TK_HEX;
-			else if (exp == FP_OCT)
-				tk.type = TK_OCT;
+			if      (exp == FP_BIN)		tk.type = TK_BIN;
+			else if (exp == FP_HEX)		tk.type = TK_HEX;
+			else if (exp == FP_OCT)		tk.type = TK_OCT;
 			else if (is_double) {
 				if (!is_float)
 					tk.type = TK_DOUBLE;
@@ -923,12 +939,10 @@ String CBase::ReadId() {
 int CBase::ReadInt() {
 	const Token& tk = GetCurrent();
 	pos++;
-	if (tk.IsType(TK_OCT))
-		return OctInt(tk.str_value);
-	if (tk.IsType(TK_HEX))
-		return HexInt(tk.str_value);
-	if (tk.IsType(TK_INTEGER))
-		return StrInt(tk.str_value);
+	if (tk.IsType(TextProc::TK_BIN))		return BinInt(tk.str_value);
+	if (tk.IsType(TextProc::TK_OCT))		return OctInt(tk.str_value);
+	if (tk.IsType(TextProc::TK_HEX))		return HexInt(tk.str_value);
+	if (tk.IsType(TextProc::TK_INTEGER))	return StrInt(tk.str_value);
 	pos--;
 	throw InputExc("Token is not int");
 }
@@ -983,3 +997,4 @@ bool CBase::IsType(int i) const {
 
 
 #define CParser			TextProc::CBase
+#define Pos				TextProc::Pos

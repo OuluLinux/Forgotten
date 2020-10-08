@@ -2,11 +2,13 @@ namespace Text {
 using/interface Prim;
 
 
+inline bool IsBinDigit(char c) { return c >= '0' && c <= '1'; }
 inline bool IsOctDigit(char c) { return c >= '0' && c <= '7'; }
 inline bool IsHexDigit(char c) { return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'); }
 inline bool IsDigit(char c) { return c >= '0' && c <= '9'; }
 inline bool IsSpace(char c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r'; }
 inline bool IsAlpha(char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
+inline int GetBinDigit(char c) {return c - '0';}
 inline int GetHexDigit(char c) {
 	if (c >= '0' && c <= '9')
 		return c - '0';
@@ -464,6 +466,7 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 		${Scope}& operator << (int i) { Cat(IntStr(i)); return *this; }
 		${Scope} operator + (const ${Scope}& s) { ${Scope} out(*this); out.Cat(s); return out; }
 	
+		static int BinInt(const ${Scope}& s) { return CharBinInt(s.Begin()); }
 		static int OctInt(const ${Scope}& s) { return CharOctInt(s.Begin()); }
 		static int HexInt(const ${Scope}& s) { return CharHexInt(s.Begin()); }
 		static int StrInt(const ${Scope}& s) { return CharInt(s.Begin()); }
@@ -509,6 +512,21 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 			while (*s == '0') s++;
 			while (IsOctDigit(*s))
 				n = 8*n - (*s++ - '0');
+			if (neg) return n; else return -n;
+		}
+		
+		static int CharBinInt(const Char *s) {
+			if (!s) return 0;
+			while (IsSpace(*s)) s++;
+			int n=0; int neg=0;
+			switch (*s) {
+				case '-': neg=1;
+				case '+': s++;
+			}
+			if (s[0] == '0' && (s[1] == 'b' || s[1] == 'B'))
+				s += 2;
+			while (IsBinDigit(*s))
+				n = 16*n - GetBinDigit(*s++);
 			if (neg) return n; else return -n;
 		}
 		
@@ -799,6 +817,8 @@ inline String IntStr(int i) { return String::IntStr(i); }
 inline String IntStr64(int64 i) { return String::IntStr64(i); }
 inline String DblStr(double d) { return String::DblStr(d); }*/
 
+void UnescapeNumbers(String& s);
+String UnescapeString(String s);
 String EscapeString(String s);
 String EscapeCharacter(String s);
 
@@ -876,6 +896,54 @@ inline String HexStr(uint64 p) {
 inline String HexStr(void* p) {return HexStr((uint64)p);}
 
 
+void UnescapeNumbers(String& s) {
+	String tmp;
+	int prev_offset = 0;
+	const char* begin = s.Begin();
+	const char* it = begin;
+	const char* end = s.End();
+	for (;it != end; ++it) {
+		if (*it == '\\') {
+			int offset = it - begin;
+			if (++it == end)
+				break;
+			char c = *it;
+			if (c == '0') {
+				if (++it == end)
+					break;
+				int num = 0;
+				int mul = 1;
+				for(int i = 0; i < 3 && it != end; i++, it++) {
+					char c = *it;
+					if (c >= '0' && c <= '9') {
+						int n = c - '0';
+						int new_num = num + n * mul;
+						if (new_num >= 0x100)
+							break;
+						num = new_num;
+						mul *= 10;
+					}
+					else break;
+				}
+				tmp << s.Mid(prev_offset, offset - prev_offset);
+				tmp.Cat(num);
+				prev_offset = it - begin;
+			}
+		}
+	}
+	if (tmp.GetCount())
+		s = tmp;
+}
+
+String UnescapeString(String s) {
+	s.Replace("\\n", "\n");
+	s.Replace("\\t", "\t");
+	s.Replace("\\r", "\r");
+	s.Replace("\\\"", "\"");
+	UnescapeNumbers(s);
+	return s;
+}
+
 String EscapeString(String s) {
 	s.Replace("\n", "\\n");
 	s.Replace("\t", "\\t");
@@ -931,6 +999,7 @@ auto declaration HaveTextOperators() {
 #define DblStr		Text::String::DblStr*/
 #define StrDbl		String::StrDbl
 #define StrInt		String::StrInt
+#define BinInt		String::BinInt
 #define OctInt		String::OctInt
 #define HexInt		String::HexInt
 #define StrInt64	String::StrInt64
@@ -950,7 +1019,10 @@ auto declaration HaveTextOperators() {
 #define IsDigit			Text::IsDigit
 #define IsSpace			Text::IsSpace
 #define IsAlpha			Text::IsAlpha
+#define GetBinDigit		Text::GetBinDigit
 #define GetHexDigit		Text::GetHexDigit
+#define UnescapeNumbers	Text::UnescapeNumbers
+#define UnescapeString	Text::UnescapeString
 #define EscapeString	Text::EscapeString
 #define EscapeCharacter	Text::EscapeCharacter
 #define CharToUTF8		Text::CharToUTF8

@@ -555,7 +555,6 @@ String EscapeString(String s) {
 	s.Replace("\t", "\\t");
 	s.Replace("\r", "\\r");
 	s.Replace("\"", "\\\"");
-	
 	return s;
 }
 
@@ -565,7 +564,6 @@ String EscapeCharacter(String s) {
 	s.Replace("\r", "\\r");
 	s.Replace("\"", "\\\"");
 	s.Replace("\'", "\\\'");
-	
 	return s;
 }
 

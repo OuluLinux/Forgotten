@@ -9,7 +9,7 @@
 
 namespace TextProc
 {
-#line 270 "../../src/Com/Tokenizer.fog"
+#line 281 "../../src/Com/Tokenizer.fog"
     CBase::CBase()
     :
         tokens(0),
@@ -17,36 +17,36 @@ namespace TextProc
         ignore_newline(true)
     {};
     
-#line 271
+#line 282
     CBase::CBase(Text::String s)
     :
         tokens(0),
         pos(0),
         ignore_newline(true)
     {
-#line 271
+#line 282
         t.Create();
-#line 271
+#line 282
         t -> Load(s, "cparser");
-#line 271
+#line 282
         Load(t -> GetTokens());
     };
     
-#line 272
+#line 283
     CBase::CBase(const Container::Vector < Token > & tokens)
     :
         tokens(0),
         pos(0),
         ignore_newline(true)
     {
-#line 272
+#line 283
         Load(tokens);
     };
     
-#line 895
+#line 911
     const Token& CBase::GetCurrent() const
     {
-#line 896
+#line 912
         if (!tokens)
             throw InputExc("No token vector set");
         if (pos < 0 || pos >= tokens -> GetCount())
@@ -54,128 +54,139 @@ namespace TextProc
         return(*tokens)[pos];
     };
     
-#line 911
+#line 927
     TextProc::FileLocation CBase::GetLocation() const
     {
-#line 912
+#line 928
         return GetCurrent().loc;
     };
     
-#line 283
+#line 297
+    Pos CBase::GetPos()
+    {
+#line 297
+        Pos p;
+#line 297
+        p.pos = pos;
+#line 297
+        return p;
+    };
+    
+#line 294
     int CBase::GetTokenCount() const
     {
-#line 283
+#line 294
         if (tokens)
-#line 283
+#line 294
             return tokens -> GetCount();
         else
-#line 283
+#line 294
             return 0;
     };
     
-#line 943
+#line 957
     bool CBase::Id(Text::String id)
     {
-#line 944
+#line 958
         const Token & tk = GetCurrent();
         if (tk.IsType(TK_ID) && tk.str_value == id)
         {
-#line 946
+#line 960
             pos ++ ;
             return true;
         }
         return false;
     };
     
-#line 903
+#line 919
     void CBase::IgnoreNewline(bool b)
     {
-#line 904
+#line 920
         ignore_newline = b;
     };
     
     bool CBase::IsEnd() const
     {
-#line 908
+#line 924
         return !tokens || pos >= tokens -> GetCount();
     };
     
-#line 970
+#line 984
     bool CBase::IsId() const
     {
-#line 971
+#line 985
         return GetCurrent().IsType(TK_ID);
     };
     
     bool CBase::IsInt() const
     {
-#line 975
+#line 989
         return GetCurrent().IsType(TK_INTEGER);
     };
     
     bool CBase::IsType(int i) const
     {
-#line 979
+#line 993
         return GetCurrent().IsType(i);
     };
     
-#line 890
+#line 906
     void CBase::Load(const Container::Vector < Token > & tokens)
     {
-#line 891
+#line 907
         this -> tokens = &tokens;
         pos = 0;
     };
     
-#line 961
+#line 975
     bool CBase::Newline()
     {
-#line 962
+#line 976
         const Token & tk = GetCurrent();
         if (tk.IsType(TK_NEWLINE))
         {
-#line 964
+#line 978
             pos ++ ;
             return true;
         }
         return false;
     };
     
-#line 295
+#line 308
     void CBase::PassId(Text::String s)
     {
-#line 296
+#line 309
         if (IsType(TextProc::TK_ID) && GetCurrent().GetString() == s)
             Next();
         else
             throw InputExc((Text::String)"Expected id '" + s + "'");
     };
     
-#line 936
+#line 950
     void CBase::PassNewline()
     {
-#line 937
+#line 951
         const Token & tk = GetCurrent();
         if (tk.IsType(TK_NEWLINE))
             throw InputExc("Token is not newline");
         pos ++ ;
     };
     
-#line 294
+#line 307
     void CBase::PassType(int i)
     {
-#line 294
+#line 307
         if (!Type(i))
         {
-#line 294
+#line 307
             throw InputExc((Text::String)"Expected type '" + Token::StaticGetTypeString(i) + "'");
         }
     };
     
-#line 915
+#line 931
     Text::String CBase::ReadId()
     {
-#line 916
+#line 932
         const Token & tk = GetCurrent();
         if (!tk.IsType(TK_ID))
             throw InputExc("Token is not id");
@@ -185,27 +196,50 @@ namespace TextProc
     
     int CBase::ReadInt()
     {
-#line 924
+#line 940
         const Token & tk = GetCurrent();
         pos ++ ;
-        if (tk.IsType(TK_OCT))
+        if (tk.IsType(TextProc::TK_BIN))
+#line 942
+            return Text::String::BinInt(tk.str_value);
+        if (tk.IsType(TextProc::TK_OCT))
+#line 943
             return Text::String::OctInt(tk.str_value);
-        if (tk.IsType(TK_HEX))
+        if (tk.IsType(TextProc::TK_HEX))
+#line 944
             return Text::String::HexInt(tk.str_value);
-        if (tk.IsType(TK_INTEGER))
+        if (tk.IsType(TextProc::TK_INTEGER))
+#line 945
             return Text::String::StrInt(tk.str_value);
         pos -- ;
         throw InputExc("Token is not int");
     };
     
-#line 952
+#line 298
+    void CBase::SetPos(const Pos& p)
+    {
+        {
+#line 298
+            if (!(tokens && p.pos >= 0 && p.pos < tokens -> GetCount()))
+            {
+#line 298
+                Lang::SysBreak("Assertion failed: tokens && p.pos >= 0 && p.pos < tokens->GetCount()");
+            }
+        }
+#line 298
+        ;
+#line 298
+        pos = p.pos;
+    };
+    
+#line 966
     bool CBase::Type(int i)
     {
-#line 953
+#line 967
         const Token & tk = GetCurrent();
         if (tk.IsType(i))
         {
-#line 955
+#line 969
             pos ++ ;
             return true;
         }
@@ -529,318 +563,324 @@ namespace TextProc
         this -> msg = msg;
     };
     
-#line 101 "../../src/Com/Tokenizer.fog"
+#line 103 "../../src/Com/Tokenizer.fog"
     Token::Token()
     :
         type(0),
         spaces(0)
     {};
     
-#line 102
+#line 104
     Token::Token(const Token& t)
     :
         type(0),
         spaces(0)
     {
-#line 102
+#line 104
         *this = t;
     };
     
-#line 103
+#line 105
     void Token::operator= (const Token& t)
     {
-#line 103
+#line 105
         type = t.type;
-#line 103
+#line 105
         str_value = t.str_value;
-#line 103
+#line 105
         loc = t.loc;
-#line 103
+#line 105
         end = t.end;
-#line 103
+#line 105
         spaces = t.spaces;
     };
     
-#line 104
+#line 106
     bool Token::operator== (const Token& t) const
     {
-#line 104
+#line 106
         return t.type == type && t.str_value == str_value && t.loc == loc && end == t.end && t.spaces == spaces;
     };
     
-#line 154
+#line 157
     Text::String Token::AsString() const
     {
-#line 155
+#line 158
         Text::String s = GetTypeString() + ": " + Text::EscapeString(GetTextValue());
         return s;
     };
     
     Text::String Token::StaticGetTextValue(int type, Text::String str_value)
     {
-#line 160
+#line 163
         switch (type)
         {
-#line 161
+#line 164
             case TK_UNKNOWN:
-#line 161
+#line 164
                 return "";
             case TK_ID:
-#line 162
-                return str_value;
-            case TK_INTEGER:
-#line 163
-                return str_value;
-            case TK_FLOAT:
-#line 164
-                return str_value;
-            case TK_DOUBLE:
 #line 165
                 return str_value;
-            case TK_EXCLAMATION:
+            case TK_INTEGER:
 #line 166
+                return str_value;
+            case TK_FLOAT:
+#line 167
+                return str_value;
+            case TK_DOUBLE:
+#line 168
+                return str_value;
+            case TK_EXCLAMATION:
+#line 169
                 return "!";
             case TK_STRING:
-#line 167
+#line 170
                 return(Text::String)"\"" + Text::EscapeString(str_value) + "\"";
             case TK_NUMBERSIGN:
-#line 168
+#line 171
                 return "#";
             case TK_PERCENT:
-#line 169
+#line 172
                 return "%";
             case TK_AMPERSAND:
-#line 170
+#line 173
                 return "&";
             case TK_BRACKET_BEGIN:
-#line 171
+#line 174
                 return "{";
             case TK_BRACKET_END:
-#line 172
+#line 175
                 return "}";
             case TK_DIV:
-#line 173
+#line 176
                 return "/";
             case TK_PARENTHESIS_BEGIN:
-#line 174
+#line 177
                 return "(";
             case TK_PARENTHESIS_END:
-#line 175
+#line 178
                 return ")";
             case TK_SQUARE_BEGIN:
-#line 176
+#line 179
                 return "[";
             case TK_SQUARE_END:
-#line 177
+#line 180
                 return "]";
             case TK_ASS:
-#line 178
+#line 181
                 return "=";
             case TK_QUESTION:
-#line 179
+#line 182
                 return "\?";
             case TK_PLUS:
-#line 180
+#line 183
                 return "+";
             case TK_SOLIDUS:
-#line 181
+#line 184
                 return "\\";
             case TK_ACCENT:
-#line 182
+#line 185
                 return "^";
             case TK_TILDE:
-#line 183
+#line 186
                 return "~";
             case TK_MUL:
-#line 184
+#line 187
                 return "*";
             case TK_CHAR:
-#line 185
+#line 188
                 return(Text::String)"'" + Text::EscapeString(str_value) + "'";
             case TK_OR:
-#line 186
+#line 189
                 return "|";
             case TK_MINUS:
-#line 187
+#line 190
                 return "-";
             case TK_SEMICOLON:
-#line 188
+#line 191
                 return ";";
             case TK_COMMA:
-#line 189
+#line 192
                 return ",";
             case TK_PUNCT:
-#line 190
+#line 193
                 return ".";
             case TK_COLON:
-#line 191
+#line 194
                 return ":";
             case TK_LESS:
-#line 192
+#line 195
                 return "<";
             case TK_GREATER:
-#line 193
+#line 196
                 return ">";
             case TK_NEWLINE:
-#line 194
+#line 197
                 return "\n";
             case TK_BLOCK_COMMENT:
-#line 195
+#line 198
                 return(Text::String)"/* " + str_value + "*/";
             case TK_COMMENT:
-#line 196
+#line 199
                 return(Text::String)"// " + str_value;
+            case TK_BIN:
+#line 200
+                return str_value;
             case TK_HEX:
-#line 197
+#line 201
                 return str_value;
             case TK_OCT:
-#line 198
+#line 202
                 return str_value;
             case TK_DOLLARSIGN:
-#line 199
+#line 203
                 return "$";
             case TK_EOF:
-#line 200
+#line 204
                 return "EOF";
             default:
-#line 201
+#line 205
                 Util::Panic("Unhandled token type");
         }
         return "";
     };
     
-#line 109
+#line 111
     Text::String Token::StaticGetTypeString(int type)
     {
-#line 110
+#line 112
         switch (type)
         {
-#line 111
+#line 113
             case TK_UNKNOWN:
-#line 111
+#line 113
                 return "<unknown>";
             case TK_ID:
-#line 112
+#line 114
                 return "id";
             case TK_INTEGER:
-#line 113
+#line 115
                 return "integer";
             case TK_FLOAT:
-#line 114
+#line 116
                 return "float";
             case TK_DOUBLE:
-#line 115
+#line 117
                 return "double";
             case TK_EXCLAMATION:
-#line 116
+#line 118
                 return "exclamation";
             case TK_STRING:
-#line 117
+#line 119
                 return "string";
             case TK_NUMBERSIGN:
-#line 118
+#line 120
                 return "number-sign";
             case TK_PERCENT:
-#line 119
+#line 121
                 return "percent";
             case TK_AMPERSAND:
-#line 120
+#line 122
                 return "ampersand";
             case TK_DIV:
-#line 121
+#line 123
                 return "divide";
             case TK_BRACKET_BEGIN:
-#line 122
+#line 124
                 return "bracket-begin";
             case TK_BRACKET_END:
-#line 123
+#line 125
                 return "bracket-end";
             case TK_PARENTHESIS_BEGIN:
-#line 124
+#line 126
                 return "parenthesis-begin";
             case TK_PARENTHESIS_END:
-#line 125
+#line 127
                 return "parenthesis-end";
             case TK_SQUARE_BEGIN:
-#line 126
+#line 128
                 return "square-begin";
             case TK_SQUARE_END:
-#line 127
+#line 129
                 return "square-end";
             case TK_ASS:
-#line 128
+#line 130
                 return "assign";
             case TK_QUESTION:
-#line 129
+#line 131
                 return "question-mark";
             case TK_PLUS:
-#line 130
+#line 132
                 return "plus";
             case TK_SOLIDUS:
-#line 131
+#line 133
                 return "solidus";
             case TK_ACCENT:
-#line 132
+#line 134
                 return "accent";
             case TK_TILDE:
-#line 133
+#line 135
                 return "tilde";
             case TK_MUL:
-#line 134
+#line 136
                 return "multiply";
             case TK_CHAR:
-#line 135
+#line 137
                 return "char";
             case TK_OR:
-#line 136
+#line 138
                 return "or";
             case TK_MINUS:
-#line 137
+#line 139
                 return "minus";
             case TK_SEMICOLON:
-#line 138
+#line 140
                 return "semicolon";
             case TK_COMMA:
-#line 139
+#line 141
                 return "comma";
             case TK_PUNCT:
-#line 140
+#line 142
                 return "punct";
             case TK_COLON:
-#line 141
+#line 143
                 return "colon";
             case TK_LESS:
-#line 142
+#line 144
                 return "less";
             case TK_GREATER:
-#line 143
+#line 145
                 return "greater";
             case TK_NEWLINE:
-#line 144
+#line 146
                 return "newline";
             case TK_BLOCK_COMMENT:
-#line 145
+#line 147
                 return "block-comment";
             case TK_COMMENT:
-#line 146
+#line 148
                 return "comment";
+            case TK_BIN:
+#line 149
+                return "binary-number";
             case TK_HEX:
-#line 147
+#line 150
                 return "hex-number";
             case TK_OCT:
-#line 148
+#line 151
                 return "oct-number";
             case TK_INVALID:
-#line 149
+#line 152
                 return "invalid";
             case TK_EOF:
-#line 150
+#line 153
                 return "end-of-file";
         }
         return "";
     };
     
-#line 324
+#line 337
     Tokenizer::Tokenizer()
     :
         cursor(0),
@@ -851,10 +891,10 @@ namespace TextProc
         tab_size(4)
     {};
     
-#line 328
+#line 341
     Token& Tokenizer::Add(int token_id)
     {
-#line 329
+#line 342
         struct Token & t = tokens.Add();
         t.loc = loc;
         t.end = loc;
@@ -863,233 +903,233 @@ namespace TextProc
         return t;
     };
     
-#line 227
+#line 231
     void Tokenizer::AddError(TextProc::FileLocation loc, Text::String msg)
     {
-#line 227
+#line 231
         messages.Add().Set("Tokenizer", loc, PROCMSG_ERROR, msg);
     };
     
-#line 228
+#line 232
     void Tokenizer::AddWarning(TextProc::FileLocation loc, Text::String msg)
     {
-#line 228
+#line 232
         messages.Add().Set("Tokenizer", loc, PROCMSG_WARNING, msg);
     };
     
-#line 818
+#line 834
     void Tokenizer::AppendString(Text::String& s)
     {
-#line 819
+#line 835
         int chr = input[cursor];
         if (chr == '\\')
         {
-#line 821
+#line 837
             int chr1;
             if (cursor + 1 < input.GetCount())
-#line 822
+#line 838
                 chr1 = input[cursor + 1];
             else
-#line 823
+#line 839
                 chr1 = 0;
             if (chr1 == '\'')
             {
-#line 825
+#line 841
                 Next();
-#line 825
+#line 841
                 Next();
                 s.Cat(0x27);
             }
             else 
-#line 828
+#line 844
             if (chr1 == '"')
             {
-#line 829
+#line 845
                 Next();
-#line 829
+#line 845
                 Next();
                 s.Cat(0x22);
             }
             else 
-#line 832
+#line 848
             if (chr1 == '\?')
             {
-#line 833
+#line 849
                 Next();
-#line 833
+#line 849
                 Next();
                 s.Cat(0x3F);
             }
             else 
-#line 836
+#line 852
             if (chr1 == '\\')
             {
-#line 837
+#line 853
                 Next();
-#line 837
+#line 853
                 Next();
                 s.Cat(0x5c);
             }
             else 
-#line 840
+#line 856
             if (chr1 == 'a')
             {
-#line 841
+#line 857
                 Next();
-#line 841
+#line 857
                 Next();
                 s.Cat(0x07);
             }
             else 
-#line 844
+#line 860
             if (chr1 == 'b')
             {
-#line 845
+#line 861
                 Next();
-#line 845
+#line 861
                 Next();
                 s.Cat(0x08);
             }
             else 
-#line 848
+#line 864
             if (chr1 == 'f')
             {
-#line 849
+#line 865
                 Next();
-#line 849
+#line 865
                 Next();
                 s.Cat(0x0c);
             }
             else 
-#line 852
+#line 868
             if (chr1 == 'n')
             {
-#line 853
+#line 869
                 Next();
-#line 853
+#line 869
                 Next();
                 s.Cat(0x0a);
             }
             else 
-#line 856
+#line 872
             if (chr1 == 'r')
             {
-#line 857
+#line 873
                 Next();
-#line 857
+#line 873
                 Next();
                 s.Cat(0x0d);
             }
             else 
-#line 860
+#line 876
             if (chr1 == 't')
             {
-#line 861
+#line 877
                 Next();
-#line 861
+#line 877
                 Next();
                 s.Cat(0x09);
             }
             else 
-#line 864
+#line 880
             if (chr1 == 'v')
             {
-#line 865
+#line 881
                 Next();
-#line 865
+#line 881
                 Next();
                 s.Cat(0x0b);
             }
             else
             {
-#line 869
+#line 885
                 s.Cat(chr);
                 Next();
             }
         }
         else
         {
-#line 874
+#line 890
             s.Cat(chr);
             Next();
         }
     };
     
-#line 238
+#line 242
     void Tokenizer::Dump() const
     {
         {
             {
-#line 238
+#line 242
                 Util::Log() << "tokens" << " {" << "\n";
-#line 238
+#line 242
                 Util::Log().Flush();
             }
-#line 238
+#line 242
             ;
-#line 238
+#line 242
             for (int i = 0; i < tokens.GetCount(); i ++ )
                 {
-#line 238
+#line 242
                     Util::Log() << "\t[" << i << "]: " << Text::ToString(tokens[i]) << "\n";
-#line 238
+#line 242
                     Util::Log().Flush();
                 }
-#line 238
+#line 242
             ;
             {
-#line 238
+#line 242
                 Util::Log() << "}" << "\n";
-#line 238
+#line 242
                 Util::Log().Flush();
             }
-#line 238
+#line 242
             ;
         }
-#line 238
+#line 242
         ;
     };
     
-#line 348
+#line 361
     bool Tokenizer::IsToken(int tk)
     {
-#line 349
+#line 362
         if (pass_cursor >= tokens.GetCount())
-#line 349
+#line 362
             return false;
         return tokens[pass_cursor].type == tk;
     };
     
-#line 379
+#line 392
     bool Tokenizer::Load(Text::String str, Text::String path)
     {
-#line 380
+#line 393
         input = str;
-#line 382
+#line 395
         loc.file = path;
         loc.line = 1;
         loc.col = 1;
-#line 386
+#line 399
         cursor = 0;
-#line 388
+#line 401
         while (cursor < input.GetCount())
             {
-#line 389
+#line 402
                 int chr = input[cursor];
-#line 391
+#line 404
                 if (Text::IsAlpha(chr) || chr == '_')
                 {
-#line 392
+#line 405
                     Token & t = Add(TK_ID);
                     t.str_value.Cat(chr);
                     Next();
                     while (cursor < input.GetCount())
                         {
-#line 396
+#line 409
                             int chr = input[cursor];
                             if (Text::IsAlpha(chr) || chr == '_' || Text::IsDigit(chr))
                             {
-#line 398
+#line 411
                                 t.str_value.Cat(chr);
                                 Next();
                             }
@@ -1097,230 +1137,245 @@ namespace TextProc
                                 break;
                         
                         }
-#line 404
+#line 417
                     t.end = loc;
                 }
                 else 
-#line 406
+#line 419
                 if (Text::IsDigit(chr))
                 {
-#line 407
+#line 420
                     Text::String n;
                     if (skip_separateunary && tokens.GetCount())
                     {
-#line 409
+#line 422
                         while (tokens.GetCount() && tokens.Top().IsType(TK_MINUS))
                             {
-#line 410
+#line 423
                                 tokens.Pop();
                                 n.Cat('-');
                             }
                         while (tokens.GetCount() && tokens.Top().IsType(TK_PLUS))
                             {
-#line 414
+#line 427
                                 tokens.Pop();
                             }
                     }
                     Token & tk = Add(TK_INTEGER);
                     bool is_double = false;
-#line 418
+#line 431
                     bool is_float = false;
                     n.Cat(chr);
                     Next();
                     int exp;
                     if (chr == '0')
-#line 422
+#line 435
                         exp = FP_OCTHEX;
                     else
-#line 423
+#line 436
                         exp = FP_INT;
                     while (cursor < input.GetCount())
                         {
-#line 425
+#line 438
                             int chr = input[cursor];
                             bool cat = false;
-#line 428
+#line 441
                             if (exp == FP_INT)
                             {
-#line 429
+#line 442
                                 if (Text::IsDigit(chr))
                                     cat = true;
                                 else 
-#line 431
+#line 444
                                 if (chr == '.')
                                 {
-#line 432
+#line 445
                                     exp = FP_FRAC;
                                     cat = true;
                                     is_double = true;
                                 }
                                 else 
-#line 436
+#line 449
                                 if (chr == 'e' || chr == 'E')
                                 {
-#line 437
+#line 450
                                     exp = FP_SIGN;
                                     cat = true;
                                     is_double = true;
                                 }
                             }
                             else 
-#line 442
+#line 455
                             if (exp == FP_FRAC)
                             {
-#line 443
+#line 456
                                 if (Text::IsDigit(chr))
                                     cat = true;
                                 else 
-#line 445
+#line 458
                                 if (chr == 'e' || chr == 'E')
                                 {
-#line 446
+#line 459
                                     exp = FP_SIGN;
                                     cat = true;
                                     is_double = true;
                                 }
                             }
                             else 
-#line 451
+#line 464
                             if (exp == FP_SIGN)
                             {
-#line 452
+#line 465
                                 if (chr == '+' || chr == '-' || Text::IsDigit(chr))
                                 {
-#line 453
+#line 466
                                     exp = FP_EXP;
                                     cat = true;
                                 }
                                 else 
-#line 456
+#line 469
                                 if (chr == 'f' || chr == 'F')
                                 {
-#line 457
+#line 470
                                     exp = FP_END;
                                     cat = true;
                                     is_float = true;
                                 }
                             }
                             else 
-#line 462
+#line 475
                             if (exp == FP_EXP)
                             {
-#line 463
+#line 476
                                 if (Text::IsDigit(chr))
                                     cat = true;
                                 else 
-#line 465
+#line 478
                                 if (chr == 'f' || chr == 'F')
                                 {
-#line 466
+#line 479
                                     exp = FP_END;
                                     cat = true;
                                     is_float = true;
                                 }
                             }
                             else 
-#line 471
+#line 484
                             if (exp == FP_OCTHEX)
                             {
-#line 472
+#line 485
+                                if (chr == 'b' || chr == 'B')
+                                {
+#line 486
+                                    exp = FP_BIN;
+                                    cat = true;
+                                }
+                                else 
+#line 489
                                 if (chr == 'x' || chr == 'X')
                                 {
-#line 473
+#line 490
                                     exp = FP_HEX;
                                     cat = true;
                                 }
                                 else 
-#line 476
+#line 493
                                 if (chr >= '0' && chr <= '7')
                                 {
-#line 477
+#line 494
                                     exp = FP_OCT;
                                     cat = true;
                                 }
                                 else 
-#line 480
+#line 497
                                 if (chr == '.')
                                 {
-#line 481
+#line 498
                                     exp = FP_FRAC;
                                     cat = true;
                                     is_double = true;
                                 }
                             }
                             else 
-#line 486
+#line 503
                             if (exp == FP_HEX)
                             {
-#line 487
+#line 504
                                 if ((chr >= '0' && chr <= '9') || (chr >= 'a' && chr <= 'f') || (chr >= 'A' && chr <= 'F'))
                                 {
-#line 490
+#line 507
                                     cat = true;
                                 }
                             }
                             else 
-#line 493
+#line 510
                             if (exp == FP_OCT)
                             {
-#line 494
+#line 511
                                 if (chr >= '0' && chr <= '7')
                                 {
-#line 495
+#line 512
                                     cat = true;
                                 }
                             }
-#line 499
+#line 516
                             if (cat)
                             {
-#line 500
+#line 517
                                 Next();
                                 n.Cat(chr);
                                 if (exp == FP_END)
-#line 502
+#line 519
                                     break;
                             
                             }
                             else
-#line 504
+#line 521
                                 break;
                         
                         }
                     tk.str_value = n;
-#line 509
+#line 526
+                    if (exp == FP_BIN)
+#line 526
+                        tk.type = TK_BIN;
+                    else 
+#line 527
                     if (exp == FP_HEX)
+#line 527
                         tk.type = TK_HEX;
                     else 
-#line 511
+#line 528
                     if (exp == FP_OCT)
+#line 528
                         tk.type = TK_OCT;
                     else 
-#line 513
+#line 529
                     if (is_double)
                     {
-#line 514
+#line 530
                         if (!is_float)
                             tk.type = TK_DOUBLE;
                         else
                             tk.type = TK_FLOAT;
                     }
-#line 520
+#line 536
                     tk.end = loc;
                 }
                 else 
-#line 522
+#line 538
                 if (chr == '!')
                 {
-#line 523
+#line 539
                     Token & tk = Add(TK_EXCLAMATION);
                     Next();
                     tk.end = loc;
                 }
                 else 
-#line 527
+#line 543
                 if (chr == '"')
                 {
-#line 528
+#line 544
                     Token & tk = Add(TK_STRING);
                     int begin_line = loc.line;
                     int begin_col = loc.col;
@@ -1329,100 +1384,100 @@ namespace TextProc
                     bool success = false;
                     while (cursor < input.GetCount())
                         {
-#line 535
+#line 551
                             int chr = input[cursor];
                             Text::String tmp;
                             tmp.Cat(chr);
                             if (chr == '\n')
                             {
-#line 539
+#line 555
                                 AddError(tk.loc, "no newline allowed in string literal");
                                 Next();
                                 loc.line ++ ;
                                 loc.col = 1;
                             }
                             else 
-#line 544
+#line 560
                             if (chr == '"')
                             {
-#line 545
+#line 561
                                 Next();
                                 success = true;
                                 break;
                             
                             }
                             else 
-#line 549
+#line 565
                             if (chr == '\\')
                             {
-#line 550
+#line 566
                                 AppendString(str);
                             }
                             else
                             {
-#line 553
+#line 569
                                 str.Cat(chr);
                                 Next();
                             }
                         }
                     tk.end = loc;
-#line 559
+#line 575
                     if (success)
                     {
-#line 560
+#line 576
                         tk.str_value = str;
                     }
                     else
                     {
-#line 563
+#line 579
                         AddError(tk.loc, "no finishing \" in string literal");
                         return false;
                     }
                 }
                 else 
-#line 567
+#line 583
                 if (chr == '#')
                 {
-#line 568
+#line 584
                     Token & tk = Add(TK_NUMBERSIGN);
                     Next();
                     tk.end = loc;
                 }
                 else 
-#line 572
+#line 588
                 if (chr == '%')
                 {
-#line 573
+#line 589
                     Token & tk = Add(TK_PERCENT);
                     Next();
                     tk.end = loc;
                 }
                 else 
-#line 577
+#line 593
                 if (chr == '&')
                 {
-#line 578
+#line 594
                     Token & tk = Add(TK_AMPERSAND);
                     Next();
                     tk.end = loc;
                 }
                 else 
-#line 582
+#line 598
                 if (chr == '/')
                 {
-#line 583
+#line 599
                     int begin_line = loc.line;
                     int begin_col = loc.col;
                     int chr1;
                     if (cursor + 1 < input.GetCount())
-#line 586
+#line 602
                         chr1 = input[cursor + 1];
                     else
-#line 587
+#line 603
                         chr1 = 0;
                     if (chr1 == '*')
                     {
-#line 589
+#line 605
                         Token * tk = 0;
                         if (!skip_comments)
                             tk = &Add(TK_BLOCK_COMMENT);
@@ -1432,51 +1487,51 @@ namespace TextProc
                         bool succ = false;
                         while (cursor < input.GetCount())
                             {
-#line 597
+#line 613
                                 chr = input[cursor];
                                 if (chr == '*')
                                 {
-#line 599
+#line 615
                                     if (cursor + 1 < input.GetCount())
-#line 599
+#line 615
                                         chr1 = input[cursor + 1];
                                     else
-#line 600
+#line 616
                                         chr1 = 0;
                                     if (chr1 == '/')
                                     {
-#line 602
+#line 618
                                         Next();
                                         Next();
                                         if (tk)
-#line 604
+#line 620
                                             tk -> str_value = c;
                                         succ = true;
                                         break;
                                     
                                     }
                                     else
-#line 608
+#line 624
                                         c.Cat(chr);
                                 }
                                 else
-#line 610
+#line 626
                                     c.Cat(chr);
                                 Next();
                             }
                         if (tk)
                         {
-#line 614
+#line 630
                             tk -> end = loc;
                             if (!succ)
                                 AddError(tk -> loc, "unterminated /* comment");
                         }
                     }
                     else 
-#line 619
+#line 635
                     if (chr1 == '/')
                     {
-#line 620
+#line 636
                         Token * tk = 0;
                         if (!skip_comments)
                             tk = &Add(TK_COMMENT);
@@ -1485,280 +1540,280 @@ namespace TextProc
                         Text::String c;
                         while (cursor < input.GetCount())
                             {
-#line 627
+#line 643
                                 chr = input[cursor];
                                 if (chr == '\n')
                                 {
-#line 629
+#line 645
                                     if (tk)
-#line 629
+#line 645
                                         tk -> str_value = c;
                                     break;
                                 
                                 }
                                 else
-#line 632
+#line 648
                                     c.Cat(chr);
                                 Next();
                             }
                         if (tk)
-#line 635
+#line 651
                             tk -> end = loc;
                     }
                     else
                     {
-#line 638
+#line 654
                         Token & tk = Add(TK_DIV);
                         Next();
                         tk.end = loc;
                     }
                 }
                 else 
-#line 643
+#line 659
                 if (chr == '{')
                 {
-#line 644
+#line 660
                     Add(TK_BRACKET_BEGIN);
                     Next();
                 }
                 else 
-#line 647
+#line 663
                 if (chr == '}')
                 {
-#line 648
+#line 664
                     Add(TK_BRACKET_END);
                     Next();
                 }
                 else 
-#line 651
+#line 667
                 if (chr == '(')
                 {
-#line 652
+#line 668
                     Add(TK_PARENTHESIS_BEGIN);
                     Next();
                 }
                 else 
-#line 655
+#line 671
                 if (chr == ')')
                 {
-#line 656
+#line 672
                     Add(TK_PARENTHESIS_END);
                     Next();
                 }
                 else 
-#line 659
+#line 675
                 if (chr == '[')
                 {
-#line 660
+#line 676
                     Add(TK_SQUARE_BEGIN);
                     Next();
                 }
                 else 
-#line 663
+#line 679
                 if (chr == ']')
                 {
-#line 664
+#line 680
                     Add(TK_SQUARE_END);
                     Next();
                 }
                 else 
-#line 667
+#line 683
                 if (chr == '=')
                 {
-#line 668
+#line 684
                     Add(TK_ASS);
                     Next();
                 }
                 else 
-#line 671
+#line 687
                 if (chr == '+')
                 {
-#line 672
+#line 688
                     Add(TK_PLUS);
                     Next();
                 }
                 else 
-#line 675
+#line 691
                 if (chr == '\?')
                 {
-#line 676
+#line 692
                     Add(TK_QUESTION);
                     Next();
                 }
                 else 
-#line 679
+#line 695
                 if (chr == '\\')
                 {
-#line 680
+#line 696
                     Add(TK_SOLIDUS);
                     Next();
                 }
                 else 
-#line 683
+#line 699
                 if (chr == '^')
                 {
-#line 684
+#line 700
                     Add(TK_ACCENT);
                     Next();
                 }
                 else 
-#line 687
+#line 703
                 if (chr == '~')
                 {
-#line 688
+#line 704
                     Add(TK_TILDE);
                     Next();
                 }
                 else 
-#line 691
+#line 707
                 if (chr == '*')
                 {
-#line 692
+#line 708
                     Add(TK_MUL);
                     Next();
                 }
                 else 
-#line 695
+#line 711
                 if (chr == '@')
                 {
-#line 696
+#line 712
                     Add(TK_AT);
                     Next();
                 }
                 else 
-#line 699
+#line 715
                 if (chr == '\'')
                 {
-#line 700
+#line 716
                     Token & tk = Add(TK_CHAR);
                     Next();
                     Text::String str;
                     bool success = false;
                     while (cursor < input.GetCount())
                         {
-#line 705
+#line 721
                             int chr = input[cursor];
                             if (chr == '\n')
                             {
-#line 707
+#line 723
                                 AddError(tk.loc, "no newline allowed in char literal");
                                 Next();
                                 loc.line ++ ;
                                 loc.col = 1;
                             }
                             else 
-#line 712
+#line 728
                             if (chr == '\'')
                             {
-#line 713
+#line 729
                                 Next();
                                 success = true;
                                 break;
                             
                             }
                             else 
-#line 717
+#line 733
                             if (chr == '\\')
                             {
-#line 718
+#line 734
                                 AppendString(str);
                             }
                             else
                             {
-#line 721
+#line 737
                                 str.Cat(chr);
                                 Next();
                             }
                         }
                     tk.end = loc;
-#line 727
+#line 743
                     if (success)
                     {
-#line 728
+#line 744
                         tk.str_value = str;
                     }
                     else
                     {
-#line 731
+#line 747
                         AddError(tk.loc, "no finishing ' in char literal");
                         return false;
                     }
                 }
                 else 
-#line 735
+#line 751
                 if (chr == '-')
                 {
-#line 736
+#line 752
                     Add(TK_MINUS);
                     Next();
                 }
                 else 
-#line 739
+#line 755
                 if (chr == ';')
                 {
-#line 740
+#line 756
                     Add(TK_SEMICOLON);
                     Next();
                 }
                 else 
-#line 743
+#line 759
                 if (chr == ',')
                 {
-#line 744
+#line 760
                     Add(TK_COMMA);
                     Next();
                 }
                 else 
-#line 747
+#line 763
                 if (chr == '.')
                 {
-#line 748
+#line 764
                     Add(TK_PUNCT);
                     Next();
                 }
                 else 
-#line 751
+#line 767
                 if (chr == ':')
                 {
-#line 752
+#line 768
                     Add(TK_COLON);
                     Next();
                 }
                 else 
-#line 755
+#line 771
                 if (chr == '<')
                 {
-#line 756
+#line 772
                     Add(TK_LESS);
                     Next();
                 }
                 else 
-#line 759
+#line 775
                 if (chr == '>')
                 {
-#line 760
+#line 776
                     Add(TK_GREATER);
                     Next();
                 }
                 else 
-#line 763
+#line 779
                 if (chr == '|')
                 {
-#line 764
+#line 780
                     Add(TK_OR);
                     Next();
                 }
                 else 
-#line 767
+#line 783
                 if (chr == '\n')
                 {
-#line 768
+#line 784
                     if (!skip_newlines)
                     {
-#line 769
+#line 785
                         Token & tk = Add(TK_NEWLINE);
                         tk.end.col = 1;
-#line 770
+#line 786
                         tk.end.line ++ ;
                     }
                     Next();
@@ -1766,40 +1821,40 @@ namespace TextProc
                     loc.col = 1;
                 }
                 else 
-#line 776
+#line 792
                 if (chr == '\t')
                 {
-#line 777
+#line 793
                     if (!tokens.IsEmpty())
                         tokens.Top().spaces += tab_size;
                     Next();
                     loc.col += tab_size - 1;
                 }
                 else 
-#line 782
+#line 798
                 if (Text::IsSpace(chr))
                 {
-#line 783
+#line 799
                     if (!tokens.IsEmpty())
                         tokens.Top().spaces ++ ;
                     Next();
                 }
                 else 
-#line 787
+#line 803
                 if (chr == 0)
                     break;
                 
                 else
                 {
-#line 790
+#line 806
                     Lang::byte b = chr;
                     if (b >= 0x80 && b <= 0xFF)
                     {
-#line 792
+#line 808
                         Next();
                         while (cursor < input.GetCount())
                             {
-#line 794
+#line 810
                                 b = input[cursor];
                                 if (b >= 0x80 && b <= 0xFF)
                                     cursor ++ ;
@@ -1812,7 +1867,7 @@ namespace TextProc
                     }
                     else
                     {
-#line 805
+#line 821
                         Text::String msg = "unexpected character '";
                         msg.Cat(chr);
                         msg.Cat('\'');
@@ -1822,65 +1877,65 @@ namespace TextProc
                 }
             }
         Add(TK_EOF);
-#line 815
+#line 831
         return messages.IsEmpty();
     };
     
-#line 343
+#line 356
     void Tokenizer::PassToken(int tk)
     {
-#line 344
+#line 357
         if (!IsToken(tk))
-#line 344
+#line 357
             throw InputExc("Unexpected token");
         pass_cursor ++ ;
     };
     
-#line 374
+#line 387
     double Tokenizer::ReadDouble()
     {
-#line 375
+#line 388
         if (!IsToken(TK_DOUBLE) && !IsToken(TK_FLOAT))
-#line 375
+#line 388
             throw InputExc("Unexpected token");
         return Text::String::StrDbl(tokens[pass_cursor ++ ].str_value);
     };
     
-#line 364
+#line 377
     Text::String Tokenizer::ReadId()
     {
-#line 365
+#line 378
         if (!IsToken(TK_ID))
-#line 365
+#line 378
             throw InputExc("Unexpected token");
         return tokens[pass_cursor ++ ].str_value;
     };
     
     Lang::int64 Tokenizer::ReadInt()
     {
-#line 370
+#line 383
         if (!IsToken(TK_INTEGER))
-#line 370
+#line 383
             throw InputExc("Unexpected token");
         return Text::String::StrInt64(tokens[pass_cursor ++ ].str_value);
     };
     
-#line 359
+#line 372
     Text::String Tokenizer::ReadString()
     {
-#line 360
+#line 373
         if (!IsToken(TK_STRING))
-#line 360
+#line 373
             throw InputExc("Unexpected token");
         return tokens[pass_cursor ++ ].str_value;
     };
     
-#line 353
+#line 366
     bool Tokenizer::TryPassToken(int tk)
     {
-#line 354
+#line 367
         if (!IsToken(tk))
-#line 354
+#line 367
             return false;
         pass_cursor ++ ;
         return true;

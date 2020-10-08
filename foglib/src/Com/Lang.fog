@@ -558,6 +558,19 @@ inline int SgnCompare(const double& a, const double& b)                 { return
 
 
 
+template <class T> inline bool IsNull(const T& o) {return o.IsNull();}
+inline bool IsNull(const bool& v)	{return v == false;}
+inline bool IsNull(const int8& v)	{return v == 0;}
+inline bool IsNull(const int16& v)	{return v == 0;}
+inline bool IsNull(const int32& v)	{return v == 0;}
+inline bool IsNull(const int64& v)	{return v == 0;}
+inline bool IsNull(const uint8& v)	{return v == 0;}
+inline bool IsNull(const uint16& v)	{return v == 0;}
+inline bool IsNull(const uint32& v)	{return v == 0;}
+inline bool IsNull(const uint64& v)	{return v == 0;}
+inline bool IsNull(const float& v)	{return v == 0.0f;}
+inline bool IsNull(const double& v)	{return v == 0.0;}
+
 }
 
 
@@ -611,6 +624,7 @@ inline int SgnCompare(const double& a, const double& b)                 { return
 #define ConstBwdPairPtrIterator	Lang::ConstBwdPairPtrIterator
 #define DynArray				Lang::DynArray
 #define SgnCompare				Lang::SgnCompare
+#define IsNull					Lang::IsNull
 
 #undef ASSERT
 #undef ASSERT_
