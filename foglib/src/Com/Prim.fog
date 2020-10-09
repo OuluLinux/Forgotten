@@ -3,15 +3,15 @@ namespace Prim {
 
 
 template<class T> inline struct CRef {
-	T& value;
+	T& r;
 	
 	
-	CRef() : value(0) {}
-	CRef(T& r) : value(r) {}
-	CRef(const CRef& r) : value(r.value) {}
-	operator T&() const {return value;}
-	T& Get() const {return value;}
-	bool operator==(const CRef& p) const {return &value == &p.value;}
+	CRef() : r(0) {}
+	CRef(T& r) : r(r) {}
+	CRef(const CRef& r) : r(r.r) {}
+	operator T&() const {return r;}
+	T& Get() const {return r;}
+	bool operator==(const CRef& p) const {return &r == &p.r;}
 };
 
 template<class T> inline struct CPtr {

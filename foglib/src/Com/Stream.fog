@@ -34,7 +34,10 @@ namespace Stream {
 		}
 		return out;
 	}
-	
+	void PutLine(String line) {
+		line += $ENDL;
+		Put(line.Begin(), line.GetCount());
+	}
 };
 
 !inline class FileIn : public CharStream {
@@ -111,7 +114,9 @@ public:
 	}
 
 	virtual void Seek(int64 i) { Native::FileSeekSet(s, (long)i); }
-
+	
+	operator bool() const {return IsOpen();}
+	
 };
 
 
@@ -125,16 +130,22 @@ String LoadFile(String path);
 public:
 	FileOut() {}
 	FileOut(FILE* s) : s(s) {}
-	FileOut(String path) {Open(path);}
+	FileOut(String path, int style=CREATE) {Open(path, style);}
 	~FileOut() { Close(); }
-
+	
+	enum {
+		CREATE,
+		APPEND
+	};
+	
 	virtual bool IsStoring() { return true; }
 
 	virtual bool IsOpen() const { return s != NULL; }
 	virtual bool IsEof() { if (!s) return true; return Native::IsFileEnd(s); }
 
-	bool Open(String path, bool append=false) {
+	bool Open(String path, int style=CREATE) {
 		if (s) Native::FileClose(s);
+		bool append = style == APPEND;
 		Native::FileOpen(&s, path.Begin(), true, append);
 		return s != NULL;
 	}
@@ -173,6 +184,8 @@ public:
 		Native::FileSeekSet(s, pos);
 		return size;
 	}
+	
+	operator bool() const {return IsOpen();}
 	
 };
 

@@ -50,6 +50,7 @@ using "Com/Parser.fog";
 using "Com/JSON.fog";
 using "Com/Make.fog";
 using "Com/Shell.fog";
+using "Com/ShellLib.fog";
 
 /*
 Core:

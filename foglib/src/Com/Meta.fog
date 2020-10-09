@@ -193,3 +193,22 @@ auto declaration MakeException(identifier Exc) {
 		${Exc}(const Text::String& s) : Text::String(s) {}
 	};
 }
+
+auto declaration MakeRef(token Cls) {
+	struct ${Cls}Ref {
+		${Cls}& r;
+		
+		
+		${Cls}Ref(${Cls}& r) : r(r) {}
+		${Cls}Ref(const ${Cls}Ref & r_) : r(r_.r) {}
+		operator ${Cls}&() const {return r;}
+		${Cls}& Get() const {return r;}
+		${Cls}& operator()() const {return r;}
+		bool operator==(const ${Cls}Ref& p) const {return &r == &p.r;}
+		template<class T> ${Cls}Ref& operator=(const T& o) {
+			r = o;
+			return *this;
+		}
+		${Cls}*operator->() {return &r;}
+	};
+}

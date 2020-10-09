@@ -25,6 +25,7 @@ class  EscLambda;
 struct EscHandle;
 struct Esc;
 
+//#define EscapeRef		Callback1<CRef<EscEscape> >
 #define EscapeRefCb		Callback1<CRef<EscEscape> >
 
 
@@ -328,12 +329,16 @@ struct EscEscape {
 	
 };
 
+$MakeRef(EscEscape);
 
 
-void Escape(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscape&));
+
+
+
+void Escape(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscapeRef));
 
 inline // resolve overloading with Function...
-void Escfn(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscape&))
+void Escfn(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscapeRef))
 {
 	return Escape(globals, function, escape);
 }
@@ -1220,7 +1225,6 @@ EscValue Esc::ExecuteLambda(const String& id, EscValue lambda, SRVal self, Vecto
 		EscValue v = Get(self);
 		EscEscape e(*this, v, argvar);
 		e.id = id;
-		typedef EscEscape& EscEscapeRef;
 		bool type_succ = l.escape.Execute<EscEscapeRef>(e);
 		ASSERT(type_succ);
 		retval = e.ret_val;
@@ -2322,6 +2326,7 @@ void  Esc::Run()
 
 
 
+/////////////// RUN
 
 
 void LambdaArgs(CParser& p, EscLambda& l)
@@ -2457,9 +2462,8 @@ void Escape(ArrayMap<String, EscValue>& globals, const char *function, DynamicCa
 	LambdaArgs(p, l);
 }
 
-void Escape(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscape&))
+void Escape(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscapeRef))
 {
-	typedef EscEscape& EscEscapeRef;
 	DynamicCallback1 cb;
 	Callback1<EscEscapeRef> cb1 = cb.Create<EscEscapeRef>();
 	cb1.Add(new Indirect::StaticCaller1(escape));
@@ -2628,5 +2632,7 @@ String   Expand(const String& doc, ArrayMap<String, EscValue>& global,
 	}
 	return out;
 }
+
+
 
 }

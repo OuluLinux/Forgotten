@@ -38,6 +38,7 @@ file
 	JSON.fog,
 	Make.fog,
 	Shell.fog,
+	ShellLib.fog,
 	"C++ Support" readonly separator,
 	Com.h,
 	Com.cpp,

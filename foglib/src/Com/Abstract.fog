@@ -50,8 +50,9 @@ public:
 	virtual bool IsEof() { return false; }
 
 	virtual int Put(const void* mem, int size) { return 0; }
-	virtual int Put(char c) { return Put(&c, 1); }
+	virtual int PutByte(int i) {char c=i; return Put(&c, 1); }
 	virtual int Get(void* mem, int size) { return 0; }
+	virtual int GetByte() {byte b = 0; Get(&b, 1); return b;}
 	virtual int64 GetCursor() { return 0; }
 	virtual void Seek(int64 i) {}
 	virtual int64 GetSize() const {return 0;}

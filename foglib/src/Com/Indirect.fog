@@ -260,6 +260,12 @@ public:
 	int64 AsInt() const {return anon_cb.AsInt();}
 };
 
+template<class A0>
+inline DynamicCallback1 MakeDynamicCallback1(Callback1<A0> cb1) {
+	DynamicCallback1 cb;
+	cb.Create<A0>() = cb1;
+	return cb;
+}
 
 template <class A0, class A1>
 class Callback2 {
@@ -386,7 +392,8 @@ struct callback_2 {
 
 // TODO use meta
 #define THISBACK(x) callback<CLASSNAME>(&CLASSNAME::x, this)
-#define THISBACK1(x, a0) callback1<CLASSNAME, decltype(a0)>(&CLASSNAME::x, this, a0)
+#define THISBACK_1(x, A0) callback_1<A0, CLASSNAME>(&CLASSNAME::x, this)
+#define THISBACK1(x, a0) callback1<decltype(a0), CLASSNAME>(&CLASSNAME::x, this, a0)
 
 
 
@@ -442,16 +449,17 @@ struct Callexit {
 }
 
 
-#define	CallBaseObject		Indirect::CallBaseObject
-#define	Callback			Indirect::Callback
-#define	Callback1			Indirect::Callback1
-#define	DynamicCallback1	Indirect::DynamicCallback1
-#define	Callback2			Indirect::Callback2
-#define	ProxyCaller			Indirect::ProxyCaller
-#define	ProxyCaller1		Indirect::ProxyCaller1
-#define	callback			Indirect::callback
-#define	callback_1			Indirect::callback_1
-#define	callback1			Indirect::callback1
-#define	callback1_1			Indirect::callback1_1
-#define	callback_2			Indirect::callback_2
+#define	CallBaseObject			Indirect::CallBaseObject
+#define	Callback				Indirect::Callback
+#define	Callback1				Indirect::Callback1
+#define	DynamicCallback1		Indirect::DynamicCallback1
+#define	MakeDynamicCallback1	Indirect::MakeDynamicCallback1
+#define	Callback2				Indirect::Callback2
+#define	ProxyCaller				Indirect::ProxyCaller
+#define	ProxyCaller1			Indirect::ProxyCaller1
+#define	callback				Indirect::callback
+#define	callback_1				Indirect::callback_1
+#define	callback1				Indirect::callback1
+#define	callback1_1				Indirect::callback1_1
+#define	callback_2				Indirect::callback_2
 

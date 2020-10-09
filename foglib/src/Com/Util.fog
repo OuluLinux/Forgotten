@@ -770,6 +770,16 @@ void Sort(V& vector, const S& sorter) {
 template <class T> struct StdLess {bool operator()(const T& a, const T& b) const {return a < b;}};
 template <class T> struct StdGreater {bool operator()(const T& a, const T& b) const {return a > b;}};
 
+template <class Range, class Less>
+void GetSortOrder(Vector<int>& index, const Range& r, const Less& less) {
+	index.SetCount(r.GetCount());
+	for(int i = index.GetCount(); --i >= 0; index[i] = i)
+		;
+	//typedef SortOrderIterator__<decltype(begin), ValueTypeOf<Range>> It;
+	//Sort__(It(index.begin(), begin), It(index.end(), begin), less);
+	__Sort(r.Begin().Get(), r.End().Get(), less);
+}
+
 
 
 
@@ -1083,6 +1093,7 @@ MAKE_FIND_ARGS(const char*)
 #define StringParser				Util::StringParser
 #define StringCache					Util::StringCache
 #define FindFile					Util::FindFile
+#define GetSortOrder				Util::GetSortOrder
 #define StdLess						Util::StdLess
 #define StdGreater					Util::StdGreater
 #define CmdArg						Util::CmdArg
