@@ -7,13 +7,16 @@ struct Date {
 	byte month, day;
 	
 	
-	Date() {}
+	Date() : year(0), month(0), day(0) {}
+	Date(int y, int m, int d) : year(y), month(m), day(d) {}
 	
 	void Set(int y, int m, int d);
 	void Set(int64 scalar);
 	int64 Get() const;
 	bool operator==(const Date& d) const {return year == d.year && month == d.month && day == d.day;}
+	
 	String AsString() const;
+	int64 AsInt() const {return Get();}
 	
 	static const int* DaysInMonth();
 	static const int* MonthDayOffset();
@@ -42,6 +45,7 @@ struct Time : public Date {
 	
 	String AsString() const;
 	String AsDiffString() const;
+	int64 AsInt() const {return Get();}
 	static Time GetSys();
 };
 

@@ -90,7 +90,8 @@ public:
 	
 	Value() {}
 	Value(const Value& v) {*this = v;}
-	Value(const char* str) {String& s = Create<String>(); s = str;}
+	//Value(const double d) {String& v = Create<String>(); v = d;}
+	//Value(const char* str) {String& v = Create<String>(); v = str;}
 	//template <class T> Value(const T& o) {obj.WrapObject(new ValueTemplate<T>(o));}
 	
 	void Clear() {obj.Clear();}
@@ -142,6 +143,7 @@ public:
 	ValueObject* GetObject() const {return obj.Get();}
 	
 	bool IsVoid() const {if (obj) return obj->GetType() == VOID_V; return true;}
+	bool IsThisNull() const {return IsVoid();}
 	bool IsArray() const;
 	bool IsMap() const;
 	bool IsArrayMapComb() const;

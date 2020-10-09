@@ -467,7 +467,9 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 		${Scope}& operator << (const ${Scope}& s) { Cat(s); return *this; }
 		${Scope}& operator << (int i) { Cat(IntStr(i)); return *this; }
 		${Scope} operator + (const ${Scope}& s) { ${Scope} out(*this); out.Cat(s); return out; }
-	
+		
+		int64 AsInt() const {return GetCount();}
+		
 		static int BinInt(const ${Scope}& s) { return CharBinInt(s.Begin()); }
 		static int OctInt(const ${Scope}& s) { return CharOctInt(s.Begin()); }
 		static int HexInt(const ${Scope}& s) { return CharHexInt(s.Begin()); }

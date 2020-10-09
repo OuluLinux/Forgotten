@@ -1,7 +1,93 @@
 namespace Shell {
+using/interface Lang;
 
 #define LTIMING(x)
 
+/////////////// BUILTIN
+
+EscValue EscFromStdValue(const Value& v)
+{
+	EscValue r;
+	Time t;
+	int64 i64;
+	if(!IsNull(v))
+		switch(v.GetType()) {
+		case Interface::BOOL_V:
+			i64 = v.Get<bool>();
+			r = i64;
+			break;
+		case Interface::INT_V:
+			i64 = v.Get<int>();;
+			r = i64;
+			break;
+		case Interface::INT64_V:
+			r = v.Get<int64>();
+			break;
+		case Interface::DOUBLE_V:
+			r = v.Get<double>();
+			break;
+		case Interface::STRING_V:
+			r = ToWString(v.Get<String>());
+			break;
+		case Interface::WSTRING_V:
+			r = v.Get<WString>();
+			break;
+		case Interface::TIME_V:
+			t = v;
+			r.MapSet("hour", t.hour);
+			r.MapSet("minute", t.min);
+			r.MapSet("second", t.sec);
+		case Interface::DATE_V:
+			t = v;
+			r.MapSet("year", t.year);
+			r.MapSet("month", t.month);
+			r.MapSet("day", t.day);
+			break;
+		case Interface::VALUEARRAY_V:
+			ValueArray va = v;
+			r.SetEmptyArray();
+			for(int i = 0; i < va.GetCount(); i++)
+				r.ArrayAdd(EscFromStdValue(va[i]));
+		}
+	return r;
+}
+
+Value StdValueFromEsc(const EscValue& v)
+{
+	if(v.IsNumber())
+		return AsValue(v.GetNumber());
+	if(v.IsArray())
+		return AsValue(v.GetWString());
+	if(IsTime(v))
+		return AsValue(Time(
+			v.GetFieldInt("year"), v.GetFieldInt("month"), v.GetFieldInt("day"),
+			v.GetFieldInt("hour"), v.GetFieldInt("minute"), v.GetFieldInt("second")));
+	if(IsDate(v))
+		return AsValue(Date(
+			v.GetFieldInt("year"), v.GetFieldInt("month"), v.GetFieldInt("day")));
+	return Value();
+}
+
+void SIC_StdFormat(EscEscapeRef e)
+{
+	e = StdValueFromEsc(e()[0]).AsString();
+}
+
+void StdValueLib(ArrayMap<String, EscValue>& global)
+{
+	Escape(global, "StdFormat(x)", SIC_StdFormat);
+}
+
+
+
+
+
+
+
+
+
+
+/////////////// STDLIB
 
 void ESC_count(EscEscapeRef e)
 {
