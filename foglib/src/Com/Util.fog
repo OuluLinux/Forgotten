@@ -80,11 +80,11 @@ inline String& ConfigPath() {static String s; return s;}
 String AppendFileName(String a, String b);
 String GetExeDirFile(String filename);
 String ConfigFile(String file_name);
-String GetFileName(String path);
-String GetFileTitle(String path);
-String GetFileDirectory(String path);
-String GetParentDirectory(String path, int steps=1);
-String GetFileExt(String path);
+String TrimFileName(String path);
+String TrimFileTitle(String path);
+String TrimFileDirectory(String path);
+String TrimParentDirectory(String path, int steps=1);
+String TrimFileExt(String path);
 void RealizeDirectory(String dir);
 void DeleteFile(String path);
 void RenameFile(String oldpath, String newpath);
@@ -1048,11 +1048,11 @@ MAKE_FIND_ARGS(const char*)
 #define ConfigPath					Util::ConfigPath
 #define AppendFileName				Util::AppendFileName
 #define ConfigFile					Util::ConfigFile
-#define GetFileName					Util::GetFileName
-#define GetFileTitle				Util::GetFileTitle
-#define GetFileDirectory			Util::GetFileDirectory
-#define GetParentDirectory			Util::GetParentDirectory
-#define GetFileExt					Util::GetFileExt
+#define TrimFileName				Util::TrimFileName
+#define TrimFileTitle				Util::TrimFileTitle
+#define TrimFileDirectory			Util::TrimFileDirectory
+#define TrimParentDirectory			Util::TrimParentDirectory
+#define TrimFileExt					Util::TrimFileExt
 #define RealizeDirectory			Util::RealizeDirectory
 #define DeleteFile					Util::DeleteFile
 #define RenameFile					Util::RenameFile

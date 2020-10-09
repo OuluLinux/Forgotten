@@ -146,6 +146,8 @@ auto declaration MakeStringClass(identifier Class, token chr, number chr_bytes) 
 			}
 		}
 		
+		inline bool IsThisNull() const {return count == 0;}
+		
 		${Scope}& Set(const Char* c, int len, bool find_end=true) {
 			Clear();
 			if (!c) return *this;

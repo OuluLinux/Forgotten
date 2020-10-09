@@ -85,6 +85,7 @@ enum {
 	TK_ORASS,
 	TK_LSHIFTASS,
 	TK_RSHIFTASS,
+	TK_3DOTS,
 	
 	TK_EOF = 100000,
 	TK_COMBINED2_BEGIN = TK_INC,
@@ -150,6 +151,7 @@ struct Token {
 			case TK_HEX: return "hex-number";
 			case TK_OCT: return "oct-number";
 			case TK_INVALID: return "invalid";
+			case TK_3DOTS: return "3-dots";
 			case TK_EOF: return "end-of-file";
 		}
 		return "";
@@ -201,6 +203,7 @@ struct Token {
 			case TK_HEX: return str_value;
 			case TK_OCT: return str_value;
 			case TK_DOLLARSIGN: return "$";
+			case TK_3DOTS: return "...";
 			case TK_EOF: return "EOF";
 			default: Panic("Unhandled token type");
 		}
@@ -279,8 +282,12 @@ class CBase {
 public:
 	typedef CBase CLASSNAME;
 	CBase() {}
-	CBase(String s) {t.Create(); t->Load(s, "cparser"); Load(t->GetTokens());}
+	CBase(String str) {t.Create(); t->Load(str, "cparser"); Load(t->GetTokens());}
+	CBase(String str, String src_name) {t.Create(); t->Load(str, src_name); Load(t->GetTokens());}
 	CBase(const Vector<Token>& tokens) {Load(tokens);}
+	
+	String GetFileName() const;
+	int GetLine() const;
 	
 	void Load(const Vector<Token>& tokens);
 	void IgnoreNewline(bool b);
@@ -315,6 +322,9 @@ public:
 	bool IsId() const;
 	bool IsInt() const;
 	bool IsType(int i) const;
+	
+	const char* GetPtr() const; // the begin of current token int original string
+	// relative position as int is enought
 	
 	void ThrowError(String msg) {throw TextProc::InputExc(msg);}
 };
@@ -761,8 +771,16 @@ bool Tokenizer::Load(String str, String path) {
 			Next();
 		}
 		else if (chr == '.') {
-			Add(TK_PUNCT);
-			Next();
+			if (cursor+2 < input.GetCount() && input[cursor+1] == '.' && input[cursor+2] == '.') {
+				Add(TK_3DOTS);
+				Next();
+				Next();
+				Next();
+			}
+			else {
+				Add(TK_PUNCT);
+				Next();
+			}
 		}
 		else if (chr == ':') {
 			Add(TK_COLON);

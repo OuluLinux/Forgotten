@@ -1,6 +1,9 @@
 namespace Indirect {
 
 
+
+
+
 class CallBaseObject {
 	int refs = 1;
 
@@ -31,6 +34,10 @@ public:
 };
 
 
+
+
+
+
 class StaticCaller : public CallBase {
 	void (*fn)();
 
@@ -53,6 +60,16 @@ public:
 	virtual void Execute() const { (*obj.*fn)(); }
 };
 
+template <class A0>
+class StaticCaller1 : public CallBase1<A0> {
+	typedef void (*Fn)(A0);
+	Fn fn;
+
+public:
+	StaticCaller1(Fn fn) : fn(fn) {}
+	virtual void Execute(const A0& a0) const { fn(a0); }
+};
+
 template <class A0, class T>
 class Caller1 : public CallBase1<A0> {
 	typedef T Cls;
@@ -64,6 +81,7 @@ public:
 	Caller1(Fn fn, Cls* obj) : fn(fn), obj(obj) {}
 	virtual void Execute(const A0& a0) const { (*obj.*fn)(a0); }
 };
+
 
 template <class T, class A0>
 class Caller_1 : public CallBase {
@@ -160,9 +178,12 @@ class Callback1 {
 	VectorPtr<Base> calls;
 
 public:
+	typedef void (*Fn)(A0);
+	
 	Callback1() {}
 	Callback1(const Callback1& cb) { *this = cb; }
 	Callback1(Base* cb) { ASSERT(cb); calls.Add(cb); }
+	Callback1(Fn fn) {Base* cb = new Base(fn); calls.Add(cb);}
 	~Callback1() { Clear(); }
 	void operator=(const Callback1& cb) {
 		Clear();
@@ -183,11 +204,60 @@ public:
 		for (int i = 0; i < calls.GetCount(); i++)
 			calls[i]->Execute(a0);
 	}
+	
+	void Add(Indirect::CallBase1<A0>* call) {calls.Add(call);}
 
 	void operator()(const A0& a0) const { Execute(a0); }
 	operator bool() const {return calls.GetCount();}
 	String AsString() const {return "Callback1";}
 	int64 AsInt() const {return calls.GetCount();}
+};
+
+
+class DynamicCallback1 {
+	$MakeMoveable();
+	
+	OneAnon anon_cb;
+	void* arg0fn = 0;
+	
+public:
+	
+	DynamicCallback1() {}
+	DynamicCallback1(const DynamicCallback1& cb) { *this = cb; }
+	~DynamicCallback1() { Clear(); }
+	void operator=(const DynamicCallback1& cb) {
+		anon_cb = cb.anon_cb;
+		arg0fn = cb.arg0fn;
+	}
+	void Clear() {anon_cb.Clear(); arg0fn = 0;}
+	
+	template<class A0>
+	Callback1<A0>& Create() {
+		Clear();
+		typedef A0 Arg;
+		arg0fn = &Container::TypeFn<Arg>;
+		return anon_cb.Create<Callback1<Arg> >();
+	}
+	
+	template<class A0>
+	bool Execute(const A0& a0) const {
+		if (!arg0fn)
+			return true; // is not wrong type
+		typedef A0 Arg;
+		void* try_arg0fn = &Container::TypeFn<Arg>;
+		if (try_arg0fn == arg0fn) {
+			Callback1<Arg>* cb = anon_cb.TryGet<Callback1<Arg> >();
+			ASSERT(cb);
+			if (cb)
+				cb->Execute(a0);
+			return true; // is right type
+		}
+		return false; // is wrong type
+	}
+
+	operator bool() const {return (bool)anon_cb;}
+	String AsString() const {return "DynamicCallback1";}
+	int64 AsInt() const {return anon_cb.AsInt();}
 };
 
 
@@ -372,14 +442,16 @@ struct Callexit {
 }
 
 
-#define	Callback		Indirect::Callback
-#define	Callback1		Indirect::Callback1
-#define	Callback2		Indirect::Callback2
-#define	ProxyCaller		Indirect::ProxyCaller
-#define	ProxyCaller1	Indirect::ProxyCaller1
-#define	callback		Indirect::callback
-#define	callback_1		Indirect::callback_1
-#define	callback1		Indirect::callback1
-#define	callback1_1		Indirect::callback1_1
-#define	callback_2		Indirect::callback_2
+#define	CallBaseObject		Indirect::CallBaseObject
+#define	Callback			Indirect::Callback
+#define	Callback1			Indirect::Callback1
+#define	DynamicCallback1	Indirect::DynamicCallback1
+#define	Callback2			Indirect::Callback2
+#define	ProxyCaller			Indirect::ProxyCaller
+#define	ProxyCaller1		Indirect::ProxyCaller1
+#define	callback			Indirect::callback
+#define	callback_1			Indirect::callback_1
+#define	callback1			Indirect::callback1
+#define	callback1_1			Indirect::callback1_1
+#define	callback_2			Indirect::callback_2
 

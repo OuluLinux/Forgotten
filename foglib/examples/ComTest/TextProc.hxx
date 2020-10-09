@@ -16,7 +16,7 @@
 
 namespace TextProc
 {
-    enum _anon_19
+    enum _anon_21
     {
         PROCMSG_UNKNOWN,
         PROCMSG_SKIP,
@@ -24,7 +24,7 @@ namespace TextProc
         PROCMSG_WARNING,
         PROCMSG_ERROR
     };
-    enum _anon_20
+    enum _anon_22
     {
         FP_INT,
         FP_DEC,
@@ -38,7 +38,7 @@ namespace TextProc
         FP_OCT,
         FP_HEX
     };
-    enum _anon_21
+    enum _anon_23
     {
         TK_UNKNOWN,
         TK_EXCLAMATION = '!',
@@ -102,6 +102,7 @@ namespace TextProc
         TK_ORASS,
         TK_LSHIFTASS,
         TK_RSHIFTASS,
+        TK_3DOTS,
         TK_EOF = 100000,
         TK_COMBINED2_BEGIN = TK_INC,
         TK_COMBINED3_BEGIN = TK_LSHIFTASS
@@ -184,10 +185,10 @@ namespace TextProc
     
     struct Pos
     {
-#line 264 "../../src/Com/Tokenizer.fog"
+#line 267 "../../src/Com/Tokenizer.fog"
         int pos;
         
-#line 265
+#line 268
         inline Pos();
         inline Pos(const Pos& p);
         inline bool Is() const;
@@ -219,9 +220,9 @@ namespace TextProc
     
     struct Token
     {
-#line 98 "../../src/Com/Tokenizer.fog"
+#line 99 "../../src/Com/Tokenizer.fog"
         TextProc::FileLocation loc;
-#line 98
+#line 99
         TextProc::FileLocation end;
         int type;
         Text::String str_value;
@@ -229,31 +230,31 @@ namespace TextProc
         
         Token();
         Token(const Token& t);
-#line 107
+#line 108
         inline bool operator!= (const Token& t) const;
-#line 105
+#line 106
         void operator= (const Token& t);
         bool operator== (const Token& t) const;
-#line 157
+#line 159
         Text::String AsString() const;
-#line 109
-        inline Text::String GetString() const;
-#line 161
-        inline Text::String GetTextValue() const;
 #line 110
+        inline Text::String GetString() const;
+#line 163
+        inline Text::String GetTextValue() const;
+#line 111
         inline Text::String GetTypeString() const;
-#line 108
+#line 109
         inline bool IsType(int i) const;
         
-#line 162
+#line 164
         static Text::String StaticGetTextValue(int type, Text::String str_value);
-#line 111
+#line 112
         static Text::String StaticGetTypeString(int type);
     };
     
     class Tokenizer
     {
-#line 213
+#line 216
         TextProc::FileLocation loc;
         int cursor;
         Text::String input;
@@ -261,168 +262,174 @@ namespace TextProc
         bool skip_newlines;
         bool skip_separateunary;
         int pass_cursor;
-#line 221
+#line 224
         int tab_size;
         
     protected:
-#line 225
+#line 228
         Container::Vector < Token > tokens;
         
     public:
-#line 259
+#line 262
         Container::Vector < ProcMsg > messages;
         
     public:
-#line 337
+#line 347
         Tokenizer();
-#line 242
+#line 245
         void Dump() const;
-#line 249
+#line 252
         inline int GetPassCursor() const;
-#line 244
+#line 247
         inline const Container::Vector < Token > & GetTokens() const;
-#line 361
+#line 371
         bool IsToken(int tk);
-#line 392
+#line 402
         bool Load(Text::String str, Text::String path);
-#line 356
+#line 366
         void PassToken(int tk);
-#line 387
+#line 397
         double ReadDouble();
-#line 377
+#line 387
         Text::String ReadId();
-#line 382
+#line 392
         Lang::int64 ReadInt();
-#line 372
+#line 382
         Text::String ReadString();
-#line 246
+#line 249
         inline void Remove(int i);
-#line 240
+#line 243
         inline void SetTabSize(int i);
-#line 237
+#line 240
         inline void SkipComments(bool b = true);
         inline void SkipNewLines(bool b = true);
         inline void SkipSeparateUnary(bool b = true);
-#line 366
+#line 376
         bool TryPassToken(int tk);
         
     protected:
-#line 341
+#line 351
         Token& Add(int token_id);
-#line 231
+#line 234
         void AddError(TextProc::FileLocation loc, Text::String msg);
         void AddWarning(TextProc::FileLocation loc, Text::String msg);
-#line 834
+#line 852
         void AppendString(Text::String& s);
-#line 227
+#line 230
         inline void Next();
     };
     
     class CBase
     {
     public:
-#line 280
+#line 283
         typedef CBase CLASSNAME;
         
     private:
-#line 271
+#line 274
         typedef TextProc::Tokenizer Toknzr;
         
         const Container::Vector < Token > *tokens;
         int pos;
-#line 276
+#line 279
         bool ignore_newline;
-#line 278
+#line 281
         Container::One < Toknzr > t;
         
     public:
         CBase();
-        CBase(Text::String s);
+        CBase(Text::String str);
+        CBase(Text::String str, Text::String src_name);
         CBase(const Container::Vector < Token > & tokens);
-#line 911
+#line 929
         const Token& GetCurrent() const;
-#line 927
+#line 289
+        Text::String GetFileName() const;
+        int GetLine() const;
+#line 945
         TextProc::FileLocation GetLocation() const;
-#line 297
+#line 304
         Pos GetPos();
-#line 294
+#line 326
+        const char *GetPtr() const;
+#line 301
         int GetTokenCount() const;
         inline int GetTokenPos() const;
-#line 288
+#line 295
         inline const Container::Vector < Token > & GetTokens() const;
-#line 957
-        bool Id(Text::String id);
-#line 919
-        void IgnoreNewline(bool b);
-#line 923
-        bool IsEnd() const;
-#line 984
-        bool IsId() const;
-#line 988
-        bool IsInt() const;
-#line 992
-        bool IsType(int i) const;
-#line 906
-        void Load(const Container::Vector < Token > & tokens);
 #line 975
+        bool Id(Text::String id);
+#line 937
+        void IgnoreNewline(bool b);
+#line 941
+        bool IsEnd() const;
+#line 1002
+        bool IsId() const;
+#line 1006
+        bool IsInt() const;
+#line 1010
+        bool IsType(int i) const;
+#line 924
+        void Load(const Container::Vector < Token > & tokens);
+#line 993
         bool Newline();
-#line 290
+#line 297
         inline void Next();
-#line 308
+#line 315
         void PassId(Text::String s);
-#line 950
+#line 968
         void PassNewline();
-#line 307
+#line 314
         void PassType(int i);
-#line 931
+#line 949
         Text::String ReadId();
-#line 939
+#line 957
         int ReadInt();
-#line 298
+#line 305
         void SetPos(const Pos& p);
-#line 291
+#line 298
         inline void SkipTerm();
-#line 319
+#line 329
         inline void ThrowError(Text::String msg);
-#line 966
+#line 984
         bool Type(int i);
     };
 };
 
 namespace TextProc
 {
-#line 295
+#line 302
     inline int CBase::GetTokenPos() const
     {
-#line 295
+#line 302
         return pos;
     };
     
-#line 288
+#line 295
     inline const Container::Vector < Token > & CBase::GetTokens() const
     {
-#line 288
+#line 295
         return *tokens;
     };
     
-#line 290
+#line 297
     inline void CBase::Next()
     {
-#line 290
+#line 297
         pos ++ ;
     };
     
-#line 291
+#line 298
     inline void CBase::SkipTerm()
     {
-#line 291
+#line 298
         pos ++ ;
     };
     
-#line 319
+#line 329
     inline void CBase::ThrowError(Text::String msg)
     {
-#line 319
+#line 329
         throw TextProc::InputExc(msg);
     };
     
@@ -462,22 +469,22 @@ namespace TextProc
         String(s)
     {};
     
-#line 265 "../../src/Com/Tokenizer.fog"
+#line 268 "../../src/Com/Tokenizer.fog"
     inline Pos::Pos()
     :
         pos(- 1)
     {};
     
-#line 266
+#line 269
     inline Pos::Pos(const Pos& p)
     :
         pos(p.pos)
     {};
     
-#line 267
+#line 270
     inline bool Pos::Is() const
     {
-#line 267
+#line 270
         return pos >= 0;
     };
     
@@ -487,96 +494,96 @@ namespace TextProc
         severity(0)
     {};
     
-#line 107 "../../src/Com/Tokenizer.fog"
+#line 108 "../../src/Com/Tokenizer.fog"
     inline bool Token::operator!= (const Token& t) const
     {
-#line 107
+#line 108
         return !(t == *this);
     };
     
-#line 109
+#line 110
     inline Text::String Token::GetString() const
     {
-#line 109
+#line 110
         return str_value;
     };
     
-#line 161
+#line 163
     inline Text::String Token::GetTextValue() const
     {
-#line 161
+#line 163
         return StaticGetTextValue(type, str_value);
     };
     
-#line 110
+#line 111
     inline Text::String Token::GetTypeString() const
     {
-#line 110
+#line 111
         return StaticGetTypeString(type);
     };
     
-#line 108
+#line 109
     inline bool Token::IsType(int i) const
     {
-#line 108
+#line 109
         return type == i;
     };
     
-#line 249
+#line 252
     inline int Tokenizer::GetPassCursor() const
     {
-#line 249
+#line 252
         return pass_cursor;
     };
     
-#line 244
+#line 247
     inline const Container::Vector < Token > & Tokenizer::GetTokens() const
     {
-#line 244
+#line 247
         return tokens;
     };
     
-#line 227
+#line 230
     inline void Tokenizer::Next()
     {
-#line 227
+#line 230
         loc.col ++ ;
-#line 227
+#line 230
         cursor ++ ;
     };
     
-#line 246
+#line 249
     inline void Tokenizer::Remove(int i)
     {
-#line 246
+#line 249
         tokens.Remove(i);
     };
     
-#line 240
+#line 243
     inline void Tokenizer::SetTabSize(int i)
     {
-#line 240
+#line 243
         tab_size = i;
     };
     
-#line 237
+#line 240
     inline void Tokenizer::SkipComments(bool b)
     {
-#line 237
+#line 240
         skip_comments = b;
     };
     
-#line 238
+#line 241
     inline void Tokenizer::SkipNewLines(bool b)
     {
-#line 238
+#line 241
         skip_newlines = b;
     };
     
-#line 239
+#line 242
     inline void Tokenizer::SkipSeparateUnary(bool b)
     {
-#line 239
+#line 242
         skip_separateunary = b;
     };
     

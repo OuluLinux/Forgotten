@@ -25,6 +25,7 @@ class  EscLambda;
 struct EscHandle;
 struct Esc;
 
+#define EscapeRefCb		Callback1<CRef<EscEscape> >
 
 
 class EscValue {
@@ -81,6 +82,7 @@ private:
 	static int             max_total;
 
 public:
+	
 	static int             GetTotalCount();
 	static void            SetMaxTotalCount(int n);
 	static int             GetMaxTotalCount();
@@ -127,8 +129,8 @@ public:
 	EscLambda&                           CreateLambda();
 
 
-	void    Escape(const char *method, Callback1<EscEscape&> escape);
-	void    Escape(const char *method, EscHandle *h, Callback1<EscEscape&> escape);
+	void    Escape(const char *method, const DynamicCallback1& escape);
+	void    Escape(const char *method, EscHandle *h, const DynamicCallback1& escape);
 	bool    HasNumberField(const char *id) const;
 	int     GetFieldInt(const char *id) const;
 
@@ -175,7 +177,6 @@ class EscLambda {
 	friend class EscValue;
 
 public:
-	typedef CRef<EscEscape> EscEscapePtr;
 	Vector<String>        arg;
 	Vector<String>        def;
 	Vector<bool>          inout;
@@ -184,7 +185,7 @@ public:
 	bool                  varargs;
 	String                filename;
 	int                   line;
-	Callback1<EscEscapePtr> escape;
+	DynamicCallback1      escape;
 	
 private:
 	EscLambda(const EscLambda&);
@@ -248,10 +249,10 @@ struct Esc : public CParser {
 
 	EscValue   GetExp();
 
-	double Number(const EscValue& a, const char *oper);
-	int64  Int(const EscValue& a, const char *oper);
-	double Number(const SRVal& a, const char *oper);
-	int64  Int(const SRVal& a, const char *oper);
+	double Number(const EscValue& a, String oper);
+	int64  Int(const EscValue& a, String oper);
+	double Number(const SRVal& a, String oper);
+	int64  Int(const SRVal& a, String oper);
 
 	EscValue   MulArray(EscValue array, EscValue times);
 
@@ -305,11 +306,11 @@ struct EscEscape {
 	EscValue         ret_val;
 	String           id;
 
-	EscValue&    operator[](int i)             { return arg[i]; }
-	int          GetCount() const              { return arg.GetCount(); }
-	void         operator=(const EscValue& v)  { ret_val = v; }
-	operator     EscValue&()                   { return ret_val; }
-	void         ThrowError(const char *s)     { esc.ThrowError(s); }
+	EscValue&    operator[](int i)				{ return arg[i]; }
+	int          GetCount() const				{ return arg.GetCount(); }
+	void         operator=(const EscValue& v)	{ ret_val = v; }
+	operator     EscValue&()					{ return ret_val; }
+	void         ThrowError(String s)			{ esc.ThrowError(s); }
 
 	String       DumpType(int i);
 	String       InCall();
@@ -323,18 +324,21 @@ struct EscEscape {
 
 	EscEscape(Esc& esc, EscValue self, Array<EscValue>& arg)
 	  : esc(esc), self(self), arg(arg) {}
+	
+	
 };
 
 
-void Escape(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscape& e));
+
+void Escape(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscape&));
 
 inline // resolve overloading with Function...
-void Escfn(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscape& e))
+void Escfn(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscape&))
 {
 	return Escape(globals, function, escape);
 }
 
-void Escape(ArrayMap<String, EscValue>& globals, const char *function, Callback1<EscEscape&> escape);
+void Escape(ArrayMap<String, EscValue>& globals, const char *function, DynamicCallback1 escape);
 
 void Scan(ArrayMap<String, EscValue>& global, const char *code, const char *filename = "");
 
@@ -1216,7 +1220,9 @@ EscValue Esc::ExecuteLambda(const String& id, EscValue lambda, SRVal self, Vecto
 		EscValue v = Get(self);
 		EscEscape e(*this, v, argvar);
 		e.id = id;
-		l.escape(e);
+		typedef EscEscape& EscEscapeRef;
+		bool type_succ = l.escape.Execute<EscEscapeRef>(e);
+		ASSERT(type_succ);
 		retval = e.ret_val;
 		self = e.self;
 	}
@@ -1477,26 +1483,26 @@ String Lims(const String& s)
 	return s;
 }
 
-double Esc::Number(const EscValue& a, const char *oper)
+double Esc::Number(const EscValue& a, String oper)
 {
 	if(!a.IsNumber())
 		ThrowError(String().Cat() << "number expected for '" << oper << "', encountered " << Lims(a.AsString()));
 	return a.GetNumber();
 }
 
-int64 Esc::Int(const EscValue& a, const char *oper)
+int64 Esc::Int(const EscValue& a, String oper)
 {
 	if(!a.IsNumber())
 		ThrowError(String().Cat() << "integer expected for '" << oper << "', encountered " << Lims(a.AsString()));
 	return a.GetInt64();
 }
 
-double Esc::Number(const SRVal& a, const char *oper)
+double Esc::Number(const SRVal& a, String oper)
 {
 	return Number(Get(a), oper);
 }
 
-int64 Esc::Int(const SRVal& a, const char *oper)
+int64 Esc::Int(const SRVal& a, String oper)
 {
 	return Int(Get(a), oper);
 }
@@ -2300,5 +2306,327 @@ void  Esc::Run()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void LambdaArgs(CParser& p, EscLambda& l)
+{
+	p.PassType('(');
+	if(!p.Type(')')) {
+		for(;;) {
+			if(p.Type(TextProc::TK_3DOTS)) {
+				l.varargs = true;
+				p.PassType(')');
+				break;
+			}
+			l.inout.Add(p.Type('&'));
+			l.arg.Add(p.ReadId());
+			if(p.Type('=')) {
+				const char *s = p.GetPtr();
+				int level = 0;
+				for(;;) {
+					if((p.IsType(')') || p.IsType(',')) && level == 0)
+						break;
+					if(p.Type(')'))
+						level--;
+					else
+					if(p.Type('('))
+						level++;
+					else
+						p.SkipTerm();
+					if(p.IsEnd())
+						p.ThrowError((String)"unexpected end of file while reading default value for argument "
+						             + l.arg.Top());
+				}
+				String def;
+				int def_len = p.GetPtr() - s;
+				def.Set(s, def_len);
+				l.def.Add(def);
+			}
+			else
+				if(l.def.GetCount())
+					p.ThrowError((String)"missing default value for argument " + l.arg.Top());
+			if(p.Type(')'))
+				break;
+			p.PassType(',');
+		}
+	}
+	l.inout.Shrink();
+	l.arg.Shrink();
+}
+
+EscValue ReadLambda(CParser& p)
+{
+	EscValue lambda;
+	EscLambda& l = lambda.CreateLambda();
+	LambdaArgs(p, l);
+	const char *t = p.GetPtr();
+	l.filename = p.GetFileName();
+	l.line = p.GetLine();
+	if(!p.Type('{'))
+		p.ThrowError("missing '{'");
+	SkipBlock(p);
+	
+	String code;
+	int code_len = p.GetPtr() - t;
+	code.Set(t, code_len);
+	
+	l.code = code;
+	return lambda;
+}
+
+EscValue ReadLambda(const char *s)
+{
+	CParser p(s);
+	return ReadLambda(p);
+}
+
+String EscEscape::InCall()
+{
+	if (IsNull(id))
+		return String();
+	else
+		return (String)" in call to '" + id + "'";
+}
+
+String EscEscape::DumpType(int i)
+{
+	if(i < arg.GetCount())
+		return String().Cat() << " (" << arg[i].GetTypeName() << " present)";
+	else
+		return " (not enough arguments)";
+}
+
+void  EscEscape::CheckNumber(int i)
+{
+	if(i < arg.GetCount() && arg[i].IsNumber())
+		return;
+	ThrowError(String().Cat() << (String)"number expected as parameter " << i + 1 << InCall()
+	           << DumpType(i));
+}
+
+double EscEscape::Number(int i)
+{
+	if(i >= arg.GetCount())
+		ThrowError(Formater("too little parameters %s")(InCall()));
+	return esc.Number(arg[i], (String)"parameter" + InCall());
+}
+
+int EscEscape::Int(int i)
+{
+	if(i >= arg.GetCount())
+		ThrowError((String)"too little parameters" + InCall());
+	return (int)esc.Int(arg[i], (String)"parameter" + InCall());
+}
+
+void  EscEscape::CheckArray(int i)
+{
+	if(i < arg.GetCount() && arg[i].IsArray())
+		return;
+	ThrowError(Formater("array expected as parameter %d %s %s")(i + 1)(InCall())(DumpType(i)));
+}
+
+void  EscEscape::CheckMap(int i)
+{
+	if(i < arg.GetCount() && arg[i].IsMap())
+		return;
+	ThrowError(Formater("map expected as parameter %d %s")(i + 1)(InCall()));
+}
+
+void Escape(ArrayMap<String, EscValue>& globals, const char *function, DynamicCallback1 escape)
+{
+	CParser p(function);
+	EscValue& v = globals.GetAdd(p.ReadId());
+	EscLambda& l = v.CreateLambda();
+	l.escape = escape;
+	LambdaArgs(p, l);
+}
+
+void Escape(ArrayMap<String, EscValue>& globals, const char *function, void (*escape)(EscEscape&))
+{
+	typedef EscEscape& EscEscapeRef;
+	DynamicCallback1 cb;
+	Callback1<EscEscapeRef> cb1 = cb.Create<EscEscapeRef>();
+	cb1.Add(new Indirect::StaticCaller1(escape));
+	Escape(globals, function, cb);
+}
+
+void  EscValue::Escape(const char *method, const DynamicCallback1& escape)
+{
+	CParser p(method);
+	String id = p.ReadId();
+	EscValue v;
+	EscLambda& l = v.CreateLambda();
+	l.escape = escape;
+	LambdaArgs(p, l);
+	MapSet(id, v);
+}
+
+void  EscValue::Escape(const char *method, EscHandle *h, const DynamicCallback1& escape)
+{
+	CParser p(method);
+	String id = p.ReadId();
+	EscValue v;
+	EscLambda& l = v.CreateLambda();
+	l.escape = escape;
+	l.handle = h;
+	h->Retain();
+	LambdaArgs(p, l);
+	if(IsVoid())
+		SetEmptyMap();
+	MapSet(id, v);
+}
+
+void Scan(ArrayMap<String, EscValue>& global, const char *file, const char *filename)
+{
+	LTIMING("Scan");
+	CParser p(file, filename);
+	while(!p.IsEnd()) {
+		EscValue& v = global.GetAdd(p.ReadId());;
+		v = ReadLambda(p);
+	}
+}
+
+EscValue Execute(ArrayMap<String, EscValue>& global, EscValue *self,
+                 const EscValue& lambda, Vector<EscValue>& arg, int op_limit)
+{
+	const EscLambda& l = lambda.GetLambda();
+	if(arg.GetCount() != l.arg.GetCount()) {
+		String argnames;
+		for(int i = 0; i < l.arg.GetCount(); i++) {
+			if (i)
+				argnames << ", ";
+			argnames << l.arg[i];
+		}
+		throw TextProc::InputExc(
+			Formater("invalid number of arguments (%d passed, expected: %s)")
+				(arg.GetCount())(argnames));
+	}
+	EscValue ret;
+	{
+		Esc sub(global, l.code, op_limit, l.filename, l.line);
+		if(self)
+			sub.self = *self;
+		for(int i = 0; i < l.arg.GetCount(); i++)
+			sub.var.GetAdd(l.arg[i]) = arg[i];
+		sub.Run();
+		if(self)
+			*self = sub.self;
+		ret = sub.return_value;
+	}
+	return ret;
+}
+
+EscValue Execute(ArrayMap<String, EscValue>& global, EscValue *self,
+                 const char *name, Vector<EscValue>& arg, int op_limit)
+{
+	if(!self->IsMap())
+		return EscValue();
+	const VectorMap<EscValue, EscValue>& m = self->GetMap();
+	int ii = m.Find(String(name));
+	if(ii >= 0 && m[ii].IsLambda())
+		return Execute(global, self, m[ii], arg, op_limit);
+	return EscValue();
+}
+
+EscValue Execute(ArrayMap<String, EscValue>& global, const char *name, int op_limit)
+{
+	int ii = global.Find(String(name));
+	Vector<EscValue> arg;
+	if(ii >= 0 && global[ii].IsLambda())
+		return Execute(global, NULL, global[ii], arg, op_limit);
+	return EscValue();
+}
+
+EscValue Evaluatex(const char *expression, ArrayMap<String, EscValue>& global, int oplimit)
+{
+	Esc sub(global, expression, oplimit, "", 0);
+	for(int i = 0; i < global.GetCount(); i++)
+		sub.var.Add(global.GetKey(i), global[i]);
+	EscValue v;
+	v = sub.GetExp();
+	for(int i = 0; i < sub.var.GetCount(); i++)
+		global.GetAdd(sub.var.GetKey(i)) = sub.var[i];
+	return v;
+}
+
+EscValue Evaluate(const char *expression, ArrayMap<String, EscValue>& global, int oplimit)
+{
+	try {
+		return Evaluatex(expression, global, oplimit);
+	}
+	catch(TextProc::InputExc&) {}
+	return EscValue();
+}
+
+String   Expand(const String& doc, ArrayMap<String, EscValue>& global,
+                int oplimit, String (*format)(const Value& v))
+{
+	String out;
+	const char *term = doc.Begin();
+	bool cond = true;
+	while(*term) {
+		if(term[0] == '<' && term[1] == ':') {
+			term += 2;
+			try {
+				Esc sub(global, term, oplimit, "", 0);
+				for(int i = 0; i < global.GetCount(); i++)
+					sub.var.Add(global.GetKey(i), global[i]);
+				EscValue v;
+				if(*term == '{') {
+					sub.Run();
+					v = sub.return_value;
+				}
+				else
+				if(sub.Type('!')) {
+					EscValue& v = global.GetAdd(sub.ReadId());
+					v = ReadLambda(sub);
+				}
+				else
+				if(sub.Type('?'))
+					cond = IsTrue(sub.GetExp());
+				else
+				if(sub.Type('/'))
+					cond = !cond;
+				else
+				if(sub.Type('.'))
+					cond = true;
+				else
+					v = sub.GetExp();
+				if(cond)
+					out << format(StdValueFromEsc(v));
+				//sub.Spaces();
+				term = sub.GetPtr();
+				if(term[0] != ':' || term[1] != '>')
+					throw TextProc::InputExc((String)"missing :>" + String(term));
+				term += 2;
+			}
+			catch(TextProc::InputExc& e) {
+				out << "(#ERROR: " << e << "#)";
+			}
+		}
+		else {
+			if(cond)
+				out.Cat(*term);
+			term++;
+		}
+	}
+	return out;
+}
 
 }

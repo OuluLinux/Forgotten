@@ -20,7 +20,7 @@
 
 namespace Interface
 {
-    enum _anon_17
+    enum _anon_19
     {
         VOID_V = 0,
         INT_V = 1,
@@ -38,7 +38,7 @@ namespace Interface
         VALUE_ARRAY_AND_MAP_V = 13,
         UNKNOWN_V = 0Xffffffff
     };
-    enum _anon_18
+    enum _anon_20
     {
         FMT_MAIN_SWITCH = 0,
         FMT_TYPE_INVALID = 0,

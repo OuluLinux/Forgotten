@@ -101,8 +101,8 @@ namespace Util
     Text::String GetFileTitle(Text::String path);
 #line 78
     inline Text::String GetHomeDir();
-#line 86
-    Text::String GetParentDirectory(Text::String path, int steps = 1);
+#line 290
+    Text::String GetParentDirectory(Text::String path, int steps);
 #line 477
     bool IsClose(double a, double b);
 #line 109
@@ -136,6 +136,15 @@ namespace Util
     void Sort(_1& vector, const _2& sorter);
 #line 912
     bool StreamCopy(Abstract::StreamBase& dest, Abstract::StreamBase& src);
+#line 85
+    Text::String TrimFileDirectory(Text::String path);
+#line 87
+    Text::String TrimFileExt(Text::String path);
+#line 83
+    Text::String TrimFileName(Text::String path);
+    Text::String TrimFileTitle(Text::String path);
+#line 86
+    Text::String TrimParentDirectory(Text::String path, int steps = 1);
 #line 898
     inline void VectorAdd(const Container::Vector < double > & from, Container::Vector < double > & to);
 #line 403

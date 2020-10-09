@@ -181,7 +181,7 @@ bool Project::Load(String name, String path) {
 	Clear();
 	this->name = name;
 	this->path = path;
-	this->dir = GetFileDirectory(path);
+	this->dir = TrimFileDirectory(path);
 	
 	if (!FileExists(path)) return false;
 	

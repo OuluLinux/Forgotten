@@ -313,7 +313,7 @@ namespace Make
         Clear();
         this -> name = name;
         this -> path = path;
-        this -> dir = Util::GetFileDirectory(path);
+        this -> dir = Util::TrimFileDirectory(path);
 #line 186
         if (!Util::FileExists(path))
 #line 186

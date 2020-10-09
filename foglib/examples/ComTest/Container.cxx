@@ -9,21 +9,97 @@
 
 namespace Container
 {
-#line 884 "../../src/Com/Container.fog"
+#line 931 "../../src/Com/Container.fog"
+    template < class _1 >
+    Text::String AnonType < _1 >::AsString() const
+    {
+#line 931
+        return Text::ToString(obj);
+    };
+    
+#line 905
+    AnonTypeBase::~AnonTypeBase() {};
+    
+#line 887
     template < class _1 >
     void CachingVector < _1 >::SetCount(int i)
     {
-#line 884
+#line 887
         if (data.GetCount() < i)
-#line 884
+#line 887
             data.SetCount(i);
-#line 884
+#line 887
         count = i;
     };
     
-#line 691
+#line 694
     template < class _1 >
     const int FixedArray2 < _1 >::size = 2;
+    
+#line 964
+    void OneAnon::operator= (const OneAnon& o)
+    {
+#line 965
+        if (obj)
+        {
+#line 966
+            if (o.obj)
+            {
+#line 967
+                if (obj -> typefn == o.obj -> typefn)
+                    obj -> Set(&*o.obj);
+                else
+                    obj = o.obj -> CopyNew();
+            }
+            else
+                obj.Clear();
+        }
+        else
+        {
+#line 976
+            if (o.obj)
+                obj = o.obj -> CopyNew();
+        }
+    };
+    
+#line 985
+    Text::String OneAnon::AsString() const
+    {
+#line 986
+        if (obj.IsEmpty())
+#line 986
+            return "OneAnon<0>";
+        else
+#line 987
+            return(Text::String)"OneAnon<" + obj -> AsString() + ">";
+    };
+    
+#line 944
+    template < class _1 >
+    _1& OneAnon::Create()
+    {
+#line 945
+        typedef _1 Cls;
+        obj.Clear();
+        AnonType < Cls > * ao = new AnonType < Cls > ;
+        obj = ao;
+        return ao -> obj;
+    };
+    
+    template < class _1 >
+    _1 *OneAnon::TryGet()
+    {
+#line 953
+        typedef _1 Cls;
+        if (obj.IsEmpty())
+            return 0;
+        if (obj -> typefn != &TypeFn < Cls > )
+            return 0;
+        AnonType < Cls > * ao = dynamic_cast< AnonType < Cls > * >(&*obj);
+        if (!ao)
+            return 0;
+        return&ao -> obj;
+    };
     
 #line 124
     template < class _1 >
@@ -112,14 +188,14 @@ namespace Container
         o.obj = 0;
     };
     
-#line 847
+#line 850
     void SortedIntMap::Add(int key, int value)
     {
-#line 848
+#line 851
         Lang::DynArray < int > & key_vec = data[key];
         if (key_vec.IsEmpty())
         {
-#line 850
+#line 853
             int mask_i = key / 64;
             Lang::int64 bit_i = key % 64;
             Lang::uint64 & v = value_mask[mask_i];
@@ -132,60 +208,60 @@ namespace Container
             first_data_i = key;
     };
     
-#line 830
+#line 833
     void SortedIntMap::Clear()
     {
         {
-#line 832
+#line 835
             Lang::FwdIterator < Lang::DynArray < int > > it = data.Begin();
             Lang::FwdIterator < Lang::DynArray < int > > end = data.End();
             for (; it != end; ++ it)
-#line 834
+#line 837
                 it -> SetCount(0);
         }
         {
             Lang::FwdIterator < Lang::uint64 > it = value_mask.Begin();
             Lang::FwdIterator < Lang::uint64 > end = value_mask.End();
             for (; it != end; ++ it)
-#line 839
+#line 842
                 *it = 0;
         }
-#line 843
+#line 846
         count = 0;
         first_data_i = 2147483647;
     };
     
-#line 822
+#line 825
     void SortedIntMap::Reserve(int count)
     {
-#line 823
+#line 826
         if (count > data.GetCount())
         {
-#line 824
+#line 827
             data.SetCount(count);
             int value_count = count / 64 + 1;
             value_mask.SetCount(value_count, 0);
         }
     };
     
-#line 707
+#line 710
     const int TopValueSorter10::size = 10;
     
-#line 724
+#line 727
     void TopValueSorter10::Add(const Key& key, const Value& value)
     {
-#line 725
+#line 728
         if (value <= this -> value[size - 1])
             return;
         for (int i = 0; i < size; i ++ )
             {
-#line 728
+#line 731
                 if (value > this -> value[i])
                 {
-#line 729
+#line 732
                     for (int j = size - 1; j > i; j -- )
                         {
-#line 730
+#line 733
                             this -> value[j] = this -> value[j - 1];
                             this -> key[j] = this -> key[j - 1];
                         }
@@ -198,23 +274,23 @@ namespace Container
             }
     };
     
-#line 717
+#line 720
     void TopValueSorter10::Reset()
     {
-#line 718
+#line 721
         count = 0;
         for (int i = 0; i < size; i ++ )
             {
-#line 720
+#line 723
                 value[i] = - 1.7976931348623157e+306;
                 key[i] = - 1;
             }
     };
     
-#line 740
+#line 743
     void TopValueSorter10::Serialize(Abstract::StreamBase& s)
     {
-#line 741
+#line 744
         for (int i = 0; i < size; i ++ )
             s % value[i] % key[i];
     };

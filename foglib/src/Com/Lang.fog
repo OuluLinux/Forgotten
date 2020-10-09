@@ -558,7 +558,7 @@ inline int SgnCompare(const double& a, const double& b)                 { return
 
 
 
-template <class T> inline bool IsNull(const T& o) {return o.IsNull();}
+template <class T> inline bool IsNull(const T& o) {return o.IsThisNull();}
 inline bool IsNull(const bool& v)	{return v == false;}
 inline bool IsNull(const int8& v)	{return v == 0;}
 inline bool IsNull(const int16& v)	{return v == 0;}

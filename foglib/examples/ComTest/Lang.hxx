@@ -1097,7 +1097,7 @@ namespace Lang
     inline bool IsNull(const _1& o)
     {
 #line 561
-        return o.IsNull();
+        return o.IsThisNull();
     };
     
 #line 562

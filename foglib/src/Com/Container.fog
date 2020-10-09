@@ -252,6 +252,9 @@ public:
 			}
 		}
 	}
+	
+	inline void Shrink();
+	
 };
 
 
@@ -893,9 +896,97 @@ struct CachingVector {
 
 
 
+template<class T> void TypeFn(T* o) {}
 
 
+struct AnonTypeBase {
+	void* typefn;
+	
+	virtual ~AnonTypeBase() {}
+	virtual void Set(const AnonTypeBase* src) = 0;
+	virtual AnonTypeBase* CopyNew() const = 0;
+	virtual String AsString() const = 0;
+	
+protected:
+	AnonTypeBase() {}
+};
 
+template <class T>
+struct AnonType : public AnonTypeBase {
+	typedef T Cls;
+	Cls obj;
+	
+	inline AnonType() {typefn = &TypeFn<Cls>;}
+	
+	virtual inline void Set(const AnonTypeBase* src) {
+		if (typefn == src->typefn) {
+			const AnonType<Cls>* cls_src = dynamic_cast<const AnonType<Cls>*>(src);
+			if (cls_src)
+				obj = *cls_src;
+		}
+	}
+	virtual inline AnonTypeBase* CopyNew() const {
+		return new Cls(obj);
+	}
+	virtual String AsString() const {return ToString(obj);}
+};
+
+class OneAnon {
+	One<AnonTypeBase> obj;
+	
+public:
+	
+	OneAnon() {}
+	OneAnon(const OneAnon& o) {*this = o;}
+	
+	void Clear() {obj.Clear();}
+	
+	template<class T> T& Create() {
+		typedef T Cls;
+		obj.Clear();
+		AnonType<Cls>* ao = new AnonType<Cls>;
+		obj = ao;
+		return ao->obj;
+	}
+	
+	template<class T> T* TryGet() {
+		typedef T Cls;
+		if (obj.IsEmpty())
+			return 0;
+		if (obj->typefn != &TypeFn<Cls>)
+			return 0;
+		AnonType<Cls>* ao = dynamic_cast<AnonType<Cls>*>(&*obj);
+		if (!ao)
+			return 0;
+		return &ao->obj;
+	}
+	
+	void operator=(const OneAnon& o) {
+		if (obj) {
+			if (o.obj) {
+				if (obj->typefn == o.obj->typefn)
+					obj->Set(&*o.obj);
+				else
+					obj = o.obj->CopyNew();
+			}
+			else
+				obj.Clear();
+		}
+		else {
+			if (o.obj)
+				obj = o.obj->CopyNew();
+			// else // useless
+		}
+	}
+	
+	bool IsEmpty() const {return obj.IsEmpty();}
+	operator bool() const {return !IsEmpty();}
+	int64 AsInt() const {return (!obj.IsEmpty()) * 1;}
+	String AsString() const {
+		if (obj.IsEmpty()) return "OneAnon<0>";
+		else return (String)"OneAnon<" + obj->AsString() + ">";
+	}
+};
 
 }
 
@@ -915,4 +1006,5 @@ struct CachingVector {
 #define FixedArray2			Container::FixedArray2
 #define TopValueSorter10	Container::TopValueSorter10
 #define CachingVector		Container::CachingVector
+#define OneAnon				Container::OneAnon
 

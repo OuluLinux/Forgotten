@@ -13,7 +13,7 @@
 
 namespace Make
 {
-    enum _anon_22
+    enum _anon_24
     {
         USES,
         FILES,
