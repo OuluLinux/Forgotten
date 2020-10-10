@@ -202,11 +202,15 @@ const short* Utf8To16(const char* in) {
 
 const char* Utf16To8(const short* in) {
 	thread_local static std::vector<wchar_t> v;
+	thread_local static std::string s;
+	
 	int len = Lang::StringLength(in, 10000000);
 	v.resize(len + 1);
-	for(wchar_t& s : v) s = *in++;
+	for(wchar_t& w : v)
+		w = *in++;
 	v[len] = 0;
-	thread_local static std::string s = GetUnicodeConverter().to_bytes(std::wstring(v.data()));
+	std::wstring ws(v.data());
+	s = GetUnicodeConverter().to_bytes(ws);
 	return s.c_str();
 }
 

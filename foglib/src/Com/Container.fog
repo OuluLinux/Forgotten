@@ -28,9 +28,9 @@ public:
 template <class T>
 inline void Swap(T& a, T& b) {
 	uint8 tmp[sizeof(T)];
-	MemoryCopy(tmp, &a, sizeof(T));
-	MemoryCopy(&a, &b, sizeof(T));
-	MemoryCopy(&b, tmp, sizeof(T));
+	MemoryCopy(tmp, (void*)&a, sizeof(T));
+	MemoryCopy((void*)&a, (void*)&b, sizeof(T));
+	MemoryCopy((void*)&b, tmp, sizeof(T));
 }
 
 template <class T>
@@ -67,6 +67,7 @@ public:
 	inline const T& operator*() const {ASSERT(obj); return *obj;}
 	inline T* Get() {return obj;}
 	inline const T* Get() const {return obj;}
+	inline T* GetMutable() const {return obj;}
 	inline T& Value() {return *obj;}
 	inline T* Detach() {ASSERT(obj); T* tmp = obj; obj = NULL; return tmp;}
 	inline operator bool() const {return !IsEmpty();}
@@ -159,6 +160,8 @@ public:
 	
 	inline Vector() {}
 	inline Vector(const Vector& v) : Base(v) {}
+	
+	inline void Shrink() {Base::Shrink();}
 	
 	inline void Serialize(StreamBase& s) {
 		static const byte correct_pre = 0xA;
@@ -916,19 +919,20 @@ struct AnonType : public AnonTypeBase {
 	typedef T Cls;
 	Cls obj;
 	
-	inline AnonType() {typefn = &TypeFn<Cls>;}
+	inline AnonType() {typefn = (void*)&TypeFn<Cls>;}
+	inline AnonType(const Cls& src) : obj(src) {typefn = (void*)&TypeFn<Cls>;}
 	
 	virtual inline void Set(const AnonTypeBase* src) {
 		if (typefn == src->typefn) {
 			const AnonType<Cls>* cls_src = dynamic_cast<const AnonType<Cls>*>(src);
 			if (cls_src)
-				obj = *cls_src;
+				obj = cls_src->obj;
 		}
 	}
 	virtual inline AnonTypeBase* CopyNew() const {
-		return new Cls(obj);
+		return new AnonType(obj);
 	}
-	virtual String AsString() const {return ToString(obj);}
+	virtual inline String AsString() const {return ToString(obj);}
 };
 
 class OneAnon {
@@ -941,7 +945,7 @@ public:
 	
 	void Clear() {obj.Clear();}
 	
-	template<class T> T& Create() {
+	template<class T> inline T& Create() {
 		typedef T Cls;
 		obj.Clear();
 		AnonType<Cls>* ao = new AnonType<Cls>;
@@ -949,13 +953,13 @@ public:
 		return ao->obj;
 	}
 	
-	template<class T> T* TryGet() {
+	template<class T> inline T* TryGet() const {
 		typedef T Cls;
 		if (obj.IsEmpty())
 			return 0;
 		if (obj->typefn != &TypeFn<Cls>)
 			return 0;
-		AnonType<Cls>* ao = dynamic_cast<AnonType<Cls>*>(&*obj);
+		AnonType<Cls>* ao = dynamic_cast<AnonType<Cls>*>(obj.GetMutable());
 		if (!ao)
 			return 0;
 		return &ao->obj;

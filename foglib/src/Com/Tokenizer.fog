@@ -227,7 +227,7 @@ protected:
 	
 	Vector<Token> tokens;
 	
-	void Next() {loc.col++; cursor++;}
+	void Next() {loc.col++; loc.cursor++; cursor++;}
 	Token& Add(int token_id);
 	void AppendString(String& s);
 	
@@ -236,7 +236,7 @@ protected:
 	
 public:
 	Tokenizer();
-	bool Load(String str, String path);
+	bool Load(String str, String path, int line=1);
 	void SkipComments(bool b=true) {skip_comments = b;}
 	void SkipNewLines(bool b=true) {skip_newlines = b;}
 	void SkipSeparateUnary(bool b=true) {skip_separateunary = b;}
@@ -279,17 +279,17 @@ class CBase {
 	bool ignore_newline = true;
 	
 	One<Toknzr> t;
+	String src_name;
+	String input;
 public:
 	typedef CBase CLASSNAME;
-	CBase() {}
-	CBase(String str) {t.Create(); t->Load(str, "cparser"); Load(t->GetTokens());}
-	CBase(String str, String src_name) {t.Create(); t->Load(str, src_name); Load(t->GetTokens());}
-	CBase(const Vector<Token>& tokens) {Load(tokens);}
+	//CBase() {}
+	CBase(String str, String src_name="cparser", int line=1) {t.Create(); t->Load(str, src_name, line); Load(str, src_name, t->GetTokens());}
+	CBase(String str, String src_name, const Vector<Token>& tokens) {Load(str, src_name, tokens);}
 	
-	String GetFileName() const;
-	int GetLine() const;
+	String GetFileName() const {return src_name;}
 	
-	void Load(const Vector<Token>& tokens);
+	void Load(String input, String src_name, const Vector<Token>& tokens);
 	void IgnoreNewline(bool b);
 	
 	const Vector<Token>& GetTokens() const {return *tokens;}
@@ -323,9 +323,13 @@ public:
 	bool IsInt() const;
 	bool IsType(int i) const;
 	
-	const char* GetPtr() const; // the begin of current token int original string
-	// relative position as int is enought
-	
+	int GetCurrentCursor() const {return GetCurrent().loc.cursor;}
+	int GetCurrentLine() const {return GetCurrent().loc.line;}
+	const char* GetCurrentInput() const {
+		int cur = GetCurrent().loc.cursor;
+		ASSERT(cur >= 0 && cur <= input.GetCount());
+		return input.Begin() + cur;
+	}
 	void ThrowError(String msg) {throw TextProc::InputExc(msg);}
 };
 
@@ -399,12 +403,13 @@ double Tokenizer::ReadDouble() {
 	return StrDbl(tokens[pass_cursor++].str_value);
 }
 
-bool Tokenizer::Load(String str, String path) {
+bool Tokenizer::Load(String str, String path, int line) {
 	input = str;
 	
 	loc.file = path;
-	loc.line = 1;
+	loc.line = line;
 	loc.col = 1;
+	loc.cursor = 0;
 	
 	cursor = 0;
 	
@@ -921,7 +926,9 @@ protected void Tokenizer::AppendString(String& s) {
 
 
 
-void CBase::Load(const Vector<Token>& tokens) {
+void CBase::Load(String input, String src_name, const Vector<Token>& tokens) {
+	this->input = input;
+	this->src_name = src_name;
 	this->tokens = &tokens;
 	pos = 0;
 }

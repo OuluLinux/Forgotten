@@ -5,6 +5,7 @@
 */
 
 namespace Shell {
+using/interface Container;
 using/interface Indirect;
 using/interface Lang;
 
@@ -80,8 +81,8 @@ private:
 	Vector<EscValue>&     CloneArray();
 
 
-	static int             total;
-	static int             max_total;
+	static int total = 0;
+	static int max_total = 1000000;
 
 public:
 	
@@ -290,9 +291,7 @@ struct Esc : public CParser {
 		int& oplimit,
 	    const String& fn,
 	    int line = 1)
-	    : global(global), op_limit(oplimit) {
-	    // : CParser(s, fn, line), )
-	    TODO
+	    : CParser(s, fn, line), global(global), op_limit(oplimit) {
 		r_stack_level = stack_level;
 		skipexp = false;
 	}
@@ -346,7 +345,7 @@ void Escfn(ArrayMap<String, EscValue>& globals, const char *function, void (*esc
 
 void Escape(ArrayMap<String, EscValue>& globals, const char *function, DynamicCallback1 escape);
 
-void Scan(ArrayMap<String, EscValue>& global, const char *code, const char *filename = "");
+void Scan(ArrayMap<String, EscValue>& global, String code, String filename = "");
 
 void StdLib(ArrayMap<String, EscValue>& global);
 
@@ -411,8 +410,6 @@ String EscTypeName(int sv_type)
 	}
 }
 
-!inline static private int EscValue::total;
-!inline static private int EscValue::max_total = 1000000;
 
 private void EscValue::Free()
 {
@@ -756,6 +753,21 @@ bool IsTrue(const EscValue& a)
 	return a.GetCount();
 }
 
+WString EscValue::GetWString() const {
+	LTIMING("operator String");
+	WStringStream s;
+	if(IsArray()) {
+		const Vector<EscValue>& a = GetArray();
+		for(int i = 0; i < a.GetCount(); i++) {
+			if(a[i].IsInt()) {
+				int c = a[i].GetInt();
+				if(c >= 0 && c < 65536)
+					s.Cat(c);
+			}
+		}
+	}
+	return s;
+}
 
 
 
@@ -2343,7 +2355,7 @@ void LambdaArgs(CParser& p, EscLambda& l)
 			l.inout.Add(p.Type('&'));
 			l.arg.Add(p.ReadId());
 			if(p.Type('=')) {
-				const char *s = p.GetPtr();
+				const char *s = p.GetCurrentInput();
 				int level = 0;
 				for(;;) {
 					if((p.IsType(')') || p.IsType(',')) && level == 0)
@@ -2360,7 +2372,8 @@ void LambdaArgs(CParser& p, EscLambda& l)
 						             + l.arg.Top());
 				}
 				String def;
-				int def_len = p.GetPtr() - s;
+				int def_len = p.GetCurrentInput() - s;
+				ASSERT(def_len > 0);
 				def.Set(s, def_len);
 				l.def.Add(def);
 			}
@@ -2381,15 +2394,16 @@ EscValue ReadLambda(CParser& p)
 	EscValue lambda;
 	EscLambda& l = lambda.CreateLambda();
 	LambdaArgs(p, l);
-	const char *t = p.GetPtr();
+	const char *t = p.GetCurrentInput();
 	l.filename = p.GetFileName();
-	l.line = p.GetLine();
+	l.line = p.GetCurrentLine();
 	if(!p.Type('{'))
 		p.ThrowError("missing '{'");
 	SkipBlock(p);
 	
 	String code;
-	int code_len = p.GetPtr() - t;
+	int code_len = p.GetCurrentInput() - t;
+	ASSERT(code_len > 0);
 	code.Set(t, code_len);
 	
 	l.code = code;
@@ -2497,7 +2511,7 @@ void  EscValue::Escape(const char *method, EscHandle *h, const DynamicCallback1&
 	MapSet(id, v);
 }
 
-void Scan(ArrayMap<String, EscValue>& global, const char *file, const char *filename)
+void Scan(ArrayMap<String, EscValue>& global, String file, String filename)
 {
 	LTIMING("Scan");
 	CParser p(file, filename);
@@ -2558,7 +2572,7 @@ EscValue Execute(ArrayMap<String, EscValue>& global, const char *name, int op_li
 	return EscValue();
 }
 
-EscValue Evaluatex(const char *expression, ArrayMap<String, EscValue>& global, int oplimit)
+EscValue Evaluatex(const String& expression, ArrayMap<String, EscValue>& global, int oplimit)
 {
 	Esc sub(global, expression, oplimit, "", 0);
 	for(int i = 0; i < global.GetCount(); i++)
@@ -2570,7 +2584,7 @@ EscValue Evaluatex(const char *expression, ArrayMap<String, EscValue>& global, i
 	return v;
 }
 
-EscValue Evaluate(const char *expression, ArrayMap<String, EscValue>& global, int oplimit)
+EscValue Evaluate(const String& expression, ArrayMap<String, EscValue>& global, int oplimit)
 {
 	try {
 		return Evaluatex(expression, global, oplimit);
@@ -2589,6 +2603,7 @@ String   Expand(const String& doc, ArrayMap<String, EscValue>& global,
 		if(term[0] == '<' && term[1] == ':') {
 			term += 2;
 			try {
+				const char* sub_begin = term;
 				Esc sub(global, term, oplimit, "", 0);
 				for(int i = 0; i < global.GetCount(); i++)
 					sub.var.Add(global.GetKey(i), global[i]);
@@ -2616,7 +2631,7 @@ String   Expand(const String& doc, ArrayMap<String, EscValue>& global,
 				if(cond)
 					out << format(StdValueFromEsc(v));
 				//sub.Spaces();
-				term = sub.GetPtr();
+				term = sub_begin + sub.GetCurrentCursor();
 				if(term[0] != ':' || term[1] != '>')
 					throw TextProc::InputExc((String)"missing :>" + String(term));
 				term += 2;
@@ -2637,3 +2652,5 @@ String   Expand(const String& doc, ArrayMap<String, EscValue>& global,
 
 
 }
+
+//#define EscValue			Shell::EscValue

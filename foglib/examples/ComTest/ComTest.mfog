@@ -12,6 +12,7 @@ using/interface Indirect;
 using/interface Concurrency;
 using/interface Network;
 using/interface TextProc;
+using/interface Shell;
 
 /*
 Esc tests:
@@ -174,7 +175,7 @@ class App {
 		
 		{
 			StringStream ss;
-			ss << "abc";
+			ss << "abc1";
 		}
 		
 		{
@@ -255,6 +256,8 @@ class App {
 			JSON j;
 		}
 		
+		TestEsc();
+		
 		/* TODO
 			- log init GetSysTime
 		*/
@@ -323,6 +326,24 @@ class App {
 		}
 		DUMPDUMB(9, s0a);
 		
+	}
+	
+	
+	void TestEsc() {
+		ArrayMap<String, Shell::EscValue> global;
+		//Escape(global, "Print(x)", SIC_Print);
+		//Escape(global, "Input()", SIC_Input);
+		//Escape(global, "InputNumber()", SIC_InputNumber);
+		Shell::StdLib(global);
+		try {
+			String s = LoadFile(GetDataFile("EscTest.esc"));
+			ASSERT(s.GetCount());
+			Shell::Scan(global, s);
+			Shell::Execute(global, "main", INT_MAX);
+		}
+		catch(TextProc::InputExc e) {
+			Cout() << "ERROR: " << e << "\n";
+		}
 	}
 };
 

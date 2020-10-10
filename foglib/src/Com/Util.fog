@@ -715,7 +715,7 @@ inline void __FinalSort(I begin, I end, const Less& less) {
 
 
 template <class I, class Less>
-void __Sort(I l, I h, const Less& less)
+inline void __Sort(I l, I h, const Less& less)
 {
 	for(;;) {
 		int count = int(h - l);
@@ -740,7 +740,7 @@ void __Sort(I l, I h, const Less& less)
 			I iih = ii;
 			while(iih + 1 != h && !less(*ii, *(iih + 1))) // Find middle range of elements equal to pivot
 				++iih;
-			if(pass > 5 || min(ii - l, h - iih) > (max(ii - l, h - iih) >> pass)) { // partition sizes ok or we have done max attempts
+			if(pass > 5 || Min(ii - l, h - iih) > (Max(ii - l, h - iih) >> pass)) { // partition sizes ok or we have done max attempts
 				if(ii - l < h - iih - 1) {       // recurse on smaller partition, tail on larger
 					__Sort(l, ii, less);
 					l = iih + 1;
@@ -760,7 +760,7 @@ void __Sort(I l, I h, const Less& less)
 }
 
 template <class V, class S>
-void Sort(V& vector, const S& sorter) {
+inline void Sort(V& vector, const S& sorter) {
 	if (vector.GetCount() < 2)
 		return;
 	//__Sort<V::Iterator, S>(vector.Begin().Get(), vector.End().Get(), sorter);
@@ -771,7 +771,7 @@ template <class T> struct StdLess {bool operator()(const T& a, const T& b) const
 template <class T> struct StdGreater {bool operator()(const T& a, const T& b) const {return a > b;}};
 
 template <class Range, class Less>
-void GetSortOrder(Vector<int>& index, const Range& r, const Less& less) {
+inline void GetSortOrder(Vector<int>& index, const Range& r, const Less& less) {
 	index.SetCount(r.GetCount());
 	for(int i = index.GetCount(); --i >= 0; index[i] = i)
 		;

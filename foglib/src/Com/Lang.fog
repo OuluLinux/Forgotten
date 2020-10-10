@@ -382,6 +382,26 @@ public:
 		count = new_count;
 	}
 	inline void IncreaseReserve(int more_reserved) {Reserve(GetCount() + more_reserved);}
+	inline void Shrink() {
+		if (reserved <= count) return;
+		if (count <= 0) {
+			if (data) {
+				Memory::Free(data);
+				data = 0;
+			}
+		}
+		else {
+			int new_reserved = count;
+			K* new_data = (K*)Memory::Alloc(count * sizeof(K));
+			if (data) {
+				if (count > 0)
+					Memory::Copy((void*)new_data, (void*)data, sizeof(K) * count);
+				Memory::Free(data);
+			}
+			data = new_data;
+			reserved = new_reserved;
+		}
+	}
 	inline void Reserve(int new_reserved) {
 		if (new_reserved <= reserved || new_reserved <= 0)
 			return;

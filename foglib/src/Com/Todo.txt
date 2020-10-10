@@ -1,6 +1,8 @@
 
 Upgrade slow code:
  - Index: too slow search
+ - use realloc in all Reserve and Shrink functions
+
 
 Use meta functions for wrapping native classes like:
  - TimeStop

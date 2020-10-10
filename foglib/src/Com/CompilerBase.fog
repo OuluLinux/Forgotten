@@ -14,10 +14,19 @@ struct FileLocation {
 	$MakeMoveable();
 	
 	String file;
-	int line = -1, col = -1;
+	int line = -1, col = -1, cursor = -1;
 	
+	FileLocation() {}
+	FileLocation(const FileLocation& loc) {*this = loc;}
 	void SetFileLocation(const FileLocation& loc) {*this = loc;}
-	$MakeImmediateTypesEqual(FileLocation);
+	void operator=(const FileLocation& loc) {
+		file = loc.file;
+		line = loc.line;
+		col = loc.col;
+		cursor = loc.cursor;
+	}
+	bool operator==(const FileLocation& loc) const {return file == loc.file && cursor == loc.cursor;}
+	
 };
 
 

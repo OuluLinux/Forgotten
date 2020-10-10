@@ -1,5 +1,5 @@
 namespace Indirect {
-
+using/interface Container;
 
 
 
@@ -18,19 +18,19 @@ public:
 
 class CallBase : public CallBaseObject {
 public:
-	virtual void Execute() const = 0;
+	virtual inline void Execute() const = 0;
 };
 
 template <class A0>
 class CallBase1 : public CallBaseObject {
 public:
-	virtual void Execute(const A0& a0) const = 0;
+	virtual inline void Execute(const A0& a0) const = 0;
 };
 
 template <class A0, class A1>
 class CallBase2 : public CallBaseObject {
 public:
-	virtual void Execute(const A0& a0, const A1& a1) const = 0;
+	virtual inline void Execute(const A0& a0, const A1& a1) const = 0;
 };
 
 
@@ -56,8 +56,8 @@ class Caller : public CallBase {
 	Cls* obj;
 
 public:
-	Caller(Fn fn, Cls* obj) : fn(fn), obj(obj) {}
-	virtual void Execute() const { (*obj.*fn)(); }
+	inline Caller(Fn fn, Cls* obj) : fn(fn), obj(obj) {}
+	virtual inline void Execute() const { (*obj.*fn)(); }
 };
 
 template <class A0>
@@ -66,8 +66,8 @@ class StaticCaller1 : public CallBase1<A0> {
 	Fn fn;
 
 public:
-	StaticCaller1(Fn fn) : fn(fn) {}
-	virtual void Execute(const A0& a0) const { fn(a0); }
+	inline StaticCaller1(Fn fn) : fn(fn) {}
+	virtual inline void Execute(const A0& a0) const { fn(a0); }
 };
 
 template <class A0, class T>
@@ -78,8 +78,8 @@ class Caller1 : public CallBase1<A0> {
 	Cls* obj;
 
 public:
-	Caller1(Fn fn, Cls* obj) : fn(fn), obj(obj) {}
-	virtual void Execute(const A0& a0) const { (*obj.*fn)(a0); }
+	inline Caller1(Fn fn, Cls* obj) : fn(fn), obj(obj) {}
+	virtual inline void Execute(const A0& a0) const { (*obj.*fn)(a0); }
 };
 
 
@@ -92,8 +92,8 @@ class Caller_1 : public CallBase {
 	A0 a0;
 
 public:
-	Caller_1(Fn fn, T* obj, A0 a0) : fn(fn), obj(obj), a0(a0) {}
-	virtual void Execute() const { (*obj.*fn)(a0); }
+	inline Caller_1(Fn fn, T* obj, A0 a0) : fn(fn), obj(obj), a0(a0) {}
+	virtual inline void Execute() const { (*obj.*fn)(a0); }
 };
 
 template <class A0, class T, class A1>
@@ -105,8 +105,8 @@ class Caller1_1 : public CallBase1<A0> {
 	A1 a1;
 
 public:
-	Caller1_1(Fn fn, T* obj, A1 a1) : fn(fn), obj(obj), a1(a1) {}
-	virtual void Execute(const A0& a0) const { (*obj.*fn)(a0, a1); }
+	inline Caller1_1(Fn fn, T* obj, A1 a1) : fn(fn), obj(obj), a1(a1) {}
+	virtual inline void Execute(const A0& a0) const { (*obj.*fn)(a0, a1); }
 };
 
 template <class A0, class A1, class T>
@@ -117,8 +117,8 @@ class Caller2 : public CallBase2<A0, A1> {
 	T* obj;
 
 public:
-	Caller2(Fn fn, T* obj) : fn(fn), obj(obj) {}
-	virtual void Execute(const A0& a0, const A1& a1) const { (*obj.*fn)(a0, a1); }
+	inline Caller2(Fn fn, T* obj) : fn(fn), obj(obj) {}
+	virtual inline void Execute(const A0& a0, const A1& a1) const { (*obj.*fn)(a0, a1); }
 };
 
 
@@ -138,35 +138,35 @@ class Callback {
 public:
 	typedef void (*Fn)();
 	
-	Callback() {}
-	Callback(const Callback& cb) { *this = cb; }
-	Callback(CallBase* cb) { ASSERT(cb); calls.Add(cb); }
-	Callback(Fn fn) {calls.Add(new StaticCaller(fn));}
-	~Callback() { Clear(); }
-	void operator=(const Callback& cb) {
+	inline Callback() {}
+	inline Callback(const Callback& cb) { *this = cb; }
+	inline Callback(CallBase* cb) { ASSERT(cb); calls.Add(cb); }
+	inline Callback(Fn fn) {calls.Add(new StaticCaller(fn));}
+	inline ~Callback() { Clear(); }
+	inline void operator=(const Callback& cb) {
 		Clear();
 		*this << cb;
 	}
-	void operator<<(const Callback& cb) {
+	inline void operator<<(const Callback& cb) {
 		int begin = calls.GetCount();
 		calls.Append(cb.calls);
 		for (int i = begin; i < calls.GetCount(); i++)
 			calls[i].Inc();
 	}
-	void Clear() {
+	inline void Clear() {
 		for (int i = 0; i < calls.GetCount(); i++)
 			calls[i].Dec();
 		calls.Clear();
 	}
-	void Execute() const {
+	inline void Execute() const {
 		for (int i = 0; i < calls.GetCount(); i++)
 			calls[i].Execute();
 	}
 
-	void operator()() const { Execute(); }
-	operator bool() const {return calls.GetCount();}
-	String AsString() const {return "Callback";}
-	int64 AsInt() const {return calls.GetCount();}
+	inline void operator()() const { Execute(); }
+	inline operator bool() const {return calls.GetCount();}
+	inline String AsString() const {return "Callback";}
+	inline int64 AsInt() const {return calls.GetCount();}
 };
 
 
@@ -180,37 +180,37 @@ class Callback1 {
 public:
 	typedef void (*Fn)(A0);
 	
-	Callback1() {}
-	Callback1(const Callback1& cb) { *this = cb; }
-	Callback1(Base* cb) { ASSERT(cb); calls.Add(cb); }
-	Callback1(Fn fn) {Base* cb = new Base(fn); calls.Add(cb);}
-	~Callback1() { Clear(); }
-	void operator=(const Callback1& cb) {
+	inline Callback1() {}
+	inline Callback1(const Callback1& cb) { *this = cb; }
+	inline Callback1(Base* cb) { ASSERT(cb); calls.Add(cb); }
+	inline Callback1(Fn fn) {Base* cb = new Base(fn); calls.Add(cb);}
+	inline ~Callback1() { Clear(); }
+	inline void operator=(const Callback1& cb) {
 		Clear();
 		*this << cb;
 	}
-	void operator<<(const Callback1& cb) {
+	inline void operator<<(const Callback1& cb) {
 		int begin = calls.GetCount();
 		calls.Append(cb.calls);
 		for (int i = begin; i < calls.GetCount(); i++)
-			calls[i]->Inc();
+			calls[i].Inc();
 	}
-	void Clear() {
+	inline void Clear() {
 		for (int i = 0; i < calls.GetCount(); i++)
-			calls[i]->Dec();
+			calls[i].Dec();
 		calls.Clear();
 	}
-	void Execute(const A0& a0) const {
+	inline void Execute(const A0& a0) const {
 		for (int i = 0; i < calls.GetCount(); i++)
-			calls[i]->Execute(a0);
+			calls[i].Execute(a0);
 	}
 	
-	void Add(Indirect::CallBase1<A0>* call) {calls.Add(call);}
+	inline void Add(Indirect::CallBase1<A0>* call) {calls.Add(call);}
 
-	void operator()(const A0& a0) const { Execute(a0); }
-	operator bool() const {return calls.GetCount();}
-	String AsString() const {return "Callback1";}
-	int64 AsInt() const {return calls.GetCount();}
+	inline void operator()(const A0& a0) const { Execute(a0); }
+	inline operator bool() const {return calls.GetCount();}
+	inline String AsString() const {return "Callback1";}
+	inline int64 AsInt() const {return calls.GetCount();}
 };
 
 
@@ -222,29 +222,29 @@ class DynamicCallback1 {
 	
 public:
 	
-	DynamicCallback1() {}
-	DynamicCallback1(const DynamicCallback1& cb) { *this = cb; }
-	~DynamicCallback1() { Clear(); }
-	void operator=(const DynamicCallback1& cb) {
+	inline DynamicCallback1() {}
+	inline DynamicCallback1(const DynamicCallback1& cb) { *this = cb; }
+	inline ~DynamicCallback1() { Clear(); }
+	inline void operator=(const DynamicCallback1& cb) {
 		anon_cb = cb.anon_cb;
 		arg0fn = cb.arg0fn;
 	}
-	void Clear() {anon_cb.Clear(); arg0fn = 0;}
+	inline void Clear() {anon_cb.Clear(); arg0fn = 0;}
 	
 	template<class A0>
-	Callback1<A0>& Create() {
+	inline Callback1<A0>& Create() {
 		Clear();
 		typedef A0 Arg;
-		arg0fn = &Container::TypeFn<Arg>;
+		arg0fn = (void*)&Container::TypeFn<Arg>;
 		return anon_cb.Create<Callback1<Arg> >();
 	}
 	
 	template<class A0>
-	bool Execute(const A0& a0) const {
+	inline bool Execute(const A0& a0) const {
 		if (!arg0fn)
 			return true; // is not wrong type
 		typedef A0 Arg;
-		void* try_arg0fn = &Container::TypeFn<Arg>;
+		void* try_arg0fn = (void*)&Container::TypeFn<Arg>;
 		if (try_arg0fn == arg0fn) {
 			Callback1<Arg>* cb = anon_cb.TryGet<Callback1<Arg> >();
 			ASSERT(cb);
@@ -255,9 +255,9 @@ public:
 		return false; // is wrong type
 	}
 
-	operator bool() const {return (bool)anon_cb;}
-	String AsString() const {return "DynamicCallback1";}
-	int64 AsInt() const {return anon_cb.AsInt();}
+	inline operator bool() const {return (bool)anon_cb;}
+	inline String AsString() const {return "DynamicCallback1";}
+	inline int64 AsInt() const {return anon_cb.AsInt();}
 };
 
 template<class A0>
@@ -274,34 +274,34 @@ class Callback2 {
 	VectorPtr<Base> calls;
 
 public:
-	Callback2() {}
-	Callback2(const Callback2& cb) { *this = cb; }
-	Callback2(Base* cb) { ASSERT(cb); calls.Add(cb); }
-	~Callback2() { Clear(); }
-	void operator=(const Callback2& cb) {
+	inline Callback2() {}
+	inline Callback2(const Callback2& cb) { *this = cb; }
+	inline Callback2(Base* cb) { ASSERT(cb); calls.Add(cb); }
+	inline ~Callback2() { Clear(); }
+	inline void operator=(const Callback2& cb) {
 		Clear();
 		*this << cb;
 	}
-	void operator<<(const Callback2& cb) {
+	inline void operator<<(const Callback2& cb) {
 		int begin = calls.GetCount();
 		calls.Append(cb.calls);
 		for (int i = begin; i < calls.GetCount(); i++)
-			calls[i]->Inc();
+			calls[i].Inc();
 	}
-	void Clear() {
+	inline void Clear() {
 		for (int i = 0; i < calls.GetCount(); i++)
-			calls[i]->Dec();
+			calls[i].Dec();
 		calls.Clear();
 	}
-	void Execute(const A0& a0, const A1& a1) const {
+	inline void Execute(const A0& a0, const A1& a1) const {
 		for (int i = 0; i < calls.GetCount(); i++)
-			calls[i]->Execute(a0, a1);
+			calls[i].Execute(a0, a1);
 	}
 
-	void operator()(const A0& a0, const A1& a1) const { Execute(a0, a1); }
-	operator bool() const {return calls.GetCount();}
-	String AsString() const {return "Callback2";}
-	int64 AsInt() const {return calls.GetCount();}
+	inline void operator()(const A0& a0, const A1& a1) const { Execute(a0, a1); }
+	inline operator bool() const {return calls.GetCount();}
+	inline String AsString() const {return "Callback2";}
+	inline int64 AsInt() const {return calls.GetCount();}
 };
 
 
@@ -325,9 +325,9 @@ class ProxyCaller1 : public CallBase1<A0> {
 	typedef Callback1<A0> Cb;
 	const Cb* cb;
 public:
-	ProxyCaller1(const Cb& cb) : cb(&cb) {}
-	virtual void Execute(const A0& a0) const { cb->Execute(a0); }
-	operator bool() const {return cb;}
+	inline ProxyCaller1(const Cb& cb) : cb(&cb) {}
+	inline virtual void Execute(const A0& a0) const { cb->Execute(a0); }
+	inline operator bool() const {return cb;}
 };
 
 

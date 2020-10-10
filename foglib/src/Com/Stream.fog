@@ -120,7 +120,13 @@ public:
 };
 
 
-String LoadFile(String path);
+!inline String LoadFile(String path) {
+	FileIn in;
+	if (!in.Open(path))
+		return "";
+	int size = in.GetSize();
+	return in.Get(size);
+}
 
 
 !inline struct FileOut : public CharStream {

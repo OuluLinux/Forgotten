@@ -1,0 +1,22 @@
+
+name = "Medieval Madness";
+size = [371, 758];
+
+ball_r = 11;
+left_pad_ct = [113, 633];
+left_pad_tip = [149, 656];
+right_pad_dist = 120;
+left_vertdiv_x = 38;
+left_vertdiv_top = 500;
+left_limit = [
+	[0, 510],
+	[0, 106],
+	[62, 345],
+	[62, 435]];
+right_limit = [
+	[334, 476],
+	[318, 476],
+	[304, 444],
+	[296, 363],
+	[334, 235]];
+

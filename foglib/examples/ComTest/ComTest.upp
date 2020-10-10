@@ -9,6 +9,7 @@ include
 file
 	Readme.txt,
 	ComTest.mfog highlight cpp,
+	EscTest.esc,
 	"FOG Generated" readonly separator,
 	Main.hxx,
 	Main.cxx,
