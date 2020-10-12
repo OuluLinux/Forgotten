@@ -1,0 +1,404 @@
+namespace Transformer {
+
+double GPT_Sample(model, x, steps, temperature=1.0, sample=False, top_k=None) {
+	TODO
+    /*block_size = model.get_block_size()
+    model.eval()
+    for k in range(steps):
+        x_cond = x if x.size(1) <= block_size else x[:, -block_size:] # crop context if needed
+        logits, _ = model(x_cond)
+        # pluck the logits at the final step and scale by temperature
+        logits = logits[:, -1, :] / temperature
+        # optionally crop probabilities to only the top k options
+        if top_k is not None:
+            logits = top_k_logits(logits, top_k)
+        # apply softmax to convert to probabilities
+        probs = F.softmax(logits, dim=-1)
+        # sample from the distribution or take the most likely
+        if sample:
+            ix = torch.multinomial(probs, num_samples=1)
+        else:
+            _, ix = torch.topk(probs, k=1, dim=-1)
+        # append to the sequence and continue
+        x = torch.cat((x, ix), dim=1)
+
+    return x*/
+};
+    
+
+class GPTConfig {
+	VectorMap<String, String> attr;
+	double embd_pdrop	= 0.1;
+	double resid_pdrop	= 0.1;
+	double attn_pdrop	= 0.1;
+	int vocab_size = 0;
+	int block_size = 0;
+	
+public:
+	GPTConfig() {}
+	
+	void Init(int vocab_size, int block_size, const VectorMap<String, String>* attr=0) {
+		this->vocab_size = vocab_size;
+		this->block_size = block_size;
+		if (attr) {
+			for(int i = 0; i < attr->GetCount(); i++) {
+				String key = attr->GetKey(i);
+				String value = attr->GetValue(i);
+				this->attr.GetAdd(key) = value;
+			}
+		}
+	}
+};
+
+
+class GPT1Config : public GPTConfig {
+	int n_layer = 12
+	int n_head = 12
+	int n_embd = 768
+	
+public:
+	GPT1Config() {}
+	
+};
+
+class CausalSelfAttention : public Neural::Module {
+	Neural::Linear key;
+	Neural::Linear query;
+	Neural::Linear value;
+	Neural::Dropout attn_drop;
+	Neural::Dropout resid_drop;
+	Neural::Linear proj;
+	int n_head = 0;
+	
+public:
+	CausalSelfAttention() {}
+	
+	void Init(GPTConfig& conf) {
+		ASSERT(config.n_embd % config.n_head == 0);
+        
+        // key, query, value projections for all heads
+        key.Init(config.n_embd, config.n_embd)
+        query.Init(config.n_embd, config.n_embd)
+        value.Init(config.n_embd, config.n_embd)
+        
+        // regularization
+        attn_drop.Init(config.attn_pdrop)
+        resid_drop.Init(config.resid_pdrop)
+        
+        // output projection
+        proj.Init(config.n_embd, config.n_embd)
+        
+        // causal mask to ensure that attention is only applied to the left
+        // in the input sequence
+        RegisterBuffer(
+			"mask",
+			Neural::Tril(torch.ones(config.block_size, config.block_size))
+				.view(1, 1, config.block_size, config.block_size));
+        
+        n_head = config.n_head
+	}
+	
+	Neural::Layer& Forward(Neural::Layer& x, Neural::Layer* prev=0) {
+		ivec3 size = x.GetSize();
+		int& B = size[0];
+		int& T = size[1];
+		int& C = size[2];
+		
+		// Calculate query, key, values for all heads in batch and move head forward to be the
+		// batch dim.
+        k = Key(x).View(B, T, n_head, floorf(C / n_head)).Transpose(1, 2); // (B, nh, T, hs)
+        q = Query(x).View(B, T, n_head, floorf(C / n_head)).Transpose(1, 2); // (B, nh, T, hs)
+        v = Value(x).View(B, T, n_head, floorf(C / n_head)).Transpose(1, 2); // (B, nh, T, hs)
+
+        // causal self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
+        att = q.Decorate(k.transpose(-2, -1)) * (1.0 / Sqrt(k.size(-1)))
+        att = att.MaskedFill(mask[:,:,:T,:T] == 0, float('-inf'))
+        att = F.GetSoftMax(att, dim=-1)
+        att = this->AttnDrop(att)
+        y = att.Decorate(v); // (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
+        y = y.Transpose(1, 2).Contiguous().View(B, T, C); // re-assemble all head outputs side by side
+
+        // output projection
+        Neural::Layer& y = ResidDrop(Proj(y))
+        return y
+	}
+	
+};
+
+class Block : public Neural::Module {
+	Neural::LayerNorm ln1;
+	Neural::LayerNorm ln2;
+	Neural::CausalSelfAttention attn;
+	Neural::Sequential mlp;
+	
+public:
+	Block() {}
+	
+	void Init(GPTConfig& conf) {
+		ln1 = LayerNorm(config.n_embd);
+        ln2 = LayerNorm(config.n_embd);
+        attn = CausalSelfAttention(config);
+        mlp = Sequential(
+            Linear(config.n_embd, 4 * config.n_embd),
+            GELU(),
+            Linear(4 * config.n_embd, config.n_embd),
+            Dropout(config.resid_pdrop),
+        );
+	}
+	
+};
+
+class GPT : public Neural::Module {
+	int block_size = 0;
+	
+public:
+	GPT() {}
+	
+	void Init(GPTConfig& conf) {
+		// input embedding stem
+        AddEmbedding(config.vocab_size, config.n_embd)
+        AddParameter(torch.zeros(1, config.block_size, config.n_embd))
+        AddDropout(config.embd_pdrop)
+        
+        // transformer
+        AddSequential(*[Block(config) for _ in range(config.n_layer)])
+            
+        // decoder head
+        AddLayerNorm(config.n_embd)
+        AddLinear(config.n_embd, config.vocab_size, bias=False)
+
+        block_size = config.block_size
+        Apply();
+
+	}
+	
+	int GetBlockSize() const {return block_size;}
+	
+	virtual void InitWeights(Neural::Layer& l) {
+		if (l.IsLinear() || l.IsEmbedding()) {
+			l.weight.data.Normal(0.0, 0.2);
+			if (l.IsLinear() && l.bias != 0)
+				l.bias.data.Zero();
+		}
+		else if (l.IsLayerNorm()) {
+			l.bias.data.Zero();
+			l.weight.data.Fill(1.0);
+		}
+	}
+	
+    void ConfigureOptimizers(train_config) {
+        // separate out all parameters to those that will and won't experience regularizing weight decay
+        Vector<String> decay;
+        Vector<String> no_decay;
+        enabled_weight_modules.Add(NLAY_LINEAR);
+        disabled_weight_modules.Add(NLAY_LAYERNORM, NLAY_EMBEDDING);
+        
+        TODO
+        /*for mn, m in self.named_modules():
+            for pn, p in m.named_parameters():
+                fpn = '%s.%s' % (mn, pn) if mn else pn # full param name
+
+                if pn.endswith('bias'):
+                    # all biases will not be decayed
+                    no_decay.add(fpn)
+                elif pn.endswith('weight') and isinstance(m, whitelist_weight_modules):
+                    # weights of whitelist modules will be weight decayed
+                    decay.add(fpn)
+                elif pn.endswith('weight') and isinstance(m, blacklist_weight_modules):
+                    # weights of blacklist modules will NOT be weight decayed
+                    no_decay.add(fpn)*/
+		
+		// special case the position embedding parameter in the root GPT module as not decayed
+		no_decay.add("pos_emb");
+		
+		// validate that we considered every parameter
+		TODO
+		/*param_dict = {pn: p for pn, p in self.named_parameters()}
+        inter_params = decay & no_decay
+        union_params = decay | no_decay
+        assert len(inter_params) == 0, "parameters %s made it into both decay/no_decay sets!" % (str(inter_params), )
+        assert len(param_dict.keys() - union_params) == 0, "parameters %s were not separated into either decay/no_decay set!" \
+                                                    % (str(param_dict.keys() - union_params), )
+		*/
+		
+		// create the pytorch optimizer object
+		/*optim_groups = [
+            {"params": [param_dict[pn] for pn in sorted(list(decay))], "weight_decay": train_config.weight_decay},
+            {"params": [param_dict[pn] for pn in sorted(list(no_decay))], "weight_decay": 0.0},
+        ]
+        optimizer = torch.optim.AdamW(optim_groups, lr=train_config.learning_rate, betas=train_config.betas)
+        return optimizer*/
+    }
+    
+    void Forward(idx, targets) {
+        ivec idx_sz = idx.GetSize();
+        int& b = idx_sz[0];
+        int& t = idx_sz[1];
+		ASSERT_(t <= self.block_size, "Cannot forward, model block size is exhausted.");
+		
+		// forward the GPT model
+		token_embeddings = self.tok_emb(idx); // each index maps to a (learnable) vector
+        position_embeddings = self.pos_emb[:, :t, :]; // each position maps to a (learnable) vector
+        x = Drop(token_embeddings + position_embeddings);
+        x = Nlocks(x);
+        x = Ln(x);
+        logits = Head(x);
+        
+        // if we are given some desired targets also calculate the loss
+        loss = 0;
+        if (targets is not None)
+            loss = F.CrossEntropy(
+				logits.View(-1, logits.GetSize(-1)), targets.View(-1))
+		
+        //return logits, loss
+    }
+    
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////
+
+struct GPT_TrainerConfig {
+	
+	// optimization parameters
+	max_epochs = 10;
+    batch_size = 64;
+    learning_rate = 3e-4;
+    betas = (0.9, 0.95);
+    grad_norm_clip = 1.0;
+    weight_decay = 0.1; // only applied on matmul weights
+    
+    // learning rate decay params: linear warmup followed by cosine decay to 10% of original
+    lr_decay = false;
+    warmup_tokens = 375e6; // these two numbers come from the GPT-3 paper, but may not be good defaults elsewhere
+    final_tokens = 260e9; // (at what point we reach 10% of original LR)
+    
+    // checkpoint settings
+    ckpt_path = 0;
+    num_workers = 0; // for DataLoader
+    
+    TrainerConfig(VectorMap<String,String>& attr) {
+		TODO
+    }
+};
+
+
+struct GPT_Trainer {
+	
+	
+	void Init(model, train_dataset, test_dataset, config) {
+		this->model = model;
+		this->train_dataset = train_dataset;
+		this->test_dataset = test_dataset;
+		this->config = config;
+		
+		// take over whatever gpus are on the system
+		device = GetBestPerformanceNeuralDevice();
+		
+	}
+	
+	void SaveCheckpoint() {
+		// DataParallel wrappers keep raw model object in .module attribute
+		raw_model = self.model.module if hasattr(self.model, "module") else self.model;
+        logger.info("saving %s", self.config.ckpt_path);
+        torch.save(raw_model.state_dict(), self.config.ckpt_path);
+	}
+	
+	void Train() {
+		TODO
+		
+		/*model, config = self.model, self.config
+        raw_model = model.module if hasattr(self.model, "module") else model;
+        optimizer = raw_model.configure_optimizers(config);
+        
+        
+        RunEpoch();
+        
+        
+        best_loss = float('inf')
+        self.tokens = 0 # counter used for learning rate decay
+        for epoch in range(config.max_epochs):
+
+            run_epoch('train')
+            if self.test_dataset is not None:
+                test_loss = run_epoch('test')
+
+            # supports early stopping based on the test loss, or just save always if no test set is provided
+            good_model = self.test_dataset is None or test_loss < best_loss
+            if self.config.ckpt_path is not None and good_model:
+                best_loss = test_loss
+                self.save_checkpoint()*/
+	}
+	
+	
+	void RunEpoch() {
+		TODO
+		/*is_train = split == 'train'
+        model.train(is_train)
+        data = self.train_dataset if is_train else self.test_dataset
+        loader = DataLoader(data, shuffle=True, pin_memory=True,
+                            batch_size=config.batch_size,
+                            num_workers=config.num_workers)
+
+        losses = []
+        pbar = tqdm(enumerate(loader), total=len(loader)) if is_train else enumerate(loader)
+        for it, (x, y) in pbar:
+
+            # place data on the correct device
+            x = x.to(self.device)
+            y = y.to(self.device)
+
+            # forward the model
+            with torch.set_grad_enabled(is_train):
+                logits, loss = model(x, y)
+                loss = loss.mean() # collapse all losses if they are scattered on multiple gpus
+                losses.append(loss.item())
+
+            if is_train:
+
+                # backprop and update the parameters
+                model.zero_grad()
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(model.parameters(), config.grad_norm_clip)
+                optimizer.step()
+
+                # decay the learning rate based on our progress
+                if config.lr_decay:
+                    self.tokens += (y >= 0).sum() # number of tokens processed this step (i.e. label is not -100)
+                    if self.tokens < config.warmup_tokens:
+                        # linear warmup
+                        lr_mult = float(self.tokens) / float(max(1, config.warmup_tokens))
+                    else:
+                        # cosine learning rate decay
+                        progress = float(self.tokens - config.warmup_tokens) / float(max(1, config.final_tokens - config.warmup_tokens))
+                        lr_mult = max(0.1, 0.5 * (1.0 + math.cos(math.pi * progress)))
+                    lr = config.learning_rate * lr_mult
+                    for param_group in optimizer.param_groups:
+                        param_group['lr'] = lr
+                else:
+                    lr = config.learning_rate
+
+                # report progress
+                pbar.set_description(f"epoch {epoch+1} iter {it}: train loss {loss.item():.5f}. lr {lr:e}")
+
+        if not is_train:
+            test_loss = float(np.mean(losses))
+            logger.info("test loss: %f", test_loss)
+            return test_loss*/
+	}
+};
+
+
+}

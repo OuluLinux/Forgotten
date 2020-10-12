@@ -1,0 +1,28 @@
+/*
+TODO
+	net arch
+		subway
+		jailhouse
+			navigator
+			hall
+			locker
+			etc.
+		entrance
+		archive
+	
+	old code
+		wiki (weboverlay/overlay)
+		
+	protocols
+		websocket
+		telnet
+		ssh
+		http, https
+		ftp, (sftp?)
+		email (internal)
+		audiostream
+		videostream
+		instant messaging
+		irc?
+		telephoning?
+*/

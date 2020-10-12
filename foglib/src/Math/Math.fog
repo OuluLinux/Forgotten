@@ -2,9 +2,17 @@ using "Com/Com.fog";
 
 /*
 TODO:
+	all vector, matrix, etc. libs
+	units
+	maybe giac integration
+	fast eval for solved equations
+		maybe x86 asm acceleration?
+
 Core
 	Geom.h
 	DCT.h
 	GeneticOptimizer.h
 	Coordinate.h
+	
+	FFT?
 /*

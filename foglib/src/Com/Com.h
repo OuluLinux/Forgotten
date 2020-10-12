@@ -194,4 +194,6 @@ struct Console {
 
 NAMESPACE_COM_END
 
+#include "Cache.h"
+
 #endif

@@ -45,6 +45,234 @@ public:
 	void Timeout(int ms) {s->Timeout(ms);}
 };
 
+
+inline int PutInverseByteOrder(TcpSocket& out, void* data, int count) {
+	if (count <= 0) return 0;
+	thread_local static Vector<byte> tmp;
+	tmp.SetCount(count);
+	const byte* src = ((const byte*)data) + count - 1;
+	for(byte& b : tmp)
+		b = *src--;
+	int res = out.Put(tmp.Begin(), count);
+	return res;
+}
+inline int GetInverseByteOrder(TcpSocket& in, void* data, int count) {
+	if (count <= 0) return 0;
+	thread_local static Vector<byte> tmp;
+	tmp.SetCount(count);
+	int res = in.Get(tmp.Begin(), count);
+	tmp.SetCount(res);
+	byte* dst = ((byte*)dst) + res - 1;
+	for(byte& b : tmp)
+		*dst-- = b;
+	return res;
+}
+inline int PutInverseByteOrder(Stream& out, void* data, int count) {
+	if (count <= 0) return 0;
+	thread_local static Vector<byte> tmp;
+	tmp.SetCount(count);
+	const byte* src = ((const byte*)data) + count - 1;
+	for(byte& b : tmp)
+		b = *src--;
+	out.Put(tmp.Begin(), count);
+	return count;
+}
+inline int GetInverseByteOrder(Stream& in, void* data, int count) {
+	if (count <= 0) return 0;
+	thread_local static Vector<byte> tmp;
+	tmp.SetCount(count);
+	int res = in.Get(tmp.Begin(), count);
+	tmp.SetCount(res);
+	byte* dst = ((byte*)dst) + res - 1;
+	for(byte& b : tmp)
+		*dst-- = b;
+	return res;
+}
+
+#ifdef CPU_LITTLE_ENDIAN
+inline int BEPut(TcpSocket& out, void* data, int count) {return PutInverseByteOrder(out, data, count);}
+inline int BEGet(TcpSocket& in, void* data, int count) {return GetInverseByteOrder(in, data, count);}
+inline int BEPut(Stream& out, void* data, int count) {return PutInverseByteOrder(out, data, count);}
+inline int BEGet(Stream& in, void* data, int count) {return GetInverseByteOrder(in, data, count);}
+inline int LEPut(Stream& out, void* data, int count) {out.Put(data, count); return count;}
+inline int LEGet(Stream& in, void* data, int count) {return in.Get(data, count);}
+#else
+inline int BEPut(TcpSocket& out, void* data, int count) {return out.Put(data, count);}
+inline int BEGet(TcpSocket& in, void* data, int count) {return in.Get(data, count);}
+inline int BEPut(Stream& out, void* data, int count) {return out.Put(data, count);}
+inline int BEGet(Stream& in, void* data, int count) {return in.Get(data, count);}
+inline int LEGet(Stream& in, void* data, int count) {return GetInverseByteOrder(in, data, count);}
+inline int LEPut(Stream& out, void* data, int count) {return PutInverseByteOrder(out, data, count);}
+#endif
+
+
+String GetIpStringFromDword(dword b);
+
+
+
+inline dword& GetDwordRef(void*& ptr) {return *((dword*)&ptr);}
+
+class SocketPeer : Moveable<SocketPeer> {
+	
+protected:
+	friend class Socket;
+	friend struct SocketEvent;
+	ENetPeer* peer = NULL;
+	
+	SocketPeer(ENetPeer* peer) : peer(peer) {}
+	
+public:
+	SocketPeer() {}
+	SocketPeer(const SocketPeer& p) {*this = p;}
+	void operator=(const SocketPeer& p) {peer = p.peer;}
+	void SetData(dword d) {GetDwordRef(peer->data) = d;}
+	
+	bool operator==(const SocketPeer& p) const {return peer == p.peer;}
+	bool IsEmpty() const {return !peer;}
+	bool IsConnecting() const {return peer && peer->state == ENET_PEER_STATE_CONNECTING;}
+	bool IsConnected() const {return peer && (peer->state == ENET_PEER_STATE_CONNECTION_SUCCEEDED || peer->state == ENET_PEER_STATE_CONNECTED);}
+	dword GetData() const {return GetDwordRef(peer->data);}
+	int GetState() const {return peer ? peer->state : -1;}
+	String GetAddr() const {return peer ? GetIpStringFromDword(peer->address.host) : "NULL";}
+	int GetPort() const {return peer ? peer->address.port : -1;}
+	
+};
+
+class SocketPacket : Moveable<SocketPacket> {
+	
+protected:
+	friend class Socket;
+	ENetPacket* packet = NULL;
+	
+	void SetSent() {packet = NULL;}
+	
+public:
+	SocketPacket() {}
+	SocketPacket(String data, bool is_reliable=false) {Set(data, is_reliable);}
+	SocketPacket(const char* data, int len, bool is_reliable=false) {Set(data, len, is_reliable);}
+	SocketPacket(SocketPacket&& p) : packet(p.packet) {p.packet = NULL;}
+	~SocketPacket() {Clear();}
+	void Clear();
+	
+	void Set(String data, bool is_reliable);
+	void Set(const char* data, int len, bool is_reliable);
+	void Append(String data);
+	void Append(const char* data, int len);
+	bool IsEmpty() const {return packet == NULL;}
+	
+};
+
+struct SocketEvent : Moveable<SocketEvent> {
+	ENetEvent event;
+	
+	
+	bool		IsConnected() const		{return event.type == ENET_EVENT_TYPE_CONNECT;}
+	bool		IsData() const			{return event.type == ENET_EVENT_TYPE_RECEIVE;}
+	bool		IsDisconnected() const	{return event.type == ENET_EVENT_TYPE_DISCONNECT;}
+	
+	int			GetEventType() const	{return event.type;}
+	String		GetPeerAddr() const		{return GetIpStringFromDword(event.peer -> address.host);}
+	int			GetPeerPort() const		{return event.peer -> address.port;}
+	int			GetDataSize() const		{return (int)(event.packet -> dataLength);}
+	const char*	GetData() const			{return (const char*)event.packet -> data;}
+	String		GetDataString() const	{return (const char*)event.packet -> data;}
+	int			GetChannel() const		{return event.channelID;}
+	SocketPeer	GetPeer() const			{return event.peer;}
+	
+};
+
+
+class Socket : Moveable<Socket> {
+	Vector<String> data_cache;
+	mutable Mutex data_lock;
+	
+	ENetHost* host = NULL;
+	ENetAddress server_addr;
+	dword timeout = 1000;
+	bool is_listening = false;
+	int channels = 5;
+	
+public:
+	typedef Socket CLASSNAME;
+	Socket();
+	~Socket();
+	
+	bool OpenServer(uint16 port, int max_clients=100);
+	bool OpenClient();
+	void Close();
+	SocketPeer Connect(String addr, uint16 port, int timeout=5000);
+	void Disconnect(SocketPeer peer, int timeout=3000);
+	void DisconnectAll(int timeout=3000);
+	void Flush() {enet_host_flush(host);}
+	
+	bool Poll(SocketEvent& ev);
+	void Send(SocketPeer peer, SocketPacket packet, int channel=0);
+	void Broadcast(SocketPacket packet, int channel=0);
+	void Put(SocketPeer peer, String s, bool is_reliable=false) {Send(peer, SocketPacket(s, is_reliable));}
+	void Put(SocketPeer peer, const char* data, int len, bool is_reliable=false) {Send(peer, SocketPacket(data, len, is_reliable));}
+	void Put(String s, bool is_reliable=false) {Broadcast(SocketPacket(s, is_reliable));}
+	void Put(const char* data, int len, bool is_reliable=false) {Broadcast(SocketPacket(data, len, is_reliable));}
+	
+	void SetChannels(int ch) {ASSERT(ch > 0); ASSERT(!IsOpen()); channels = ch;}
+	void SetTimeout(dword ms) {timeout = ms;}
+	void SetNote(SocketPeer peer, String str);
+	
+	void GetPeers(Vector<SocketPeer>& peers) const;
+	bool IsOpen() const {return host != NULL;}
+	bool IsListening() const {return is_listening;}
+	String GetNote(SocketPeer peer) const;
+	
+	static void Init();
+	static void Deinit();
+	
+	
+};
+
+void SocketTest(bool client);
+
+
+class WebSocket {
+	typedef Native::StdWebSocket Std;
+	One<Std> s;
+	
+public:
+	WebSocket() {s.Create();}
+	~WebSocket() {}
+	
+	bool Listen(int port);
+	bool Accept(WebSocket& sock);
+	bool IsOpen();
+	void Close();
+	String GetLine(int max_len = UINT16_MAX);
+	String GetPeerAddr();
+	int Put(String str) {return Put((void*)str.Begin(), str.GetCount());}
+	int Put(const void* data, int size);
+	int Get(void* data, int size);
+	String Get(int size);
+	bool Connect(String addr, int port);
+	void Timeout(int ms);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 String TcpSocket::Get(int size) {
 	Vector<char> buf;
 	buf.SetCount(size);
@@ -70,6 +298,352 @@ String TcpSocket::GetLine(int max_len) {
 		out.Cat(chr);
 	}
 	return out;
+}
+
+
+
+
+
+
+
+
+
+
+
+void SocketPacket::Clear() {
+	if (packet) {
+		enet_packet_destroy(packet);
+		packet = NULL;
+	}
+}
+
+void SocketPacket::Set(String data, bool is_reliable) {
+	Clear();
+	packet = enet_packet_create(
+		data.Begin(),
+		data.GetCount(),
+        is_reliable ? ENET_PACKET_FLAG_RELIABLE : 0);
+}
+
+void SocketPacket::Set(const char* data, int len, bool is_reliable) {
+	Clear();
+	packet = enet_packet_create(
+		data,
+		len,
+        is_reliable ? ENET_PACKET_FLAG_RELIABLE : 0);
+}
+
+void SocketPacket::Append(String data) {
+	ASSERT(packet);
+	if (packet) {
+		int begin = packet->dataLength;
+		int len = data.GetCount();
+		int new_len = begin + len;
+		enet_packet_resize(packet, new_len);
+		memcpy(&packet->data[begin], data.Begin(), len);
+	}
+}
+
+void SocketPacket::Append(const char* data, int len) {
+	ASSERT(packet && len > 0);
+	if (packet && len > 0) {
+		int begin = packet->dataLength;
+		int new_len = begin + len;
+		enet_packet_resize(packet, new_len);
+		memcpy(&packet->data[begin], data, len);
+	}
+}
+
+
+
+Socket::Socket() {
+	
+}
+
+Socket::~Socket() {
+	Close();
+}
+
+bool Socket::OpenServer(uint16 port, int max_clients) {
+	Close();
+	
+	server_addr.host = ENET_HOST_ANY;
+	server_addr.port = port;
+	host = enet_host_create (&server_addr  /* the address to bind the server host to */,
+	                          max_clients  /* allow up to 32 clients and/or outgoing connections */,
+	                             channels  /* allow up to 2 channels to be used, 0 and 1 */,
+	                                    0  /* assume any amount of incoming bandwidth */,
+	                                    0  /* assume any amount of outgoing bandwidth */);
+	is_listening = true;
+	
+	return host != NULL;
+}
+
+bool Socket::OpenClient() {
+	Close();
+	
+	host = enet_host_create (NULL /* create a client host */,
+	            1 /* only allow 1 outgoing connection */,
+	            channels /* allow up x channels to be used */,
+	            0 /* assume any amount of incoming bandwidth */,
+	            0 /* assume any amount of outgoing bandwidth */);
+	
+	is_listening = false;
+	
+	
+	
+	return host != NULL;
+}
+
+void Socket::DisconnectAll(int timeout) {
+	if (host) {
+		ENetPeer* it = host->peers;
+		ENetPeer* end = host->peers + host->peerCount;
+		while (it != end) {
+			if (it->state == ENET_PEER_STATE_CONNECTED)
+				enet_peer_disconnect(it, 0);
+			it++;
+		}
+		
+		Sleep(timeout);
+		
+		it = host->peers;
+		while (it != end) {
+			if (it->state != ENET_PEER_STATE_DISCONNECTED)
+				enet_peer_reset(it);
+			it++;
+		}
+	}
+}
+
+void Socket::Disconnect(SocketPeer peer, int timeout) {
+	if (host && peer.peer && peer.peer->state != ENET_PEER_STATE_DISCONNECTED) {
+		enet_peer_disconnect(peer.peer, 0);
+		TimeStop ts;
+		while (ts.Elapsed() < timeout && peer.peer->state != ENET_PEER_STATE_DISCONNECTED)
+			Sleep(1);
+		enet_peer_reset(peer.peer);
+	}
+}
+
+void Socket::Close() {
+	if (host) {
+		DisconnectAll();
+		enet_host_destroy(host);
+		host = NULL;
+		is_listening = false;
+		data_cache.Clear();
+	}
+}
+
+SocketPeer Socket::Connect(String addr, uint16 port, int timeout) {
+	if (host) {
+		ENetAddress address;
+		enet_address_set_host(&address, addr.Begin());
+		address.port = port;
+		
+		ENetPeer* peer = enet_host_connect(host, &address, channels, 0);
+		
+		if (peer) {
+			ENetPacket* packet = enet_packet_create("", 0, 1);
+			ASSERT(packet);
+			enet_peer_send(peer, 0, packet);
+			
+			TimeStop ts;
+			while (ts.Elapsed() < timeout) {
+				if (peer->state == ENET_PEER_STATE_CONNECTION_SUCCEEDED ||
+					peer->state == ENET_PEER_STATE_CONNECTED)
+					break;
+				Sleep(1);
+			}
+			return peer;
+		}
+	}
+	return SocketPeer();
+}
+
+bool Socket::Poll(SocketEvent& ev) {
+	bool succ = false;
+	if (host)
+		succ = enet_host_service(host, &ev.event, timeout) > 0;
+	return succ;
+}
+
+void Socket::Send(SocketPeer peer, SocketPacket packet, int channel) {
+	ASSERT(IsOpen());
+	ASSERT(!peer.IsEmpty());
+	ASSERT(!packet.IsEmpty());
+	if (host && peer.peer && packet.packet) {
+		enet_peer_send(peer.peer, channel, packet.packet);
+		packet.packet = NULL;
+	}
+}
+
+void Socket::Broadcast(SocketPacket packet, int channel) {
+	ASSERT(IsOpen());
+	ASSERT(!packet.IsEmpty());
+	if (host && packet.packet) {
+		enet_host_broadcast(host, channel, packet.packet);
+		packet.packet = NULL;
+	}
+}
+
+void Socket::GetPeers(Vector<SocketPeer>& peers) const {
+	peers.SetCount(0);
+	if (host) {
+		peers.Reserve(host->connectedPeers);
+		ENetPeer* it = host->peers;
+		ENetPeer* end = host->peers + host->peerCount;
+		while (it != end) {
+			if (it->state == ENET_PEER_STATE_CONNECTED)
+				peers.Add(it);
+			it++;
+		}
+	}
+}
+
+void Socket::SetNote(SocketPeer peer, String str) {
+	data_lock.Enter();
+	if (peer.peer) {
+		if (peer.peer->data) {
+			dword id = GetDwordRef(peer.peer->data) - 1;
+			if (id < data_cache.GetCount())
+				data_cache[id] = str;
+		}
+		else {
+			dword id = data_cache.GetCount();
+			data_cache.Add(str);
+			GetDwordRef(peer.peer->data) = id + 1;
+		}
+	}
+	data_lock.Leave();
+}
+
+String Socket::GetNote(SocketPeer peer) const {
+	if (peer.peer && peer.peer->data) {
+		dword id = GetDwordRef(peer.peer->data) - 1;
+		if (id < data_cache.GetCount())
+			return data_cache[id];
+	}
+	return "";
+}
+
+void Socket::Init() {
+	ONCELOCK {
+		enet_initialize();
+	}
+}
+
+void Socket::Deinit() {
+	ONCELOCK {
+		enet_deinitialize();
+	}
+}
+
+
+void TestEventHandler(Socket& sock, SocketEvent& ev) {
+	if (ev.IsConnected()) {
+		String name = Format("%X", (int)Random(0x10000));
+		sock.SetNote(ev.GetPeer(), name);
+		COUT(Format("A new connection \"%s\" from %s:%d.", name, ev.GetPeerAddr(), ev.GetPeerPort()));
+		sock.Send(ev.GetPeer(), SocketPacket("Hello " + name, true));
+	}
+	else if (ev.IsData()) {
+		COUT(Format("From %s a packet of length %d containing %s was received from %s on channel %d",
+			sock.GetNote(ev.GetPeer()), ev.GetDataSize(), ev.GetDataString(), ev.GetPeerAddr(), ev.GetChannel()));
+	}
+	else if (ev.IsDisconnected()) {
+		COUT(Format("%s disconnected.", sock.GetNote(ev.GetPeer())));
+		sock.SetNote(ev.GetPeer(), "");
+	}
+	else {
+		COUT(Format("Unexpected event type %d", ev.GetEventType()));
+	}
+}
+
+void SocketTest(bool client) {
+	int duration = 5*1000;
+	TimeStop ts;
+	int port = 4242;
+	
+	if (!client) {
+		COUT("Starting server");
+		Socket sock;
+		sock.SetTimeout(200);
+		if (!sock.OpenServer(port)) {
+			COUT(Format("Couldn't listen port %d", port));
+			return;
+		}
+		COUT("Opened server");
+		
+		TimeStop sender;
+		SocketEvent ev;
+		int next_msg = 200 + Random(1000);
+		while (ts.Elapsed() < duration && !Thread::IsShutdownThreads()) {
+			if (sender.Elapsed() >= next_msg) {
+				String msg = Format("%X", (int)Random(0x10000));
+				COUT("Server is broadcasting message: " << msg);
+				sock.Broadcast(SocketPacket(msg, true));
+				next_msg = 200 + Random(1000);
+				sender.Reset();
+			}
+			else if (sock.Poll(ev)) {
+				TestEventHandler(sock, ev);
+			}
+			else Sleep(1);
+		}
+		
+		Vector<SocketPeer> peers;
+		sock.GetPeers(peers);
+		COUT("Connected peers before shutdown:");
+		for(int i = 0; i < peers.GetCount(); i++) {
+			const SocketPeer& peer = peers[i];
+			COUT("\t" << i << ":\t" << sock.GetNote(peer) << ": " << peer.GetAddr());
+		}
+		
+		COUT("Sending goodbye");
+		sock.Broadcast(SocketPacket(String("Closing now... goodbye!"), true));
+		sock.Flush();
+		
+		COUT("Closing");
+		sock.Close();
+		
+		COUT("Server closed successfully");
+	}
+	else {
+		COUT("Starting client");
+		Socket sock;
+		sock.SetTimeout(200);
+		if (!sock.OpenClient()) {
+			COUT("Couldn't open client");
+			return;
+		}
+		COUT("Opened Client");
+		
+		SocketPeer host = sock.Connect("127.0.0.1", port, 1000);
+		if (!host.IsConnecting()) {
+			COUT("Couldn't connect host in port " << port);
+			return;
+		}
+		
+		TimeStop sender;
+		SocketEvent ev;
+		int next_msg = 200 + Random(1000);
+		while (ts.Elapsed() < duration && !Thread::IsShutdownThreads()) {
+			if (sender.Elapsed() >= next_msg) {
+				String msg = Format("%X", (int)Random(0x10000));
+				COUT("Client is broadcasting message: " << msg);
+				sock.Broadcast(SocketPacket(msg, true));
+				next_msg = 200 + Random(1000);
+				sender.Reset();
+			}
+			else if (sock.Poll(ev)) {
+				TestEventHandler(sock, ev);
+			}
+			else Sleep(10);
+		}
+		COUT("Client closed successfully");
+	}
 }
 
 }

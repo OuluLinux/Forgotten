@@ -1,25 +1,50 @@
 
-namespace Prim			{};
-namespace Algorithm		{using/interface Prim;};
-namespace Lang			{using/interface Algorithm;};
-namespace Native		{using/interface Lang;};
-namespace Hash			{using/interface Native;};
-namespace Random		{using/interface Hash;};
-namespace Abstract		{using/interface Random;};
-namespace Text			{using/interface Abstract;};
-namespace Container		{using/interface Text;};
-namespace Shared		{using/interface Container;};
-namespace Stream		{using/interface Shared;};
-namespace Chrono		{using/interface Stream;};
-namespace Util			{using/interface Chrono;};
-namespace Math			{using/interface Util;};
-namespace Indirect		{using/interface Math;};
-namespace Concurrency	{using/interface Indirect;};
+/*
+Core:
+	
+	Scripting
+		ECS?
+	enet
+	
+	Crypto
+	
+	AStar etc
+	ActionPlanner
+		PipelinePlanner
+	
+	
+	CLI.h (from u++ ssh?)
+	
+	
+	
+	
+	
+*/
+
+
+namespace Prim				{};
+namespace Algorithm			{using/interface Prim;};
+namespace Lang				{using/interface Algorithm;};
+namespace Native			{using/interface Lang;};
+namespace Hash				{using/interface Native;};
+namespace Random			{using/interface Hash;};
+namespace Abstract			{using/interface Random;};
+namespace Text				{using/interface Abstract;};
+namespace Container			{using/interface Text;};
+namespace Shared			{using/interface Container;};
+namespace Stream			{using/interface Shared;};
+namespace Chrono			{using/interface Stream;};
+namespace Util				{using/interface Chrono;};
+namespace Math				{using/interface Util;};
+namespace Indirect			{using/interface Math;};
+namespace Concurrency		{using/interface Indirect;};
 namespace Network			{using/interface Concurrency;};
-namespace Interface			{using/interface Network;};
+namespace Crypto			{using/interface Network;};
+namespace Interface			{using/interface Crypto;};
 namespace LockedContainer	{using/interface Interface;};
 namespace TextProc			{using/interface LockedContainer;};
 namespace Shell				{using/interface TextProc;};
+namespace CLI				{using/interface Shell;};
 
 #define NULL 0
 
@@ -42,6 +67,7 @@ using "Com/Math.fog";
 using "Com/Indirect.fog";
 using "Com/Concurrency.fog";
 using "Com/Network.fog";
+using "Com/Crypto.fog";
 using "Com/Interface.fog";
 using "Com/LockedContainer.fog";
 using "Com/CompilerBase.fog";
@@ -49,53 +75,12 @@ using "Com/Tokenizer.fog";
 using "Com/Parser.fog";
 using "Com/JSON.fog";
 using "Com/Make.fog";
+using "Com/CLI.fog";
 using "Com/Shell.fog";
 using "Com/ShellLib.fog";
-
-/*
-Core:
-	Version.h
-	
-	ECS.h
-	Scripting
-	AStar etc
-	ActionPlanner
-		PipelinePlanner
-	
-	NativeGuiWindow
-	WindowManager
-		(Expect own shaders per window)
-	SharedMemory windows for separate processes
-	
-	Ultimate++ integration (like sdl2 backend)
-	CLI.h (from u++ ssh?)
-	Desktop basics (start menu, file manager, text editor, calc)
-	ChromiumEmbedded (sdl2 port with tweaks)
-		driver like selenium
-			site rippers
-				Internet media sources
-					free legal movies, video, audio, news (youtube-dl? soundcloud? bookmarks?)
-					entertaining social media (twitter? instagram? tiktok? pinterest? etc.)
-	MediaPlayer / FFMpeg
-		Stream server
-	Simple sound fx & music (the simplest fm synth)
-	Game gfx drawer (draw something like in commander keen (+ topdown  & bike & skateboard))
-	
-	native HtmlElements for static export and docs
-	
-	MeshNetwork (also simulated inside one app)
-	Crypto
-	
-	
-	Note: Do games after physics engine only
-	
-	
-	Transformer
-	Text-to-speech
-	Speech-to-text
-	FFT
-	
-*/
-
+using "Com/MetaCompiler.fog";
+using "Com/NatShell.fog";
+using "Com/Neural.fog";
+using "Com/Transformer.fog";
 
 

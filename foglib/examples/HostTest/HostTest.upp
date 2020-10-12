@@ -1,0 +1,9 @@
+uses
+	Host;
+
+file
+	HostTest.fog;
+
+mainconfig
+	"" = "";
+

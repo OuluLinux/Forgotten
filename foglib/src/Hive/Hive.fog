@@ -10,7 +10,36 @@ using "Hive/Program.fog";
 
 /*
 TODO:
+	"CtrlLib"
+
 Core
-	Graph.h
+	audiocore
+		fm sound+fx
+		neural guitar fx (like SmartGuitarAmp)
+	
+	basic html elements
+	gui
+	
+	window manager
+	remote windows
+		shared memory windows?
+		Ultimate++ integration (like sdl2 backend) ?
+	
+	bliss symbols
+	old poker code
+	
+	Desktop basics (start menu, file manager, text editor, calc)
+	ChromiumEmbedded (sdl2 port with tweaks)
+		driver like selenium
+			site rippers
+				Internet media sources
+					free legal movies, video, audio, news (youtube-dl? soundcloud? bookmarks?)
+					entertaining social media (twitter? instagram? tiktok? pinterest? etc.)
+	MediaPlayer / FFMpeg
+		Stream server
+	Simple sound fx & music (the simplest fm synth)
+	Game gfx drawer (draw something like in commander keen (+ topdown  & bike & skateboard))
+	
+	 
 /*
 

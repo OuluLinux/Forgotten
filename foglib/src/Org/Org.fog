@@ -1,0 +1,28 @@
+
+/*
+	check "upp-components"
+	
+	TODO
+		Graph.h
+		GraphLib
+		window manager core
+		bliss gui core
+			many "color channels" for hidden 3d info etc.
+		raw audio io
+		
+		parser generator "MetaCompiler.fog"
+			check META-II again too
+		parsers
+			simple english
+				---> natural language shell scripting "NatShell.fog"
+			glsl
+			shader script
+			gui script
+			neural script
+		
+		glsl export
+		shadertoy player
+		opencl raytracer
+		
+	
+*/

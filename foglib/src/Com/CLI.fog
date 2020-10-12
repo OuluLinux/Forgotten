@@ -1,0 +1,60 @@
+namespace CLI {
+
+namespace Native {
+
+struct TermValue {
+	int glyph;
+	short fg;
+	short bg;
+	unsigned char attr;
+	char cb;
+};
+
+struct TermBuf {
+	void* native_arg;
+	
+	TermValue* values;
+	int w;
+	int h;
+	const char* title;
+	
+	int event_type;
+	int key;
+	int mouse_x;
+	int mouse_y;
+	int mouse_event;
+	int mouse_wheel;
+	
+	
+	void (*update_callback)(void*);
+	void (*update_native)(void*);
+};
+
+void CreateNativeCLI(TermBuf* buf) :{ export/noimplementation; };
+
+}
+
+
+struct TerminalBuffer {
+	
+	
+	TerminalBuffer();
+	
+	int CreateCallback(Callback cb);
+	void RemoveCallback(int id);
+	
+	void SetTitle(String s);
+	void SetSize(Size sz);
+	void Set(Point pt, int glyph, int fg=-1, int bg=-1, int attr=-1);
+	void SetCallback(Point pt, int cb_id);
+	
+	Size GetSize() const;
+	int GetGlyph(Point pt) const;
+	int GetForeground(Point pt) const;
+	int GetBackground(Point pt) const;
+	int GetAttributes(Point pt) const;
+	
+};
+
+
+}

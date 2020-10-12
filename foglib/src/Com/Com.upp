@@ -2,6 +2,9 @@ description "\377B128,0,0";
 
 noblitz;
 
+uses
+	plugin/websocketpp;
+
 library(POSIX) pthread;
 
 file
@@ -30,6 +33,7 @@ file
 	Indirect.fog,
 	Concurrency.fog,
 	Network.fog,
+	Crypto.fog,
 	Interface.fog,
 	LockedContainer.fog,
 	CompilerBase.fog,
@@ -37,6 +41,7 @@ file
 	Parser.fog,
 	JSON.fog,
 	Make.fog,
+	CLI.fog,
 	Shell.fog,
 	ShellLib.fog,
 	"C++ Support" readonly separator,
@@ -49,6 +54,9 @@ file
 	Math.cpp,
 	Concurrency.cpp,
 	Network.cpp,
+	Cache.h,
+	Cache.cpp,
+	CLI.cpp,
 	_ readonly separator;
 
 custom() "fog",

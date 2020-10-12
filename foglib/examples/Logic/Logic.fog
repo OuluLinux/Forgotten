@@ -9,7 +9,19 @@ using/interface Com;
 
 /*
 TODO:
-Core
+	Neural scripting
+	Neural libs in torch style
+	
+	covnnetcpp old examples...
+	
 	Neural.h
+	
+	Transformer
+	wavenet
+	
+	Text-to-speech
+	Speech-to-text
+	FFT
+	
 /*
 
