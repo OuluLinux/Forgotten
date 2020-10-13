@@ -320,6 +320,7 @@ void FogTargetFile::emit_contents(FogStream& s, const FogRoot& aRoot) const {
 	}
 	
 	s << "#include <new>\n";
+	s << "#include <typeinfo>\n";
 	
 	PrimIdMap visibleFiles(_visible_files.tally());
 	

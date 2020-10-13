@@ -8,7 +8,7 @@ uses
 library(POSIX) pthread;
 
 file
-	Com.fog highlight cpp,
+	Com.fog,
 	"Notes for programmer" readonly separator,
 	Todo.txt,
 	Pitfalls.fog,
@@ -24,9 +24,10 @@ file
 	Random.fog,
 	Abstract.fog,
 	Text.fog,
+	Cache.fog,
 	Container.fog,
 	Shared.fog,
-	Stream.fog highlight cpp,
+	Stream.fog,
 	Util.fog,
 	Math.fog,
 	Chrono.fog,
@@ -54,9 +55,9 @@ file
 	Math.cpp,
 	Concurrency.cpp,
 	Network.cpp,
+	CLI.cpp,
 	Cache.h,
 	Cache.cpp,
-	CLI.cpp,
 	_ readonly separator;
 
 custom() "fog",

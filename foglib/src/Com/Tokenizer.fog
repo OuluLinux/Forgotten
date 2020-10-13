@@ -287,6 +287,8 @@ public:
 	CBase(String str, String src_name="cparser", int line=1) {t.Create(); t->Load(str, src_name, line); Load(str, src_name, t->GetTokens());}
 	CBase(String str, String src_name, const Vector<Token>& tokens) {Load(str, src_name, tokens);}
 	
+	void Dump() {TODO;}
+	
 	String GetFileName() const {return src_name;}
 	
 	void Load(String input, String src_name, const Vector<Token>& tokens);

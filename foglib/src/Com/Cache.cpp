@@ -1,12 +1,13 @@
 #include "Com.h"
 
 
-namespace Memcached {
-using namespace Upp;
+namespace Cache::Native {
 
+thread_local memcached_st *memc = 0;
+thread_local memcached_server_st *servers = 0;
+const char* memcached_error = 0;
 
-thread__ memcached_st *memc = NULL;
-thread__ memcached_server_st *servers = NULL;
+const char* GetLastError() {return memcached_error;}
 
 void InitMemcachedThread() {
 	if (memc == NULL) {
@@ -15,64 +16,77 @@ void InitMemcachedThread() {
 		
 		servers = memcached_server_list_append(servers, "localhost", 11211, &rc);
 		if (rc != MEMCACHED_SUCCESS) {
-			LOG("Memcache error: " << String(memcached_strerror(memc, rc)));
+			memcached_error = memcached_strerror(memc, rc);
 		}
 		
 		rc = memcached_server_push(memc, servers);
 		if (rc != MEMCACHED_SUCCESS) {
-			LOG("Memcache error: " << String(memcached_strerror(memc, rc)));
+			memcached_error = memcached_strerror(memc, rc);
 		}
 		
 		rc = memcached_server_push(memc, servers);
 		if (rc != MEMCACHED_SUCCESS) {
-			LOG("Memcache error: " << String(memcached_strerror(memc, rc)));
+			memcached_error = memcached_strerror(memc, rc);
 		}
 	}
 }
 
-bool ClearMemcached(String key) {
+void DeinitMemcachedThread() {
+	if (memc) {
+		memcached_free(memc);
+		memc = 0;
+	}
+}
+
+
+bool ClearMemcached(const char* key, int keylen) {
 	const char* empty_str = "";
-	memcached_return rc = memcached_set(memc, key.Begin(), key.GetCount(), empty_str, 0, (time_t)0, (uint32_t)0);
+	//int keylen = strnlen(key, 1024);
+	memcached_return rc = memcached_set(memc, key, keylen, empty_str, 0, (time_t)0, (uint32_t)0);
 	
 	if (rc != MEMCACHED_SUCCESS) {
-		LOG("Memcache error: " << String(memcached_strerror(memc, rc)));
+		memcached_error = memcached_strerror(memc, rc);
 		return false;
-	} else {
-		return true;
 	}
+	else
+		return true;
+}
+
+bool SetMemcached(const char* key, int keylen, const char* value, int valuelen) {
+	if (!memc)
+		InitMemcachedThread();
+	
+	//int keylen = strnlen(key, 1024);
+	//int valuelen = strnlen(value, 100*1024*1024);
+	memcached_return rc =
+		memcached_set(memc, key, keylen, value, valuelen, (time_t)0, (uint32_t)0);
+	
+	if (rc != MEMCACHED_SUCCESS) {
+		memcached_error = memcached_strerror(memc, rc);
+		return false;
+	}
+	else
+		return true;
+}
+
+bool GetMemcached(const char* key, int keylen, const char** value) {
+	uint32_t flags;
+	size_t value_len = 0;
+	memcached_return rc;
+	
+	*value = (const char*)memcached_get(memc, key, keylen, &value_len, &flags, &rc);
+	
+	if (rc != MEMCACHED_SUCCESS) {
+		memcached_error = memcached_strerror(memc, rc);
+		if (*value) free((void*)*value);
+		return false;
+	}
+	return true;
 }
 
 
 
-struct MemcachedTester {
-	
-	void Process() {
-		ASSERT(memc == NULL);
-		InitMemcachedThread();
-		
-		String obj;
-		ASSERT(GetMemcached("test", obj));
-		
-		LOG(Thread::GetCurrentId() << ": " << obj);
-	}
-	
-	void Test() {
-		InitMemcachedThread();
-		
-		String obj;
-		obj = "testing123123";
-		
-		ASSERT(SetMemcached("test", obj));
-		
-		for(int i = 0; i < 100; i++) {
-			Thread::Start(callback(Process));
-		}
-		Thread::ShutdownThreads();
-		
-		ASSERT(ClearMemcached("test"));
-		ASSERT(!GetMemcached("test", obj));
-	}
-};
+
 
 }
 

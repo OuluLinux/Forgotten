@@ -46,6 +46,17 @@ public:
 };
 
 
+
+
+
+
+#if 0
+
+
+
+
+
+
 inline int PutInverseByteOrder(TcpSocket& out, void* data, int count) {
 	if (count <= 0) return 0;
 	thread_local static Vector<byte> tmp;
@@ -645,6 +656,12 @@ void SocketTest(bool client) {
 		COUT("Client closed successfully");
 	}
 }
+
+
+
+#endif
+
+
 
 }
 

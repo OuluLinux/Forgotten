@@ -1216,7 +1216,7 @@ EscValue Esc::ExecuteLambda(const String& id, EscValue lambda, SRVal self, Vecto
 	if(!lambda.IsLambda())
 		ThrowError(Formater("'%s' is not a lambda")(id));
 	const EscLambda& l = lambda.GetLambda();
-	if(!l.varargs && arg.GetCount() > l.arg.GetCount()
+	if((!l.varargs && arg.GetCount() > l.arg.GetCount())
 	   || arg.GetCount() < l.arg.GetCount() - l.def.GetCount())
 		ThrowError((String)"invalid number of arguments in call to '" + id + "'");
 	Esc sub(global, l.code, op_limit, l.filename, l.line);

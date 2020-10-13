@@ -1,0 +1,77 @@
+namespace Cache {
+
+namespace Native {
+
+void InitMemcachedThread() :{ export/noimplementation; };
+void DeinitMemcachedThread() :{ export/noimplementation; };
+bool ClearMemcached(const char* key, int keylen) :{ export/noimplementation; };
+bool SetMemcached(const char* key, int keylen, const char* value, int valuelen) :{ export/noimplementation; };
+bool GetMemcached(const char* key, int keylen, const char** value) :{ export/noimplementation; };
+const char* GetLastError() :{ export/noimplementation; };
+
+}
+
+
+void InitCacheThread() {Native::InitMemcachedThread();}
+void DeinitCacheThread() {Native::DeinitMemcachedThread();}
+void ClearCache(String key) {Native::ClearMemcached(ke.Begin());}
+
+template <class T>
+bool SetCache(String key, T& obj) {
+	StringStream ss;
+	ss.SetStoring();
+	ss % obj;
+	String result = ss.GetResult();
+	
+	return Native::SetMemcached(key.Begin(), key.GetCount(), result.Begin(), result.GetCount());
+}
+
+template <class T>
+bool GetCache(String key, T& obj) {
+	const char* value = 0;
+	if (Native::GetMemcached(key.Begin(), key.GetCount(), value) && *value) {
+		int value_len = strlen(value);
+		MemStream mem(value, value_len);
+		mem.Seek(0);
+		mem.SetLoading();
+		mem % obj;
+		free(value);
+		return true;
+	}
+	return false;
+}
+
+
+
+
+struct CacheTester {
+	
+	void Process() {
+		ASSERT(memc == NULL);
+		InitCacheThread();
+		
+		String obj;
+		ASSERT(GetCache("test", obj));
+		
+		LOG(Thread::GetCurrentId() << ": " << obj);
+	}
+	
+	void Test() {
+		InitCacheThread();
+		
+		String obj;
+		obj = "testing123123";
+		
+		ASSERT(SetCache("test", obj));
+		
+		for(int i = 0; i < 100; i++) {
+			Thread::Start(callback(Process));
+		}
+		Thread::ShutdownThreads();
+		
+		ASSERT(ClearCache("test"));
+		ASSERT(!GetCache("test", obj));
+	}
+};
+
+}
