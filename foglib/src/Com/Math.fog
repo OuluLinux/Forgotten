@@ -5,6 +5,7 @@ using/interface Container;
 
 namespace Native {
 
+double Pow(double a, double b) :{ export/noimplementation; };
 double Floor(double a) :{ export/noimplementation; };
 double Round(double a) :{ export/noimplementation; };
 double Sin(double a) :{ export/noimplementation; };

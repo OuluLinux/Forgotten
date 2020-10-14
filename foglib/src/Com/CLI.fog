@@ -44,15 +44,16 @@ struct TerminalBuffer {
 	void RemoveCallback(int id);
 	
 	void SetTitle(String s);
-	void SetSize(Size sz);
-	void Set(Point pt, int glyph, int fg=-1, int bg=-1, int attr=-1);
-	void SetCallback(Point pt, int cb_id);
+	void SetSize(int w, int h);
+	void Set(int x, int y, int glyph, int fg=-1, int bg=-1, int attr=-1);
+	void SetCallback(int x, int y, int cb_id);
 	
-	Size GetSize() const;
-	int GetGlyph(Point pt) const;
-	int GetForeground(Point pt) const;
-	int GetBackground(Point pt) const;
-	int GetAttributes(Point pt) const;
+	int GetWidth() const;
+	int GetHeight() const;
+	int GetGlyph(int x, int y) const;
+	int GetForeground(int x, int y) const;
+	int GetBackground(int x, int y) const;
+	int GetAttributes(int x, int y) const;
 	
 };
 

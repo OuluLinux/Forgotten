@@ -5,6 +5,7 @@ NAMESPACE_MATH_BEGIN
 namespace Native {
 
 
+double Pow(double a, double b) {return ::pow(a, b);}
 double Floor(double a) {return ::floor(a);}
 double Round(double a) {return ::round(a);}
 double Sin(double a)   {return ::sin(a);}

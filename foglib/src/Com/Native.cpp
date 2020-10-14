@@ -124,17 +124,6 @@ void GetSysTime(short& year, byte& mon, byte& day, byte& hour, byte& min, byte& 
 	sec		= tmp.tm_sec;
 }
 
-struct HighResTimePoint {
-	high_resolution_clock::time_point start;
-	
-	void Reset();
-	int Elapsed() const;
-	double ElapsedSeconds() const;
-	int ResetElapsed();
-	double ResetElapsedSeconds();
-	static HighResTimePoint* Create();
-};
-
 void HighResTimePoint::Reset() {
 	start = high_resolution_clock::now();
 }

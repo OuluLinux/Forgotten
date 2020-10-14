@@ -58,8 +58,8 @@
 
 
 #define MACROSTR(x) #x
-#define COUT(x) {::UScript::String ____s; ____s << x; Cout() << ____s << "\n";}
-#define COUTLOG(x) {::UScript::String ____s; ____s << x; LOG(____s); Cout() << ____s << "\n";}
+#define COUT(x) {String ____s; ____s << x; Cout() << ____s << "\n";}
+#define COUTLOG(x) {String ____s; ____s << x; LOG(____s); Cout() << ____s << "\n";}
 #define TODO {Panic("TODO"); throw Exc();}
 #define SYNON_UNION_2(type, name0, name1) union {type name0; type name1;};
 

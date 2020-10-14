@@ -14,6 +14,124 @@ using/interface Network;
 using/interface TextProc;
 using/interface Shell;
 
+
+
+
+struct SocketTester {
+	
+	!inline void Test(Socket& sock, Network::Native::NetEvent& ev) {
+		if (ev.IsConnected()) {
+			String name = HexStr(Random::Range(0x10000));
+			sock.SetNote(ev.GetPeer(), name);
+			COUT(Formater("A new connection \"%s\" from %s:%d.")(name)(ev.GetPeerAddr())(ev.GetPeerPort()));
+			sock.Send(ev.GetPeer(), SocketPacket((String)"Hello " + name, true));
+		}
+		else if (ev.IsData()) {
+			COUT(Formater("From %s a packet of length %d containing %s was received from %s on channel %d")
+				(sock.GetNote(ev.GetPeer()))
+				(ev.GetDataSize())
+				(ev.GetDataString())
+				(ev.GetPeerAddr())
+				(ev.GetChannel()));
+		}
+		else if (ev.IsDisconnected()) {
+			COUT(Formater("%s disconnected.")(sock.GetNote(ev.GetPeer())));
+			sock.SetNote(ev.GetPeer(), "");
+		}
+		else {
+			COUT(Formater("Unexpected event type %d")(ev.GetEventType()));
+		}
+	}
+	
+	
+	!inline void RunTest(bool client) {
+		int duration = 5*1000;
+		TimeStop ts;
+		int port = 4242;
+		
+		if (!client) {
+			COUT("Starting server");
+			Socket sock;
+			sock.SetTimeout(200);
+			if (!sock.OpenServer(port)) {
+				COUT(Formater("Couldn't listen port %d")(port));
+				return;
+			}
+			COUT("Opened server");
+			
+			TimeStop sender;
+			Network::Native::NetEvent ev;
+			int next_msg = 200 + Random::Range(1000);
+			while (ts.Elapsed() < duration && !Thread::IsShutdownThreads()) {
+				if (sender.Elapsed() >= next_msg) {
+					String msg = HexStr(Random::Range(0x10000));
+					COUT("Server is broadcasting message: " << msg);
+					sock.Broadcast(SocketPacket(msg, true));
+					next_msg = 200 + Random::Range(1000);
+					sender.Reset();
+				}
+				else if (sock.Poll(ev)) {
+					Test(sock, ev);
+				}
+				else Sleep(1);
+			}
+			
+			Vector<SocketPeer> peers;
+			sock.GetPeers(peers);
+			COUT("Connected peers before shutdown:");
+			for(int i = 0; i < peers.GetCount(); i++) {
+				const SocketPeer& peer = peers[i];
+				COUT("\t" << i << ":\t" << sock.GetNote(peer) << ": " << peer.GetAddr());
+			}
+			
+			COUT("Sending goodbye");
+			sock.Broadcast(SocketPacket(String("Closing now... goodbye!"), true));
+			sock.Flush();
+			
+			COUT("Closing");
+			sock.Close();
+			
+			COUT("Server closed successfully");
+		}
+		else {
+			COUT("Starting client");
+			Socket sock;
+			sock.SetTimeout(200);
+			if (!sock.OpenClient()) {
+				COUT("Couldn't open client");
+				return;
+			}
+			COUT("Opened Client");
+			
+			SocketPeer host = sock.Connect("127.0.0.1", port, 1000);
+			if (!host.IsConnecting()) {
+				COUT("Couldn't connect host in port " << port);
+				return;
+			}
+			
+			TimeStop sender;
+			Network::Native::NetEvent ev;
+			int next_msg = 200 + Random::Range(1000);
+			while (ts.Elapsed() < duration && !Thread::IsShutdownThreads()) {
+				if (sender.Elapsed() >= next_msg) {
+					String msg = HexStr(Random::Range(0x10000));
+					COUT("Client is broadcasting message: " << msg);
+					sock.Broadcast(SocketPacket(msg, true));
+					next_msg = 200 + Random::Range(1000);
+					sender.Reset();
+				}
+				else if (sock.Poll(ev)) {
+					Test(sock, ev);
+				}
+				else Sleep(10);
+			}
+			COUT("Client closed successfully");
+		}
+	}
+
+};
+
+
 /*
 Esc tests:
 	

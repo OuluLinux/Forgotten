@@ -125,6 +125,31 @@ using namespace std::chrono;
 #define NAMESPACE_MATH_END		}
 
 
+namespace Native {
+
+
+struct HighResTimePoint {
+	high_resolution_clock::time_point start;
+	
+	void Reset();
+	int Elapsed() const;
+	double ElapsedSeconds() const;
+	int ResetElapsed();
+	double ResetElapsedSeconds();
+	static HighResTimePoint* Create();
+};
+
+
+}
+
+
+namespace Concurrency::Native {
+
+void Sleep(int ms);
+	
+}
+
+
 namespace Lang {
 
 template <class T> struct Ptr;

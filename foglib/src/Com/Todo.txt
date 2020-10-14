@@ -1,4 +1,8 @@
 
+Clean code:
+ - restructure native code in "namespace Com::Native {" way
+	- remove "::Native"
+
 Upgrade slow code:
  - Index: too slow search
  - use realloc in all Reserve and Shrink functions

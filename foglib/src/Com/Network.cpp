@@ -1,7 +1,42 @@
 #include "Com.h"
+#include <plugin/enet/enet.h>
+#include <plugin/websocketpp/config/asio_no_tls.hpp>
+#include <plugin/websocketpp/server.hpp>
 
 namespace Network::Native {
+using namespace Com;
 
+
+const char* GetIpStringFromDword(dword d) {
+	static thread_local char addr[4*3+3+1];
+	
+	if (!d)
+		return "0.0.0.0";
+	
+	int cur = 0;
+	bool is_invalid = false;
+	for (size_t i = 0; i < 4; i++) {
+		if (i) addr[cur++] = '.';
+		int shift = (4-1-i) * 8;
+		byte b = (d >> shift) & 0xFF;
+		bool empty = true;
+		for(int j = 0; j < 3; j++) {
+			byte mul;
+			switch (j) {
+				case 0: mul = 100; break;
+				case 1: mul = 10; break;
+				case 2: mul = 1; break;
+			}
+			int v = (b / mul) % 10;
+			if (empty && !v) continue;
+			empty = false;
+			addr[cur++] = '0' + v;
+		}
+	}
+	addr[cur++] = 0;
+
+	return addr;
+}
 
 struct StdTcpSocket {
 	#ifdef flagWIN32
@@ -36,6 +71,150 @@ struct StdTcpSocket {
 };
 
 const char* StdTcpSocket::GetLastError() {return last_error;}
+
+
+/*using websocketpp::lib::placeholders::_1;
+using websocketpp::lib::placeholders::_2;
+using websocketpp::lib::bind;*/
+
+struct StdWebSocketServer {
+	typedef websocketpp::server<websocketpp::config::asio>::message_ptr message_ptr;
+	
+	websocketpp::server<websocketpp::config::asio> server;
+	
+	
+	StdWebSocketServer();
+	void Clear();
+	void Close();
+	bool Listen(int port);
+	bool IsOpen() const;
+	int Put(const void* data, int size);
+	int Get(void* data, int size);
+	const char* GetPeerAddr() const;
+	void Timeout(int ms);
+	
+};
+
+struct StdWebSocketClient {
+	
+	void Clear();
+	void Close();
+	bool Accept(StdWebSocketServer& server);
+	bool IsOpen() const;
+	int Put(const void* data, int size);
+	int Get(void* data, int size);
+	const char* GetPeerAddr() const;
+	bool Connect(const char* addr, int port);
+	void Timeout(int ms);
+	
+};
+
+struct StdWebSocket {
+	StdWebSocketServer server;
+	StdWebSocketClient client;
+	bool is_server = false;
+	
+	bool IsServer() const {return is_server;}
+	void SwitchServer() {if (!is_server) {client.Clear(); is_server = true;}}
+	void SwitchClient() {if (is_server) {server.Clear(); is_server = false;}}
+	
+	
+	bool Listen(int port);
+	bool Accept(StdWebSocket& sock);
+	bool IsOpen();
+	void Close();
+	const char* GetLine(int max_len);
+	const char* GetPeerAddr() const;
+	int Put(const void* data, int size);
+	int Get(void* data, int size);
+	const char* Get(int size);
+	bool Connect(const char* addr, int port);
+	void Timeout(int ms);
+};
+
+
+struct NetAddress {
+	uint32	host;
+	uint16	port;
+};
+
+#define THISPACKET		((ENetPacket*)this)
+#define THISPEER		((ENetPeer*)this)
+#define THISEVENT		((ENetEvent*)this)
+#define THISHOST		((ENetHost*)this)
+
+
+struct NetPacket {
+	void Clear();
+	void Append(void* data, int len);
+	
+	static NetPacket* Create(void* data, int len, bool is_reliable);
+};
+
+
+struct NetPeer {
+	void Disconnect();
+	void Reset();
+	void*& GetDataRef();
+	void SetData(dword d);
+	void Send(int channel, NetPacket* packet);
+	
+	bool IsConnecting() const;
+	bool IsConnected() const;
+	bool IsDisconnected() const;
+	dword GetData() const;
+	int GetState() const;
+	const char* GetAddr() const;
+	int GetPort() const;
+	
+};
+
+
+struct NetEvent {
+	bool		IsConnected() const;
+	bool		IsData() const;
+	bool		IsDisconnected() const;
+	int			GetEventType() const;
+	const char*	GetPeerAddr() const;
+	int			GetPeerPort() const;
+	int			GetDataSize() const;
+	const char*	GetData() const;
+	const char*	GetDataString() const;
+	int			GetChannel() const;
+	NetPeer*	GetPeer() const;
+};
+
+struct NetHost {
+	void Flush();
+	void DisconnectPeers();
+	void ResetPeers();
+	void Destroy();
+	NetPeer* Connect(const char* addr, int port, int channels, int timeout);
+	int Poll(NetEvent* event, int timeout);
+	void Broadcast(int channel, NetPacket* p);
+	int GetPeerCount() const;
+	NetPeer* Begin();
+	NetPeer* End();
+	
+	static NetHost* Create(
+		NetAddress* addr,
+		int max_clients,
+		int channels,
+		int incoming_bandwidth,
+		int outgoing_bandwidth);
+	
+};
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -361,6 +540,17 @@ void StdTcpSocket::Timeout(int ms) {
 		setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&ms, sizeof(int));
 }
 
+void StdTcpSocket::GetPeerAddr(char* buf, int bufsize) {
+	if (!buf || bufsize <= 0) return;
+	buf[0] = 0;
+	if (!IsOpen()) return;
+	sockaddr_in client_info = {0};
+	socklen_t len = sizeof(client_info);
+	getpeername(sock, (struct sockaddr*)&client_info, &len);
+	inet_ntop(client_info.sin_family, (const void*)&client_info.sin_addr, buf, bufsize);
+}
+
+
 #else
 
 StdTcpSocket::StdTcpSocket() {
@@ -404,5 +594,478 @@ void StdTcpSocket::Timeout(int ms) {
 }
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bool StdWebSocket::Listen(int port) {
+	SwitchServer();
+	return server.Listen(port);
+}
+
+bool StdWebSocket::Accept(StdWebSocket& sock) {
+	SwitchClient();
+	ASSERT(sock.IsServer());
+	return client.Accept(sock.server);
+}
+
+bool StdWebSocket::IsOpen() {
+	if (is_server)
+		return server.IsOpen();
+	else
+		return client.IsOpen();
+}
+
+void StdWebSocket::Close() {
+	if (is_server)
+		server.Close();
+	else
+		client.Close();
+}
+
+const char* StdWebSocket::GetLine(int max_len) {
+	static thread_local std::string s;
+	s.clear();
+	if (is_server) {
+		for(int i = 0; i < max_len; i++) {
+			char c;
+			if (!server.Get(&c, 1)) break;
+			s.append(1, c);
+		}
+	}
+	else {
+		for(int i = 0; i < max_len; i++) {
+			char c;
+			if (!client.Get(&c, 1)) break;
+			s.append(1, c);
+		}
+	}
+	return s.c_str();
+}
+
+const char* StdWebSocket::GetPeerAddr() const {
+	if (is_server)
+		return server.GetPeerAddr();
+	else
+		return client.GetPeerAddr();
+}
+
+int StdWebSocket::Put(const void* data, int size) {
+	if (is_server)
+		return server.Put(data, size);
+	else
+		return client.Put(data, size);
+}
+
+int StdWebSocket::Get(void* data, int size) {
+	if (is_server)
+		return server.Get(data, size);
+	else
+		return client.Get(data, size);
+}
+
+const char* StdWebSocket::Get(int size) {
+	if (size <= 0) return 0;
+	if (size > UINT16_MAX) size = UINT16_MAX;
+	
+	static thread_local std::vector<char> v;
+	v.resize(size);
+	Get(v.data(), size);
+	return v.data();
+}
+
+bool StdWebSocket::Connect(const char* addr, int port) {
+	SwitchClient();
+	return client.Connect(addr, port);
+}
+
+void StdWebSocket::Timeout(int ms) {
+	if (is_server)
+		server.Timeout(ms);
+	else
+		client.Timeout(ms);
+}
+
+
+
+
+
+
+
+
+
+
+
+StdWebSocketServer::StdWebSocketServer() {
+	
+    // Set logging settings
+    server.set_access_channels(websocketpp::log::alevel::all);
+    server.clear_access_channels(websocketpp::log::alevel::frame_payload);
+
+    // Initialize Asio
+    server.init_asio();
+	
+}
+
+void StdWebSocketServer::Clear() {
+	
+}
+
+void StdWebSocketServer::Close() {
+	
+}
+
+bool StdWebSocketServer::Listen(int port) {
+	server.listen(port);
+}
+
+bool StdWebSocketServer::IsOpen() const {
+	
+}
+
+int StdWebSocketServer::Put(const void* data, int size) {
+	
+}
+
+int StdWebSocketServer::Get(void* data, int size) {
+	
+}
+
+const char* StdWebSocketServer::GetPeerAddr() const {
+	
+}
+
+void StdWebSocketServer::Timeout(int ms) {
+	
+}
+
+
+
+
+
+
+
+
+
+void StdWebSocketClient::Clear() {
+	
+}
+
+void StdWebSocketClient::Close() {
+	
+}
+
+bool StdWebSocketClient::Accept(StdWebSocketServer& server) {
+	
+}
+
+bool StdWebSocketClient::IsOpen() const {
+	
+}
+
+int StdWebSocketClient::Put(const void* data, int size) {
+	
+}
+
+int StdWebSocketClient::Get(void* data, int size) {
+	
+}
+
+const char* StdWebSocketClient::GetPeerAddr() const {
+	
+}
+
+bool StdWebSocketClient::Connect(const char* addr, int port) {
+	
+}
+
+void StdWebSocketClient::Timeout(int ms) {
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void NetInitialize() {
+	enet_initialize();
+}
+
+void NetDeinitialize() {
+	enet_deinitialize();
+}
+
+
+
+
+
+
+
+
+void NetPacket::Clear() {
+	enet_packet_destroy(THISPACKET);
+}
+
+NetPacket* NetPacket::Create(void* data, int len, bool is_reliable) {
+	return (NetPacket*)enet_packet_create(data, len, is_reliable);
+}
+
+void NetPacket::Append(void* data, int len) {
+	int begin = THISPACKET->dataLength;
+	int new_len = begin + len;
+	enet_packet_resize(THISPACKET, new_len);
+	memcpy(&THISPACKET->data[begin], data, len);
+}
+
+
+
+
+
+
+
+
+
+inline dword& GetDwordRef(void*& ptr) {return *((dword*)&ptr);}
+
+void NetPeer::Disconnect() {
+	enet_peer_disconnect(THISPEER, 0);
+}
+
+void NetPeer::Reset() {
+	enet_peer_reset(THISPEER);
+}
+
+void*& NetPeer::GetDataRef() {
+	return THISPEER->data;
+}
+
+void NetPeer::SetData(dword d) {
+	GetDwordRef(THISPEER->data) = d;
+}
+
+void NetPeer::Send(int channel, NetPacket* packet) {
+	enet_peer_send(THISPEER, 0, (ENetPacket*)packet);
+}
+
+
+bool NetPeer::IsConnecting() const {
+	return THISPEER->state == ENET_PEER_STATE_CONNECTING;
+}
+
+bool NetPeer::IsConnected() const {
+	return	THISPEER->state == ENET_PEER_STATE_CONNECTION_SUCCEEDED ||
+			THISPEER->state == ENET_PEER_STATE_CONNECTED;
+}
+
+bool NetPeer::IsDisconnected() const {
+	return THISPEER->state == ENET_PEER_STATE_DISCONNECTED;
+}
+
+dword NetPeer::GetData() const {
+	return GetDwordRef(THISPEER->data);
+}
+
+int NetPeer::GetState() const {
+	return THISPEER->state;
+}
+
+const char* NetPeer::GetAddr() const {
+	return GetIpStringFromDword(THISPEER->address.host);
+}
+
+int NetPeer::GetPort() const {
+	return THISPEER->address.port;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bool NetEvent::IsConnected() const {
+	return THISEVENT->type == ENET_EVENT_TYPE_CONNECT;
+}
+
+bool NetEvent::IsData() const {
+	return THISEVENT->type == ENET_EVENT_TYPE_RECEIVE;
+}
+
+bool NetEvent::IsDisconnected() const {
+	return THISEVENT->type == ENET_EVENT_TYPE_DISCONNECT;
+}
+
+int NetEvent::GetEventType() const {
+	return THISEVENT->type;
+}
+
+const char* NetEvent::GetPeerAddr() const {
+	return GetIpStringFromDword(THISEVENT->peer -> address.host);
+}
+
+int NetEvent::GetPeerPort() const {
+	return THISEVENT->peer -> address.port;
+}
+
+int NetEvent::GetDataSize() const {
+	return (int)THISEVENT->packet -> dataLength;
+}
+
+const char* NetEvent::GetData() const {
+	return (const char*)THISEVENT->packet->data;
+}
+
+const char* NetEvent::GetDataString() const {
+	return (const char*)THISEVENT->packet->data;
+}
+
+int NetEvent::GetChannel() const {
+	return THISEVENT->channelID;
+}
+
+NetPeer* NetEvent::GetPeer() const {
+	return (NetPeer*)THISEVENT->peer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void NetHost::Flush() {
+	enet_host_flush(THISHOST);
+}
+
+void NetHost::DisconnectPeers() {
+	ENetPeer* it = THISHOST->peers;
+	ENetPeer* end = THISHOST->peers + THISHOST->peerCount;
+	while (it != end) {
+		if (it->state == ENET_PEER_STATE_CONNECTED)
+			enet_peer_disconnect(it, 0);
+		it++;
+	}
+}
+
+void NetHost::ResetPeers() {
+	ENetPeer* it = THISHOST->peers;
+	ENetPeer* end = THISHOST->peers + THISHOST->peerCount;
+	while (it != end) {
+		if (it->state != ENET_PEER_STATE_DISCONNECTED)
+			enet_peer_reset(it);
+		it++;
+	}
+}
+
+void NetHost::Destroy() {
+	enet_host_destroy(THISHOST);
+}
+
+NetPeer* NetHost::Connect(const char* addr, int port, int channels, int timeout) {
+	if (!addr || !port || channels <= 0)
+		return 0;
+	int addrlen = strnlen(addr, 512);
+	if (!addrlen || addrlen >= 512)
+		return 0;
+	
+	ENetAddress address;
+	enet_address_set_host(&address, addr);
+	address.port = port;
+	
+	ENetPeer* peer = enet_host_connect(THISHOST, &address, channels, 0);
+	if (!peer)
+		return 0;
+	
+	ENetPacket* packet = enet_packet_create("", 0, 1);
+	ASSERT(packet);
+	enet_peer_send(peer, 0, packet);
+	
+	::Native::HighResTimePoint ts;
+	while (ts.Elapsed() < timeout) {
+		if (peer->state == ENET_PEER_STATE_CONNECTION_SUCCEEDED ||
+			peer->state == ENET_PEER_STATE_CONNECTED)
+			break;
+		Concurrency::Native::Sleep(1);
+	}
+	return (NetPeer*)peer;
+}
+
+int NetHost::Poll(NetEvent* event, int timeout) {
+	return enet_host_service(THISHOST, (ENetEvent*)event, timeout);
+}
+
+void NetHost::Broadcast(int channel, NetPacket* p) {
+	enet_host_broadcast(THISHOST, channel, (ENetPacket*)p);
+}
+
+int NetHost::GetPeerCount() const {
+	return THISHOST->connectedPeers;
+}
+
+NetPeer* NetHost::Begin() {
+	return (NetPeer*)THISHOST->peers;
+}
+
+NetPeer* NetHost::End() {
+	return (NetPeer*)THISHOST->peers + THISHOST->peerCount;
+}
+
+
+NetHost* NetHost::Create(
+	NetAddress* addr,
+	int max_clients,
+	int channels,
+	int incoming_bandwidth,
+	int outgoing_bandwidth) {
+	return (NetHost*)enet_host_create(
+		(ENetAddress*)addr,
+		max_clients,
+		channels,
+		incoming_bandwidth,
+		outgoing_bandwidth);
+}
+
+
+
 
 }

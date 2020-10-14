@@ -4,7 +4,9 @@ typedef uint64 key64;
 
 class Signer;
 
-class Crypto : Moveable<Crypto> {
+class Basic {
+	$MakeMoveable();
+	
 	static const int parts = 4;
 	union {
 		key64 pub;
@@ -22,8 +24,8 @@ class Crypto : Moveable<Crypto> {
 	
 	
 public:
-	typedef Crypto CLASSNAME;
-	Crypto();
+	typedef Basic CLASSNAME;
+	Basic();
 	
 	void Clear();
 	void GenerateKeys();
@@ -38,13 +40,13 @@ public:
 	String GetPrivateKey() const;
 	String GetCertificateKey() const {return cert;}
 	
-	void operator<<(const Crypto& c) {Clear(); pub = c.pub; n = c.n;}
+	void operator<<(const Basic& c) {Clear(); pub = c.pub; n = c.n;}
 	
 	
-	static double log(double d) {return log_fast_lb(d);}
-	static double sqrt(double d) {return pow_fast(d, 0.5);}
-	static double pow(double a, double b) {return ::pow(a, b);}
-	static key64 rand() {return Random(2147483647);}
+	static double log(double d) {return Math::Native::log_fast_lb(d);}
+	static double sqrt(double d) {return Math::Native::pow_fast(d, 0.5);}
+	static double pow(double a, double b) {return Math::Native::Pow(a, b);}
+	static key64 rand() {return Random::Int();}
 	
 	static key64 PowerMod(key64 pa, key64 pd, key64 pn);
 	static bool IsProst(key64 n);
@@ -61,8 +63,10 @@ public:
 };
 
 
-class Signer : public Moveable<Signer> {
-	Crypto crypto;
+class Signer {
+	$MakeMoveable();
+	
+	Basic crypto;
 	
 public:
 	typedef Signer CLASSNAME;
@@ -78,7 +82,7 @@ public:
 	
 	String Sign(String msg) const;
 	bool Verify(String msg, String sign) const;
-	bool VerifyCertification(const Crypto& crypto) const;
+	bool VerifyCertification(const Basic& crypto) const;
 	
 };
 
@@ -101,18 +105,17 @@ void EncryptionTest();
 
 
 
-
-Crypto::Crypto() {
+Basic::Basic() {
 	Clear();
 }
 
-void Crypto::Clear() {
+void Basic::Clear() {
 	pub = 0;
 	priv = 0;
 	n = 0;
 }
 
-void Crypto::GenerateKeys() {
+void Basic::GenerateKeys() {
 	String a;
 	for(int i = 0; i < 4; i++)
 		for(int j = 0; j < 0x100; j++)
@@ -120,13 +123,13 @@ void Crypto::GenerateKeys() {
 	
 	while(true) {
 		for(int i = 0; i < parts; i++) {
-			key64 p = Crypto::GenerateProst();
-			key64 q = Crypto::GenerateProst();
+			key64 p = Basic::GenerateProst();
+			key64 q = Basic::GenerateProst();
 			key64 f = (p - 1) * (q - 1);
 			
 			key64 n = p * q;
-			key64 pub = Crypto::GenerateCoprime(f);
-			key64 priv = Crypto::GenerateD(f, pub);
+			key64 pub = Basic::GenerateCoprime(f);
+			key64 priv = Basic::GenerateD(f, pub);
 			
 			if (n < 0x10000 && pub < 0x10000 && priv < 0x10000 &&
 				n > 0 && pub > 0 && priv > 0) {
@@ -145,7 +148,7 @@ void Crypto::GenerateKeys() {
 	}
 }
 
-bool Crypto::SetKeys(String pub, String priv) {
+bool Basic::SetKeys(String pub, String priv) {
 	const int len = (sizeof(key64) * 2) * 2;
 	if (pub.GetCount() != len || priv.GetCount() != len)
 		return false;
@@ -162,7 +165,7 @@ bool Crypto::SetKeys(String pub, String priv) {
 	return this->pub != 0 && this->priv != 0;
 }
 
-bool Crypto::SetPublicKey(String key) {
+bool Basic::SetPublicKey(String key) {
 	const int len = (sizeof(key64) * 2) * 2;
 	if (key.GetCount() != len)
 		return false;
@@ -172,7 +175,7 @@ bool Crypto::SetPublicKey(String key) {
 	return pub != 0 && n != 0;
 }
 
-bool Crypto::SetPrivateKey(String key) {
+bool Basic::SetPrivateKey(String key) {
 	const int len = (sizeof(key64) * 2) * 2;
 	if (key.GetCount() != len)
 		return false;
@@ -182,14 +185,14 @@ bool Crypto::SetPrivateKey(String key) {
 	return priv != 0 && n != 0;
 }
 
-bool Crypto::SetCertificateKey(const Signer& sign, String cert) {
+bool Basic::SetCertificateKey(const Signer& sign, String cert) {
 	if (!sign.Verify(GetPublicKey(), cert))
 		return false;
 	this->cert = cert;
 	return true;
 }
 
-String Crypto::KeyStr(key64 k) {
+String Basic::KeyStr(key64 k) {
 	union {
 		uint64 u64;
 		byte bytes[8];
@@ -216,7 +219,7 @@ int DigitHex(int chr) {
 		return chr - 'A' + 10;
 	return -1;
 }
-key64 Crypto::StrKey(String s) {
+key64 Basic::StrKey(String s) {
 	union {
 		uint64 u64;
 		byte bytes[8];
@@ -232,15 +235,15 @@ key64 Crypto::StrKey(String s) {
 	return u64;
 }
 
-String Crypto::GetPublicKey() const {
+String Basic::GetPublicKey() const {
 	return KeyStr(pub) + KeyStr(n);
 }
 
-String Crypto::GetPrivateKey() const {
+String Basic::GetPrivateKey() const {
 	return KeyStr(priv) + KeyStr(n);
 }
 
-String Crypto::Encrypt(String msg) const {
+String Basic::Encrypt(String msg) const {
 	ASSERT(n && pub);
 	String out;
 	out.Reserve(msg.GetCount() * 2);
@@ -268,7 +271,7 @@ String Crypto::Encrypt(String msg) const {
 	return out;
 }
 
-String Crypto::Decrypt(String msg) const {
+String Basic::Decrypt(String msg) const {
 	ASSERT(n && priv);
 	String out;
 	out.Reserve(msg.GetCount() / 2);
@@ -296,7 +299,7 @@ String Crypto::Decrypt(String msg) const {
 	return out;
 }
 
-key64 Crypto::powxy(key64 x, key64 y) {
+key64 Basic::powxy(key64 x, key64 y) {
 	const key64 M = 1e9 + 7;
     if (y == 0) return 1;
     if (y%2 == 1) return (x*powxy(x, y-1)) % M;
@@ -304,7 +307,7 @@ key64 Crypto::powxy(key64 x, key64 y) {
     return (t*t)%M;
 }
 
-key64 Crypto::PowerMod(key64 pa_, key64 pd_, key64 pn_) {
+key64 Basic::PowerMod(key64 pa_, key64 pd_, key64 pn_) {
 	//typedef __int128 BigInt;
 	typedef key64 BigInt;
 	BigInt pa = pa_;
@@ -332,7 +335,7 @@ key64 Crypto::PowerMod(key64 pa_, key64 pd_, key64 pn_) {
 	return prev;
 }
 
-bool Crypto::IsProst(key64 n) {
+bool Basic::IsProst(key64 n) {
 	bool k = true;
 	if (n != 2){
 		key64 end = (key64) sqrt(n) + 1;
@@ -346,7 +349,7 @@ bool Crypto::IsProst(key64 n) {
 	return k;
 }
 
-key64 Crypto::GenerateProst() {
+key64 Basic::GenerateProst() {
 	key64 t = 10 + rand() % 90;
 
 	do{
@@ -357,7 +360,7 @@ key64 Crypto::GenerateProst() {
 	return t;
 }
 
-key64 Crypto::Evklid(key64 num1, key64 num2) {
+key64 Basic::Evklid(key64 num1, key64 num2) {
 	key64 prev1 = max(num1,num2);
 	key64 prev0 = min(num1,num2);
 	while (prev0 != 0) {
@@ -368,7 +371,7 @@ key64 Crypto::Evklid(key64 num1, key64 num2) {
 	return prev1;
 }
 
-key64 Crypto::GenerateCoprime(key64 x) {
+key64 Basic::GenerateCoprime(key64 x) {
 	key64 i = 1 + rand() % 99;
 	do {
 		i++;
@@ -377,7 +380,7 @@ key64 Crypto::GenerateCoprime(key64 x) {
 	return i;
 }
 
-key64 Crypto::GenerateD(key64 f, key64 e) {
+key64 Basic::GenerateD(key64 f, key64 e) {
 	//return (int) ((f * (1 + rand() % 4) + 1) / e);
 	for (int i = 1; i < 100; i++) {
 		if (((f * (i) + 1) % e) == 0) {
@@ -441,7 +444,7 @@ bool Signer::Verify(String msg, String sign) const {
 	return hash.GetCount() && hash == exp_hash;
 }
 
-bool Signer::VerifyCertification(const Crypto& crypto) const {
+bool Signer::VerifyCertification(const Basic& crypto) const {
 	String cert = crypto.GetCertificateKey();
 	String pub_key = crypto.GetPublicKey();
 	String hash = MD5String(pub_key);
@@ -466,14 +469,12 @@ void EncryptionTest() {
 	
 	if (1) {
 		COUT("---- Manual usage test ----");
-		key64 e, d, n, f, p, q;
-	
-		p = Crypto::GenerateProst();
-		q = Crypto::GenerateProst();
-		f = (p-1)*(q-1);
-		n = p*q;
-		e = Crypto::GenerateCoprime(f);
-		d = Crypto::GenerateD(f,e);
+		key64 p = Basic::GenerateProst();
+		key64 q = Basic::GenerateProst();
+		key64 f = (p-1)*(q-1);
+		key64 n = p*q;
+		key64 e = Basic::GenerateCoprime(f);
+		key64 d = Basic::GenerateD(f,e);
 	
 		COUT("p = " << p);
 		COUT("q = " << q);
@@ -490,7 +491,7 @@ void EncryptionTest() {
 		COUT("Input: " << a);
 		for (int i = 0; i < a.GetCount(); i++) {
 			key64 x = a[i];
-			c.Add(Crypto::PowerMod(x,e,n));
+			c.Add(Basic::PowerMod(x,e,n));
 		}
 		
 		COUT("Mid:");
@@ -500,7 +501,7 @@ void EncryptionTest() {
 	
 		// Decryption
 		for (int i = 0; i < c.GetCount(); i++) {
-			b.Cat(Crypto::PowerMod(c[i],d,n));
+			b.Cat(Basic::PowerMod(c[i],d,n));
 		}
 		COUT("Output: " << b);
 	}
@@ -514,7 +515,10 @@ void EncryptionTest() {
 			msg.Cat(Random(0x100));
 		}
 		
-		String pub, priv, enc_msg, dec_msg;
+		String pub;
+		String priv;
+		String enc_msg;
+		String dec_msg;
 		{
 			Crypto gen;
 			gen.GenerateKeys();
@@ -569,16 +573,20 @@ void EncryptionTest() {
 			}
 		}
 		
-		COUT((msg == dec_msg ? "Success" : "Fail"));
+		if (msg == dec_msg)	{COUT("Success");}
+		else				{COUT("Fail");}
 	}
+	
 	
 	if (1) {
 		COUT("\n\n---- Trust chain test ----");
 		
 		struct Node {
 			VectorMap<int, Crypto> send;
-			Crypto recv, master_send;
-			Signer sign, master_sign;
+			Crypto recv;
+			Crypto master_send;
+			Signer sign;
+			Signer master_sign;
 			int id = -1;
 			int parent = -1;
 			
@@ -663,7 +671,8 @@ void EncryptionTest() {
 				
 				link_msg = enc_cert;
 				{
-					for(int child_id : path) {
+					for(int i = 0; i < path.GetCount(); i++) {
+						int child_id = path[i];
 						
 						// Current sends towards original sender
 						String link_enc_msg = cur->send.Get(child_id).Encrypt(link_msg);
@@ -719,7 +728,6 @@ void EncryptionTest() {
 		}
 		
 		TimeStop ts;
-		//while (ts.Elapsed() < 5*1000) {
 		for(int iter = 0; iter < 20; iter++) {
 			int from = Random(nodes.GetCount());
 			Node& f = nodes[from];
@@ -746,10 +754,14 @@ void EncryptionTest() {
 			else {
 				COUTLOG(from << " --> " << to << " sending failed");
 			}
-			
 		}
 	}
 }
+
+
+
+
+
 
 }
 
