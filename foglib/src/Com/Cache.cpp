@@ -1,5 +1,6 @@
 #include "Com.h"
 
+#if 0
 
 namespace Cache::Native {
 
@@ -91,4 +92,4 @@ bool GetMemcached(const char* key, int keylen, const char** value) {
 }
 
 
-
+#endif

@@ -135,7 +135,7 @@ void TopicEditor::ExportGroupPdf()
 	}
 }
 
-String MakeHtml(const char *title, String css, String body)
+/*String MakeHtml(const char *title, String css, String body)
 {
 	String h =
 		"<HTML>\r\n"
@@ -149,7 +149,7 @@ String MakeHtml(const char *title, String css, String body)
 		  << css << "\r\n-->\r\n</STYLE>\r\n";
 	h << "</HEAD><BODY>" << body << "</BODY>";
 	return h;
-}
+}*/
 
 void TopicEditor::ExportHTML()
 {

@@ -1,6 +1,0 @@
-uses
-	Logic;
-
-mainconfig
-	"" = "";
-

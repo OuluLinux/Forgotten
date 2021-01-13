@@ -1,9 +1,0 @@
-description "\377B0,128,0";
-
-uses
-	Com;
-
-file
-	Math.fog,
-	_ readonly separator;
-

@@ -1,27 +1,4 @@
 
-/*
-Core:
-	
-	Scripting
-		ECS?
-	enet
-	
-	Crypto
-	
-	AStar etc
-	ActionPlanner
-		PipelinePlanner
-	
-	
-	CLI.h (from u++ ssh?)
-	
-	
-	
-	
-	
-*/
-
-
 namespace Prim				{};
 namespace Algorithm			{using/interface Prim;};
 namespace Lang				{using/interface Algorithm;};
@@ -46,6 +23,8 @@ namespace LockedContainer	{using/interface Interface;};
 namespace TextProc			{using/interface LockedContainer;};
 namespace Shell				{using/interface TextProc;};
 namespace CLI				{using/interface Shell;};
+
+namespace FogLib			{using/interface CLI;};
 
 #define NULL 0
 

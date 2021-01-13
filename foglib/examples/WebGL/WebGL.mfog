@@ -1,7 +1,7 @@
-using "MachLib/MachLib.fog";
+using "Com/Com.fog";
 
 namespace WebGL {
-using/interface ManyCom;
+using/interface FogLib;
 }
 
 
@@ -13,10 +13,9 @@ class WebGLExample {
 	
 	
 	!inline public int Main() {
-		Program program(GLSLVersion::GLSL440);
+		Stream::Console::Put("Hello World!");
 		
-		String str("Testing 123");
-		Console::Put(str);
+		//Util::Cout() << "Testing 123\n";
 		
 		/*Console::Put("Vertex source:\n");
 		Console::Put(program.GetVertexSource());

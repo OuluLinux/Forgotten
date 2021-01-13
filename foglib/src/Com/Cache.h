@@ -1,6 +1,7 @@
 #ifndef _Com_Cache_h_
 #define _Com_Cache_h_
 
+#if 0
 
 #include <libmemcached/memcached.h>
 
@@ -15,5 +16,7 @@ bool SetMemcached(const char* key, const char* value);
 bool GetMemcached(const char* key, const char** value);
 
 }
+
+#endif
 
 #endif

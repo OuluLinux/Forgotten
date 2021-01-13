@@ -483,7 +483,8 @@ void EncryptionTest() {
 		COUT("e = " << e);
 		COUT("d = " << d);
 	
-		String a, b;
+		String a;
+		String b;
 		Vector<key64> c;
 		
 		//Encryption
