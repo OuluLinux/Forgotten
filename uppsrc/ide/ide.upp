@@ -19,7 +19,6 @@ uses
 	ide/Android,
 	ide/Java,
 	ide/MacroManager,
-	urepo,
 	Report;
 
 file

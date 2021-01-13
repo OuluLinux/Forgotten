@@ -3,6 +3,9 @@
 #include <plugin/websocketpp/config/asio_no_tls.hpp>
 #include <plugin/websocketpp/server.hpp>
 
+#include <plugin/websocketpp/config/asio_no_tls_client.hpp>
+#include <plugin/websocketpp/client.hpp>
+
 namespace Network::Native {
 using namespace Com;
 
@@ -73,64 +76,65 @@ struct StdTcpSocket {
 const char* StdTcpSocket::GetLastError() {return last_error;}
 
 
-/*using websocketpp::lib::placeholders::_1;
-using websocketpp::lib::placeholders::_2;
-using websocketpp::lib::bind;*/
 
-struct StdWebSocketServer {
-	typedef websocketpp::server<websocketpp::config::asio>::message_ptr message_ptr;
+class StdWebSocketServer {
+	struct connection_data {
+	    int sessionid;
+	};
+	typedef websocketpp::connection_hdl connection_hdl;
+	typedef websocketpp::server<websocketpp::config::asio> Server;
+	typedef Server::message_ptr MessagePtr;
+	typedef std::map<connection_hdl,connection_data,std::owner_less<connection_hdl>> con_list;
 	
-	websocketpp::server<websocketpp::config::asio> server;
+	Server server;
+	con_list connections;
+	int next_sessionid = 0;
+	bool verbose = false;
+	void (*fn)(void*, int, const char*, int);
+	void *fn_arg;
 	
+	void on_open(websocketpp::connection_hdl conn);
+	void on_close(websocketpp::connection_hdl conn);
+	void on_message(websocketpp::connection_hdl conn, MessagePtr msg);
+	connection_data& get_data_from_hdl(connection_hdl hdl);
 	
+public:
 	StdWebSocketServer();
-	void Clear();
+	
+	void SetVerbose(bool b);
+	void Run(int port);
+	void StopListening();
 	void Close();
-	bool Listen(int port);
-	bool IsOpen() const;
-	int Put(const void* data, int size);
-	int Get(void* data, int size);
-	const char* GetPeerAddr() const;
-	void Timeout(int ms);
+	void SetMessageCallback(void (*fn)(void*, int, const char*, int), void* arg);
+	
+	static StdWebSocketServer* Create();
+};
+
+class StdWebSocketClient {
+	typedef websocketpp::client<websocketpp::config::asio_client> Client;
+	typedef websocketpp::config::asio_client::message_type::ptr MessagePtr;
+	
+	Client c;
+	bool verbose = false;
+	void (*fn)(void*, const char*, int);
+	void *fn_arg;
+	Client::connection_ptr con;
+	
+	void on_message(websocketpp::connection_hdl conn, MessagePtr msg);
+	
+public:
+	StdWebSocketClient();
+	
+	void SetVerbose(bool b);
+	void Run(const char* ws_url);
+	void SetMessageCallback(void (*fn)(void*, const char*, int), void* arg);
+	void Put(void* data, int data_len);
+	void Close();
+	
+	static StdWebSocketClient* Create();
 	
 };
 
-struct StdWebSocketClient {
-	
-	void Clear();
-	void Close();
-	bool Accept(StdWebSocketServer& server);
-	bool IsOpen() const;
-	int Put(const void* data, int size);
-	int Get(void* data, int size);
-	const char* GetPeerAddr() const;
-	bool Connect(const char* addr, int port);
-	void Timeout(int ms);
-	
-};
-
-struct StdWebSocket {
-	StdWebSocketServer server;
-	StdWebSocketClient client;
-	bool is_server = false;
-	
-	bool IsServer() const {return is_server;}
-	void SwitchServer() {if (!is_server) {client.Clear(); is_server = true;}}
-	void SwitchClient() {if (is_server) {server.Clear(); is_server = false;}}
-	
-	
-	bool Listen(int port);
-	bool Accept(StdWebSocket& sock);
-	bool IsOpen();
-	void Close();
-	const char* GetLine(int max_len);
-	const char* GetPeerAddr() const;
-	int Put(const void* data, int size);
-	int Get(void* data, int size);
-	const char* Get(int size);
-	bool Connect(const char* addr, int port);
-	void Timeout(int ms);
-};
 
 
 struct NetAddress {
@@ -608,93 +612,6 @@ void StdTcpSocket::Timeout(int ms) {
 
 
 
-bool StdWebSocket::Listen(int port) {
-	SwitchServer();
-	return server.Listen(port);
-}
-
-bool StdWebSocket::Accept(StdWebSocket& sock) {
-	SwitchClient();
-	ASSERT(sock.IsServer());
-	return client.Accept(sock.server);
-}
-
-bool StdWebSocket::IsOpen() {
-	if (is_server)
-		return server.IsOpen();
-	else
-		return client.IsOpen();
-}
-
-void StdWebSocket::Close() {
-	if (is_server)
-		server.Close();
-	else
-		client.Close();
-}
-
-const char* StdWebSocket::GetLine(int max_len) {
-	static thread_local std::string s;
-	s.clear();
-	if (is_server) {
-		for(int i = 0; i < max_len; i++) {
-			char c;
-			if (!server.Get(&c, 1)) break;
-			s.append(1, c);
-		}
-	}
-	else {
-		for(int i = 0; i < max_len; i++) {
-			char c;
-			if (!client.Get(&c, 1)) break;
-			s.append(1, c);
-		}
-	}
-	return s.c_str();
-}
-
-const char* StdWebSocket::GetPeerAddr() const {
-	if (is_server)
-		return server.GetPeerAddr();
-	else
-		return client.GetPeerAddr();
-}
-
-int StdWebSocket::Put(const void* data, int size) {
-	if (is_server)
-		return server.Put(data, size);
-	else
-		return client.Put(data, size);
-}
-
-int StdWebSocket::Get(void* data, int size) {
-	if (is_server)
-		return server.Get(data, size);
-	else
-		return client.Get(data, size);
-}
-
-const char* StdWebSocket::Get(int size) {
-	if (size <= 0) return 0;
-	if (size > UINT16_MAX) size = UINT16_MAX;
-	
-	static thread_local std::vector<char> v;
-	v.resize(size);
-	Get(v.data(), size);
-	return v.data();
-}
-
-bool StdWebSocket::Connect(const char* addr, int port) {
-	SwitchClient();
-	return client.Connect(addr, port);
-}
-
-void StdWebSocket::Timeout(int ms) {
-	if (is_server)
-		server.Timeout(ms);
-	else
-		client.Timeout(ms);
-}
 
 
 
@@ -702,8 +619,9 @@ void StdWebSocket::Timeout(int ms) {
 
 
 
-
-
+using websocketpp::lib::placeholders::_1;
+using websocketpp::lib::placeholders::_2;
+using websocketpp::lib::bind;
 
 
 StdWebSocketServer::StdWebSocketServer() {
@@ -715,83 +633,150 @@ StdWebSocketServer::StdWebSocketServer() {
     // Initialize Asio
     server.init_asio();
 	
+    server.set_open_handler(bind(&StdWebSocketServer::on_open, this, _1));
+    server.set_close_handler(bind(&StdWebSocketServer::on_close, this, _1));
+    server.set_message_handler(bind(&StdWebSocketServer::on_message, this, _1, _2));
 }
 
-void StdWebSocketServer::Clear() {
+void StdWebSocketServer::on_open(websocketpp::connection_hdl hdl) {
+	connection_data data;
+    data.sessionid = next_sessionid++;
+
+	if (verbose)	std::cout	<< "Opening connection with sessionid " << data.sessionid << endl;
 	
+    connections[hdl] = data;
+}
+
+void StdWebSocketServer::on_close(websocketpp::connection_hdl hdl) {
+	connection_data& data = get_data_from_hdl(hdl);
+	
+	if (verbose)	std::cout	<< "Closing connection with sessionid " << data.sessionid << endl;
+	
+	connections.erase(hdl);
+}
+
+void StdWebSocketServer::on_message(websocketpp::connection_hdl hdl, MessagePtr msg) {
+	connection_data& data = get_data_from_hdl(hdl);
+	
+	std::string s = msg->get_payload();
+	if (verbose)	std::cout	<< "Got a message from connection with sessionid " << data.sessionid << endl;
+	
+	if (fn)
+		fn(fn_arg, data.sessionid, s.c_str(), s.size());
+}
+
+StdWebSocketServer::connection_data& StdWebSocketServer::get_data_from_hdl(connection_hdl hdl) {
+	auto it = connections.find(hdl);
+	
+	if (it == connections.end()) {
+		// this connection is not in the list. This really shouldn't happen
+		// and probably means something else is wrong.
+		throw std::invalid_argument("No data available for session");
+	}
+	
+	return it->second;
+}
+
+void StdWebSocketServer::SetVerbose(bool b) {verbose = b;}
+
+void StdWebSocketServer::Run(int port) {
+	server.listen(port);
+	server.start_accept();
+	server.run();
+}
+
+void StdWebSocketServer::StopListening() {
+	websocketpp::lib::error_code ec;
+	server.stop_listening(ec);
 }
 
 void StdWebSocketServer::Close() {
-	
+	server.stop();
 }
 
-bool StdWebSocketServer::Listen(int port) {
-	server.listen(port);
+void StdWebSocketServer::SetMessageCallback(void (*fn)(void*, int, const char*, int), void* arg) {
+	this->fn = fn;
+	fn_arg = arg;
 }
 
-bool StdWebSocketServer::IsOpen() const {
-	
+StdWebSocketServer* StdWebSocketServer::Create() {return new StdWebSocketServer();}
+
+
+
+
+
+
+
+
+
+StdWebSocketClient::StdWebSocketClient() {
+	// Set logging to be pretty verbose (everything except message payloads)
+    c.set_access_channels(websocketpp::log::alevel::all);
+    c.clear_access_channels(websocketpp::log::alevel::frame_payload);
+
+    // Initialize ASIO
+    c.init_asio();
+
+    // Register our message handler
+    c.set_message_handler(bind(&StdWebSocketClient::on_message, this, _1, _2));
 }
 
-int StdWebSocketServer::Put(const void* data, int size) {
-	
+void StdWebSocketClient::SetVerbose(bool b) {verbose = b;}
+
+void StdWebSocketClient::Run(const char* ws_url) {
+	if (!ws_url) return;
+	try {
+		std::string url = ws_url;
+		websocketpp::lib::error_code ec;
+		con = c.get_connection(url, ec);
+		if (ec) {
+			if (verbose)
+				std::cout << "could not create connection because: " << ec.message() << endl;
+			return;
+		}
+		
+		// Note that connect here only requests a connection. No network messages are
+        // exchanged until the event loop starts running in the next line.
+        c.connect(con);
+
+        // Start the ASIO io_service run loop
+        // this will cause a single connection to be made to the server. c.run()
+        // will exit when this connection is closed.
+        c.run();
+	}
+	catch (websocketpp::exception const & e) {
+		if (verbose)
+			std::cout << e.what() << endl;
+    }
 }
 
-int StdWebSocketServer::Get(void* data, int size) {
-	
+void StdWebSocketClient::SetMessageCallback(void (*fn)(void*, const char*, int), void* arg) {
+	this->fn = fn;
+	fn_arg = arg;
 }
 
-const char* StdWebSocketServer::GetPeerAddr() const {
+void StdWebSocketClient::StdWebSocketClient::on_message(websocketpp::connection_hdl hdl, MessagePtr msg) {
+	std::string s = msg->get_payload();
+	if (verbose)
+		std::cout	<< "Got a message (size " << s.size() << ")" << endl;
 	
+	if (fn) {
+		fn(fn_arg, s.c_str(), s.size());
+	}
 }
 
-void StdWebSocketServer::Timeout(int ms) {
-	
-}
 
-
-
-
-
-
-
-
-
-void StdWebSocketClient::Clear() {
-	
+void StdWebSocketClient::Put(void* data, int data_len) {
+	c.send(con->get_handle(), data, data_len, websocketpp::frame::opcode::binary);
 }
 
 void StdWebSocketClient::Close() {
-	
+	c.stop();
 }
 
-bool StdWebSocketClient::Accept(StdWebSocketServer& server) {
-	
-}
 
-bool StdWebSocketClient::IsOpen() const {
-	
-}
+StdWebSocketClient* StdWebSocketClient::Create() {return new StdWebSocketClient();}
 
-int StdWebSocketClient::Put(const void* data, int size) {
-	
-}
-
-int StdWebSocketClient::Get(void* data, int size) {
-	
-}
-
-const char* StdWebSocketClient::GetPeerAddr() const {
-	
-}
-
-bool StdWebSocketClient::Connect(const char* addr, int port) {
-	
-}
-
-void StdWebSocketClient::Timeout(int ms) {
-	
-}
 
 
 

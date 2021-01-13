@@ -59,6 +59,9 @@
 
 #if defined flagPOSIX
 	#include <unistd.h>
+	#include <curses.h>
+	#undef timeout
+	#define timeout_(delay)		wtimeout(stdscr,(delay))
 #endif
 
 #if defined flagMSC

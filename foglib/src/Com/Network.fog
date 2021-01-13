@@ -24,23 +24,31 @@ struct StdTcpSocket {
 };
 
 
-
-struct StdWebSocket {
-	bool Listen(int port)							:{ export/noimplementation; };
-	bool Accept(StdWebSocket& sock)					:{ export/noimplementation; };
-	bool IsOpen()									:{ export/noimplementation; };
-	void Close()									:{ export/noimplementation; };
-	const char* GetLine(int max_len = UINT16_MAX)	:{ export/noimplementation; };
-	const char* GetPeerAddr()						:{ export/noimplementation; };
-	int Put(const void* data, int size)				:{ export/noimplementation; };
-	int Get(void* data, int size)					:{ export/noimplementation; };
-	const char* Get(int size)						:{ export/noimplementation; };
-	bool Connect(const char* addr, int port)		:{ export/noimplementation; };
-	void Timeout(int ms)							:{ export/noimplementation; };
+class StdWebSocketServer {
+public:
+	
+	void SetVerbose(bool b)				:{ export/noimplementation; };
+	void Run(int port)					:{ export/noimplementation; };
+	void StopListening()				:{ export/noimplementation; };
+	void Close()						:{ export/noimplementation; };
+	//void Put(void* data, int data_len)	:{ export/noimplementation; };
+	void SetMessageCallback(void (*fn)(void*, int, const char*, int), void* arg)
+										:{ export/noimplementation; };
+	static StdWebSocketServer* Create()	:{ export/noimplementation; };
 };
 
 
-
+class StdWebSocketClient {
+public:
+	
+	void SetVerbose(bool b)				:{ export/noimplementation; };
+	void Run(const char* ws_url)		:{ export/noimplementation; };
+	void Put(void* data, int data_len)	:{ export/noimplementation; };
+	void Close()						:{ export/noimplementation; };
+	void SetMessageCallback(void (*fn)(void*, const char*, int), void* arg)
+										:{ export/noimplementation; };
+	static StdWebSocketClient* Create()	:{ export/noimplementation; };
+};
 
 
 #define ENET_HOST_ANY       0
@@ -342,7 +350,7 @@ public:
 
 
 
-class WebSocket {
+/*class WebSocket {
 	typedef Native::StdWebSocket Std;
 	One<Std> s;
 	
@@ -373,7 +381,7 @@ public:
 	bool Connect(String addr, int port) {return s->Connect(addr.Begin(), port);}
 	void Timeout(int ms) {s->Timeout(ms);}
 	Std& GetStd() {return *s;}
-};
+};*/
 
 
 

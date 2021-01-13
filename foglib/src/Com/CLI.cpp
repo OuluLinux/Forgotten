@@ -36,4 +36,19 @@ void CreateNativeCLI(TermBuf* buf) {
 	
 }
 
+
+class StdTermCtrl {
+	
+	
+public:
+	StdTermCtrl();
+	
+	void Run();
+	void MoveCursor(int x, int y);
+	int GetWidth() const;
+	int GetHeight() const;
+	
+	
+};
+
 }
